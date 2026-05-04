@@ -85,6 +85,7 @@ set(PYTYR_DEPENDENCY_HEADER_DIRS
     loki
     oneapi
     tbb
+    valla
 )
 
 set(PYTYR_DEPENDENCY_CMAKE_PACKAGES
@@ -94,6 +95,7 @@ set(PYTYR_DEPENDENCY_CMAKE_PACKAGES
     gtl
     loki
     TBB
+    valla
 )
 
 foreach(prefix IN LISTS CMAKE_PREFIX_PATH)
@@ -113,8 +115,9 @@ foreach(prefix IN LISTS CMAKE_PREFIX_PATH)
                 "${dependency_libdir}/libfmt.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
                 "${dependency_libdir}/libloki_parsers${CMAKE_SHARED_LIBRARY_SUFFIX}*"
                 "${dependency_libdir}/libloki_parsers.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
-                "${dependency_libdir}/libtbb${CMAKE_SHARED_LIBRARY_SUFFIX}*"
-                "${dependency_libdir}/libtbb.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
+                "${dependency_libdir}/libtbb*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
+                "${dependency_libdir}/libvalla${CMAKE_SHARED_LIBRARY_SUFFIX}*"
+                "${dependency_libdir}/libvalla.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
             )
             if(PYTYR_DEPENDENCY_RUNTIME_LIBRARIES)
                 install(FILES ${PYTYR_DEPENDENCY_RUNTIME_LIBRARIES}
