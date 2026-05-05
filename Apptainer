@@ -5,7 +5,6 @@ Stage: build
 %files
     CMakeLists.txt /opt/tyr/CMakeLists.txt
     LICENSE /opt/tyr/LICENSE
-    MANIFEST.in /opt/tyr/MANIFEST.in
     pyproject.toml /opt/tyr/pyproject.toml
     README.md /opt/tyr/README.md
     Config.cmake.in /opt/tyr/Config.cmake.in
@@ -16,7 +15,6 @@ Stage: build
     python /opt/tyr/python
     src /opt/tyr/src
     tests /opt/tyr/tests
-    dependencies /opt/tyr/dependencies
 
 %post
     # Set noninteractive mode for apt
@@ -38,26 +36,20 @@ Stage: build
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
 
-    # Python typing extensions for stubgen, which is used by pytyr
-    python3.10 -m pip install --no-cache-dir --upgrade typing_extensions
+    python3.10 -m pip install --no-cache-dir --upgrade pip
+    PYYGGDRASIL_JOBS=2 PYPDDL_JOBS=2 python3.10 -m pip install --no-cache-dir typing_extensions pyyggdrasil==0.0.5 pypddl==1.0.2
 
     # Set working directory
     cd /opt/tyr
 
-    # Build and install dependencies
-    cmake -S dependencies -B dependencies-build \
-        -DCMAKE_INSTALL_PREFIX=/opt/tyr/dependencies-install \
-        -DCMAKE_PREFIX_PATH=/opt/tyr/dependencies-install \
-        -DTYR_BUILD_SHARED_DEPENDENCIES=ON \
-        -DCMAKE_INSTALL_LIBDIR=lib \
-        -DPython_EXECUTABLE=/usr/bin/python3.10
-    cmake --build dependencies-build -j4
+    NATIVE_PREFIX_PATH="$(python3.10 -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')"
 
     # Build Tyr
     cmake -S . -B build \
-        -DCMAKE_PREFIX_PATH=/opt/tyr/dependencies-install \
+        -DCMAKE_PREFIX_PATH="${NATIVE_PREFIX_PATH}" \
         -DCMAKE_BUILD_TYPE=Release \
         -DPython_EXECUTABLE=/usr/bin/python3.10 \
+        -DPython3_EXECUTABLE=/usr/bin/python3.10 \
         -DBUILD_TESTS=OFF \
         -DBUILD_PROFILING=OFF \
         -DBUILD_PYTYR=OFF \
@@ -66,10 +58,14 @@ Stage: build
         -DTYR_LINK_STATIC_DEPENDENCIES=OFF \
         -DTYR_HEADER_INSTANTIATION=OFF \
         -DTYR_STATE_STORAGE_POLICY=Tree
-    cmake --build build -j4
+    cmake --build build -j2
 
     # Install Tyr to a staging directory
     cmake --install build --prefix=/opt/tyr/install
+
+    mkdir -p /opt/tyr/runtime-lib
+    cp -a "$(python3.10 -c 'import pypddl; print(pypddl.native_prefix() / "lib")')"/* /opt/tyr/runtime-lib/
+    cp -a "$(python3.10 -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"/* /opt/tyr/runtime-lib/
 
 
 # Runtime stage
@@ -80,7 +76,7 @@ Stage: runtime
 %files from build
     /opt/tyr/install /usr/local
     /opt/tyr/build/exe/gbfs_lazy /usr/local/bin/gbfs_lazy
-    /opt/tyr/dependencies-install/lib /usr/local/lib
+    /opt/tyr/runtime-lib /usr/local/lib
 
 %post
     # Install only runtime dependencies
