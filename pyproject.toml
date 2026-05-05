@@ -1,20 +1,26 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
+    "pyyggdrasil==0.0.5",
+    "pypddl==1.0.2",
 ]
 build-backend = "pytyr_build_backend"
 backend-path = ["python"]
 
 [project]
 name = "pytyr"
-version = "0.0.10"
+version = "0.0.11"
 description = "Tyr datalog/planning library"
-readme = {text = "", content-type = "text/plain"}
+readme = "README.md"
+license = "GPL-3.0-or-later"
 requires-python = ">=3.9"
 authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
 ]
-dependencies = []
+dependencies = [
+    "pyyggdrasil==0.0.5",
+    "pypddl==1.0.2",
+]
 
 [project.urls]
 Homepage = "https://github.com/drexlerd/tyr"
@@ -31,11 +37,19 @@ install.components = ["pytyr"]
 wheel.packages = []
 
 [tool.scikit-build.sdist]
-include = ["dependencies/**"]
+include = [
+    "CMakeLists.txt",
+    "Config.cmake.in",
+    "LICENSE",
+    "README.md",
+    "pyproject.toml",
+    "python/**",
+    "cmake/**",
+    "include/**",
+    "src/**",
+]
 exclude = [
     "build*/**",
-    "dependencies-build/**",
-    "dependencies-install/**",
     "python/src/pytyr.egg-info/**",
     "*.egg-info/**",
     "profiling-results/**",
@@ -55,9 +69,10 @@ TYR_HEADER_INSTANTIATION = {env = "TYR_HEADER_INSTANTIATION", default = "OFF"}
 
 [tool.cibuildwheel]
 container-engine = "docker"
+before-build = "python -m pip install --no-cache-dir pyyggdrasil==0.0.5 pypddl==1.0.2"
 
 [tool.cibuildwheel.linux]
-repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
+repair-wheel-command = "LD_LIBRARY_PATH=$(python -c 'import os, pypddl, pyyggdrasil; prefixes = [pypddl.native_prefix(), pyyggdrasil.native_prefix()]; print(os.pathsep.join(str(path) for prefix in prefixes for path in sorted(prefix.glob(\"lib*\")) if path.is_dir()))') auditwheel repair -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.macos]
-repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+repair-wheel-command = "DYLD_LIBRARY_PATH=$(python -c 'import os, pypddl, pyyggdrasil; prefixes = [pypddl.native_prefix(), pyyggdrasil.native_prefix()]; print(os.pathsep.join(str(path) for prefix in prefixes for path in sorted(prefix.glob(\"lib*\")) if path.is_dir()))') delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"

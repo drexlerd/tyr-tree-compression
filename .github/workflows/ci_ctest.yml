@@ -27,24 +27,18 @@ jobs:
 
       - name: Install python requirements
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install typing_extensions
+          python -m pip install --no-cache-dir --upgrade pip
+          python -m pip install --no-cache-dir typing_extensions pyyggdrasil==0.0.5 pypddl==1.0.2
+        env:
+          PIP_NO_CACHE_DIR: 1
+          PYYGGDRASIL_JOBS: 2
+          PYPDDL_JOBS: 2
 
       - name: Install CMake on Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake
-
-      - name: Configure, Build, and Install Dependencies
-        run: |
-          cmake -S dependencies -B dependencies-build \
-                -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/dependencies-install \
-                -DCMAKE_INSTALL_LIBDIR=lib \
-                -DTYR_BUILD_SHARED_DEPENDENCIES=ON
-          cmake --build dependencies-build -j2
-          cmake --install dependencies-build
 
       - name: Configure and Build Tyr
         run: |
@@ -53,11 +47,17 @@ jobs:
                 -DTYR_BUILD_SHARED=ON \
                 -DTYR_LINK_STATIC_DEPENDENCIES=OFF \
                 -DCMAKE_INSTALL_LIBDIR=lib \
+                -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
+                -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
                 -S . -B build_${{ matrix.build_type }} \
-                -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
+                -DCMAKE_PREFIX_PATH="$(python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')"
           cmake --build build_${{ matrix.build_type }} -j2
 
       - name: Run Tests
         working-directory: build_${{ matrix.build_type }}/tests/unit
         run: |
+          PYPDDL_LIB_DIR="$(python -c 'import pypddl; print(pypddl.native_prefix() / "lib")')"
+          PYYGGDRASIL_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
+          export DYLD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
+          export LD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
           GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V
