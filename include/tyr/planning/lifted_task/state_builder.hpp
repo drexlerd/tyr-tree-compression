@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_LIFTED_TASK_UNPACKED_STATE_HPP_
-#define TYR_PLANNING_LIFTED_TASK_UNPACKED_STATE_HPP_
+#ifndef TYR_PLANNING_LIFTED_TASK_STATE_BUILDER_HPP_
+#define TYR_PLANNING_LIFTED_TASK_STATE_BUILDER_HPP_
 
 #include "tyr/common/config.hpp"
 #include "tyr/common/dynamic_bitset.hpp"
@@ -28,9 +28,9 @@
 #include "tyr/planning/lifted_task/state_iterators.hpp"
 #include "tyr/planning/lifted_task/state_storage.hpp"
 #include "tyr/planning/state_index.hpp"
-#include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_iterators.hpp"
-#include "tyr/planning/unpacked_state.hpp"
+#include "tyr/planning/state_storage.hpp"
+#include "tyr/planning/state_builder.hpp"
 
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
@@ -55,21 +55,26 @@ struct LiftedUnpackedAtomStorageType<formalism::DerivedTag>
 template<formalism::FactKind T>
 using LiftedUnpackedAtomStorage = typename LiftedUnpackedAtomStorageType<T>::type;
 
+}
+
+namespace tyr
+{
+
 template<>
-class UnpackedState<LiftedTag>
+class Builder<planning::State<planning::LiftedTag>>
 {
 public:
-    using TaskType = Task<LiftedTag>;
+    using TaskType = planning::Task<planning::LiftedTag>;
 
-    UnpackedState() = default;
+    Builder() = default;
 
-    Index<State<LiftedTag>> get_index() const;
-    void set(Index<State<LiftedTag>> index);
+    Index<planning::State<planning::LiftedTag>> get_index() const;
+    void set(Index<planning::State<planning::LiftedTag>> index);
 
     void clear();
     void clear_unextended_part();
     void clear_extended_part();
-    void assign_unextended_part(const UnpackedState<LiftedTag>& other);
+    void assign_unextended_part(const planning::UnpackedState<planning::LiftedTag>& other);
 
     /**
      * UnpackedStateConcept
@@ -89,43 +94,43 @@ public:
     bool test(formalism::planning::GroundAtomView<formalism::DerivedTag> view) const;
     void set(formalism::planning::GroundAtomView<formalism::DerivedTag> view);
 
-    FDRFactRange<LiftedTag, formalism::FluentTag> get_fluent_facts() const noexcept;
-    AtomRange<formalism::DerivedTag> get_derived_atoms() const noexcept;
-    FunctionTermValueRange<formalism::FluentTag> get_fluent_fterm_values() const noexcept;
+    planning::FDRFactRange<planning::LiftedTag, formalism::FluentTag> get_fluent_facts() const noexcept;
+    planning::AtomRange<formalism::DerivedTag> get_derived_atoms() const noexcept;
+    planning::FunctionTermValueRange<formalism::FluentTag> get_fluent_fterm_values() const noexcept;
 
     auto get_fluent_facts_view(const formalism::planning::Repository& repository) const noexcept;
     auto get_derived_atoms_view(const formalism::planning::Repository& repository) const noexcept;
     auto get_fluent_fterm_values_view(const formalism::planning::Repository& repository) const noexcept;
 
     template<formalism::FactKind T>
-    LiftedUnpackedAtomStorage<T>& get_atoms() noexcept;
+    planning::LiftedUnpackedAtomStorage<T>& get_atoms() noexcept;
     template<formalism::FactKind T>
-    const LiftedUnpackedAtomStorage<T>& get_atoms() const noexcept;
+    const planning::LiftedUnpackedAtomStorage<T>& get_atoms() const noexcept;
 
-    planning::NumericUnpackedStorage<LiftedTag>& get_numeric_variables() noexcept;
-    const planning::NumericUnpackedStorage<LiftedTag>& get_numeric_variables() const noexcept;
+    planning::NumericUnpackedStorage<planning::LiftedTag>& get_numeric_variables() noexcept;
+    const planning::NumericUnpackedStorage<planning::LiftedTag>& get_numeric_variables() const noexcept;
 
 private:
-    Index<State<LiftedTag>> m_index;
+    Index<planning::State<planning::LiftedTag>> m_index;
 
-    planning::FactUnpackedStorage<LiftedTag> m_fact_storage;
-    planning::AtomUnpackedStorage<LiftedTag> m_atom_storage;
-    planning::NumericUnpackedStorage<LiftedTag> m_numeric_storage;
+    planning::FactUnpackedStorage<planning::LiftedTag> m_fact_storage;
+    planning::AtomUnpackedStorage<planning::LiftedTag> m_atom_storage;
+    planning::NumericUnpackedStorage<planning::LiftedTag> m_numeric_storage;
 };
 
-static_assert(UnpackedStateConcept<UnpackedState<LiftedTag>, LiftedTag>);
+static_assert(planning::UnpackedStateConcept<planning::UnpackedState<planning::LiftedTag>, planning::LiftedTag>);
 
-inline auto UnpackedState<LiftedTag>::get_fluent_facts_view(const formalism::planning::Repository& repository_) const noexcept
+inline auto Builder<planning::State<planning::LiftedTag>>::get_fluent_facts_view(const formalism::planning::Repository& repository_) const noexcept
 {
     return get_fluent_facts() | std::views::transform([repository = &repository_](auto id) { return make_view(id, *repository); });
 }
 
-inline auto UnpackedState<LiftedTag>::get_derived_atoms_view(const formalism::planning::Repository& repository_) const noexcept
+inline auto Builder<planning::State<planning::LiftedTag>>::get_derived_atoms_view(const formalism::planning::Repository& repository_) const noexcept
 {
     return get_derived_atoms() | std::views::transform([repository = &repository_](auto id) { return make_view(id, *repository); });
 }
 
-inline auto UnpackedState<LiftedTag>::get_fluent_fterm_values_view(const formalism::planning::Repository& repository_) const noexcept
+inline auto Builder<planning::State<planning::LiftedTag>>::get_fluent_fterm_values_view(const formalism::planning::Repository& repository_) const noexcept
 {
     return get_fluent_fterm_values()
            | std::views::transform([repository = &repository_](auto&& pair) { return std::make_pair(make_view(pair.first, *repository), pair.second); });

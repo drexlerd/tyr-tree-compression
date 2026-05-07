@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_AXIOM_EVALUATOR_HPP_
 #define TYR_PLANNING_LIFTED_TASK_AXIOM_EVALUATOR_HPP_
 
-#include "tyr/planning/lifted_task/unpacked_state.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 //
 #include "tyr/common/onetbb.hpp"
 #include "tyr/datalog/policies/annotation.hpp"

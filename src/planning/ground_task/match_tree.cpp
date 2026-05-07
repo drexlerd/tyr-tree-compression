@@ -34,7 +34,7 @@
 #include "tyr/planning/ground_task/match_tree/nodes/node_data.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/variable_view.hpp"
 #include "tyr/planning/ground_task/match_tree/repository.hpp"
-#include "tyr/planning/ground_task/unpacked_state.hpp"
+#include "tyr/planning/ground_task/state_builder.hpp"
 
 #include <algorithm>
 #include <cassert>

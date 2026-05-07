@@ -33,7 +33,7 @@
 #include "tyr/planning/applicability_lifted_decl.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/unpacked_state.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/node.hpp"
 
 #include <algorithm>

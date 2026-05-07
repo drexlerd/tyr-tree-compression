@@ -28,7 +28,7 @@
 #include "tyr/formalism/planning/merge_datalog.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
-#include "tyr/planning/lifted_task/unpacked_state.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 
 namespace f = tyr::formalism;
 namespace fp = tyr::formalism::planning;

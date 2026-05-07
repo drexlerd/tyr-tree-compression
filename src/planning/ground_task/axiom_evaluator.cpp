@@ -24,7 +24,7 @@
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/ground_task.hpp"
 #include "tyr/planning/ground_task/match_tree/match_tree.hpp"
-#include "tyr/planning/ground_task/unpacked_state.hpp"
+#include "tyr/planning/ground_task/state_builder.hpp"
 
 namespace tyr::planning
 {

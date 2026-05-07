@@ -28,7 +28,7 @@
 #include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/lifted_task/state_data.hpp"
 #include "tyr/planning/lifted_task/state_view.hpp"
-#include "tyr/planning/lifted_task/unpacked_state.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/task_utils.hpp"
 
 #include <fmt/ostream.h>

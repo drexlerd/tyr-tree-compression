@@ -18,6 +18,8 @@
 #ifndef TYR_PLANNING_DECLARATIONS_HPP_
 #define TYR_PLANNING_DECLARATIONS_HPP_
 
+#include "tyr/common/types.hpp"
+
 #include <concepts>
 #include <memory>
 
@@ -45,9 +47,9 @@ template<TaskKind Kind>
 struct LabeledNode;
 
 template<TaskKind Kind>
-class UnpackedState;
-template<TaskKind Kind>
 class State;
+template<TaskKind Kind>
+using UnpackedState = ::tyr::Builder<State<Kind>>;
 
 template<TaskKind Kind>
 struct StateContext;

@@ -33,7 +33,7 @@
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/lifted_task.hpp"  // for LiftedTag
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/unpacked_state.hpp"  // for UnpackedState
+#include "tyr/planning/lifted_task/state_builder.hpp"  // for UnpackedState
 #include "tyr/planning/task_utils.hpp"                  // for insert_fact_s...
 
 #include <cista/containers/hash_storage.h>  // for operator!=

@@ -18,7 +18,7 @@
 #include "tyr/planning/ground_task.hpp"
 #include "tyr/planning/ground_task/state_repository.hpp"
 #include "tyr/planning/ground_task/state_view.hpp"
-#include "tyr/planning/ground_task/unpacked_state.hpp"
+#include "tyr/planning/ground_task/state_builder.hpp"
 
 #include <cassert>
 #include <limits>
@@ -26,8 +26,9 @@
 namespace f = tyr::formalism;
 namespace fp = tyr::formalism::planning;
 
-namespace tyr::planning
+namespace tyr
 {
+using namespace planning;
 
 Index<State<GroundTag>> UnpackedState<GroundTag>::get_index() const { return m_index; }
 
@@ -142,19 +143,13 @@ GroundStateView& GroundStateView::operator=(View&&) noexcept = default;
 
 Index<planning::State<planning::GroundTag>> GroundStateView::get_index() const { return m_unpacked->get_index(); }
 
-formalism::planning::FDRValue GroundStateView::get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const
-{
-    return m_unpacked->get(index);
-}
+formalism::planning::FDRValue GroundStateView::get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const { return m_unpacked->get(index); }
 
 float_t GroundStateView::get(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index) const { return m_unpacked->get(index); }
 
 bool GroundStateView::test(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index) const { return m_unpacked->test(index); }
 
-const std::shared_ptr<planning::StateRepository<planning::GroundTag>>& GroundStateView::get_state_repository() const noexcept
-{
-    return m_state_repository;
-}
+const std::shared_ptr<planning::StateRepository<planning::GroundTag>>& GroundStateView::get_state_repository() const noexcept { return m_state_repository; }
 
 const planning::UnpackedState<planning::GroundTag>& GroundStateView::get_unpacked_state() const noexcept { return *m_unpacked; }
 
@@ -164,10 +159,7 @@ bool GroundStateView::test(formalism::planning::GroundAtomView<formalism::Static
 
 float_t GroundStateView::get(formalism::planning::GroundFunctionTermView<formalism::StaticTag> view) const { return get(view.get_index()); }
 
-formalism::planning::FDRValue GroundStateView::get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const
-{
-    return get(view.get_index());
-}
+formalism::planning::FDRValue GroundStateView::get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const { return get(view.get_index()); }
 
 float_t GroundStateView::get(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view) const { return get(view.get_index()); }
 

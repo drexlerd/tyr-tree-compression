@@ -15,11 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_UNPACKED_STATE_HPP_
-#define TYR_PLANNING_UNPACKED_STATE_HPP_
+#ifndef TYR_PLANNING_STATE_BUILDER_HPP_
+#define TYR_PLANNING_STATE_BUILDER_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/planning/fdr_value.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -29,9 +28,6 @@
 
 namespace tyr::planning
 {
-
-template<TaskKind Kind>
-class UnpackedState;
 
 template<typename T, typename Kind>
 concept UnpackedStateConcept = requires(T& s,

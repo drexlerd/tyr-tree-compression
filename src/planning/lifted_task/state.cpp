@@ -18,13 +18,14 @@
 #include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/lifted_task/state_repository.hpp"
 #include "tyr/planning/lifted_task/state_view.hpp"
-#include "tyr/planning/lifted_task/unpacked_state.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 
 #include <cassert>
 #include <limits>
 
-namespace tyr::planning
+namespace tyr
 {
+using namespace planning;
 
 Index<State<LiftedTag>> UnpackedState<LiftedTag>::get_index() const { return m_index; }
 
@@ -70,10 +71,7 @@ void UnpackedState<LiftedTag>::set(formalism::planning::FDRFactView<formalism::F
 
 float_t UnpackedState<LiftedTag>::get(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view) const { return get(view.get_index()); }
 
-void UnpackedState<LiftedTag>::set(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view, float_t value)
-{
-    set(view.get_index(), value);
-}
+void UnpackedState<LiftedTag>::set(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view, float_t value) { set(view.get_index(), value); }
 
 bool UnpackedState<LiftedTag>::test(formalism::planning::GroundAtomView<formalism::DerivedTag> view) const { return test(view.get_index()); }
 
@@ -165,19 +163,13 @@ LiftedStateView& LiftedStateView::operator=(View&&) noexcept = default;
 
 Index<planning::State<planning::LiftedTag>> LiftedStateView::get_index() const { return m_unpacked->get_index(); }
 
-formalism::planning::FDRValue LiftedStateView::get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const
-{
-    return m_unpacked->get(index);
-}
+formalism::planning::FDRValue LiftedStateView::get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const { return m_unpacked->get(index); }
 
 float_t LiftedStateView::get(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index) const { return m_unpacked->get(index); }
 
 bool LiftedStateView::test(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index) const { return m_unpacked->test(index); }
 
-const std::shared_ptr<planning::StateRepository<planning::LiftedTag>>& LiftedStateView::get_state_repository() const noexcept
-{
-    return m_state_repository;
-}
+const std::shared_ptr<planning::StateRepository<planning::LiftedTag>>& LiftedStateView::get_state_repository() const noexcept { return m_state_repository; }
 
 const planning::UnpackedState<planning::LiftedTag>& LiftedStateView::get_unpacked_state() const noexcept { return *m_unpacked; }
 
@@ -185,10 +177,7 @@ bool LiftedStateView::test(formalism::planning::GroundAtomView<formalism::Static
 
 float_t LiftedStateView::get(formalism::planning::GroundFunctionTermView<formalism::StaticTag> view) const { return get(view.get_index()); }
 
-formalism::planning::FDRValue LiftedStateView::get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const
-{
-    return get(view.get_index());
-}
+formalism::planning::FDRValue LiftedStateView::get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const { return get(view.get_index()); }
 
 float_t LiftedStateView::get(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view) const { return get(view.get_index()); }
 

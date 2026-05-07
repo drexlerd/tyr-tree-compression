@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_AXIOM_EVALUATOR_HPP_
 #define TYR_PLANNING_GROUND_TASK_AXIOM_EVALUATOR_HPP_
 
-#include "tyr/planning/ground_task/unpacked_state.hpp"
+#include "tyr/planning/ground_task/state_builder.hpp"
 //
 #include "tyr/formalism/planning/ground_axiom_index.hpp"
 #include "tyr/planning/axiom_evaluator.hpp"

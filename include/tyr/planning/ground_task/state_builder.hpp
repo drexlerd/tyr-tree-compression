@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_GROUND_TASK_UNPACKED_STATE_HPP_
-#define TYR_PLANNING_GROUND_TASK_UNPACKED_STATE_HPP_
+#ifndef TYR_PLANNING_GROUND_TASK_STATE_BUILDER_HPP_
+#define TYR_PLANNING_GROUND_TASK_STATE_BUILDER_HPP_
 
 #include "tyr/common/config.hpp"
 #include "tyr/common/dynamic_bitset.hpp"
@@ -28,7 +28,7 @@
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task/state_storage.hpp"
 #include "tyr/planning/state_storage.hpp"
-#include "tyr/planning/unpacked_state.hpp"
+#include "tyr/planning/state_builder.hpp"
 
 #include <boost/dynamic_bitset.hpp>
 #include <cassert>
@@ -55,20 +55,25 @@ struct GroundUnpackedAtomStorageType<formalism::DerivedTag>
 template<formalism::FactKind T>
 using GroundUnpackedAtomStorage = typename GroundUnpackedAtomStorageType<T>::type;
 
+}
+
+namespace tyr
+{
+
 template<>
-class UnpackedState<GroundTag>
+class Builder<planning::State<planning::GroundTag>>
 {
 public:
-    using TaskType = Task<GroundTag>;
+    using TaskType = planning::Task<planning::GroundTag>;
 
-    UnpackedState() = default;
+    Builder() = default;
 
     /**
      * UnpackedStateConcept
      */
 
-    Index<State<GroundTag>> get_index() const;
-    void set(Index<State<GroundTag>> index);
+    Index<planning::State<planning::GroundTag>> get_index() const;
+    void set(Index<planning::State<planning::GroundTag>> index);
 
     formalism::planning::FDRValue get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const;
     void set(Data<formalism::planning::FDRFact<formalism::FluentTag>> fact);
@@ -82,7 +87,7 @@ public:
     void clear();
     void clear_unextended_part();
     void clear_extended_part();
-    void assign_unextended_part(const UnpackedState<GroundTag>& other);
+    void assign_unextended_part(const planning::UnpackedState<planning::GroundTag>& other);
 
     /**
      * For GroundTag
@@ -92,22 +97,22 @@ public:
     void resize_derived_atoms(size_t num_derived_atoms);
 
     template<formalism::FactKind T>
-    GroundUnpackedAtomStorage<T>& get_atoms() noexcept;
+    planning::GroundUnpackedAtomStorage<T>& get_atoms() noexcept;
     template<formalism::FactKind T>
-    const GroundUnpackedAtomStorage<T>& get_atoms() const noexcept;
+    const planning::GroundUnpackedAtomStorage<T>& get_atoms() const noexcept;
 
-    planning::NumericUnpackedStorage<GroundTag>& get_numeric_variables() noexcept;
-    const planning::NumericUnpackedStorage<GroundTag>& get_numeric_variables() const noexcept;
+    planning::NumericUnpackedStorage<planning::GroundTag>& get_numeric_variables() noexcept;
+    const planning::NumericUnpackedStorage<planning::GroundTag>& get_numeric_variables() const noexcept;
 
 private:
-    Index<State<GroundTag>> m_index;
+    Index<planning::State<planning::GroundTag>> m_index;
 
-    planning::FactUnpackedStorage<GroundTag> m_fact_storage;
-    planning::AtomUnpackedStorage<GroundTag> m_atom_storage;
-    planning::NumericUnpackedStorage<GroundTag> m_numeric_storage;
+    planning::FactUnpackedStorage<planning::GroundTag> m_fact_storage;
+    planning::AtomUnpackedStorage<planning::GroundTag> m_atom_storage;
+    planning::NumericUnpackedStorage<planning::GroundTag> m_numeric_storage;
 };
 
-static_assert(UnpackedStateConcept<UnpackedState<GroundTag>, GroundTag>);
+static_assert(planning::UnpackedStateConcept<planning::UnpackedState<planning::GroundTag>, planning::GroundTag>);
 
 }
 

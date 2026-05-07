@@ -25,8 +25,8 @@
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/ground_task/unpacked_state.hpp"
-#include "tyr/planning/lifted_task/unpacked_state.hpp"
+#include "tyr/planning/ground_task/state_builder.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/task.hpp"
 
 namespace tyr::planning

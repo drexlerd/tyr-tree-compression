@@ -24,7 +24,7 @@
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_index.hpp"
 #include "tyr/planning/task.hpp"
-#include "tyr/planning/unpacked_state.hpp"
+#include "tyr/planning/state_builder.hpp"
 
 #include <concepts>
 #include <ranges>

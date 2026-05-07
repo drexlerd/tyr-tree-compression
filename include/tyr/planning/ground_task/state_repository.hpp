@@ -25,7 +25,7 @@
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task/state_data.hpp"
 #include "tyr/planning/ground_task/state_view.hpp"
-#include "tyr/planning/ground_task/unpacked_state.hpp"
+#include "tyr/planning/ground_task/state_builder.hpp"
 #include "tyr/planning/state_index.hpp"
 #include "tyr/planning/state_repository.hpp"
 #include "tyr/planning/state_storage/config.hpp"

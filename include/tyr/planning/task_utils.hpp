@@ -24,7 +24,7 @@
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/planning/merge_datalog_decl.hpp"
 #include "tyr/formalism/planning/repository.hpp"
-#include "tyr/planning/lifted_task/unpacked_state.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/programs/translation_context.hpp"
 #include "tyr/planning/task.hpp"
 

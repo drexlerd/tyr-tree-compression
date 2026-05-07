@@ -21,7 +21,7 @@
 #include "tyr/common/declarations.hpp"
 #include "tyr/common/onetbb.hpp"
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/unpacked_state.hpp"
+#include "tyr/planning/state_builder.hpp"
 
 namespace tyr::planning
 {
