@@ -37,8 +37,6 @@ template<typename Tag, typename H = Hash<Data<Tag>>, typename E = EqualTo<Data<T
 class IndexedHashSet
 {
     static_assert(bit::is_power_of_two(FirstSegmentSize));
-    static_assert(std::is_trivially_copyable_v<Data<Tag>>);
-    static_assert(std::is_default_constructible_v<Data<Tag>>);
 
 private:
     class IndexableHash;

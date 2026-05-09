@@ -23,6 +23,7 @@
 #include <bit>
 #include <cassert>
 #include <cstddef>
+#include <new>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -34,10 +35,76 @@ template<typename T, size_t FirstSegmentSize = 32>
 class SegmentedVector
 {
     static_assert(bit::is_power_of_two(FirstSegmentSize));
-    static_assert(std::is_trivially_copyable_v<T>);
-    static_assert(std::is_default_constructible_v<T>);
 
 private:
+    struct Segment
+    {
+        T* data = nullptr;
+        size_t capacity = 0;
+        size_t size = 0;
+
+        explicit Segment(size_t capacity_) :
+            data(static_cast<T*>(::operator new(capacity_ * sizeof(T), std::align_val_t { alignof(T) }))),
+            capacity(capacity_),
+            size(0)
+        {
+        }
+
+        Segment(const Segment&) = delete;
+        Segment& operator=(const Segment&) = delete;
+
+        Segment(Segment&& other) noexcept : data(other.data), capacity(other.capacity), size(other.size)
+        {
+            other.data = nullptr;
+            other.capacity = 0;
+            other.size = 0;
+        }
+
+        Segment& operator=(Segment&& other) noexcept
+        {
+            if (this == &other)
+                return *this;
+
+            destroy_all();
+            deallocate();
+
+            data = other.data;
+            capacity = other.capacity;
+            size = other.size;
+
+            other.data = nullptr;
+            other.capacity = 0;
+            other.size = 0;
+
+            return *this;
+        }
+
+        ~Segment()
+        {
+            destroy_all();
+            deallocate();
+        }
+
+        void destroy_at(size_t pos) noexcept(std::is_nothrow_destructible_v<T>)
+        {
+            std::destroy_at(data + pos);
+            --size;
+        }
+
+        void destroy_all() noexcept(std::is_nothrow_destructible_v<T>)
+        {
+            for (size_t i = 0; i < size; ++i)
+                std::destroy_at(data + i);
+            size = 0;
+        }
+
+        void deallocate() noexcept
+        {
+            if (data)
+                ::operator delete(data, std::align_val_t { alignof(T) });
+        }
+    };
+
     static constexpr size_t seg_shift = std::countr_zero(FirstSegmentSize);
     static constexpr size_t seg_mask = FirstSegmentSize - 1;
 
@@ -55,16 +122,14 @@ private:
     {
         if (m_segments.empty())
         {
-            m_segments.emplace_back();
-            m_segments.back().resize(FirstSegmentSize);
+            m_segments.emplace_back(FirstSegmentSize);
             m_capacity += FirstSegmentSize;
         }
 
         while (m_capacity < n)
         {
             const size_t new_segment_size = FirstSegmentSize << m_segments.size();
-            m_segments.emplace_back();
-            m_segments.back().resize(new_segment_size);
+            m_segments.emplace_back(new_segment_size);
             m_capacity += new_segment_size;
         }
     }
@@ -72,7 +137,17 @@ private:
 public:
     SegmentedVector() : m_segments(), m_capacity(0), m_size(0) {}
 
-    void clear() noexcept { m_size = 0; }
+    SegmentedVector(const SegmentedVector&) = delete;
+    SegmentedVector& operator=(const SegmentedVector&) = delete;
+    SegmentedVector(SegmentedVector&&) noexcept = default;
+    SegmentedVector& operator=(SegmentedVector&&) noexcept = default;
+
+    void clear() noexcept(std::is_nothrow_destructible_v<T>)
+    {
+        for (auto& segment : m_segments)
+            segment.destroy_all();
+        m_size = 0;
+    }
 
     void push_back(const T& element)
     {
@@ -80,15 +155,32 @@ public:
 
         const auto index = get_segment_index(m_size);
         const auto offset = get_segment_pos(m_size);
-        m_segments[index][offset] = element;
+        std::construct_at(m_segments[index].data + offset, element);
 
         ++m_size;
+        ++m_segments[index].size;
+    }
+
+    void push_back(T&& element)
+    {
+        resize_to_fit(m_size + 1);
+
+        const auto index = get_segment_index(m_size);
+        const auto offset = get_segment_pos(m_size);
+        std::construct_at(m_segments[index].data + offset, std::move(element));
+
+        ++m_size;
+        ++m_segments[index].size;
     }
 
     void pop_back()
     {
         assert(m_size > 0);
         --m_size;
+
+        const auto index = get_segment_index(m_size);
+        const auto offset = get_segment_pos(m_size);
+        m_segments[index].destroy_at(offset);
     }
 
     const T& operator[](size_t pos) const
@@ -97,7 +189,7 @@ public:
 
         const auto index = get_segment_index(pos);
         const auto offset = get_segment_pos(pos);
-        return m_segments[index][offset];
+        return m_segments[index].data[offset];
     }
 
     T& operator[](size_t pos)
@@ -106,7 +198,7 @@ public:
 
         const auto index = get_segment_index(pos);
         const auto offset = get_segment_pos(pos);
-        return m_segments[index][offset];
+        return m_segments[index].data[offset];
     }
 
     const T& at(size_t pos) const
@@ -116,7 +208,7 @@ public:
 
         const auto index = get_segment_index(pos);
         const auto offset = get_segment_pos(pos);
-        return m_segments.at(index).at(offset);
+        return m_segments.at(index).data[offset];
     }
 
     T& at(size_t pos)
@@ -126,7 +218,7 @@ public:
 
         const auto index = get_segment_index(pos);
         const auto offset = get_segment_pos(pos);
-        return m_segments.at(index).at(offset);
+        return m_segments.at(index).data[offset];
     }
 
     const T& front() const noexcept
@@ -157,7 +249,7 @@ public:
     {
         size_t bytes = 0;
         for (const auto& seg : m_segments)
-            bytes += seg.capacity() * sizeof(T);
+            bytes += seg.capacity * sizeof(T);
         return bytes;
     }
 
@@ -167,7 +259,7 @@ public:
 
 private:
     // Segments grow geometrically, i.e., FirstSegmentSize, 2*FirstSegmentSize, 4*FirstSegmentSize, ...
-    std::vector<std::vector<T>> m_segments;
+    std::vector<Segment> m_segments;
     size_t m_capacity;
     size_t m_size;
 };
