@@ -62,6 +62,26 @@ public:
 private:
     formalism::planning::GroundConjunctiveConditionView m_goal;
 };
+
+template<TaskKind Kind>
+class ExhaustiveGoalStrategy : public GoalStrategy<Kind>
+{
+public:
+    static std::shared_ptr<ExhaustiveGoalStrategy<Kind>> create() { return std::make_shared<ExhaustiveGoalStrategy<Kind>>(); }
+
+    bool is_static_goal_satisfied(const Task<Kind>& task) override
+    {
+        static_cast<void>(task);
+        return true;
+    }
+
+    bool is_dynamic_goal_satisfied(const StateView<Kind>& state) override
+    {
+        static_cast<void>(state);
+        return false;
+    }
+};
+
 }
 
 #endif

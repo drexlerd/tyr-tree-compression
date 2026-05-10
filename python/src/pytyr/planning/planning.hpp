@@ -232,6 +232,15 @@ void bind_conjunctive_goal_strategy(nb::module_& m, const std::string& name)
 }
 
 template<TaskKind Kind>
+void bind_exhaustive_goal_strategy(nb::module_& m, const std::string& name)
+{
+    using T = ExhaustiveGoalStrategy<Kind>;
+
+    nb::class_<T, GoalStrategy<Kind>>(m, name.c_str())  //
+        .def(nb::init<>());
+}
+
+template<TaskKind Kind>
 class PyPruningStrategy : public PruningStrategy<Kind>
 {
 public:

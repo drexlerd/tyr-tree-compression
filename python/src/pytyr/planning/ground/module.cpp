@@ -49,6 +49,7 @@ void bind_ground_module_definitions(nb::module_& m)
     bind_search_result<GroundTag>(m, "SearchResult");
     bind_goal_strategy<GroundTag>(m, "GoalStrategy");
     bind_conjunctive_goal_strategy<GroundTag>(m, "ConjunctiveGoalStrategy");
+    bind_exhaustive_goal_strategy<GroundTag>(m, "ExhaustiveGoalStrategy");
     bind_pruning_strategy<GroundTag>(m, "PruningStrategy");
     bind_heuristic<GroundTag>(m, "Heuristic");
     bind_blind_heuristic<GroundTag>(m, "BlindHeuristic");

@@ -84,6 +84,7 @@ should not be used further.
     bind_search_result<LiftedTag>(m, "SearchResult");
     bind_goal_strategy<LiftedTag>(m, "GoalStrategy");
     bind_conjunctive_goal_strategy<LiftedTag>(m, "ConjunctiveGoalStrategy");
+    bind_exhaustive_goal_strategy<LiftedTag>(m, "ExhaustiveGoalStrategy");
     bind_pruning_strategy<LiftedTag>(m, "PruningStrategy");
     bind_heuristic<LiftedTag>(m, "Heuristic");
     bind_blind_heuristic<LiftedTag>(m, "BlindHeuristic");
