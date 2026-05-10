@@ -31,6 +31,7 @@
 #include <ostream>
 #include <sstream>
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -746,4 +747,5 @@ struct formatter<tyr::formalism::datalog::ProgramView, char>
 };
 
 }  // namespace fmt
+#endif
 #endif

@@ -24,6 +24,7 @@
 #include <sstream>
 #include <vector>
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -502,5 +503,6 @@ struct formatter<tyr::analysis::TaskVariableDomainsView, char>
 };
 
 }  // namespace fmt
+#endif
 
 #endif

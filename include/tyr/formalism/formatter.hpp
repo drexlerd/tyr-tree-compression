@@ -29,6 +29,7 @@
 #include <fmt/ranges.h>
 #include <ostream>
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -366,5 +367,6 @@ struct formatter<tyr::View<tyr::Index<tyr::formalism::Function<T>>, C>, char>
 };
 
 }
+#endif
 
 #endif

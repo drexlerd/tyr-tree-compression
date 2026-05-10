@@ -40,6 +40,7 @@ struct PlanFormatting
 };
 }  // namespace tyr::formalism::planning
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -1464,5 +1465,6 @@ struct formatter<tyr::formalism::planning::PlanningFDRTask, char>
 };
 
 }
+#endif
 
 #endif

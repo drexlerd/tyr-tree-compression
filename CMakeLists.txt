@@ -28,6 +28,13 @@ if(TYR_ENABLE_INNER_PARALLELISM)
     add_compile_definitions(TYR_ENABLE_INNER_PARALLELISM)
 endif()
 
+option(TYR_ENABLE_FMT_FORMATTERS "Enable Tyr's public fmt::formatter specializations." ON)
+if(TYR_ENABLE_FMT_FORMATTERS)
+    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=1)
+else()
+    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=0)
+endif()
+
 option(TYR_USE_LLD "Use LLVM lld linker when available" ON)
 
 option(TYR_BUILD_SHARED "Build tyr::core as a shared library." OFF)

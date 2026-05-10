@@ -33,6 +33,7 @@
 #include <utility>
 #include <vector>
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -246,5 +247,6 @@ struct formatter<tyr::planning::Plan<Kind>, char>
 };
 
 }  // namespace fmt
+#endif
 
 #endif

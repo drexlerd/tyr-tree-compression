@@ -18,6 +18,10 @@
 #ifndef TYR_COMMON_CONFIG_HPP_
 #define TYR_COMMON_CONFIG_HPP_
 
+#ifndef TYR_ENABLE_FMT_FORMATTERS
+#define TYR_ENABLE_FMT_FORMATTERS 1
+#endif
+
 #include <algorithm>
 #include <cassert>
 #include <cista/mode.h>

@@ -37,6 +37,7 @@
 #include <sstream>
 #include <string>
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -472,5 +473,6 @@ struct formatter<tyr::datalog::AggregatedRuleWorkerStatistics, char>
 
 
 }  // namespace fmt
+#endif
 
 #endif

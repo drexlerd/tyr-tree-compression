@@ -18,6 +18,7 @@
 #ifndef TYR_COMMON_FORMATTER_HPP_
 #define TYR_COMMON_FORMATTER_HPP_
 
+#include "tyr/common/config.hpp"
 #include "tyr/common/declarations.hpp"
 #include "tyr/common/dynamic_bitset.hpp"
 #include "tyr/common/index_mixins.hpp"
@@ -55,6 +56,7 @@ std::string to_string(const T& element)
 
 }  // namespace tyr
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -295,6 +297,7 @@ struct formatter<std::monostate, char>
 };
 
 }  // namespace fmt
+#endif
 
 namespace tyr
 {

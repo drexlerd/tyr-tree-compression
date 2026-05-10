@@ -23,6 +23,7 @@
 
 #include <sstream>
 
+#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -63,5 +64,6 @@ struct formatter<tyr::formalism::unification::SubstitutionFunction<T>, char>
 };
 
 }
+#endif
 
 #endif
