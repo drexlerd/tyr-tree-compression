@@ -30,17 +30,17 @@
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/ground_task.hpp"
 #include "tyr/planning/ground_task/node.hpp"
+#include "tyr/planning/ground_task/state_builder.hpp"
 #include "tyr/planning/ground_task/state_repository.hpp"
 #include "tyr/planning/ground_task/state_view.hpp"
 #include "tyr/planning/ground_task/successor_generator.hpp"
-#include "tyr/planning/ground_task/state_builder.hpp"
 #include "tyr/planning/heuristic.hpp"
 #include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/lifted_task/node.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/lifted_task/state_repository.hpp"
 #include "tyr/planning/lifted_task/state_view.hpp"
 #include "tyr/planning/lifted_task/successor_generator.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/search_node.hpp"
 #include "tyr/planning/search_space.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -277,7 +277,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
             if (pruning_strategy->should_prune_successor_state(state, succ_state, is_new_successor_state))
             {
                 successor_search_node.status = SearchNodeStatus::CLOSED;
-                event_handler->on_prune_node(succ_node);
+                event_handler->on_prune_node(labeled_succ_node);
                 continue;
             }
 

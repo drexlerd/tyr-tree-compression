@@ -60,6 +60,9 @@ public:
     /// @brief React on pruning a node.
     virtual void on_prune_node(const Node<Kind>& node) = 0;
 
+    /// @brief React on pruning a generated successor node.
+    virtual void on_prune_node(const LabeledNode<Kind>& labeled_succ_node) = 0;
+
     /// @brief React on starting a search.
     virtual void on_start_search(const Node<Kind>& node, float_t f_value) = 0;
 
@@ -160,6 +163,16 @@ public:
         if (verbosity(2))
         {
             self().on_prune_node_impl(node);
+        }
+    }
+
+    void on_prune_node(const LabeledNode<Kind>& labeled_succ_node) override
+    {
+        m_statistics.increment_num_pruned();
+
+        if (verbosity(2))
+        {
+            self().on_prune_node_impl(labeled_succ_node.node);
         }
     }
 
