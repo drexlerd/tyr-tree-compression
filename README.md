@@ -145,10 +145,10 @@ cmake --install build --prefix=<path/to/installation-directory>
 
 Optional targets are disabled by default and can be enabled during configure:
 
-- `-DBUILD_TESTS=ON`
-- `-DBUILD_EXECUTABLES=ON`
-- `-DBUILD_PROFILING=ON`
-- `-DBUILD_PYTYR=ON`
+- `-DTYR_BUILD_TESTS=ON`
+- `-DTYR_BUILD_EXECUTABLES=ON`
+- `-DTYR_BUILD_PROFILING=ON`
+- `-DTYR_BUILD_PYTYR=ON`
 
 More detailed build instructions are available [here](docs/BUILD.md).
 

@@ -18,20 +18,20 @@ cmake -S . -B build \
   -DPython_EXECUTABLE=${PWD}/.venv/bin/python \
   -DPython3_EXECUTABLE=${PWD}/.venv/bin/python \
   -DCMAKE_PREFIX_PATH="$(.venv/bin/python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')" \
-  -DBUILD_TESTS=ON \
-  -DBUILD_EXECUTABLES=ON \
-  -DBUILD_PROFILING=ON \
-  -DBUILD_PYTYR=ON
+  -DTYR_BUILD_TESTS=ON \
+  -DTYR_BUILD_EXECUTABLES=ON \
+  -DTYR_BUILD_PROFILING=ON \
+  -DTYR_BUILD_PYTYR=ON
 ```
 
 Install native dependencies through Python packages: `pyyggdrasil` provides shared third-party dependencies and `pypddl` provides Loki.
 
 Build options:
 
-- `BUILD_TESTS`: builds C++ unit tests.
-- `BUILD_EXECUTABLES`: builds command-line executables.
-- `BUILD_PROFILING`: builds profiling and benchmark targets.
-- `BUILD_PYTYR`: builds Python bindings.
+- `TYR_BUILD_TESTS`: builds C++ unit tests.
+- `TYR_BUILD_EXECUTABLES`: builds command-line executables.
+- `TYR_BUILD_PROFILING`: builds profiling and benchmark targets.
+- `TYR_BUILD_PYTYR`: builds Python bindings.
 
 Before running a validation target, check whether the existing `build/` directory was configured with the required option. Do not reconfigure CMake unless the needed target is missing or configuration changed.
 

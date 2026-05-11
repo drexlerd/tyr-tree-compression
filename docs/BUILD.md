@@ -52,9 +52,9 @@ cmake -S . -B build \
   -DCMAKE_PREFIX_PATH="$(.venv/bin/python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')" \
   -DTYR_BUILD_SHARED=ON \
   -DTYR_LINK_STATIC_DEPENDENCIES=OFF \
-  -DBUILD_TESTS=ON \
-  -DBUILD_EXECUTABLES=ON \
-  -DBUILD_PROFILING=ON
+  -DTYR_BUILD_TESTS=ON \
+  -DTYR_BUILD_EXECUTABLES=ON \
+  -DTYR_BUILD_PROFILING=ON
 ```
 
 Install Tyr from a configured build directory with:

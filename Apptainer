@@ -50,10 +50,10 @@ Stage: build
         -DCMAKE_BUILD_TYPE=Release \
         -DPython_EXECUTABLE=/usr/bin/python3.10 \
         -DPython3_EXECUTABLE=/usr/bin/python3.10 \
-        -DBUILD_TESTS=OFF \
-        -DBUILD_PROFILING=OFF \
-        -DBUILD_PYTYR=OFF \
-        -DBUILD_EXECUTABLES=ON \
+        -DTYR_BUILD_TESTS=OFF \
+        -DTYR_BUILD_PROFILING=OFF \
+        -DTYR_BUILD_PYTYR=OFF \
+        -DTYR_BUILD_EXECUTABLES=ON \
         -DTYR_BUILD_SHARED=ON \
         -DTYR_LINK_STATIC_DEPENDENCIES=OFF \
         -DTYR_HEADER_INSTANTIATION=OFF \

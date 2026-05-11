@@ -63,10 +63,10 @@ endif()
 # Build Targets
 ##############################################################
 
-option(BUILD_PYTYR "Build" OFF)
-option(BUILD_TESTS "Build" OFF)
-option(BUILD_EXECUTABLES "Build" OFF)
-option(BUILD_PROFILING "Build" OFF)
+option(TYR_BUILD_PYTYR "Build pytyr Python bindings." OFF)
+option(TYR_BUILD_TESTS "Build Tyr tests." OFF)
+option(TYR_BUILD_EXECUTABLES "Build Tyr executables." OFF)
+option(TYR_BUILD_PROFILING "Build Tyr profiling targets." OFF)
 
 
 ##############################################################
@@ -292,28 +292,28 @@ add_subdirectory(src)
 # -------------------
 # Target Python Tyr
 # -------------------
-if(BUILD_PYTYR)
+if(TYR_BUILD_PYTYR)
     add_subdirectory(python/src)
 endif()
 
 # ----------
 # Target Exe
 # ----------
-if (BUILD_EXECUTABLES)
+if(TYR_BUILD_EXECUTABLES)
     add_subdirectory(exe)
 endif()
 
 # ----------------
 # Target Profiling
 # ----------------
-if(BUILD_PROFILING)
+if(TYR_BUILD_PROFILING)
     add_subdirectory(profiling)
 endif()
 
 # -----------
 # Target Test
 # -----------
-if(BUILD_TESTS)
+if(TYR_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 

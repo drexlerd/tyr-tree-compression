@@ -56,10 +56,10 @@ exclude = [
 ]
 
 [tool.scikit-build.cmake.define]
-BUILD_PYTYR = true
-BUILD_TESTS = false
-BUILD_EXECUTABLES = false
-BUILD_PROFILING = false
+TYR_BUILD_PYTYR = true
+TYR_BUILD_TESTS = false
+TYR_BUILD_EXECUTABLES = false
+TYR_BUILD_PROFILING = false
 TYR_USE_LLD = false
 TYR_BUILD_SHARED = true
 TYR_LINK_STATIC_DEPENDENCIES = false

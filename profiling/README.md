@@ -70,7 +70,7 @@ undefined
 Configure with profiling enabled:
 
 ```bash
-cmake -S . -B build -DBUILD_PROFILING=ON
+cmake -S . -B build -DTYR_BUILD_PROFILING=ON
 cmake --build build --target successor_generator -j24
 ```
 
