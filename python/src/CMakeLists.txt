@@ -158,4 +158,6 @@ nanobind_add_stub(
     COMPONENT pytyr
 )
 
+install(SCRIPT "${CMAKE_SOURCE_DIR}/cmake/patch_python_stubs.cmake" COMPONENT pytyr)
+
 add_custom_target(pytyr_wheel DEPENDS _pytyr)

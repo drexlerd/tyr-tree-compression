@@ -143,7 +143,7 @@ def _fix_wheel_stubs(wheel_path: Path) -> None:
 
             target.parent.mkdir(parents=True, exist_ok=True)
             text = path.read_text(encoding="utf-8")
-            target.write_text(text.replace("pytyr._pytyr.", "pytyr."), encoding="utf-8")
+            target.write_text(text, encoding="utf-8")
 
         private_stub_root = wheel_root / "pytyr" / "_pytyr"
         if private_stub_root.is_dir():
