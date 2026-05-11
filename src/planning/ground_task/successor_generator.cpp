@@ -42,17 +42,21 @@ SuccessorGenerator<GroundTag>::SuccessorGenerator(TaskPtr<GroundTag> task, Execu
 }
 
 SuccessorGenerator<GroundTag>::SuccessorGenerator(uint_t index, TaskPtr<GroundTag> task, ExecutionContextPtr execution_context) :
-    SuccessorGenerator(index, task, std::make_shared<StateRepository<GroundTag>>(index, task, std::move(execution_context)))
+    SuccessorGenerator(index, task, execution_context, std::make_shared<StateRepository<GroundTag>>(index, task, std::move(execution_context)))
 {
 }
 
-SuccessorGenerator<GroundTag>::SuccessorGenerator(uint_t index, TaskPtr<GroundTag> task, StateRepositoryPtr<GroundTag> state_repository) :
+SuccessorGenerator<GroundTag>::SuccessorGenerator(uint_t index,
+                                                  TaskPtr<GroundTag> task,
+                                                  ExecutionContextPtr execution_context,
+                                                  StateRepositoryPtr<GroundTag> state_repository) :
     m_index(index),
     m_task(std::move(task)),
     m_applicable_actions(),
     m_state_repository(std::move(state_repository)),
     m_executor()
 {
+    static_cast<void>(execution_context);
 }
 
 SuccessorGeneratorPtr<GroundTag> SuccessorGenerator<GroundTag>::create(TaskPtr<GroundTag> task, ExecutionContextPtr execution_context)

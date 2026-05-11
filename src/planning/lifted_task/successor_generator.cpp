@@ -80,14 +80,17 @@ SuccessorGenerator<LiftedTag>::SuccessorGenerator(TaskPtr<LiftedTag> task, Execu
 }
 
 SuccessorGenerator<LiftedTag>::SuccessorGenerator(uint_t index, TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context) :
-    SuccessorGenerator(index, task, std::make_shared<StateRepository<LiftedTag>>(index, task, execution_context))
+    SuccessorGenerator(index, task, execution_context, std::make_shared<StateRepository<LiftedTag>>(index, task, execution_context))
 {
 }
 
-SuccessorGenerator<LiftedTag>::SuccessorGenerator(uint_t index, TaskPtr<LiftedTag> task, StateRepositoryPtr<LiftedTag> state_repository) :
+SuccessorGenerator<LiftedTag>::SuccessorGenerator(uint_t index,
+                                                  TaskPtr<LiftedTag> task,
+                                                  ExecutionContextPtr execution_context,
+                                                  StateRepositoryPtr<LiftedTag> state_repository) :
     m_index(index),
     m_task(std::move(task)),
-    m_execution_context(state_repository->get_execution_context()),
+    m_execution_context(std::move(execution_context)),
     m_workspace(m_task->get_action_program().get_program_context(),
                 m_task->get_action_program().get_const_program_workspace(),
                 d::NoOrAnnotationPolicy(),
@@ -97,6 +100,7 @@ SuccessorGenerator<LiftedTag>::SuccessorGenerator(uint_t index, TaskPtr<LiftedTa
     m_executor()
 {
     assert(m_execution_context);
+    assert(m_state_repository->get_execution_context() == m_execution_context);
 }
 
 SuccessorGeneratorPtr<LiftedTag> SuccessorGenerator<LiftedTag>::create(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context)

@@ -42,6 +42,7 @@ The Python interface for implementing search algorithms is:
 
 ```py
 # Recommended namespace aliases
+from pytyr.common import ExecutionContext
 import pytyr.formalism.planning as tfp
 import pytyr.planning.lifted as tpl  # pytyr.planning.ground also exists
 
@@ -51,10 +52,13 @@ parser = tfp.Parser("domain.pddl")
 task = tpl.Task(parser.parse_task("problem.pddl"))
 
 # Instantiate a single-threaded execution environment.
-execution_context = tpl.ExecutionContext(1)
+execution_context = ExecutionContext(1)
 
-# Instantiate a lifted successor generator.
-successor_generator = tpl.SuccessorGenerator(task, execution_context)
+# Instantiate the planning objects. Factories assign unique context indices so
+# state views from different state repositories hash and compare correctly.
+axiom_evaluator = tpl.AxiomEvaluatorFactory().create(task, execution_context)
+state_repository = tpl.StateRepositoryFactory().create(task, axiom_evaluator)
+successor_generator = tpl.SuccessorGeneratorFactory().create(task, execution_context, state_repository)
 
 # Get the initial node (state + metric value)
 initial_node = successor_generator.get_initial_node()
@@ -77,19 +81,26 @@ namespace tp = tyr::planning;
 // Parse and translate a task over a domain.
 auto parser = tfp::Parser("domain.pddl");
 // Instantiate a lifted task.
-auto task = tp::LiftedTask::create(parser.parse_task("problem.pddl"));
+auto task = tp::Task<tp::LiftedTag>::create(parser.parse_task("problem.pddl"));
 
 // Instantiate a single-threaded execution environment
-auto execution_context = tp::ExecutionContext::create(1);
+auto execution_context = tyr::ExecutionContext::create(1);
 
-// Instantiate a lifted successor generator.
-auto successor_generator = tp::SuccessorGenerator<tp::LiftedTask>(task, execution_context);
+// Instantiate the planning objects. Factories assign unique context indices so
+// state views from different state repositories hash and compare correctly.
+auto axiom_evaluator_factory = tp::AxiomEvaluatorFactory<tp::LiftedTag>();
+auto state_repository_factory = tp::StateRepositoryFactory<tp::LiftedTag>();
+auto successor_generator_factory = tp::SuccessorGeneratorFactory<tp::LiftedTag>();
+
+auto axiom_evaluator = axiom_evaluator_factory.create(task, execution_context);
+auto state_repository = state_repository_factory.create(task, axiom_evaluator);
+auto successor_generator = successor_generator_factory.create(task, execution_context, state_repository);
 
 // Get the initial node (state + metric value).
-auto initial_node = successor_generator.get_initial_node();
+auto initial_node = successor_generator->get_initial_node();
 
 // Get the labeled successor nodes (sequence of ground action + node).
-auto labeled_successor_nodes = successor_generator.get_labeled_successor_nodes(initial_node);
+auto labeled_successor_nodes = successor_generator->get_labeled_successor_nodes(initial_node);
 
 ```
 

@@ -176,8 +176,8 @@ TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryIndexForIdentity)
     auto first_repository = state_repository_factory.create(lifted_task, first_axiom_evaluator);
     auto second_repository = state_repository_factory.create(lifted_task, second_axiom_evaluator);
 
-    auto first_successor_generator = successor_generator_factory.create(lifted_task, first_repository);
-    auto second_successor_generator = successor_generator_factory.create(lifted_task, second_repository);
+    auto first_successor_generator = successor_generator_factory.create(lifted_task, execution_context, first_repository);
+    auto second_successor_generator = successor_generator_factory.create(lifted_task, execution_context, second_repository);
 
     const auto first_state = first_repository->get_initial_state();
     const auto second_state = second_repository->get_initial_state();

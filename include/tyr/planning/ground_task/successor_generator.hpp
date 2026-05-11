@@ -36,7 +36,7 @@ class SuccessorGenerator<GroundTag>
 public:
     explicit SuccessorGenerator(TaskPtr<GroundTag> task, ExecutionContextPtr execution_context);
     SuccessorGenerator(uint_t index, TaskPtr<GroundTag> task, ExecutionContextPtr execution_context);
-    SuccessorGenerator(uint_t index, TaskPtr<GroundTag> task, StateRepositoryPtr<GroundTag> state_repository);
+    SuccessorGenerator(uint_t index, TaskPtr<GroundTag> task, ExecutionContextPtr execution_context, StateRepositoryPtr<GroundTag> state_repository);
 
     static SuccessorGeneratorPtr<GroundTag> create(TaskPtr<GroundTag> task, ExecutionContextPtr execution_context);
 

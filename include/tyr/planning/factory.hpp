@@ -68,9 +68,9 @@ class SuccessorGeneratorFactory
 public:
     SuccessorGeneratorFactory() : m_next_index(0) {}
 
-    SuccessorGeneratorPtr<Kind> create(TaskPtr<Kind> task, StateRepositoryPtr<Kind> state_repository)
+    SuccessorGeneratorPtr<Kind> create(TaskPtr<Kind> task, ExecutionContextPtr execution_context, StateRepositoryPtr<Kind> state_repository)
     {
-        return std::make_shared<SuccessorGenerator<Kind>>(m_next_index++, std::move(task), std::move(state_repository));
+        return std::make_shared<SuccessorGenerator<Kind>>(m_next_index++, std::move(task), std::move(execution_context), std::move(state_repository));
     }
 
 private:

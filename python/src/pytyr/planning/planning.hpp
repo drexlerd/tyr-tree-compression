@@ -232,7 +232,7 @@ void bind_successor_generator_factory(nb::module_& m, const std::string& name)
 
     nb::class_<T>(m, name.c_str())  //
         .def(nb::init<>())
-        .def("create", &T::create, "task"_a, "state_repository"_a);
+        .def("create", &T::create, "task"_a, "execution_context"_a, "state_repository"_a);
 }
 
 template<TaskKind Kind>
