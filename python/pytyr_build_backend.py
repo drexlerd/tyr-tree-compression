@@ -60,7 +60,7 @@ def _is_native_library(path: Path) -> bool:
 def _strip_args() -> list[str]:
     if platform.system() == "Darwin":
         return ["-x"]
-    return ["--strip-unneeded"]
+    return ["--strip-debug"]
 
 
 def _record_digest(path: Path) -> tuple[str, str]:

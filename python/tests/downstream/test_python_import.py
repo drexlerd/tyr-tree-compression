@@ -80,6 +80,9 @@ def test_downstream_python_binding_imports_public_pytyr_api_and_links_tyr_core(t
     subprocess.run([cmake, "--build", str(build_dir), "-j8"], check=True)
 
     env["PYTHONPATH"] = str(project_dir / "src") + os.pathsep + env.get("PYTHONPATH", "")
+    runtime_library_path = os.pathsep.join(str(path) for path in dependency_library_dirs)
+    env["LD_LIBRARY_PATH"] = runtime_library_path + os.pathsep + env.get("LD_LIBRARY_PATH", "")
+    env["DYLD_LIBRARY_PATH"] = runtime_library_path + os.pathsep + env.get("DYLD_LIBRARY_PATH", "")
 
     result = subprocess.run(
         [
