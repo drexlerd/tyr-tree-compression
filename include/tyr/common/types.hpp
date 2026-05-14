@@ -34,7 +34,7 @@ template<typename T>
 using DataList = ::cista::offset::vector<Data<T>>;
 
 template<typename T>
-struct Builder;
+class Builder;
 
 template<typename T>
 struct Index;
