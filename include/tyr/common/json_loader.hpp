@@ -19,8 +19,10 @@
 #define TYR_COMMON_JSON_LOADER_HPP_
 
 #include <boost/json.hpp>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -93,6 +95,22 @@ inline size_t as_size(const boost::json::object& object, std::string_view key, s
     if (!value || !value->is_int64() || value->as_int64() < 0)
         throw std::runtime_error(std::string(context) + "." + std::string(key) + " must be a non-negative integer.");
     return static_cast<size_t>(value->as_int64());
+}
+
+inline double as_double(const boost::json::object& object, std::string_view key, std::string_view context)
+{
+    const auto* value = object.if_contains(key);
+    if (!value)
+        throw std::runtime_error(std::string(context) + "." + std::string(key) + " must be a number or \"NaN\".");
+
+    if (value->is_double())
+        return value->as_double();
+    if (value->is_int64())
+        return static_cast<double>(value->as_int64());
+    if (value->is_string() && std::string(value->as_string()) == "NaN")
+        return std::numeric_limits<double>::quiet_NaN();
+
+    throw std::runtime_error(std::string(context) + "." + std::string(key) + " must be a number or \"NaN\".");
 }
 
 }

@@ -164,17 +164,6 @@ template<TaskKind Kind>
 using DefaultEventHandlerPtr = std::shared_ptr<DefaultEventHandler<Kind>>;
 }
 
-namespace serialized
-{
-template<TaskKind Kind>
-class EventHandler;
-template<TaskKind Kind>
-using EventHandlerPtr = std::shared_ptr<EventHandler<Kind>>;
-template<TaskKind Kind>
-class DefaultEventHandler;
-template<TaskKind Kind>
-using DefaultEventHandlerPtr = std::shared_ptr<DefaultEventHandler<Kind>>;
-}
 }
 
 #endif

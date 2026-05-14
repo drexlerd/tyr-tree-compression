@@ -40,6 +40,8 @@ template<TaskKind Kind>
 class EventHandler
 {
 public:
+    using StatisticsType = tyr::planning::Statistics;
+
     virtual ~EventHandler() = default;
 
     /// @brief React on expanding a node. This is called immediately after popping from the queue.
@@ -80,6 +82,9 @@ public:
 
     /// @brief React on exhausting a search.
     virtual void on_exhausted() = 0;
+
+    virtual const tyr::planning::Statistics& get_search_statistics() const = 0;
+    virtual const tyr::planning::Statistics& get_statistics() const = 0;
 };
 
 /**
@@ -186,7 +191,7 @@ public:
 
         m_statistics.set_search_start_time_point(std::chrono::high_resolution_clock::now());
 
-        if (verbosity(0))
+        if (verbosity(1))
         {
             self().on_start_search_impl(node, f_value);
         }
@@ -196,7 +201,7 @@ public:
     {
         m_progress_statistics.add_snap_shot(m_statistics);
 
-        if (verbosity(0))
+        if (verbosity(1))
         {
             self().on_finish_f_layer_impl(f_value, m_statistics.get_num_expanded(), m_statistics.get_num_generated());
         }
@@ -207,13 +212,13 @@ public:
     {
         m_statistics.set_search_end_time_point(std::chrono::high_resolution_clock::now());
 
-        if (verbosity(0))
+        if (verbosity(1))
             self().on_end_search_impl();
     }
 
     void on_solved(const Plan<Kind>& plan) override
     {
-        if (verbosity(0))
+        if (verbosity(1))
         {
             self().on_solved_impl(plan);
         }
@@ -221,7 +226,7 @@ public:
 
     void on_unsolvable() override
     {
-        if (verbosity(0))
+        if (verbosity(1))
         {
             self().on_unsolvable_impl();
         }
@@ -229,7 +234,7 @@ public:
 
     void on_exhausted() override
     {
-        if (verbosity(0))
+        if (verbosity(1))
         {
             self().on_exhausted_impl();
         }
@@ -239,7 +244,8 @@ public:
      * Getters
      */
 
-    const tyr::planning::Statistics& get_statistics() const { return m_statistics; }
+    const tyr::planning::Statistics& get_search_statistics() const override { return m_statistics; }
+    const tyr::planning::Statistics& get_statistics() const override { return m_statistics; }
     const tyr::planning::ProgressStatistics& get_progress_statistics() const { return m_progress_statistics; }
 };
 

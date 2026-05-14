@@ -52,6 +52,8 @@ find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& successor_generator, H
 template<TaskKind Kind>
 struct Solver
 {
+    using EventHandlerType = EventHandler<Kind>;
+
     TaskPtr<Kind> task;
     SuccessorGeneratorPtr<Kind> successor_generator;
     HeuristicPtr<Kind> heuristic;

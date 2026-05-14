@@ -55,6 +55,8 @@ SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, uint_t max_ari
 template<TaskKind Kind>
 struct Solver
 {
+    using EventHandlerType = EventHandler<Kind>;
+
     brfs::Solver<Kind> brfs_solver;
     uint_t max_arity;
     Options<Kind> options;

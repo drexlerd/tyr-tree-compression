@@ -50,6 +50,8 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 template<TaskKind Kind>
 struct Solver
 {
+    using EventHandlerType = EventHandler<Kind>;
+
     TaskPtr<Kind> task;
     SuccessorGeneratorPtr<Kind> successor_generator;
     Options<Kind> options;

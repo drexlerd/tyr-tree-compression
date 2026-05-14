@@ -17,6 +17,7 @@
 
 #include "tyr/common/json_loader.hpp"
 
+#include <cmath>
 #include <filesystem>
 #include <fmt/core.h>
 #include <gtest/gtest.h>
@@ -37,7 +38,7 @@ struct GroundSearchContext
     p::SuccessorGeneratorPtr<p::GroundTag> successor_generator;
 };
 
-struct IwCase
+struct SiwCase
 {
     std::string name;
     std::filesystem::path domain_file;
@@ -45,7 +46,8 @@ struct IwCase
     uint_t max_arity;
     std::optional<p::SearchStatus> expected_status;
     std::optional<uint_t> expected_plan_length;
-    std::optional<uint_t> expected_solution_arity;
+    std::optional<uint_t> expected_maximum_effective_width;
+    std::optional<double> expected_average_effective_width;
 };
 
 p::SearchStatus parse_status(const std::string& status)
@@ -95,12 +97,13 @@ std::string to_string(p::SearchStatus status)
     throw std::runtime_error("Unknown search status.");
 }
 
-IwCase parse_case(const boost::json::object& suite, const boost::json::object& object)
+SiwCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
     const auto max_arity = static_cast<uint_t>(tyr::common::as_size(suite, "max_arity", "suite"));
     auto expected_status = std::optional<p::SearchStatus> {};
     auto expected_plan_length = std::optional<uint_t> {};
-    auto expected_solution_arity = std::optional<uint_t> {};
+    auto expected_maximum_effective_width = std::optional<uint_t> {};
+    auto expected_average_effective_width = std::optional<double> {};
 
     if (const auto* value = object.if_contains("expected_status"))
     {
@@ -114,31 +117,37 @@ IwCase parse_case(const boost::json::object& suite, const boost::json::object& o
             throw std::runtime_error("case.expected_plan_length must be a non-negative integer.");
         expected_plan_length = static_cast<uint_t>(value->as_int64());
     }
-    if (const auto* value = object.if_contains("expected_solution_arity"))
+    if (const auto* value = object.if_contains("expected_maximum_effective_width"))
     {
         if (!value->is_int64() || value->as_int64() < 0)
-            throw std::runtime_error("case.expected_solution_arity must be a non-negative integer.");
-        expected_solution_arity = static_cast<uint_t>(value->as_int64());
+            throw std::runtime_error("case.expected_maximum_effective_width must be a non-negative integer.");
+        expected_maximum_effective_width = static_cast<uint_t>(value->as_int64());
+    }
+    if (const auto* value = object.if_contains("expected_average_effective_width"))
+    {
+        static_cast<void>(value);
+        expected_average_effective_width = tyr::common::as_double(object, "expected_average_effective_width", "case");
     }
 
-    return IwCase { tyr::common::as_string(object, "name", "case"),
-                    tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
-                    tyr::common::suite_path(suite, tyr::common::as_string(object, "task_file", "case")),
-                    max_arity,
-                    expected_status,
-                    expected_plan_length,
-                    expected_solution_arity };
+    return SiwCase { tyr::common::as_string(object, "name", "case"),
+                     tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
+                     tyr::common::suite_path(suite, tyr::common::as_string(object, "task_file", "case")),
+                     max_arity,
+                     expected_status,
+                     expected_plan_length,
+                     expected_maximum_effective_width,
+                     expected_average_effective_width };
 }
 
-std::vector<IwCase> load_cases()
+std::vector<SiwCase> load_cases()
 {
-    const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/algorithms/iw.json");
+    const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/algorithms/siw.json");
     const auto& suite_object = tyr::common::as_object(suite, "suite");
     const auto* cases_value = suite_object.if_contains("cases");
     if (!cases_value)
         throw std::runtime_error("suite.cases is required.");
 
-    auto result = std::vector<IwCase> {};
+    auto result = std::vector<SiwCase> {};
     for (const auto& case_value : tyr::common::as_array(*cases_value, "suite.cases"))
         result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
     return result;
@@ -156,30 +165,34 @@ GroundSearchContext create_ground_context(const std::filesystem::path& domain_fi
 }
 }
 
-class IwTest : public ::testing::TestWithParam<IwCase>
+class SiwTest : public ::testing::TestWithParam<SiwCase>
 {
 };
 
-TEST_P(IwTest, MatchesExpectedOutcome)
+TEST_P(SiwTest, MatchesExpectedOutcome)
 {
     const auto& param = GetParam();
     auto context = create_ground_context(param.domain_file, param.task_file);
     auto brfs_solver = p::brfs::Solver<p::GroundTag> { context.task, context.successor_generator, p::brfs::Options<p::GroundTag> {} };
     brfs_solver.options.event_handler = p::brfs::DefaultEventHandler<p::GroundTag>::create();
 
-    auto options = p::iw::Options<p::GroundTag> {};
-    const auto iw_event_handler = p::iw::DefaultEventHandler<p::GroundTag>::create();
-    options.event_handler = iw_event_handler;
+    auto iw_solver = p::iw::Solver<p::GroundTag> { std::move(brfs_solver), param.max_arity, p::iw::Options<p::GroundTag> {} };
+    const auto event_handler = p::siw::DefaultEventHandler<p::GroundTag>::create();
 
-    const auto result = p::iw::find_solution(brfs_solver, param.max_arity, options);
+    auto options = p::siw::Options<p::GroundTag> {};
+    options.event_handler = event_handler;
+
+    const auto result = p::siw::find_solution(iw_solver, options);
 
     const auto plan_length = result.plan ? std::optional<uint_t>(result.plan->get_length()) : std::nullopt;
-    const auto solution_arity = iw_event_handler->get_statistics().get_solution_arity();
-    fmt::println("IW_OBSERVED {} {} {} {}",
+    const auto maximum_effective_width = event_handler->get_statistics().get_maximum_effective_width();
+    const auto average_effective_width = event_handler->get_statistics().get_average_effective_width();
+    fmt::println("SIW_OBSERVED {} {} {} {} {}",
                  param.name,
                  to_string(result.status),
                  plan_length ? std::to_string(*plan_length) : std::string("null"),
-                 solution_arity ? std::to_string(*solution_arity) : std::string("null"));
+                 maximum_effective_width ? std::to_string(*maximum_effective_width) : std::string("null"),
+                 average_effective_width ? std::to_string(*average_effective_width) : std::string("null"));
 
     if (param.expected_status)
     {
@@ -189,15 +202,25 @@ TEST_P(IwTest, MatchesExpectedOutcome)
     {
         ASSERT_TRUE(result.plan);
         EXPECT_EQ(result.plan->get_length(), *param.expected_plan_length);
-        EXPECT_TRUE(solution_arity);
     }
-    if (param.expected_solution_arity)
+    if (param.expected_maximum_effective_width)
     {
-        ASSERT_TRUE(solution_arity);
-        EXPECT_EQ(*solution_arity, *param.expected_solution_arity);
+        ASSERT_TRUE(maximum_effective_width);
+        EXPECT_EQ(*maximum_effective_width, *param.expected_maximum_effective_width);
+    }
+    if (param.expected_average_effective_width)
+    {
+        if (std::isnan(*param.expected_average_effective_width))
+        {
+            EXPECT_FALSE(average_effective_width);
+            return;
+        }
+
+        ASSERT_TRUE(average_effective_width);
+        EXPECT_NEAR(*average_effective_width, *param.expected_average_effective_width, 1e-6);
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(TyrPlanningIw, IwTest, ::testing::ValuesIn(load_cases()), [](const testing::TestParamInfo<IwCase>& info) { return info.param.name; });
+INSTANTIATE_TEST_SUITE_P(TyrPlanningSiw, SiwTest, ::testing::ValuesIn(load_cases()), [](const testing::TestParamInfo<SiwCase>& info) { return info.param.name; });
 
 }
