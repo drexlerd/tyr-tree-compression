@@ -3,6 +3,10 @@ function(configure_yggdrasil)
     return()
   endif()
 
+  if(NOT Python3_EXECUTABLE AND Python_EXECUTABLE)
+    set(Python3_EXECUTABLE "${Python_EXECUTABLE}")
+  endif()
+
   find_package(Python3 QUIET COMPONENTS Interpreter)
   if(NOT Python3_Interpreter_FOUND)
     return()
