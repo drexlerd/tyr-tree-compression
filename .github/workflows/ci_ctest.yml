@@ -2,6 +2,8 @@ name: CI Ctest
 
 on:
   push:
+    branches-ignore:
+      - test-pypi
   pull_request:
 
 jobs:
