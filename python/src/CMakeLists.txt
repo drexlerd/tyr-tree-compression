@@ -42,39 +42,35 @@ nanobind_add_module(_pytyr
 
 target_link_libraries(_pytyr PRIVATE tyr::core TBB::tbb)
 
-if(TYR_BUILD_SHARED)
-    if(APPLE)
-        tyr_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "@loader_path" "../")
-        list(APPEND PYTYR_MODULE_RPATH "@loader_path/native/${CMAKE_INSTALL_LIBDIR}")
-        tyr_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "@loader_path" "../../../")
-        tyr_make_python_native_runtime_rpaths(PYTYR_INSTALL_NATIVE_LIBRARY_RPATHS "@loader_path" "../../../")
-    elseif(UNIX)
-        tyr_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "$ORIGIN" "../")
-        list(APPEND PYTYR_MODULE_RPATH "$ORIGIN/native/${CMAKE_INSTALL_LIBDIR}")
-        tyr_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "$ORIGIN" "../../../")
-        tyr_make_python_native_runtime_rpath_string(PYTYR_INSTALL_NATIVE_LIBRARY_RPATH "$ORIGIN" "../../../")
-    endif()
+if(APPLE)
+    tyr_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "@loader_path" "../")
+    list(APPEND PYTYR_MODULE_RPATH "@loader_path/native/${CMAKE_INSTALL_LIBDIR}")
+    tyr_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "@loader_path" "../../../")
+    tyr_make_python_native_runtime_rpaths(PYTYR_INSTALL_NATIVE_LIBRARY_RPATHS "@loader_path" "../../../")
+elseif(UNIX)
+    tyr_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "$ORIGIN" "../")
+    list(APPEND PYTYR_MODULE_RPATH "$ORIGIN/native/${CMAKE_INSTALL_LIBDIR}")
+    tyr_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "$ORIGIN" "../../../")
+    tyr_make_python_native_runtime_rpath_string(PYTYR_INSTALL_NATIVE_LIBRARY_RPATH "$ORIGIN" "../../../")
+endif()
 
-    if(PYTYR_MODULE_RPATH)
-        set_target_properties(_pytyr PROPERTIES
-            BUILD_RPATH "${PYTYR_MODULE_RPATH}"
-            INSTALL_RPATH "${PYTYR_MODULE_RPATH}")
-    endif()
+if(PYTYR_MODULE_RPATH)
+    set_target_properties(_pytyr PROPERTIES
+        BUILD_RPATH "${PYTYR_MODULE_RPATH}"
+        INSTALL_RPATH "${PYTYR_MODULE_RPATH}")
 endif()
 
 install(TARGETS _pytyr DESTINATION "pytyr" COMPONENT pytyr)
-if(TYR_BUILD_SHARED)
-    set_property(TARGET core PROPERTY INTERFACE_INCLUDE_DIRECTORIES
-        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-        "$<BUILD_INTERFACE:${TYR_NATIVE_DEPENDENCY_INCLUDE_DIRECTORIES}>")
-    set_property(TARGET core PROPERTY INSTALL_RPATH "${PYTYR_CORE_RPATH}")
-    install(TARGETS core
-            EXPORT pytyrTyrcoreTargets
-            LIBRARY DESTINATION "${PYTYR_NATIVE_LIBDIR}" COMPONENT pytyr
-            ARCHIVE DESTINATION "${PYTYR_NATIVE_LIBDIR}" COMPONENT pytyr
-            RUNTIME DESTINATION "${PYTYR_NATIVE_BINDIR}" COMPONENT pytyr
-            INCLUDES DESTINATION "${PYTYR_NATIVE_INCLUDEDIR}")
-endif()
+set_property(TARGET core PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${TYR_NATIVE_DEPENDENCY_INCLUDE_DIRECTORIES}>")
+set_property(TARGET core PROPERTY INSTALL_RPATH "${PYTYR_CORE_RPATH}")
+install(TARGETS core
+        EXPORT pytyrTyrcoreTargets
+        LIBRARY DESTINATION "${PYTYR_NATIVE_LIBDIR}" COMPONENT pytyr
+        ARCHIVE DESTINATION "${PYTYR_NATIVE_LIBDIR}" COMPONENT pytyr
+        RUNTIME DESTINATION "${PYTYR_NATIVE_BINDIR}" COMPONENT pytyr
+        INCLUDES DESTINATION "${PYTYR_NATIVE_INCLUDEDIR}")
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/tyr"
         DESTINATION "${PYTYR_NATIVE_INCLUDEDIR}"
         COMPONENT pytyr)
@@ -87,13 +83,11 @@ install(FILES
             "${CMAKE_BINARY_DIR}/tyrConfigVersion.cmake"
         DESTINATION "${PYTYR_NATIVE_CMAKEDIR}/tyr"
         COMPONENT pytyr)
-if(TYR_BUILD_SHARED)
-    install(EXPORT pytyrTyrcoreTargets
-            NAMESPACE tyr::
-            FILE "tyrcoreTargets.cmake"
-            DESTINATION "${PYTYR_NATIVE_CMAKEDIR}/tyr"
-            COMPONENT pytyr)
-endif()
+install(EXPORT pytyrTyrcoreTargets
+        NAMESPACE tyr::
+        FILE "tyrcoreTargets.cmake"
+        DESTINATION "${PYTYR_NATIVE_CMAKEDIR}/tyr"
+        COMPONENT pytyr)
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/cmake/"
         DESTINATION "${PYTYR_NATIVE_CMAKEDIR}/tyr/cmake"
         COMPONENT pytyr)

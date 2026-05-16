@@ -111,66 +111,70 @@ auto labeled_successor_nodes = successor_generator->get_labeled_successor_nodes(
 
 Tyr consumes native dependencies from Python packages:
 
+- `pyyggdrasil >= 0.0.9` for shared third-party native dependencies.
+- `pypddl >= 1.0.6` for Loki's PDDL parser library, headers, and CMake package.
+
+The shared workspace layout and general Python/CMake integration pattern are
+documented in the
+[Planning and Learning build instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#local-development).
+
+## Build C++
+
+Install Tyr's native dependency providers into the active Python environment,
+then configure CMake with their native prefixes:
+
 ```console
-uv pip install pyyggdrasil>=0.0.8 pypddl>=1.0.5
+python -m pip install 'pyyggdrasil>=0.0.9' 'pypddl>=1.0.6'
+
 cmake -S . -B build \
   -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
   -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')"
+  -DCMAKE_PREFIX_PATH="$(python -c 'import os, pyyggdrasil, pypddl; print(os.pathsep.join(map(str, [pyyggdrasil.native_prefix(), pypddl.native_prefix()])))')"
+
+cmake --build build -j4
 ```
 
-For offline/local development, install the native providers from sibling source
-checkouts first:
+CMake options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `TYR_BUILD_TESTS` | `OFF` | Build Tyr tests. |
+| `TYR_BUILD_EXECUTABLES` | `OFF` | Build Tyr executables. |
+| `TYR_BUILD_PROFILING` | `OFF` | Build Tyr profiling targets. |
+| `TYR_BUILD_PYTYR` | `OFF` | Build `pytyr` Python bindings. |
+| `TYR_ENABLE_FMT_FORMATTERS` | `ON` | Enable Tyr's public `fmt::formatter` specializations. |
+| `TYR_HEADER_INSTANTIATION` | `OFF` | Enable stronger inlining at higher compile-time cost. |
+| `TYR_ENABLE_INNER_PARALLELISM` | `OFF` | Enable inner rule parallelism. |
+| `TYR_USE_LLD` | `ON` | Use LLVM `lld` when available. |
+| `TYR_ENABLE_LTO` | `ON` | Enable link-time optimization for optimized builds. |
+| `TYR_STATE_STORAGE_POLICY` | `Tree` | State storage backend; accepted values are `Tree` and `Hashset`. |
+
+Install Tyr from a configured build directory with:
 
 ```console
-cd ../yggdrasil
-uv pip install --python ../tyr/.venv/bin/python .
-cd ../loki
-uv pip install --python ../tyr/.venv/bin/python .
-```
-
-## Build Instructions
-
-```console
-cmake -S . -B build \
-  -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-  -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')" \
-  -DTYR_BUILD_SHARED=ON \
-  -DTYR_LINK_STATIC_DEPENDENCIES=OFF
-
-cmake --build build -j16
 cmake --install build --prefix=<path/to/installation-directory>
 ```
 
-Optional targets are disabled by default and can be enabled during configure:
+More detailed Tyr-specific build instructions are available in
+[`docs/BUILD.md`](docs/BUILD.md).
 
-- `-DTYR_BUILD_TESTS=ON`
-- `-DTYR_BUILD_EXECUTABLES=ON`
-- `-DTYR_BUILD_PROFILING=ON`
-- `-DTYR_BUILD_PYTYR=ON`
+## Build Python
 
-More detailed build instructions are available [here](docs/BUILD.md).
-
-## Integration Instructions
-
-The Python package `pytyr` installs Tyr's native headers, shared library, and
-CMake package config under `pytyr.native_prefix()`. It depends on `pypddl` for
-Loki and `pyyggdrasil` for third-party native dependencies:
-
-```python
-import pypddl
-import pyyggdrasil
-import pytyr
-
-print(pytyr.native_prefix())
-print(pypddl.native_prefix())
-print(pyyggdrasil.native_prefix())
+```console
+python -m pip install .[test]
+pytest python/tests
 ```
 
-Downstream CMake projects can then use:
+## CMake Integration
+
+The Python package `pytyr` installs Tyr's native headers, shared library, and
+CMake package config under `pytyr.native_prefix()`. Downstream CMake projects
+should include the native prefixes of `pytyr` and its native package
+dependencies in `CMAKE_PREFIX_PATH`:
 
 ```console
 cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import pytyr, pypddl, pyyggdrasil; print(f"{pytyr.native_prefix()};{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')"
+  -DCMAKE_PREFIX_PATH="$(python -c 'import os, pyyggdrasil, pypddl, pytyr; print(os.pathsep.join(map(str, [pyyggdrasil.native_prefix(), pypddl.native_prefix(), pytyr.native_prefix()])))')"
 ```
+
+Tyr exports the `tyr::core` aggregate target.

@@ -37,9 +37,7 @@ endif()
 
 option(TYR_USE_LLD "Use LLVM lld linker when available" ON)
 
-option(TYR_BUILD_SHARED "Build tyr::core as a shared library." OFF)
-
-option(TYR_LINK_STATIC_DEPENDENCIES "Prefer static dependency libraries when finding installed dependencies." ON)
+message("Build shared libraries enabled.")
 
 option(TYR_ENABLE_LTO "Enable link-time optimization for optimized builds." ON)
 
@@ -278,7 +276,7 @@ endif()
 # Loki
 # -----
 
-find_package(loki 1.0.5 COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(loki 1.0.6 COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(loki_FOUND)
   message(STATUS "Found loki: ${loki_DIR} (found version ${loki_VERSION})")
 endif()

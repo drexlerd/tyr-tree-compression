@@ -2,8 +2,8 @@
 
 Tyr consumes native third-party dependencies from Python packages:
 
-- `pyyggdrasil>=0.0.8` provides shared libraries, headers, and CMake packages for common native dependencies.
-- `pypddl>=1.0.5` provides Loki's PDDL parser library, headers, and CMake package.
+- `pyyggdrasil>=0.0.9` provides shared libraries, headers, and CMake packages for common native dependencies.
+- `pypddl>=1.0.6` provides Loki's PDDL parser library, headers, and CMake package.
 
 ## Requirements
 
@@ -17,7 +17,7 @@ Create a virtual environment and install the native dependency providers:
 
 ```console
 uv venv
-uv pip install pyyggdrasil>=0.0.8 pypddl>=1.0.5
+uv pip install pyyggdrasil>=0.0.9 pypddl>=1.0.6
 ```
 
 For plain `pip`, use:
@@ -25,7 +25,7 @@ For plain `pip`, use:
 ```console
 python -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install pyyggdrasil>=0.0.8 pypddl>=1.0.5
+.venv/bin/python -m pip install pyyggdrasil>=0.0.9 pypddl>=1.0.6
 ```
 
 ## C++ Build
@@ -36,9 +36,7 @@ Configure Tyr with the native prefixes from the installed Python packages:
 cmake -S . -B build \
   -DPython_EXECUTABLE=${PWD}/.venv/bin/python \
   -DPython3_EXECUTABLE=${PWD}/.venv/bin/python \
-  -DCMAKE_PREFIX_PATH="$(.venv/bin/python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')" \
-  -DTYR_BUILD_SHARED=ON \
-  -DTYR_LINK_STATIC_DEPENDENCIES=OFF
+  -DCMAKE_PREFIX_PATH="$(.venv/bin/python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')"
 
 cmake --build build -j$(nproc)
 ```
@@ -50,8 +48,6 @@ cmake -S . -B build \
   -DPython_EXECUTABLE=${PWD}/.venv/bin/python \
   -DPython3_EXECUTABLE=${PWD}/.venv/bin/python \
   -DCMAKE_PREFIX_PATH="$(.venv/bin/python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')" \
-  -DTYR_BUILD_SHARED=ON \
-  -DTYR_LINK_STATIC_DEPENDENCIES=OFF \
   -DTYR_BUILD_TESTS=ON \
   -DTYR_BUILD_EXECUTABLES=ON \
   -DTYR_BUILD_PROFILING=ON

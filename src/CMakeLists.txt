@@ -39,13 +39,7 @@ elseif("${TYR_STATE_STORAGE_POLICY}" STREQUAL "Tree")
     )
 endif()
 
-if(TYR_BUILD_SHARED)
-    set(TYR_CORE_LIBRARY_TYPE SHARED)
-else()
-    set(TYR_CORE_LIBRARY_TYPE STATIC)
-endif()
-
-add_library(core ${TYR_CORE_LIBRARY_TYPE} ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
+add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     analysis/listeners.cpp
     analysis/program_domains.cpp
     analysis/stratification.cpp
@@ -141,23 +135,21 @@ add_library(core ${TYR_CORE_LIBRARY_TYPE} ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBL
 )
 set_target_properties(core PROPERTIES OUTPUT_NAME tyr_core)
 
-if(TYR_BUILD_SHARED)
-    if(APPLE)
-        set(TYR_LIBRARY_ORIGIN "@loader_path")
-    elseif(UNIX)
-        set(TYR_LIBRARY_ORIGIN "$ORIGIN")
-    endif()
-
-    foreach(prefix IN LISTS CMAKE_PREFIX_PATH)
-        if(EXISTS "${prefix}/${CMAKE_INSTALL_LIBDIR}")
-            list(APPEND TYR_CORE_BUILD_RPATHS "${prefix}/${CMAKE_INSTALL_LIBDIR}")
-        endif()
-    endforeach()
-
-    set_target_properties(core PROPERTIES
-        BUILD_RPATH "${TYR_CORE_BUILD_RPATHS}"
-        INSTALL_RPATH "${TYR_LIBRARY_ORIGIN}")
+if(APPLE)
+    set(TYR_LIBRARY_ORIGIN "@loader_path")
+elseif(UNIX)
+    set(TYR_LIBRARY_ORIGIN "$ORIGIN")
 endif()
+
+foreach(prefix IN LISTS CMAKE_PREFIX_PATH)
+    if(EXISTS "${prefix}/${CMAKE_INSTALL_LIBDIR}")
+        list(APPEND TYR_CORE_BUILD_RPATHS "${prefix}/${CMAKE_INSTALL_LIBDIR}")
+    endif()
+endforeach()
+
+set_target_properties(core PROPERTIES
+    BUILD_RPATH "${TYR_CORE_BUILD_RPATHS}"
+    INSTALL_RPATH "${TYR_LIBRARY_ORIGIN}")
 
 # Create an alias for simpler reference
 add_library(tyr::core ALIAS core)
