@@ -86,6 +86,25 @@ void append_plan(const Plan<Kind>& subplan, Node<Kind>& current_node, LabeledNod
     }
 }
 
+template<TaskKind Kind>
+struct ReachedSubgoal
+{
+    Node<Kind> node;
+    size_t plan_position;
+};
+
+template<TaskKind Kind>
+std::optional<size_t> find_reached_subgoal(const std::vector<ReachedSubgoal<Kind>>& reached_subgoals, const Node<Kind>& node)
+{
+    for (const auto& reached_subgoal : reached_subgoals)
+    {
+        if (reached_subgoal.node.get_state().get_index() == node.get_state().get_index())
+            return reached_subgoal.plan_position;
+    }
+
+    return std::nullopt;
+}
+
 }
 
 template<TaskKind Kind, SerializedSolverConcept<Kind> Solver>
@@ -114,6 +133,10 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
     auto current_start_node = options.start_node ? options.start_node : solver.options.start_node;
     auto combined_start_node = std::optional<Node<Kind>> {};
     auto combined_labeled_succ_nodes = LabeledNodeList<Kind> {};
+    auto reached_subgoals = std::vector<detail::ReachedSubgoal<Kind>> {};
+
+    if (current_start_node)
+        reached_subgoals.push_back(detail::ReachedSubgoal<Kind> { *current_start_node, 0 });
 
     if (current_start_node && options.goal_strategy->is_dynamic_goal_satisfied(current_start_node->get_state(), current_start_node->get_state()))
     {
@@ -139,6 +162,8 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
         if (!combined_start_node && sub_result.plan)
         {
             combined_start_node = sub_result.plan->get_start_node();
+            if (reached_subgoals.empty())
+                reached_subgoals.push_back(detail::ReachedSubgoal<Kind> { *combined_start_node, 0 });
         }
 
         if (local_solver.options.event_handler)
@@ -181,7 +206,6 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
         }
 
         detail::append_plan(*sub_result.plan, current_node, combined_labeled_succ_nodes);
-        current_start_node = Node<Kind>(sub_result.goal_node->get_state(), 0);
 
         if (combined_start_node && options.goal_strategy->is_dynamic_goal_satisfied(combined_start_node->get_state(), sub_result.goal_node->get_state()))
         {
@@ -194,6 +218,21 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
             event_handler->on_end_search(result.status);
             return result;
         }
+
+        if (const auto cycle_begin = detail::find_reached_subgoal(reached_subgoals, *sub_result.goal_node))
+        {
+            auto result = SearchResult<Kind> {};
+            result.status = SearchStatus::CYCLE;
+            result.plan = Plan<Kind>(*combined_start_node, std::move(combined_labeled_succ_nodes));
+            result.goal_node = result.plan->get_labeled_succ_nodes().back().node;
+            result.cycle_range = std::pair<size_t, size_t> { *cycle_begin, result.plan->get_length() };
+
+            event_handler->on_end_search(result.status);
+            return result;
+        }
+
+        current_start_node = Node<Kind>(sub_result.goal_node->get_state(), 0);
+        reached_subgoals.push_back(detail::ReachedSubgoal<Kind> { *current_start_node, combined_labeled_succ_nodes.size() });
     }
 
     auto result = SearchResult<Kind> {};

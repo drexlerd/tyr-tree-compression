@@ -44,6 +44,7 @@ public:
     auto get_index() const noexcept { return m_handle; }
     auto get_function() const noexcept { return get_row().get_relation(); }
     auto get_row() const noexcept { return make_view(get_data().binding, *m_context); }
+    auto get_key() const noexcept { return get_row().get_key(); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

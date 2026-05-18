@@ -57,6 +57,7 @@ public:
     void get_labeled_successor_nodes(const Node<LiftedTag>& node, std::vector<LabeledNode<LiftedTag>>& out_nodes);
 
     Node<LiftedTag> get_successor_node(const Node<LiftedTag>& node, formalism::planning::GroundActionView action);
+    formalism::planning::GroundActionView get_ground_action(formalism::planning::ActionBindingView binding);
 
     // Action binding API (interning)
     Node<LiftedTag> get_successor_node(const Node<LiftedTag>& node, formalism::planning::ActionBindingView binding);

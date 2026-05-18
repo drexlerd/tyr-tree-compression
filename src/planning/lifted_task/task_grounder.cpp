@@ -46,8 +46,12 @@
 #include "tyr/planning/programs/ground.hpp"
 #include "tyr/planning/task_utils.hpp"
 
+#include <algorithm>
+#include <vector>
+
 namespace d = tyr::datalog;
 namespace f = tyr::formalism;
+namespace fd = tyr::formalism::datalog;
 namespace fp = tyr::formalism::planning;
 namespace fpi = tyr::formalism::planning::invariant;
 
@@ -391,6 +395,22 @@ std::optional<fp::GroundAxiomView> ground_pruned(fp::AxiomView element,
     canonicalize(axiom);
     return context.destination.get_or_create(axiom).first;
 }
+
+template<f::FactKind T>
+auto sorted_predicate_bindings(const d::PredicateFactSets<T>& fact_sets)
+{
+    auto result = std::vector<fd::PredicateBindingView<T>> {};
+
+    for (const auto& set : fact_sets.get_sets())
+        for (const auto binding : set.get_bindings())
+            result.push_back(binding);
+
+    std::sort(result.begin(),
+              result.end(),
+              [](const auto lhs, const auto rhs) { return Less<decltype(lhs.get_key())> {}(lhs.get_key(), rhs.get_key()); });
+
+    return result;
+}
 }
 
 GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_task,  //
@@ -445,6 +465,8 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
      * Create ground atoms
      */
 
+    const auto predicate_bindings = sorted_predicate_bindings<f::FluentTag>(workspace.facts.fact_sets.predicate);
+
     auto fluent_predicates = task.get_domain().get_predicates<f::FluentTag>();
     auto fluent_predicates_set = UnorderedSet<fp::PredicateView<f::FluentTag>>(fluent_predicates.begin(), fluent_predicates.end());
     auto fluent_atoms = fp::GroundAtomViewList<f::FluentTag> {};
@@ -457,33 +479,27 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
         auto& fluent_atom = *fluent_atom_ptr;
         auto derived_atom_ptr = builder.get_builder<fp::GroundAtom<f::DerivedTag>>();
         auto& derived_atom = *derived_atom_ptr;
-        for (const auto& set : workspace.facts.fact_sets.predicate.get_sets())
+        for (const auto binding : predicate_bindings)
         {
-            if (ground_program.get_translation_context().d2p.fluent_to_fluent_predicate.contains(set.get_predicate()))
+            if (ground_program.get_translation_context().d2p.fluent_to_fluent_predicate.contains(binding.get_relation()))
             {
-                for (const auto& binding : set.get_bindings())
-                {
-                    fluent_atom.clear();
-                    fluent_atom.binding = fp::merge_d2p<f::FluentTag, f::FluentTag>(binding,
-                                                                                    ground_program.get_translation_context().d2p.fluent_to_fluent_predicate,
-                                                                                    merge_planning_context)
-                                              .first.get_index();
-                    canonicalize(fluent_atom);
-                    fluent_atoms.push_back(repository->get_or_create(fluent_atom).first);
-                }
+                fluent_atom.clear();
+                fluent_atom.binding = fp::merge_d2p<f::FluentTag, f::FluentTag>(binding,
+                                                                                ground_program.get_translation_context().d2p.fluent_to_fluent_predicate,
+                                                                                merge_planning_context)
+                                          .first.get_index();
+                canonicalize(fluent_atom);
+                fluent_atoms.push_back(repository->get_or_create(fluent_atom).first);
             }
-            else if (ground_program.get_translation_context().d2p.fluent_to_derived_predicate.contains(set.get_predicate()))
+            else if (ground_program.get_translation_context().d2p.fluent_to_derived_predicate.contains(binding.get_relation()))
             {
-                for (const auto& binding : set.get_bindings())
-                {
-                    derived_atom.clear();
-                    derived_atom.binding = fp::merge_d2p<f::FluentTag, f::DerivedTag>(binding,
-                                                                                      ground_program.get_translation_context().d2p.fluent_to_derived_predicate,
-                                                                                      merge_planning_context)
-                                               .first.get_index();
-                    canonicalize(derived_atom);
-                    derived_atoms.push_back(repository->get_or_create(derived_atom).first);
-                }
+                derived_atom.clear();
+                derived_atom.binding = fp::merge_d2p<f::FluentTag, f::DerivedTag>(binding,
+                                                                                  ground_program.get_translation_context().d2p.fluent_to_derived_predicate,
+                                                                                  merge_planning_context)
+                                           .first.get_index();
+                canonicalize(derived_atom);
+                derived_atoms.push_back(repository->get_or_create(derived_atom).first);
             }
         }
     }
@@ -561,42 +577,39 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
     for (const auto atom : task.get_atoms<f::StaticTag>())
         set(uint_t(atom.get_index()), true, static_atoms_bitset);
 
-    for (const auto& set : workspace.facts.fact_sets.predicate.get_sets())
+    for (const auto binding : predicate_bindings)
     {
-        for (const auto& binding : set.get_bindings())
+        const auto& mapping = ground_program.get_predicate_to_action_mapping();
+
+        if (const auto it = mapping.find(binding.get_relation()); it != mapping.end())
         {
-            const auto& mapping = ground_program.get_predicate_to_action_mapping();
+            const auto action = it->second;
 
-            if (const auto it = mapping.find(binding.get_relation()); it != mapping.end())
+            workspace.binding.clear();
+            for (const auto object : binding.get_objects())
+                workspace.binding.push_back(object.get_index());
+
+            auto grounder_context = fp::GrounderContext { workspace.planning_builder, *repository, workspace.binding };
+
+            const auto ground_action_or_nullopt =
+                ground_pruned(action,
+                              fluent_atoms_set,
+                              derived_atoms_set,
+                              lifted_task.get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
+                              iter_workspace,
+                              grounder_context,
+                              *fdr_context);
+
+            if (!ground_action_or_nullopt.has_value())
+                continue;
+
+            const auto& ground_action = ground_action_or_nullopt.value();
+
+            assert(is_statically_applicable(ground_action, static_atoms_bitset));
+
+            if (is_consistent(ground_action, fluent_assign, derived_assign))
             {
-                const auto action = it->second;
-
-                workspace.binding.clear();
-                for (const auto object : binding.get_objects())
-                    workspace.binding.push_back(object.get_index());
-
-                auto grounder_context = fp::GrounderContext { workspace.planning_builder, *repository, workspace.binding };
-
-                const auto ground_action_or_nullopt =
-                    ground_pruned(action,
-                                  fluent_atoms_set,
-                                  derived_atoms_set,
-                                  lifted_task.get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
-                                  iter_workspace,
-                                  grounder_context,
-                                  *fdr_context);
-
-                if (!ground_action_or_nullopt.has_value())
-                    continue;
-
-                const auto& ground_action = ground_action_or_nullopt.value();
-
-                assert(is_statically_applicable(ground_action, static_atoms_bitset));
-
-                if (is_consistent(ground_action, fluent_assign, derived_assign))
-                {
-                    fdr_task.ground_actions.push_back(ground_action.get_index());
-                }
+                fdr_task.ground_actions.push_back(ground_action.get_index());
             }
         }
     }
@@ -605,35 +618,32 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
 
     auto ground_axioms_set = UnorderedSet<Index<fp::GroundAxiom>> {};
 
-    for (const auto& set : workspace.facts.fact_sets.predicate.get_sets())
+    for (const auto binding : predicate_bindings)
     {
-        for (const auto& binding : set.get_bindings())
+        const auto& mapping = ground_program.get_predicate_to_axiom_mapping();
+
+        if (const auto it = mapping.find(binding.get_relation()); it != mapping.end())
         {
-            const auto& mapping = ground_program.get_predicate_to_axiom_mapping();
+            const auto axiom = it->second;
 
-            if (const auto it = mapping.find(binding.get_relation()); it != mapping.end())
+            workspace.binding.clear();
+            for (const auto object : binding.get_objects())
+                workspace.binding.push_back(object.get_index());
+
+            auto grounder_context = fp::GrounderContext { workspace.planning_builder, *repository, workspace.binding };
+
+            const auto ground_axiom_or_nullopt = ground_pruned(axiom, fluent_atoms_set, derived_atoms_set, grounder_context, *fdr_context);
+
+            if (!ground_axiom_or_nullopt.has_value())
+                continue;
+
+            const auto& ground_axiom = ground_axiom_or_nullopt.value();
+
+            assert(is_statically_applicable(ground_axiom, static_atoms_bitset));
+
+            if (is_consistent(ground_axiom, fluent_assign, derived_assign))
             {
-                const auto axiom = it->second;
-
-                workspace.binding.clear();
-                for (const auto object : binding.get_objects())
-                    workspace.binding.push_back(object.get_index());
-
-                auto grounder_context = fp::GrounderContext { workspace.planning_builder, *repository, workspace.binding };
-
-                const auto ground_axiom_or_nullopt = ground_pruned(axiom, fluent_atoms_set, derived_atoms_set, grounder_context, *fdr_context);
-
-                if (!ground_axiom_or_nullopt.has_value())
-                    continue;
-
-                const auto& ground_axiom = ground_axiom_or_nullopt.value();
-
-                assert(is_statically_applicable(ground_axiom, static_atoms_bitset));
-
-                if (is_consistent(ground_axiom, fluent_assign, derived_assign))
-                {
-                    fdr_task.ground_axioms.push_back(ground_axiom.get_index());
-                }
+                fdr_task.ground_axioms.push_back(ground_axiom.get_index());
             }
         }
     }

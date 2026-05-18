@@ -25,6 +25,7 @@
 #include "tyr/formalism/planning/views.hpp"                   // for Index
 #include "tyr/planning/ground_task/axiom_stratification.hpp"  // for compute...
 
+#include <cassert>  // for assert
 #include <tuple>    // for operat...
 #include <utility>  // for move
 
@@ -39,8 +40,12 @@ Task<GroundTag>::Task(formalism::planning::PlanningFDRTask task) :
     m_static_atoms_bitset(),
     m_static_numeric_variables(),
     m_action_match_tree(match_tree::MatchTree<fp::GroundAction>::create(get_task().get_ground_actions().get_data(), get_task().get_context())),
+    m_action_binding_to_ground_action(),
     m_axiom_match_tree_strata()
 {
+    for (const auto action : get_task().get_ground_actions())
+        m_action_binding_to_ground_action.emplace(action.get_row(), action);
+
     for (const auto atom : get_task().template get_atoms<f::StaticTag>())
         set(uint_t(atom.get_index()), true, m_static_atoms_bitset);
 
@@ -65,4 +70,19 @@ template size_t Task<GroundTag>::get_num_atoms<f::DerivedTag>() const noexcept;
 size_t Task<GroundTag>::get_num_actions() const noexcept { return get_task().get_ground_actions().size(); }
 
 size_t Task<GroundTag>::get_num_axioms() const noexcept { return get_task().get_ground_axioms().size(); }
+
+std::optional<fp::GroundActionView> Task<GroundTag>::find_ground_action(fp::ActionBindingView binding) const
+{
+    const auto it = m_action_binding_to_ground_action.find(binding);
+    if (it == m_action_binding_to_ground_action.end())
+        return std::nullopt;
+    return it->second;
+}
+
+fp::GroundActionView Task<GroundTag>::get_ground_action(fp::ActionBindingView binding) const
+{
+    const auto action = find_ground_action(binding);
+    assert(action.has_value() && "Ground action binding not found.");
+    return action.value();
+}
 }

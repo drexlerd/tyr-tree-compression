@@ -29,6 +29,8 @@
 #include "tyr/formalism/planning/axiom_index.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
+#include <utility>
+
 namespace tyr
 {
 
@@ -50,6 +52,7 @@ public:
     auto get_index() const noexcept { return m_handle; }
     auto get_relation() const noexcept { return make_view(m_handle.relation, *m_context); }
     auto get_objects() const noexcept { return make_view(get_data(), *m_context); }
+    auto get_key() const noexcept { return std::make_pair(get_relation(), get_objects()); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

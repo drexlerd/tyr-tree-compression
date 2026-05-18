@@ -31,6 +31,7 @@
 
 #include <boost/dynamic_bitset.hpp>  // for dynamic_bitset
 #include <limits>                    // for numeric_limits
+#include <optional>                  // for optional
 #include <stddef.h>                  // for size_t
 #include <vector>                    // for vector
 
@@ -64,6 +65,8 @@ public:
     bool has_axioms() const noexcept { return !get_task().get_ground_axioms().empty(); }
 
     const auto& get_action_match_tree() const noexcept { return m_action_match_tree; }
+    std::optional<formalism::planning::GroundActionView> find_ground_action(formalism::planning::ActionBindingView binding) const;
+    formalism::planning::GroundActionView get_ground_action(formalism::planning::ActionBindingView binding) const;
     const auto& get_axiom_match_tree_strata() const noexcept { return m_axiom_match_tree_strata; }
 
 private:
@@ -73,6 +76,7 @@ private:
     std::vector<float_t> m_static_numeric_variables;
 
     match_tree::MatchTreePtr<formalism::planning::GroundAction> m_action_match_tree;
+    UnorderedMap<formalism::planning::ActionBindingView, formalism::planning::GroundActionView> m_action_binding_to_ground_action;
 
     std::vector<match_tree::MatchTreePtr<formalism::planning::GroundAxiom>> m_axiom_match_tree_strata;
 };

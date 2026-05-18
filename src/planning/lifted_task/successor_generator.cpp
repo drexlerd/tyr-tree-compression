@@ -142,6 +142,23 @@ Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_successor_node(const Node<Lif
     return m_executor.apply_action(state_context, action, *m_state_repository);
 }
 
+fp::GroundActionView SuccessorGenerator<LiftedTag>::get_ground_action(fp::ActionBindingView binding)
+{
+    m_workspace.binding.clear();
+    for (const auto object : binding.get_data())
+        m_workspace.binding.push_back(object);
+
+    auto grounder_context = fp::GrounderContext { m_workspace.planning_builder, *m_task->get_repository(), m_workspace.binding };
+    const auto action = binding.get_relation();
+    return fp::ground(action,
+                      grounder_context,
+                      m_task->get_grounder_cache(),
+                      m_task->get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
+                      m_cartesian_workspace,
+                      *m_task->get_fdr_context())
+        .first;
+}
+
 // Action binding API (interning)
 Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_successor_node(const Node<LiftedTag>& node, formalism::planning::ActionBindingView binding)
 {

@@ -24,6 +24,7 @@
 
 #include <optional>
 #include <stdexcept>
+#include <utility>
 
 namespace tyr::planning
 {
@@ -36,6 +37,7 @@ enum class SearchStatus
     OUT_OF_STATES,
     FAILED,
     EXHAUSTED,
+    CYCLE,
     SOLVED,
     UNSOLVABLE
 };
@@ -63,6 +65,7 @@ struct SearchResult
     SearchStatus status = SearchStatus::IN_PROGRESS;
     std::optional<Plan<Kind>> plan = std::nullopt;
     std::optional<Node<Kind>> goal_node = std::nullopt;
+    std::optional<std::pair<size_t, size_t>> cycle_range = std::nullopt;
 };
 
 }

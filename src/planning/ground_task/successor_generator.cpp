@@ -94,6 +94,11 @@ Node<GroundTag> SuccessorGenerator<GroundTag>::get_successor_node(const Node<Gro
     return m_executor.apply_action(state_context, action, *m_state_repository);
 }
 
+fp::GroundActionView SuccessorGenerator<GroundTag>::get_ground_action(fp::ActionBindingView binding) const
+{
+    return m_task->get_ground_action(binding);
+}
+
 Node<GroundTag> SuccessorGenerator<GroundTag>::get_node(Index<State<GroundTag>> state_index)
 {
     auto state = m_state_repository->get_registered_state(state_index);

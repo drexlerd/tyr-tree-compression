@@ -17,6 +17,8 @@
 
 #include "tyr/common/json_loader.hpp"
 
+#include <algorithm>
+#include <deque>
 #include <gtest/gtest.h>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
@@ -80,6 +82,47 @@ GroundSearchContext create_gripper_context()
 
     return GroundSearchContext { std::move(task), std::move(successor_generator) };
 }
+
+class NeverSatisfiedGoalStrategy : public p::GoalStrategy<p::GroundTag>
+{
+public:
+    bool is_static_goal_satisfied(const p::Task<p::GroundTag>& task) override
+    {
+        static_cast<void>(task);
+        return true;
+    }
+
+    bool is_dynamic_goal_satisfied(const p::StateView<p::GroundTag>& seed_state, const p::StateView<p::GroundTag>& state) override
+    {
+        static_cast<void>(seed_state);
+        static_cast<void>(state);
+        return false;
+    }
+};
+
+class ScriptedSolver
+{
+private:
+    std::shared_ptr<std::deque<p::SearchResult<p::GroundTag>>> m_results;
+
+public:
+    using EventHandlerType = p::brfs::EventHandler<p::GroundTag>;
+
+    p::brfs::Options<p::GroundTag> options;
+
+    explicit ScriptedSolver(std::deque<p::SearchResult<p::GroundTag>> results) :
+        m_results(std::make_shared<std::deque<p::SearchResult<p::GroundTag>>>(std::move(results)))
+    {
+        options.event_handler = std::make_shared<SilentBrfsEventHandler<p::GroundTag>>();
+    }
+
+    p::SearchResult<p::GroundTag> solve()
+    {
+        auto result = std::move(m_results->front());
+        m_results->pop_front();
+        return result;
+    }
+};
 }
 
 TEST(TyrPlanningSerialized, BrfsSubsolverMatchesDirectBrfs)
@@ -111,6 +154,56 @@ TEST(TyrPlanningSerialized, BrfsSubsolverMatchesDirectBrfs)
     EXPECT_GE(event_handler->get_statistics().get_num_subsearches(), 1);
     EXPECT_EQ(event_handler->get_statistics().get_search_statistics().size(), event_handler->get_statistics().get_num_subsearches());
     EXPECT_EQ(event_handler->get_statistics().get_solver_statistics().size(), event_handler->get_statistics().get_num_subsearches());
+}
+
+TEST(TyrPlanningSerialized, DetectsRepeatedSubgoalState)
+{
+    auto context = create_gripper_context();
+    auto start_node = context.successor_generator->get_initial_node();
+    auto labeled_succ_nodes = p::LabeledNodeList<p::GroundTag> {};
+    context.successor_generator->get_labeled_successor_nodes(start_node, labeled_succ_nodes);
+    ASSERT_FALSE(labeled_succ_nodes.empty());
+
+    const auto first_labeled_succ_node_it =
+        std::find_if(labeled_succ_nodes.begin(),
+                     labeled_succ_nodes.end(),
+                     [&](const auto& labeled_succ_node)
+                     { return labeled_succ_node.node.get_state().get_index() != start_node.get_state().get_index(); });
+    ASSERT_NE(first_labeled_succ_node_it, labeled_succ_nodes.end());
+    const auto first_labeled_succ_node = *first_labeled_succ_node_it;
+    const auto first_goal_node = first_labeled_succ_node.node;
+    const auto second_start_node = p::Node<p::GroundTag>(first_goal_node.get_state(), 0);
+    const auto repeated_start_node = p::Node<p::GroundTag>(start_node.get_state(), 1);
+
+    auto first_subresult = p::SearchResult<p::GroundTag> {};
+    first_subresult.status = p::SearchStatus::SOLVED;
+    first_subresult.goal_node = first_goal_node;
+    first_subresult.plan = p::Plan<p::GroundTag>(start_node, p::LabeledNodeList<p::GroundTag> { first_labeled_succ_node });
+
+    auto second_subresult = p::SearchResult<p::GroundTag> {};
+    second_subresult.status = p::SearchStatus::SOLVED;
+    second_subresult.goal_node = repeated_start_node;
+    second_subresult.plan = p::Plan<p::GroundTag>(second_start_node,
+                                                  p::LabeledNodeList<p::GroundTag> { p::LabeledNode<p::GroundTag> {
+                                                      first_labeled_succ_node.label,
+                                                      repeated_start_node,
+                                                  } });
+
+    auto solver = ScriptedSolver(std::deque<p::SearchResult<p::GroundTag>> { std::move(first_subresult), std::move(second_subresult) });
+
+    auto options = p::serialized::Options<p::GroundTag, ScriptedSolver> {};
+    options.event_handler = p::serialized::DefaultEventHandler<p::GroundTag, ScriptedSolver>::create();
+    options.subgoal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+    options.goal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+
+    const auto result = p::serialized::find_solution(solver, options);
+
+    ASSERT_EQ(result.status, p::SearchStatus::CYCLE);
+    ASSERT_TRUE(result.plan);
+    ASSERT_TRUE(result.cycle_range);
+    EXPECT_EQ(result.plan->get_length(), 2);
+    EXPECT_EQ(result.cycle_range->first, 0);
+    EXPECT_EQ(result.cycle_range->second, 2);
 }
 
 }

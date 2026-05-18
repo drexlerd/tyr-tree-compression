@@ -53,6 +53,8 @@ p::SearchStatus parse_status(const std::string& status)
         return p::SearchStatus::SOLVED;
     if (status == "EXHAUSTED")
         return p::SearchStatus::EXHAUSTED;
+    if (status == "CYCLE")
+        return p::SearchStatus::CYCLE;
     if (status == "UNSOLVABLE")
         return p::SearchStatus::UNSOLVABLE;
     if (status == "OUT_OF_TIME")
@@ -85,6 +87,8 @@ std::string to_string(p::SearchStatus status)
             return "FAILED";
         case p::SearchStatus::EXHAUSTED:
             return "EXHAUSTED";
+        case p::SearchStatus::CYCLE:
+            return "CYCLE";
         case p::SearchStatus::SOLVED:
             return "SOLVED";
         case p::SearchStatus::UNSOLVABLE:

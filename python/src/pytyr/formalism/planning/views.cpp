@@ -17,6 +17,7 @@
 
 #include "views.hpp"
 
+#include <nanobind/stl/pair.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <tyr/common/python/bindings.hpp>
@@ -66,7 +67,9 @@ void bind_relation_binding(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("get_objects", &V::get_objects);
+                   .def("get_relation", &V::get_relation)
+                   .def("get_objects", &V::get_objects)
+                   .def("get_key", &V::get_key);
     add_print(cls);
     add_hash(cls);
 }
@@ -105,7 +108,8 @@ void bind_ground_atom(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_predicate", &V::get_predicate)
-                   .def("get_objects", [](const V& self) { return self.get_row().get_objects(); });
+                   .def("get_objects", [](const V& self) { return self.get_row().get_objects(); })
+                   .def("get_key", &V::get_key);
     add_print(cls);
     add_hash(cls);
 }
@@ -195,7 +199,8 @@ void bind_ground_function_term(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_function", &V::get_function)
-                   .def("get_objects", [](const V& self) { return self.get_row().get_objects(); });
+                   .def("get_objects", [](const V& self) { return self.get_row().get_objects(); })
+                   .def("get_key", &V::get_key);
     add_print(cls);
     add_hash(cls);
 }
@@ -403,6 +408,7 @@ void bind_ground_action(nb::module_& m, const std::string& name)
                    .def("get_index", &V::get_index)
                    .def("get_action", &V::get_action)
                    .def("get_objects", [](const V& self) { return self.get_row().get_objects(); })
+                   .def("get_key", &V::get_key)
                    .def("get_condition", &V::get_condition)
                    .def("get_effects", &V::get_effects);
     add_print(cls);
@@ -417,6 +423,7 @@ void bind_ground_axiom(nb::module_& m, const std::string& name)
                    .def("get_index", &V::get_index)
                    .def("get_axiom", &V::get_axiom)
                    .def("get_objects", [](const V& self) { return self.get_row().get_objects(); })
+                   .def("get_key", &V::get_key)
                    .def("get_body", &V::get_body)
                    .def("get_head", &V::get_head);
     add_print(cls);
