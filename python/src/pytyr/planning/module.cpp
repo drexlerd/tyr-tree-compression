@@ -53,6 +53,7 @@ void bind_module_definitions(nb::module_& m)
         .value("OUT_OF_STATES", SearchStatus::OUT_OF_STATES)
         .value("FAILED", SearchStatus::FAILED)
         .value("EXHAUSTED", SearchStatus::EXHAUSTED)
+        .value("CYCLE", SearchStatus::CYCLE)
         .value("SOLVED", SearchStatus::SOLVED)
         .value("UNSOLVABLE", SearchStatus::UNSOLVABLE)
         .export_values();
