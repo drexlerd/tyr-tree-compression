@@ -44,6 +44,8 @@ struct Data<tests::IndexedHashSetTestTag>
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
+inline bool is_canonical(const Data<tests::IndexedHashSetTestTag>&) { return true; }
+
 }
 
 namespace tyr::tests
