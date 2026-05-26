@@ -18,6 +18,7 @@
 #ifndef TYR_SOLVER_POLICIES_ANNOTATION_TYPES_HPP_
 #define TYR_SOLVER_POLICIES_ANNOTATION_TYPES_HPP_
 
+#include "tyr/common/associative_containers.hpp"
 #include "tyr/common/closed_interval.hpp"
 #include "tyr/common/config.hpp"
 #include "tyr/common/hash.hpp"

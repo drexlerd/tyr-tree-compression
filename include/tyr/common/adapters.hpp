@@ -20,6 +20,7 @@
 
 #include "tyr/common/associative_container_formatters.hpp"
 #include "tyr/common/cista_comparators.hpp"
+#include "tyr/common/cista_formatters.hpp"
 #include "tyr/common/closed_interval.hpp"
 #include "tyr/common/dynamic_bitset_comparators.hpp"
 #include "tyr/common/dynamic_bitset_formatters.hpp"

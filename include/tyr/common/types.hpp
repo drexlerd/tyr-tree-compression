@@ -18,7 +18,7 @@
 #ifndef TYR_COMMON_TYPES_HPP_
 #define TYR_COMMON_TYPES_HPP_
 
-#include "tyr/common/concepts.hpp"
+#include "tyr/common/dependent_false.hpp"
 
 #include <cista/containers/vector.h>
 #include <concepts>

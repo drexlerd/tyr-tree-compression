@@ -18,7 +18,7 @@
 #ifndef TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 #define TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 
-#include "tyr/common/formatter.hpp"
+#include "tyr/common/cista_formatters.hpp"
 #include "tyr/common/iostream.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/variable_dependency_graph.hpp"

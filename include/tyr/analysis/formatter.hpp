@@ -11,7 +11,7 @@
 #define TYR_ANALYSIS_FORMATTER_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/formatter.hpp"
+#include "tyr/common/cista_formatters.hpp"
 #include "tyr/common/iostream.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/planning/formatter.hpp"

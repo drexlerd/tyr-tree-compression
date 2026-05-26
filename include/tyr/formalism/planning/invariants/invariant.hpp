@@ -18,6 +18,7 @@
 #ifndef TYR_FORMALISM_PLANNING_INVARIANTS_INVARIANT_HPP_
 #define TYR_FORMALISM_PLANNING_INVARIANTS_INVARIANT_HPP_
 
+#include "tyr/common/block_array_comparators.hpp"
 #include "tyr/common/comparators.hpp"
 #include "tyr/common/associative_containers.hpp"
 #include "tyr/common/equal_to.hpp"

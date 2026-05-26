@@ -19,7 +19,7 @@
 #define TYR_PLANNING_FORMATTER_HPP_
 
 #include "tyr/common/chrono.hpp"
-#include "tyr/common/formatter.hpp"
+#include "tyr/common/cista_formatters.hpp"
 #include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/planning/algorithms/statistics.hpp"
 #include "tyr/planning/declarations.hpp"

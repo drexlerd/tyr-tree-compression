@@ -20,8 +20,6 @@
 
 #include "tyr/common/associative_containers.hpp"
 
-#include <unordered_set>
-
 namespace tyr
 {
 template<typename T>

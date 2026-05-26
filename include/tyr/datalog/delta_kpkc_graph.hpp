@@ -22,7 +22,7 @@
 #include "tyr/common/dynamic_bitset.hpp"
 #include "tyr/common/dynamic_bitset_comparators.hpp"
 #include "tyr/common/equal_to.hpp"
-#include "tyr/common/formatter.hpp"
+#include "tyr/common/cista_formatters.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/vector.hpp"
 #include "tyr/datalog/declarations.hpp"

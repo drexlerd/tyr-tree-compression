@@ -19,14 +19,20 @@
 #define TYR_COMMON_ASSOCIATIVE_CONTAINER_FORMATTERS_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-
 #include <type_traits>
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <gtl/phmap.hpp>
+
+namespace tyr
+{
+template<typename T>
+struct EqualTo;
+
+template<typename T>
+struct Hash;
+}
 
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt

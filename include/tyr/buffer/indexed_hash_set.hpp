@@ -22,6 +22,7 @@
 #include "tyr/buffer/declarations.hpp"
 #include "tyr/buffer/segmented_buffer.hpp"
 #include "tyr/common/config.hpp"
+#include "tyr/common/cista_comparators.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/segmented_vector.hpp"

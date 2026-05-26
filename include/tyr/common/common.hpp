@@ -23,7 +23,6 @@
 #include "tyr/common/comparators.hpp"
 #include "tyr/common/containers.hpp"
 #include "tyr/common/core.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/iostream.hpp"

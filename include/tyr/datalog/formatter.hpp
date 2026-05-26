@@ -19,7 +19,7 @@
 #define TYR_DATALOG_FORMATTER_HPP_
 
 #include "tyr/common/chrono.hpp"
-#include "tyr/common/formatter.hpp"
+#include "tyr/common/cista_formatters.hpp"
 #include "tyr/common/dynamic_bitset_formatters.hpp"
 #include "tyr/common/iostream.hpp"
 #include "tyr/datalog/assignment.hpp"

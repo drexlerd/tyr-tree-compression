@@ -16,6 +16,7 @@
  */
 
 #include "tyr/datalog/fact_sets.hpp"
+#include "tyr/common/dynamic_bitset.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 

@@ -18,6 +18,8 @@
 #ifndef TYR_COMMON_CONCEPTS_HPP_
 #define TYR_COMMON_CONCEPTS_HPP_
 
+#include "tyr/common/dependent_false.hpp"
+
 #include <concepts>
 #include <ranges>
 #include <type_traits>
@@ -42,11 +44,6 @@ concept SameAsIgnoringCvref = std::same_as<std::remove_cvref_t<T>, U>;
 
 template<typename T, typename U>
 concept UnsignedIntegralSameAsIgnoringConst = std::unsigned_integral<std::remove_const_t<T>> && std::same_as<std::remove_const_t<T>, std::remove_const_t<U>>;
-
-template<typename T>
-struct dependent_false : std::false_type
-{
-};
 
 }
 

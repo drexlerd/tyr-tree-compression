@@ -20,18 +20,11 @@
 
 #include "tyr/common/config.hpp"
 
-#include <cista/containers/optional.h>
-#include <cista/containers/string.h>
-#include <cista/containers/variant.h>
-#include <cista/containers/vector.h>
-#include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/ranges.h>
 #include <memory>
 #include <optional>
 #include <ranges>
 #include <string>
-#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -55,21 +48,6 @@ std::string to_string(const T& element)
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
-
-template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator, typename Char>
-struct range_format_kind<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, Char, void> : std::false_type
-{
-};
-
-template<typename Ptr, typename Char>
-struct range_format_kind<::cista::basic_string<Ptr>, Char, void> : std::false_type
-{
-};
-
-template<typename C, typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator, typename Char>
-struct range_format_kind<tyr::View<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, C>, Char, void> : std::false_type
-{
-};
 
 template<typename T>
 struct formatter<tyr::Index<T>, char>
@@ -124,111 +102,6 @@ struct formatter<std::unique_ptr<T, Deleter>, char>
         return fmt::format_to(ctx.out(), "<nullptr>");
     }
 };
-
-template<typename T>
-struct formatter<::cista::optional<T>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const ::cista::optional<T>& value, FormatContext& ctx) const
-    {
-        if (value.has_value())
-            return fmt::format_to(ctx.out(), "{}", value.value());
-        return fmt::format_to(ctx.out(), "<nullopt>");
-    }
-};
-
-template<typename T, typename... Ts>
-struct formatter<::cista::offset::variant<T, Ts...>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const ::cista::offset::variant<T, Ts...>& value, FormatContext& ctx) const
-    {
-        return std::visit(
-            [&](auto&& arg)
-            {
-                return fmt::format_to(ctx.out(), "{}", arg);
-            },
-            value);
-    }
-};
-
-template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
-struct formatter<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "[");
-        bool first = true;
-        for (const auto& element : value)
-        {
-            if (!first)
-                out = fmt::format_to(out, ", ");
-            first = false;
-            out = fmt::format_to(out, "{}", element);
-        }
-        return fmt::format_to(out, "]");
-    }
-};
-
-template<typename C, typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
-struct formatter<tyr::View<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, C>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const tyr::View<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, C>& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "[");
-        bool first = true;
-        for (const auto& element : value)
-        {
-            if (!first)
-                out = fmt::format_to(out, ", ");
-            first = false;
-            out = fmt::format_to(out, "{}", element);
-        }
-        return fmt::format_to(out, "]");
-    }
-};
-
-template<typename C, typename T>
-struct formatter<tyr::View<::cista::optional<T>, C>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const tyr::View<::cista::optional<T>, C>& value, FormatContext& ctx) const
-    {
-        if (value.has_value())
-            return fmt::format_to(ctx.out(), "{}", value.value());
-        return fmt::format_to(ctx.out(), "<nullopt>");
-    }
-};
-
-template<typename C, typename T, typename... Ts>
-struct formatter<tyr::View<::cista::offset::variant<T, Ts...>, C>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const tyr::View<::cista::offset::variant<T, Ts...>, C>& value, FormatContext& ctx) const
-    {
-        return visit(
-            [&](auto&& arg)
-            {
-                return fmt::format_to(ctx.out(), "{}", arg);
-            },
-            value);
-    }
-};
-
 
 template<>
 struct formatter<std::monostate, char>

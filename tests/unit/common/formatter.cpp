@@ -19,6 +19,8 @@
 #include <tyr/common/associative_container_formatters.hpp>
 #include <tyr/common/associative_containers.hpp>
 #include <tyr/common/formatter.hpp>
+#include <tyr/common/equal_to.hpp>
+#include <tyr/common/hash.hpp>
 
 #include <memory>
 #include <optional>

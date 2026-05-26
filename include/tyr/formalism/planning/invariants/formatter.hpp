@@ -18,7 +18,7 @@
 #ifndef TYR_FORMALISM_PLANNING_INVARIANTS_FORMATTER_HPP_
 #define TYR_FORMALISM_PLANNING_INVARIANTS_FORMATTER_HPP_
 
-#include "tyr/common/formatter.hpp"
+#include "tyr/common/cista_formatters.hpp"
 #include "tyr/common/iostream.hpp"
 #include "tyr/formalism/formatter.hpp"
 #include "tyr/formalism/planning/invariants/invariant.hpp"

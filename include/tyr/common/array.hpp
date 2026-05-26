@@ -20,7 +20,6 @@
 
 #include "tyr/common/bit_packed_array_pool.hpp"
 #include "tyr/common/block_array_pool.hpp"
-#include "tyr/common/types.hpp"
 #include "tyr/common/types_utils.hpp"
 
 #include <concepts>

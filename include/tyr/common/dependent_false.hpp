@@ -15,15 +15,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_REPOSITORY_TYPES_HPP_
-#define TYR_COMMON_REPOSITORY_TYPES_HPP_
+#ifndef TYR_COMMON_DEPENDENT_FALSE_HPP_
+#define TYR_COMMON_DEPENDENT_FALSE_HPP_
 
-#include "tyr/common/array.hpp"
-#include "tyr/common/canonicalization.hpp"
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/optional.hpp"
-#include "tyr/common/types.hpp"
-#include "tyr/common/variant.hpp"
-#include "tyr/common/vector.hpp"
+#include <type_traits>
+
+namespace tyr
+{
+
+template<typename T>
+struct dependent_false : std::false_type
+{
+};
+
+}
 
 #endif
