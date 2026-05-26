@@ -20,7 +20,6 @@
 
 #include "tyr/common/concepts.hpp"
 #include "tyr/common/config.hpp"
-#include "tyr/common/equal_to.hpp"
 
 #include <limits>
 #include <tuple>
@@ -44,7 +43,7 @@ struct IndexMixin
     // Comparisons
     // ----------------------------------------------------
 
-    friend constexpr bool operator==(const IndexMixin& lhs, const IndexMixin& rhs) noexcept { return EqualTo<uint_t> {}(lhs.value, rhs.value); }
+    friend constexpr bool operator==(const IndexMixin& lhs, const IndexMixin& rhs) noexcept { return lhs.value == rhs.value; }
     friend constexpr bool operator!=(const IndexMixin& lhs, const IndexMixin& rhs) noexcept { return !(lhs == rhs); }
     friend constexpr bool operator<=(const IndexMixin& lhs, const IndexMixin& rhs) noexcept { return lhs.value <= rhs.value; }
     friend constexpr bool operator<(const IndexMixin& lhs, const IndexMixin& rhs) noexcept { return lhs.value < rhs.value; }

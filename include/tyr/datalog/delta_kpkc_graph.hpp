@@ -18,7 +18,9 @@
 #ifndef TYR_DATALOG_DELTA_KPKC_GRAPH_HPP_
 #define TYR_DATALOG_DELTA_KPKC_GRAPH_HPP_
 
+#include "tyr/common/associative_containers.hpp"
 #include "tyr/common/dynamic_bitset.hpp"
+#include "tyr/common/dynamic_bitset_comparators.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/formatter.hpp"
 #include "tyr/common/hash.hpp"

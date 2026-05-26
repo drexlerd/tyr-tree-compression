@@ -17,7 +17,10 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/comparators.hpp>
+#include <tyr/common/cista_comparators.hpp>
+#include <tyr/common/block_array_comparators.hpp>
 
+#include <cstdint>
 #include <limits>
 #include <span>
 #include <vector>
@@ -52,6 +55,33 @@ TEST(TyrTests, TyrCommonLessRangeOrdersPrefixes)
 
     EXPECT_TRUE(less_range(lhs, rhs));
     EXPECT_FALSE(less_range(rhs, lhs));
+}
+
+TEST(TyrTests, TyrCommonBlockArrayComparatorOrdersViews)
+{
+    auto lhs_storage = std::vector<uint8_t> { 1, 2 };
+    auto rhs_storage = std::vector<uint8_t> { 1, 3 };
+
+    using View = BasicBlockArrayView<uint8_t, bit::ForwardingBlockCoder<uint8_t>>;
+    auto lhs = View(lhs_storage.data(), lhs_storage.size());
+    auto rhs = View(rhs_storage.data(), rhs_storage.size());
+
+    EXPECT_TRUE(Less<View> {}(lhs, rhs));
+    EXPECT_FALSE(Less<View> {}(rhs, lhs));
+}
+
+TEST(TyrTests, TyrCommonCistaLessAdaptersOrderOffsetVector)
+{
+    auto lhs = ::cista::offset::vector<int> {};
+    lhs.emplace_back(1);
+    lhs.emplace_back(2);
+
+    auto rhs = ::cista::offset::vector<int> {};
+    rhs.emplace_back(1);
+    rhs.emplace_back(3);
+
+    EXPECT_TRUE(Less<::cista::offset::vector<int>> {}(lhs, rhs));
+    EXPECT_FALSE(Less<::cista::offset::vector<int>> {}(rhs, lhs));
 }
 
 }

@@ -19,18 +19,10 @@
 #define TYR_COMMON_HASH_HPP_
 
 #include "tyr/common/concepts.hpp"
-#include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/observer_ptr.hpp"
-
-#include <cista/containers/optional.h>
-#include <cista/containers/string.h>
-#include <cista/containers/variant.h>
-#include <cista/containers/vector.h>
 
 #include <array>
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <map>
 #include <optional>
@@ -81,47 +73,6 @@ struct Hash<void>
     size_t operator()(const T& el) const noexcept
     {
         return Hash<std::remove_cvref_t<T>> {}(el);
-    }
-};
-
-template<>
-struct Hash<::cista::offset::string>
-{
-    using Type = ::cista::offset::string;
-
-    size_t operator()(const Type& el) const noexcept { return hash_range(el); }
-};
-
-template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
-struct Hash<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>>
-{
-    using Type = ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>;
-
-    size_t operator()(const Type& el) const noexcept { return hash_range(el); }
-};
-
-template<typename... Ts>
-struct Hash<::cista::offset::variant<Ts...>>
-{
-    using Type = ::cista::offset::variant<Ts...>;
-
-    size_t operator()(const Type& el) const noexcept
-    {
-        return el.apply([](auto&& arg) -> size_t { return Hash<std::remove_cvref_t<decltype(arg)>> {}(arg); });
-    }
-};
-
-template<typename T>
-struct Hash<::cista::optional<T>>
-{
-    using Type = ::cista::optional<T>;
-
-    size_t operator()(const Type& el) const noexcept
-    {
-        if (!el.has_value())
-            return 0x9e3779b97f4a7c15ULL;
-
-        return Hash<T> {}(*el);
     }
 };
 
@@ -203,24 +154,6 @@ template<typename T, std::size_t Extent>
 struct Hash<std::span<T, Extent>>
 {
     size_t operator()(const std::span<T, Extent>& span) const noexcept { return hash_range(span); }
-};
-
-template<typename T>
-struct Hash<ObserverPtr<T>>
-{
-    size_t operator()(ObserverPtr<T> ptr) const noexcept { return Hash<std::remove_cvref_t<T>> {}(*ptr); }
-};
-
-template<std::unsigned_integral Block>
-struct Hash<BitsetSpan<Block>>
-{
-    size_t operator()(const BitsetSpan<Block>& bitset_span) const noexcept
-    {
-        size_t aggregated_hash = bitset_span.num_bits();
-        for (const auto& block : bitset_span.blocks())
-            hash_combine(aggregated_hash, block);
-        return aggregated_hash;
-    }
 };
 
 template<Identifiable T>

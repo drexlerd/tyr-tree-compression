@@ -22,6 +22,8 @@
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/types.hpp"
 
+#include <cista/containers/optional.h>
+
 #include <algorithm>
 #include <type_traits>
 

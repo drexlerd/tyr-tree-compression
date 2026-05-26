@@ -16,11 +16,14 @@
  */
 
 #include <gtest/gtest.h>
+#include <tyr/common/associative_container_formatters.hpp>
+#include <tyr/common/associative_containers.hpp>
 #include <tyr/common/formatter.hpp>
 
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace tyr::tests
@@ -45,6 +48,14 @@ TEST(TyrTests, TyrCommonFormatterHandlesNullableWrappers)
     EXPECT_EQ(fmt::format("{}", std::optional<int> { 7 }), "7");
     EXPECT_EQ(fmt::format("{}", std::shared_ptr<int> {}), "<nullptr>");
     EXPECT_EQ(fmt::format("{}", std::make_shared<int>(9)), "9");
+}
+
+TEST(TyrTests, TyrCommonAssociativeContainerFormatterFormatsFlatHashMap)
+{
+    auto values = UnorderedMap<int, std::string_view> {};
+    values.emplace(1, "one");
+
+    EXPECT_EQ(fmt::format("{}", values), "{1: one}");
 }
 
 }

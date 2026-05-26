@@ -19,7 +19,6 @@
 #include <tyr/common/core.hpp>
 
 #include <chrono>
-#include <filesystem>
 #include <limits>
 #include <stdexcept>
 #include <tuple>
@@ -37,7 +36,6 @@ TEST(TyrTests, TyrCommonCoreUmbrellaExposesLightweightHelpers)
 {
     EXPECT_EQ(bit::ceil_div(5u, 2u), 3u);
     EXPECT_EQ(to_ms(std::chrono::seconds(1)), 1000);
-    EXPECT_EQ(common::resolve_path(std::filesystem::path("/tmp"), "x"), std::filesystem::path("/tmp/x"));
     EXPECT_EQ(to_uint_t(7), uint_t { 7 });
     EXPECT_THROW(to_uint_t(static_cast<size_t>(std::numeric_limits<uint_t>::max()) + 1), std::overflow_error);
 

@@ -19,45 +19,30 @@
 #define TYR_COMMON_FORMATTER_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
-#include "tyr/common/uint_mixins.hpp"
-#include "tyr/common/vector.hpp"
 
-#include <array>
-#include <concepts>
 #include <cista/containers/optional.h>
 #include <cista/containers/string.h>
 #include <cista/containers/variant.h>
 #include <cista/containers/vector.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <fmt/ranges.h>
-#include <map>
 #include <memory>
 #include <optional>
 #include <ranges>
-#include <ostream>
-#include <set>
-#include <span>
-#include <sstream>
 #include <string>
-#include <string_view>
-#include <tuple>
 #include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
 #include <variant>
 #include <vector>
 
-#include <gtl/phmap.hpp>
-
 namespace tyr
 {
+
+template<typename T>
+struct Index;
+
+template<typename T, typename C>
+struct View;
 
 template<typename T>
 std::string to_string(const T& element)
@@ -83,11 +68,6 @@ struct range_format_kind<::cista::basic_string<Ptr>, Char, void> : std::false_ty
 
 template<typename C, typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator, typename Char>
 struct range_format_kind<tyr::View<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, C>, Char, void> : std::false_type
-{
-};
-
-template<typename K, typename V, typename Allocator, typename Char>
-struct range_format_kind<gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocator>, Char, void> : std::false_type
 {
 };
 
@@ -142,27 +122,6 @@ struct formatter<std::unique_ptr<T, Deleter>, char>
         if (value)
             return fmt::format_to(ctx.out(), "{}", *value);
         return fmt::format_to(ctx.out(), "<nullptr>");
-    }
-};
-
-template<typename K, typename V, typename Allocator>
-struct formatter<gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocator>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocator>& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "{{");
-        auto first = true;
-        for (const auto& [key, mapped] : value)
-        {
-            if (!first)
-                out = fmt::format_to(out, ", ");
-            first = false;
-            out = fmt::format_to(out, "{}: {}", key, mapped);
-        }
-        return fmt::format_to(out, "}}");
     }
 };
 
@@ -270,28 +229,6 @@ struct formatter<tyr::View<::cista::offset::variant<T, Ts...>, C>, char>
     }
 };
 
-template<std::unsigned_integral Block>
-struct formatter<tyr::BitsetSpan<Block>, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template<typename FormatContext>
-    auto format(const tyr::BitsetSpan<Block>& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "{{");
-        size_t pos = value.find_first();
-        bool first = true;
-        while (pos != tyr::BitsetSpan<Block>::npos)
-        {
-            if (!first)
-                out = fmt::format_to(out, ", ");
-            first = false;
-            out = fmt::format_to(out, "{}", pos);
-            pos = value.find_next(pos);
-        }
-        return fmt::format_to(out, "}}");
-    }
-};
 
 template<>
 struct formatter<std::monostate, char>

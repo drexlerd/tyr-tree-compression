@@ -15,22 +15,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_COMMON_HPP_
-#define TYR_COMMON_COMMON_HPP_
+#ifndef TYR_COMMON_DYNAMIC_BITSET_COMPARATORS_HPP_
+#define TYR_COMMON_DYNAMIC_BITSET_COMPARATORS_HPP_
 
-#include "tyr/common/adapters.hpp"
-#include "tyr/common/block_array_comparators.hpp"
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/containers.hpp"
-#include "tyr/common/core.hpp"
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/dynamic_bitset.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
-#include "tyr/common/iostream.hpp"
-#include "tyr/common/path.hpp"
-#include "tyr/common/project_adapters.hpp"
-#include "tyr/common/repository_types.hpp"
-#include "tyr/common/tuple.hpp"
-#include "tyr/common/uint_mixins.hpp"
+
+#include <concepts>
+#include <cstddef>
+
+namespace tyr
+{
+template<std::unsigned_integral Block>
+struct Hash<BitsetSpan<Block>>
+{
+    size_t operator()(const BitsetSpan<Block>& bitset_span) const noexcept
+    {
+        size_t aggregated_hash = bitset_span.num_bits();
+        for (const auto& block : bitset_span.blocks())
+            hash_combine(aggregated_hash, block);
+        return aggregated_hash;
+    }
+};
+
+template<std::unsigned_integral Block>
+struct EqualTo<BitsetSpan<Block>>
+{
+    bool operator()(const BitsetSpan<Block>& lhs, const BitsetSpan<Block>& rhs) const noexcept { return lhs == rhs; }
+};
+}
 
 #endif

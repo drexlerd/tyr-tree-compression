@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/equal_to.hpp>
+#include <tyr/common/cista_comparators.hpp>
+#include <tyr/common/observer_ptr_comparators.hpp>
 
 #include <limits>
 #include <span>
@@ -51,6 +53,29 @@ TEST(TyrTests, TyrCommonEqualRangeChecksSize)
     const auto rhs = std::vector<int> { 1, 2, 3 };
 
     EXPECT_FALSE(equal_range(lhs, rhs));
+}
+
+TEST(TyrTests, TyrCommonCistaEqualToAdaptersCompareOffsetVector)
+{
+    auto lhs = ::cista::offset::vector<int> {};
+    lhs.emplace_back(1);
+    lhs.emplace_back(2);
+
+    auto rhs = ::cista::offset::vector<int> {};
+    rhs.emplace_back(1);
+    rhs.emplace_back(2);
+
+    EXPECT_TRUE(EqualTo<::cista::offset::vector<int>> {}(lhs, rhs));
+}
+
+TEST(TyrTests, TyrCommonObserverPtrEqualToAdaptersComparePointees)
+{
+    const auto lhs_value = 7;
+    const auto rhs_value = 7;
+    const auto lhs = make_observer(lhs_value);
+    const auto rhs = make_observer(rhs_value);
+
+    EXPECT_TRUE(EqualTo<ObserverPtr<const int>> {}(lhs, rhs));
 }
 
 }

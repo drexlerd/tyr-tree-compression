@@ -25,7 +25,6 @@
 #include "tyr/common/itertools.hpp"
 #include "tyr/common/memory.hpp"
 #include "tyr/common/observer_ptr.hpp"
-#include "tyr/common/path.hpp"
 #include "tyr/common/type_list.hpp"
 
 #endif

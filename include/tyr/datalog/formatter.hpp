@@ -20,6 +20,7 @@
 
 #include "tyr/common/chrono.hpp"
 #include "tyr/common/formatter.hpp"
+#include "tyr/common/dynamic_bitset_formatters.hpp"
 #include "tyr/common/iostream.hpp"
 #include "tyr/datalog/assignment.hpp"
 #include "tyr/datalog/consistency_graph.hpp"

@@ -15,22 +15,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_COMMON_HPP_
-#define TYR_COMMON_COMMON_HPP_
+#ifndef TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
+#define TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
 
-#include "tyr/common/adapters.hpp"
-#include "tyr/common/block_array_comparators.hpp"
+#include "tyr/common/block_array_pool.hpp"
 #include "tyr/common/comparators.hpp"
-#include "tyr/common/containers.hpp"
-#include "tyr/common/core.hpp"
-#include "tyr/common/declarations.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/iostream.hpp"
-#include "tyr/common/path.hpp"
-#include "tyr/common/project_adapters.hpp"
-#include "tyr/common/repository_types.hpp"
-#include "tyr/common/tuple.hpp"
-#include "tyr/common/uint_mixins.hpp"
+
+namespace tyr
+{
+
+template<typename T, typename C>
+struct View;
+
+template<typename Block, typename Coder>
+struct Less<BasicBlockArrayView<Block, Coder>>
+{
+    using Type = BasicBlockArrayView<Block, Coder>;
+
+    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
+};
+
+template<typename Block, typename Coder, typename C>
+struct Less<View<BasicBlockArrayView<Block, Coder>, C>>
+{
+    using Type = View<BasicBlockArrayView<Block, Coder>, C>;
+
+    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
+};
+}
 
 #endif

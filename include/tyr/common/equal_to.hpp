@@ -19,15 +19,7 @@
 #define TYR_COMMON_EQUAL_TO_HPP_
 
 #include "tyr/common/concepts.hpp"
-#include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/observer_ptr.hpp"
 
-#include <cista/containers/optional.h>
-#include <cista/containers/string.h>
-#include <cista/containers/variant.h>
-#include <cista/containers/vector.h>
-
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <functional>
@@ -79,62 +71,6 @@ struct EqualTo<T>
             return std::isnan(lhs) && std::isnan(rhs);
 
         return std::equal_to<T> {}(lhs, rhs);
-    }
-};
-
-template<>
-struct EqualTo<::cista::offset::string>
-{
-    using Type = ::cista::offset::string;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return equal_range(lhs, rhs); }
-};
-
-template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
-struct EqualTo<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>>
-{
-    using Type = ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return equal_range(lhs, rhs); }
-};
-
-template<typename... Ts>
-struct EqualTo<::cista::offset::variant<Ts...>>
-{
-    using Type = ::cista::offset::variant<Ts...>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        return lhs.apply(
-            [&](auto&& l)
-            {
-                return rhs.apply(
-                    [&](auto&& r)
-                    {
-                        // Recursively apply EqualTo for matching types
-                        if constexpr (std::is_same_v<std::remove_cvref_t<decltype(l)>, std::remove_cvref_t<decltype(r)>>)
-                            return EqualTo<std::remove_cvref_t<decltype(l)>> {}(l, r);
-                        // Different types are always unequal
-                        return false;
-                    });
-            });
-    }
-};
-
-template<typename T>
-struct EqualTo<::cista::optional<T>>
-{
-    using Type = ::cista::optional<T>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        if (!lhs.has_value() && !rhs.has_value())
-            return true;
-
-        if (lhs.has_value() != rhs.has_value())
-            return false;
-
-        return EqualTo<T> {}(*lhs, *rhs);
     }
 };
 
@@ -233,18 +169,6 @@ template<typename T, std::size_t Extent>
 struct EqualTo<std::span<T, Extent>>
 {
     bool operator()(const std::span<T, Extent>& lhs, const std::span<T, Extent>& rhs) const noexcept { return equal_range(lhs, rhs); }
-};
-
-template<typename T>
-struct EqualTo<ObserverPtr<T>>
-{
-    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return EqualTo<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
-};
-
-template<std::unsigned_integral Block>
-struct EqualTo<BitsetSpan<Block>>
-{
-    bool operator()(const BitsetSpan<Block>& lhs, const BitsetSpan<Block>& rhs) const noexcept { return lhs == rhs; }
 };
 
 template<Identifiable T>

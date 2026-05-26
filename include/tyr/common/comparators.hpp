@@ -18,22 +18,13 @@
 #ifndef TYR_COMMON_COMPARATORS_HPP_
 #define TYR_COMMON_COMPARATORS_HPP_
 
-#include "tyr/common/block_array_pool.hpp"
 #include "tyr/common/concepts.hpp"
-#include "tyr/common/types.hpp"
 
-#include <algorithm>
-#include <concepts>
-#include <cstddef>
-#include <cista/containers/optional.h>
-#include <cista/containers/variant.h>
-#include <cista/containers/vector.h>
 #include <array>
+#include <cstddef>
 #include <functional>
-#include <map>
 #include <optional>
 #include <ranges>
-#include <set>
 #include <span>
 #include <tuple>
 #include <type_traits>
@@ -97,14 +88,6 @@ private:
     }
 };
 
-template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
-struct Less<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>>
-{
-    using Type = ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
-};
-
 template<typename T, size_t N>
 struct Less<std::array<T, N>>
 {
@@ -153,20 +136,6 @@ struct Less<std::optional<T>>
     }
 };
 
-template<typename T>
-struct Less<::cista::optional<T>>
-{
-    using Type = ::cista::optional<T>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        if (lhs.has_value() != rhs.has_value())
-            return !lhs.has_value();
-
-        return lhs.has_value() ? Less<std::remove_cvref_t<T>> {}(*lhs, *rhs) : false;
-    }
-};
-
 template<typename... Ts>
 struct Less<std::variant<Ts...>>
 {
@@ -187,51 +156,12 @@ struct Less<std::variant<Ts...>>
     }
 };
 
-template<typename... Ts>
-struct Less<::cista::offset::variant<Ts...>>
-{
-    using Type = ::cista::offset::variant<Ts...>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        if (lhs.index() != rhs.index())
-            return lhs.index() < rhs.index();
-
-        return lhs.apply(
-            [&](auto&& l)
-            {
-                return rhs.apply(
-                    [&](auto&& r)
-                    {
-                        if constexpr (std::is_same_v<std::remove_cvref_t<decltype(l)>, std::remove_cvref_t<decltype(r)>>)
-                            return Less<std::remove_cvref_t<decltype(l)>> {}(l, r);
-                        return false;
-                    });
-            });
-    }
-};
-
 template<typename T, std::size_t Extent>
 struct Less<std::span<T, Extent>>
 {
     bool operator()(const std::span<T, Extent>& lhs, const std::span<T, Extent>& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
-template<typename Block, typename Coder>
-struct Less<BasicBlockArrayView<Block, Coder>>
-{
-    using Type = BasicBlockArrayView<Block, Coder>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
-};
-
-template<typename Block, typename Coder, typename C>
-struct Less<View<BasicBlockArrayView<Block, Coder>, C>>
-{
-    using Type = View<BasicBlockArrayView<Block, Coder>, C>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
-};
 
 template<Identifiable T>
 struct Less<T>

@@ -15,17 +15,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_ADAPTERS_HPP_
-#define TYR_COMMON_ADAPTERS_HPP_
+#ifndef TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
+#define TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
 
-#include "tyr/common/associative_container_formatters.hpp"
-#include "tyr/common/cista_comparators.hpp"
-#include "tyr/common/closed_interval.hpp"
-#include "tyr/common/dynamic_bitset_comparators.hpp"
-#include "tyr/common/dynamic_bitset_formatters.hpp"
-#include "tyr/common/formatter.hpp"
-#include "tyr/common/json.hpp"
-#include "tyr/common/observer_ptr_comparators.hpp"
-#include "tyr/common/onetbb.hpp"
+#include "tyr/common/equal_to.hpp"
+#include "tyr/common/hash.hpp"
+#include "tyr/common/observer_ptr.hpp"
+
+#include <type_traits>
+
+namespace tyr
+{
+
+template<typename T>
+struct Hash<ObserverPtr<T>>
+{
+    size_t operator()(ObserverPtr<T> ptr) const noexcept { return Hash<std::remove_cvref_t<T>> {}(*ptr); }
+};
+
+template<typename T>
+struct EqualTo<ObserverPtr<T>>
+{
+    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return EqualTo<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
+};
+
+}
 
 #endif

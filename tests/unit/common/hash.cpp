@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/hash.hpp>
+#include <tyr/common/cista_comparators.hpp>
+#include <tyr/common/observer_ptr_comparators.hpp>
 
 #include <array>
 #include <span>
@@ -39,6 +41,23 @@ TEST(TyrTests, TyrCommonHashRangeKeepsSizeInSeed)
     const auto two = std::array<int, 2> { 0, 0 };
 
     EXPECT_NE(hash_range(one), hash_range(two));
+}
+
+TEST(TyrTests, TyrCommonCistaHashAdaptersHashOffsetVector)
+{
+    auto values = ::cista::offset::vector<int> {};
+    values.emplace_back(1);
+    values.emplace_back(2);
+
+    EXPECT_EQ(hash_range(values), Hash<::cista::offset::vector<int>> {}(values));
+}
+
+TEST(TyrTests, TyrCommonObserverPtrHashAdaptersHashPointee)
+{
+    const auto value = 7;
+    const auto ptr = make_observer(value);
+
+    EXPECT_EQ(Hash<int> {}(value), Hash<ObserverPtr<const int>> {}(ptr));
 }
 
 }

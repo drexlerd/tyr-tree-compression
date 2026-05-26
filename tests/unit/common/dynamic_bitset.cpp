@@ -18,6 +18,8 @@
 #include <gtest/gtest.h>
 #include <tyr/common/config.hpp>
 #include <tyr/common/dynamic_bitset.hpp>
+#include <tyr/common/dynamic_bitset_comparators.hpp>
+#include <tyr/common/dynamic_bitset_formatters.hpp>
 #include <vector>
 
 namespace tyr::tests
@@ -74,6 +76,27 @@ TEST(TyrTests, TyrCommonDynamicBitset)
 
     lhs ^= rhs;
     EXPECT_TRUE(lhs.all());
+}
+
+TEST(TyrTests, TyrCommonDynamicBitsetAdaptersHashAndCompareSpans)
+{
+    auto lhs_blocks = std::vector<uint64_t>(BitsetSpan<uint64_t>::num_blocks(8), 0);
+    auto rhs_blocks = std::vector<uint64_t>(BitsetSpan<uint64_t>::num_blocks(8), 0);
+
+    auto lhs = BitsetSpan<uint64_t>(lhs_blocks.data(), 8);
+    auto rhs = BitsetSpan<uint64_t>(rhs_blocks.data(), 8);
+
+    lhs.set(1);
+    rhs.set(1);
+
+    EXPECT_TRUE(EqualTo<BitsetSpan<uint64_t>> {}(lhs, rhs));
+    EXPECT_EQ(Hash<BitsetSpan<uint64_t>> {}(lhs), Hash<BitsetSpan<uint64_t>> {}(rhs));
+
+    rhs.set(2);
+
+    EXPECT_FALSE(EqualTo<BitsetSpan<uint64_t>> {}(lhs, rhs));
+    EXPECT_NE(Hash<BitsetSpan<uint64_t>> {}(lhs), Hash<BitsetSpan<uint64_t>> {}(rhs));
+    EXPECT_EQ(fmt::format("{}", lhs), "{1}");
 }
 
 }

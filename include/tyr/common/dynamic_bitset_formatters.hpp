@@ -1,0 +1,57 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef TYR_COMMON_DYNAMIC_BITSET_FORMATTERS_HPP_
+#define TYR_COMMON_DYNAMIC_BITSET_FORMATTERS_HPP_
+
+#include "tyr/common/config.hpp"
+#include "tyr/common/dynamic_bitset.hpp"
+
+#include <concepts>
+#include <cstddef>
+
+#include <fmt/format.h>
+
+#if TYR_ENABLE_FMT_FORMATTERS
+namespace fmt
+{
+template<std::unsigned_integral Block>
+struct formatter<tyr::BitsetSpan<Block>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template<typename FormatContext>
+    auto format(const tyr::BitsetSpan<Block>& value, FormatContext& ctx) const
+    {
+        auto out = fmt::format_to(ctx.out(), "{{");
+        size_t pos = value.find_first();
+        bool first = true;
+        while (pos != tyr::BitsetSpan<Block>::npos)
+        {
+            if (!first)
+                out = fmt::format_to(out, ", ");
+            first = false;
+            out = fmt::format_to(out, "{}", pos);
+            pos = value.find_next(pos);
+        }
+        return fmt::format_to(out, "}}");
+    }
+};
+}
+#endif
+
+#endif
