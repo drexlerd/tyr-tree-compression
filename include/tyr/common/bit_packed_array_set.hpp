@@ -19,16 +19,22 @@
 #define TYR_COMMON_BIT_PACKED_ARRAY_SET_HPP_
 
 #include "tyr/common/bit_packed_array_pool.hpp"
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
+#include "tyr/common/config.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <concepts>
 #include <memory>
 #include <optional>
 #include <ranges>
 #include <span>
+#include <stdexcept>
+#include <utility>
+
+#include <gtl/phmap.hpp>
 
 namespace tyr
 {
@@ -50,6 +56,23 @@ private:
     class IndexableHash;
     class IndexableEqualTo;
 
+    void ensure_fits(std::span<const value_type> element) const
+    {
+        if (element.size() != length())
+            throw std::invalid_argument("BitPackedArraySet: wrong number of elements.");
+    }
+
+    index_type insert_new_with_matching_hash(size_t h, std::span<const value_type> element)
+    {
+        const auto index = to_uint_t(m_pool->size());
+        m_pool->push_back(element);
+
+        [[maybe_unused]] const auto [it, inserted] = m_set.emplace_with_hash(h, index);
+        assert(inserted);
+
+        return index;
+    }
+
 public:
     BitPackedArraySet(size_t length, uint8_t width) :
         m_pool(std::make_unique<pool_type>(length, width)),
@@ -67,6 +90,7 @@ public:
 
     std::optional<index_type> find_with_hash(std::span<const value_type> element, size_t h) const
     {
+        ensure_fits(element);
         assert(h == BitPackedArraySet::hash(element) && "The given hash does not match container internal's hash.");
         assert(h == m_set.hash(element));
 
@@ -77,46 +101,38 @@ public:
         return std::nullopt;
     }
 
-    std::optional<index_type> find(std::span<const value_type> element) const
-    {
-        assert(BitPackedArraySet::hash(element) == m_set.hash(element));
+    std::optional<index_type> find(std::span<const value_type> element) const { return find_with_hash(element, BitPackedArraySet::hash(element)); }
 
-        return find_with_hash(element, BitPackedArraySet::hash(element));
-    }
+    bool contains_with_hash(std::span<const value_type> element, size_t h) const { return find_with_hash(element, h).has_value(); }
 
     std::pair<index_type, bool> insert_with_hash(size_t h, std::span<const value_type> element)
     {
+        ensure_fits(element);
         assert(h == BitPackedArraySet::hash(element) && "The given hash does not match container internal's hash.");
         assert(h == m_set.hash(element));
 
         if (const auto it = m_set.find(element, h); it != m_set.end())
             return { *it, false };
 
-        return { insert_new_with_hash(h, element), true };
+        return { insert_new_with_matching_hash(h, element), true };
     }
 
     index_type insert_new_with_hash(size_t h, std::span<const value_type> element)
     {
+        ensure_fits(element);
         assert(h == BitPackedArraySet::hash(element) && "The given hash does not match container internal's hash.");
         assert(h == m_set.hash(element));
 
-        const auto index = static_cast<index_type>(m_pool->size());
-        m_pool->push_back(element);
-
-        [[maybe_unused]] const auto [it, inserted] = m_set.emplace_with_hash(h, index);
-        assert(inserted);
-
-        return index;
+        return insert_new_with_matching_hash(h, element);
     }
 
-    std::pair<index_type, bool> insert(std::span<const value_type> element)
+    std::pair<index_type, bool> insert(std::span<const value_type> element) { return insert_with_hash(BitPackedArraySet::hash(element), element); }
+
+    bool contains(std::span<const value_type> element) const
     {
-        assert(BitPackedArraySet::hash(element) == m_set.hash(element));
-
-        return insert_with_hash(BitPackedArraySet::hash(element), element);
+        ensure_fits(element);
+        return m_set.contains(element);
     }
-
-    bool contains(std::span<const value_type> element) const { return m_set.contains(element); }
 
     ConstArrayView operator[](index_type index) const { return std::as_const(*m_pool)[index]; }
 
@@ -136,25 +152,14 @@ public:
 private:
     struct Hash
     {
-        template<std::ranges::input_range Range>
-            requires std::same_as<std::ranges::range_value_t<Range>, value_type>
-        size_t operator()(const Range& el) const noexcept
-        {
-            size_t aggregated_hash = 0;
-            for (const auto& item : el)
-                hash_combine(aggregated_hash, item);
-            return aggregated_hash;
-        }
+        template<InputRangeOf<value_type> Range>
+        size_t operator()(const Range& el) const noexcept { return hash_range(el); }
     };
 
     struct EqualTo
     {
-        template<std::ranges::input_range Range1, std::ranges::input_range Range2>
-            requires std::same_as<std::ranges::range_value_t<Range1>, value_type> && std::same_as<std::ranges::range_value_t<Range2>, value_type>
-        bool operator()(const Range1& lhs, const Range2& rhs) const noexcept
-        {
-            return std::ranges::equal(lhs, rhs);
-        }
+        template<InputRangeOf<value_type> Range1, InputRangeOf<value_type> Range2>
+        bool operator()(const Range1& lhs, const Range2& rhs) const noexcept { return equal_range(lhs, rhs); }
     };
 
     class IndexableHash

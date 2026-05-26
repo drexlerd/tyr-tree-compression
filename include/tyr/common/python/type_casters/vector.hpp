@@ -60,8 +60,7 @@ struct type_caster<::tyr::View<::cista::basic_vector<Type, Ptr, IndexPointers, T
     }
 };
 
-template<typename Block, typename Coder, typename C>
-    requires std::unsigned_integral<std::remove_cv_t<Block>>
+template<std::unsigned_integral Block, typename Coder, typename C>
 struct type_caster<::tyr::View<::tyr::BasicBlockArrayView<Block, Coder>, C>>
 {
     using ViewT = ::tyr::View<::tyr::BasicBlockArrayView<Block, Coder>, C>;

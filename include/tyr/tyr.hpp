@@ -25,6 +25,7 @@
 #include "tyr/buffer/buffer.hpp"
 
 // Common
+#include "tyr/common/core.hpp"
 #include "tyr/common/common.hpp"
 
 // Formalism

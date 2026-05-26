@@ -18,7 +18,6 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_NUMERIC_EFFECT_OPERATOR_UTILS_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_NUMERIC_EFFECT_OPERATOR_UTILS_HPP_
 
-#include "tyr/common/declarations.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 
 namespace tyr::formalism::planning

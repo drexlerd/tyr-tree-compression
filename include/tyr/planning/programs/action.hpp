@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_PROGRAMS_ACTION_HPP_
 #define TYR_PLANNING_PROGRAMS_ACTION_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/associative_containers.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/datalog/program_context.hpp"

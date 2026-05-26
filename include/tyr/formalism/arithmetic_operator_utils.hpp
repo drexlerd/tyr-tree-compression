@@ -19,7 +19,6 @@
 #define TYR_FORMALISM_ARITHMETIC_OPERATOR_UTILS_HPP_
 
 #include "tyr/common/closed_interval.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/formalism/declarations.hpp"
 
 namespace tyr::formalism

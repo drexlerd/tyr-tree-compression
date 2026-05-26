@@ -15,7 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json_loader.hpp"
+#include "tyr/common/json.hpp"
+#include "tyr/common/json_suite.hpp"
 
 #include <filesystem>
 #include <fmt/core.h>
@@ -100,22 +101,14 @@ std::string to_string(p::SearchStatus status)
 
 SiwCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
-    const auto max_arity = static_cast<uint_t>(tyr::common::as_size(suite, "max_arity", "suite"));
+    const auto max_arity = tyr::common::as_uint_t(suite, "max_arity", "suite");
     auto expected_status = std::optional<p::SearchStatus> {};
     auto expected_maximum_effective_width = std::optional<uint_t> {};
 
-    if (const auto* value = object.if_contains("expected_status"))
-    {
-        if (!value->is_string())
-            throw std::runtime_error("case.expected_status must be a string.");
-        expected_status = parse_status(std::string(value->as_string()));
-    }
-    if (const auto* value = object.if_contains("expected_maximum_effective_width"))
-    {
-        if (!value->is_int64() || value->as_int64() < 0)
-            throw std::runtime_error("case.expected_maximum_effective_width must be a non-negative integer.");
-        expected_maximum_effective_width = static_cast<uint_t>(value->as_int64());
-    }
+    if (const auto value = tyr::common::find_string(object, "expected_status", "case"))
+        expected_status = parse_status(*value);
+    if (const auto value = tyr::common::find_uint_t(object, "expected_maximum_effective_width", "case"))
+        expected_maximum_effective_width = *value;
 
     return SiwCase { tyr::common::as_string(object, "name", "case"),
                      tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
@@ -129,12 +122,8 @@ std::vector<SiwCase> load_cases()
 {
     const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/algorithms/siw.json");
     const auto& suite_object = tyr::common::as_object(suite, "suite");
-    const auto* cases_value = suite_object.if_contains("cases");
-    if (!cases_value)
-        throw std::runtime_error("suite.cases is required.");
-
     auto result = std::vector<SiwCase> {};
-    for (const auto& case_value : tyr::common::as_array(*cases_value, "suite.cases"))
+    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
         result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
     return result;
 }

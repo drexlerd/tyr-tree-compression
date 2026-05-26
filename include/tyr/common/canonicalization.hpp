@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (C) 2025-2026 Dominik Drexler
  *
@@ -25,22 +23,42 @@
 #include "tyr/common/types.hpp"
 
 #include <algorithm>
+#include <type_traits>
 
 namespace tyr
 {
 
-template<typename T>
-bool is_canonical(const IndexList<T>& list)
+namespace detail
+{
+template<typename List>
+bool is_canonical_list(const List& list)
 {
     using Element = std::remove_cvref_t<decltype(*list.begin())>;
     return std::is_sorted(list.begin(), list.end(), Less<Element> {});
 }
 
+template<typename List>
+void canonicalize_list(List& list)
+{
+    using Element = std::remove_cvref_t<decltype(*list.begin())>;
+
+    if (!is_canonical_list(list))
+        std::sort(list.begin(), list.end(), Less<Element> {});
+
+    list.erase(std::unique(list.begin(), list.end(), EqualTo<Element> {}), list.end());
+}
+}
+
+template<typename T>
+bool is_canonical(const IndexList<T>& list)
+{
+    return detail::is_canonical_list(list);
+}
+
 template<typename T>
 bool is_canonical(const DataList<T>& list)
 {
-    using Element = std::remove_cvref_t<decltype(*list.begin())>;
-    return std::is_sorted(list.begin(), list.end(), Less<Element> {});
+    return detail::is_canonical_list(list);
 }
 
 template<typename T>
@@ -52,27 +70,13 @@ bool is_canonical(const ::cista::optional<T>& element)
 template<typename T>
 void canonicalize(IndexList<T>& list)
 {
-    if (!is_canonical(list))
-    {
-        using Element = std::remove_cvref_t<decltype(*list.begin())>;
-        std::sort(list.begin(), list.end(), Less<Element> {});
-    }
-
-    using Element = std::remove_cvref_t<decltype(*list.begin())>;
-    list.erase(std::unique(list.begin(), list.end(), EqualTo<Element> {}), list.end());
+    detail::canonicalize_list(list);
 }
 
 template<typename T>
 void canonicalize(DataList<T>& list)
 {
-    if (!is_canonical(list))
-    {
-        using Element = std::remove_cvref_t<decltype(*list.begin())>;
-        std::sort(list.begin(), list.end(), Less<Element> {});
-    }
-
-    using Element = std::remove_cvref_t<decltype(*list.begin())>;
-    list.erase(std::unique(list.begin(), list.end(), EqualTo<Element> {}), list.end());
+    detail::canonicalize_list(list);
 }
 
 template<typename T>

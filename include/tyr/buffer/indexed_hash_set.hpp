@@ -128,7 +128,7 @@ public:
         // 3. Write to storage
         auto begin = m_arena->write(m_buf->base(), m_buf->size(), alignof(Data<Tag>));
 
-        const auto index = Index<Tag>(static_cast<uint_t>(m_storage->size()));
+        const auto index = Index<Tag>(to_uint_t(m_storage->size()));
 
         // 4. Insert into vec
         const auto serialized_element = ::cista::deserialize<const Data<Tag>, Mode>(begin, begin + m_buf->size());

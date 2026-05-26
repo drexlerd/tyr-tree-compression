@@ -13,7 +13,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/detail/nb_dict.h>
 #include <type_traits>
-#include <tyr/common/declarations.hpp>
+#include <tyr/common/associative_containers.hpp>
 #include <tyr/common/equal_to.hpp>
 #include <tyr/common/hash.hpp>
 

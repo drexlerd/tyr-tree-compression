@@ -19,7 +19,7 @@
 #define TYR_ANALYSIS_LISTENERS_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/declarations.hpp"  // for UnorderedMap, UnorderedSet
+#include "tyr/common/associative_containers.hpp"
 #include "tyr/common/equal_to.hpp"      // for EqualTo
 #include "tyr/common/hash.hpp"          // for Hash
 #include "tyr/common/types.hpp"

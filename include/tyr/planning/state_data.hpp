@@ -19,7 +19,7 @@
 #define TYR_PLANNING_STATE_DATA_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/planning/declarations.hpp"

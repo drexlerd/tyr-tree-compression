@@ -28,6 +28,7 @@
 #include <gtl/phmap.hpp>
 #include <memory>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace tyr
@@ -79,6 +80,10 @@ public:
         return find_with_hash(element, IndexedHashSet::hash(element));
     }
 
+    bool contains_with_hash(const Data<Tag>& element, size_t h) const { return find_with_hash(element, h).has_value(); }
+
+    bool contains(const Data<Tag>& element) const { return find(element).has_value(); }
+
     std::pair<Index<Tag>, bool> insert_with_hash(size_t h, const Data<Tag>& element)
     {
         // assert(is_canonical(element) && "The given element is not canonical. Did you forget to call canonicalize?");
@@ -97,7 +102,7 @@ public:
         assert(h == hash(element) && "The given hash does not match container internal's hash.");
         assert(h == m_set.hash(element));
 
-        Index<Tag> idx(static_cast<uint_t>(m_storage->size()));
+        Index<Tag> idx(to_uint_t(m_storage->size()));
         m_storage->push_back(element);
         [[maybe_unused]] const auto [it, inserted] = m_set.emplace_with_hash(h, idx);
         assert(inserted);
@@ -125,6 +130,8 @@ public:
     }
 
     std::size_t size() const noexcept { return m_storage->size(); }
+
+    bool empty() const noexcept { return m_storage->empty(); }
 
 private:
     class IndexableHash

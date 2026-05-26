@@ -18,39 +18,13 @@
 #ifndef TYR_COMMON_DECLARATIONS_HPP_
 #define TYR_COMMON_DECLARATIONS_HPP_
 
+#include "tyr/common/associative_containers.hpp"
+#include "tyr/common/concepts.hpp"
 #include "tyr/common/config.hpp"
-
-#include <cista/containers/optional.h>
-#include <cista/containers/string.h>
-#include <cista/containers/variant.h>
-#include <cista/containers/vector.h>
-#include <concepts>
-#include <functional>
-#include <gtl/btree.hpp>
-#include <gtl/phmap.hpp>
-#include <tuple>
-#include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
 namespace tyr
 {
 
-/**
- * General utility
- */
-
-/// @brief Check whether T has a function that returns members that aims to identify the class.
-template<typename T>
-concept Identifiable = requires(const T a) {
-    { a.identifying_members() };
-};
-
-template<typename T>
-struct dependent_false : std::false_type
-{
-};
 
 /**
  * Forward declarations and type defs
@@ -60,15 +34,6 @@ template<typename T>
 class ObserverPtr;
 
 template<typename T>
-struct Hash;
-
-template<typename T>
-struct EqualTo;
-
-template<typename T>
-struct Less;
-
-template<typename T>
 struct LessEqual;
 
 template<typename T>
@@ -76,18 +41,6 @@ struct Greater;
 
 template<typename T>
 struct GreaterEqual;
-
-template<typename T>
-using UnorderedSet = gtl::flat_hash_set<T, Hash<T>, EqualTo<T>>;
-
-template<typename T, typename V>
-using UnorderedMap = gtl::flat_hash_map<T, V, Hash<T>, EqualTo<T>>;
-
-template<typename T>
-using Set = gtl::btree_set<T, Less<T>>;
-
-template<typename T, typename V>
-using Map = gtl::btree_map<T, V, Less<T>>;
 
 }
 

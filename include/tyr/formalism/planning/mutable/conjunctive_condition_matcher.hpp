@@ -19,7 +19,7 @@
 #define TYR_FORMALISM_PLANNING_MUTABLE_CONJUNCTIVE_CONDITION_MATCHER_HPP_
 
 #include "tyr/common/comparators.hpp"
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/associative_containers.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/formalism/planning/mutable/conjunctive_condition.hpp"
@@ -28,6 +28,7 @@
 #include "tyr/formalism/unification/structure_traits.hpp"
 #include "tyr/formalism/unification/structure_traits_impl.hpp"
 
+#include <boost/dynamic_bitset/dynamic_bitset.hpp>
 #include <vector>
 
 namespace tyr::formalism::planning

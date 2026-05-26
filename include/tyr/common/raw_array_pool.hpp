@@ -11,18 +11,17 @@
 #define TYR_COMMON_RAW_ARRAY_POOL_HPP_
 
 #include "tyr/common/bit.hpp"
+#include "tyr/common/concepts.hpp"
 
 #include <bit>
 #include <cassert>
 #include <cstddef>
-#include <type_traits>
 #include <vector>
 
 namespace tyr
 {
 
-template<typename T, size_t ArraysPerSegment = 1024>
-    requires std::is_trivially_copyable_v<T>
+template<TriviallyCopyable T, size_t ArraysPerSegment = 1024>
 class RawArrayPool
 {
     static_assert(bit::is_power_of_two(ArraysPerSegment));
@@ -80,6 +79,30 @@ public:
         return &m_segments[seg][idx * m_array_size];
     }
 
+    const T* front() const noexcept
+    {
+        assert(!empty());
+        return (*this)[0];
+    }
+
+    T* front() noexcept
+    {
+        assert(!empty());
+        return (*this)[0];
+    }
+
+    const T* back() const noexcept
+    {
+        assert(!empty());
+        return (*this)[m_size - 1];
+    }
+
+    T* back() noexcept
+    {
+        assert(!empty());
+        return (*this)[m_size - 1];
+    }
+
     void clear() noexcept
     {
         m_cur_seg = 0;
@@ -96,6 +119,7 @@ public:
     }
 
     size_t size() const noexcept { return m_size; }
+    bool empty() const noexcept { return m_size == 0; }
     size_t array_size() const noexcept { return m_array_size; }
 
 private:

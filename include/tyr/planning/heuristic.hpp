@@ -19,7 +19,7 @@
 #define TYR_PLANNING_HEURISTIC_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/associative_containers.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/formalism/planning/declarations.hpp"

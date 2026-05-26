@@ -18,7 +18,7 @@
 #ifndef TYR_COMMON_UNORDERED_SET_HPP_
 #define TYR_COMMON_UNORDERED_SET_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/associative_containers.hpp"
 
 #include <unordered_set>
 

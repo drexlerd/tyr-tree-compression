@@ -19,14 +19,20 @@
 #define TYR_COMMON_COMPARATORS_HPP_
 
 #include "tyr/common/block_array_pool.hpp"
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
 #include "tyr/common/types.hpp"
 
 #include <algorithm>
+#include <concepts>
+#include <cstddef>
+#include <cista/containers/optional.h>
+#include <cista/containers/variant.h>
+#include <cista/containers/vector.h>
 #include <array>
 #include <functional>
 #include <map>
 #include <optional>
+#include <ranges>
 #include <set>
 #include <span>
 #include <tuple>
@@ -37,6 +43,9 @@
 
 namespace tyr
 {
+
+template<std::ranges::input_range LhsRange, std::ranges::input_range RhsRange>
+inline bool less_range(const LhsRange& lhs, const RhsRange& rhs) noexcept;
 
 /// @brief `Less` is our custom less-than comparator, like std::less.
 ///
@@ -93,28 +102,19 @@ struct Less<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Alloc
 {
     using Type = ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>;
 
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), Less<std::remove_cvref_t<T>> {});
-    }
+    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 template<typename T, size_t N>
 struct Less<std::array<T, N>>
 {
-    bool operator()(const std::array<T, N>& lhs, const std::array<T, N>& rhs) const noexcept
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), Less<std::remove_cvref_t<T>> {});
-    }
+    bool operator()(const std::array<T, N>& lhs, const std::array<T, N>& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 template<typename T, typename Allocator>
 struct Less<std::vector<T, Allocator>>
 {
-    bool operator()(const std::vector<T, Allocator>& lhs, const std::vector<T, Allocator>& rhs) const noexcept
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), Less<std::remove_cvref_t<T>> {});
-    }
+    bool operator()(const std::vector<T, Allocator>& lhs, const std::vector<T, Allocator>& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 template<typename T1, typename T2>
@@ -214,10 +214,7 @@ struct Less<::cista::offset::variant<Ts...>>
 template<typename T, std::size_t Extent>
 struct Less<std::span<T, Extent>>
 {
-    bool operator()(const std::span<T, Extent>& lhs, const std::span<T, Extent>& rhs) const noexcept
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), Less<std::remove_cvref_t<T>> {});
-    }
+    bool operator()(const std::span<T, Extent>& lhs, const std::span<T, Extent>& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 template<typename Block, typename Coder>
@@ -225,10 +222,7 @@ struct Less<BasicBlockArrayView<Block, Coder>>
 {
     using Type = BasicBlockArrayView<Block, Coder>;
 
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), Less<typename Type::value_type> {});
-    }
+    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 template<typename Block, typename Coder, typename C>
@@ -236,16 +230,7 @@ struct Less<View<BasicBlockArrayView<Block, Coder>, C>>
 {
     using Type = View<BasicBlockArrayView<Block, Coder>, C>;
 
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        return std::lexicographical_compare(
-            lhs.begin(),
-            lhs.end(),
-            rhs.begin(),
-            rhs.end(),
-            [](const auto& lhs_value, const auto& rhs_value)
-            { return Less<std::remove_cvref_t<decltype(lhs_value)>> {}(lhs_value, rhs_value); });
-    }
+    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 template<Identifiable T>
@@ -260,22 +245,19 @@ struct Less<T>
         return Less<std::remove_cvref_t<MembersTupleType>> {}(lhs.identifying_members(), rhs.identifying_members());
     }
 
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const T& a, const U& v) const noexcept
     {
         return Less<std::remove_cvref_t<MembersTupleType>> {}(a.identifying_members(), v);
     }
 
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const U& v, const T& b) const noexcept
     {
         return Less<std::remove_cvref_t<MembersTupleType>> {}(v, b.identifying_members());
     }
 
-    template<class U, class V>
-        requires(std::same_as<std::remove_cvref_t<U>, MembersTupleType> && std::same_as<std::remove_cvref_t<V>, MembersTupleType>)
+    template<SameAsIgnoringCvref<MembersTupleType> U, SameAsIgnoringCvref<MembersTupleType> V>
     bool operator()(const U& u, const V& v) const noexcept
     {
         return Less<std::remove_cvref_t<MembersTupleType>> {}(u, v);
@@ -305,23 +287,20 @@ struct LessEqual<T>
     }
 
     // Mixed overloads required by Abseil: (T, view) and (view, T)
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const T& a, const U& v) const noexcept
     {
         return LessEqual<std::remove_cvref_t<MembersTupleType>> {}(a.identifying_members(), v);
     }
 
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const U& v, const T& b) const noexcept
     {
         return LessEqual<std::remove_cvref_t<MembersTupleType>> {}(v, b.identifying_members());
     }
 
     // Optional: view-view compare (handy for testing)
-    template<class U, class V>
-        requires(std::same_as<std::remove_cvref_t<U>, MembersTupleType> && std::same_as<std::remove_cvref_t<V>, MembersTupleType>)
+    template<SameAsIgnoringCvref<MembersTupleType> U, SameAsIgnoringCvref<MembersTupleType> V>
     bool operator()(const U& u, const V& v) const noexcept
     {
         return LessEqual<std::remove_cvref_t<MembersTupleType>> {}(u, v);
@@ -351,23 +330,20 @@ struct Greater<T>
     }
 
     // Mixed overloads required by Abseil: (T, view) and (view, T)
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const T& a, const U& v) const noexcept
     {
         return Greater<std::remove_cvref_t<MembersTupleType>> {}(a.identifying_members(), v);
     }
 
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const U& v, const T& b) const noexcept
     {
         return Greater<std::remove_cvref_t<MembersTupleType>> {}(v, b.identifying_members());
     }
 
     // Optional: view-view compare (handy for testing)
-    template<class U, class V>
-        requires(std::same_as<std::remove_cvref_t<U>, MembersTupleType> && std::same_as<std::remove_cvref_t<V>, MembersTupleType>)
+    template<SameAsIgnoringCvref<MembersTupleType> U, SameAsIgnoringCvref<MembersTupleType> V>
     bool operator()(const U& u, const V& v) const noexcept
     {
         return Greater<std::remove_cvref_t<MembersTupleType>> {}(u, v);
@@ -397,28 +373,53 @@ struct GreaterEqual<T>
     }
 
     // Mixed overloads required by Abseil: (T, view) and (view, T)
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const T& a, const U& v) const noexcept
     {
         return GreaterEqual<std::remove_cvref_t<MembersTupleType>> {}(a.identifying_members(), v);
     }
 
-    template<class U>
-        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    template<SameAsIgnoringCvref<MembersTupleType> U>
     bool operator()(const U& v, const T& b) const noexcept
     {
         return GreaterEqual<std::remove_cvref_t<MembersTupleType>> {}(v, b.identifying_members());
     }
 
     // Optional: view-view compare (handy for testing)
-    template<class U, class V>
-        requires(std::same_as<std::remove_cvref_t<U>, MembersTupleType> && std::same_as<std::remove_cvref_t<V>, MembersTupleType>)
+    template<SameAsIgnoringCvref<MembersTupleType> U, SameAsIgnoringCvref<MembersTupleType> V>
     bool operator()(const U& u, const V& v) const noexcept
     {
         return GreaterEqual<std::remove_cvref_t<MembersTupleType>> {}(u, v);
     }
 };
+
+template<std::ranges::input_range LhsRange, std::ranges::input_range RhsRange>
+inline bool less_range(const LhsRange& lhs, const RhsRange& rhs) noexcept
+{
+    auto lhs_it = std::ranges::begin(lhs);
+    auto rhs_it = std::ranges::begin(rhs);
+    const auto lhs_end = std::ranges::end(lhs);
+    const auto rhs_end = std::ranges::end(rhs);
+
+    for (; lhs_it != lhs_end && rhs_it != rhs_end; ++lhs_it, ++rhs_it)
+    {
+        using LhsValue = std::remove_cvref_t<decltype(*lhs_it)>;
+        using RhsValue = std::remove_cvref_t<decltype(*rhs_it)>;
+        if constexpr (std::same_as<LhsValue, RhsValue>)
+        {
+            if (Less<LhsValue> {}(*lhs_it, *rhs_it))
+                return true;
+            if (Less<LhsValue> {}(*rhs_it, *lhs_it))
+                return false;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return lhs_it == lhs_end && rhs_it != rhs_end;
+}
 
 }
 

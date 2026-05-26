@@ -31,6 +31,7 @@
 #include <cstdint>
 #include <limits>
 #include <ranges>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -41,6 +42,14 @@ namespace tyr
 using int_t = std::int32_t;
 using uint_t = std::uint32_t;
 using float_t = double;
+
+inline uint_t to_uint_t(size_t value)
+{
+    if (value > std::numeric_limits<uint_t>::max())
+        throw std::overflow_error("Value does not fit into uint_t.");
+
+    return static_cast<uint_t>(value);
+}
 
 template<typename T>
 struct FloatTolerance

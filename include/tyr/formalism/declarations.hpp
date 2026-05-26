@@ -19,9 +19,10 @@
 #define TYR_FORMALISM_DECLARATIONS_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/type_list.hpp"
 #include "tyr/common/types.hpp"
+
+#include <tuple>
 
 namespace tyr::formalism
 {

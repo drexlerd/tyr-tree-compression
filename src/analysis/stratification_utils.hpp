@@ -18,10 +18,9 @@
 #ifndef TYR_SRC_ANALYSIS_STRATIFICATION_UTILS_HPP_
 #define TYR_SRC_ANALYSIS_STRATIFICATION_UTILS_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/config.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
-#include "tyr/common/index_mixins.hpp"
 
 #include <algorithm>
 #include <boost/graph/adjacency_list.hpp>
@@ -31,6 +30,8 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+
+#include <gtl/phmap.hpp>
 
 namespace tyr::analysis::stratification
 {
@@ -84,7 +85,8 @@ inline Dag build_condensation_dag(const DepGraph& g, const std::vector<uint_t>& 
 {
     Dag dag(num_comps);
 
-    auto best = UnorderedMap<std::pair<uint_t, uint_t>, EdgeKind> {};
+    using EdgeMap = gtl::flat_hash_map<std::pair<uint_t, uint_t>, EdgeKind, Hash<std::pair<uint_t, uint_t>>, EqualTo<std::pair<uint_t, uint_t>>>;
+    auto best = EdgeMap {};
     best.reserve(boost::num_edges(g));
 
     for (auto e_it = boost::edges(g); e_it.first != e_it.second; ++e_it.first)

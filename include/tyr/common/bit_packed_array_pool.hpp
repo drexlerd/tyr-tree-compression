@@ -214,6 +214,7 @@ public:
      */
 
     size_t size() const noexcept { return m_length; }
+    bool empty() const noexcept { return m_length == 0; }
     uint8_t width() const noexcept { return m_width; }
 
 private:
@@ -225,8 +226,7 @@ private:
 
 /// Stores fixed-length arrays as bit-packed unsigned integer codes with stable references.
 /// Values are encoded and decoded via Coder.
-template<std::unsigned_integral Block, typename Coder = bit::ForwardingBlockCoder<Block>, size_t FirstSegmentSize = 16>
-    requires bit::BlockCoder<Coder, Block>
+template<std::unsigned_integral Block, bit::BlockCoder<Block> Coder = bit::ForwardingBlockCoder<Block>, size_t FirstSegmentSize = 16>
 class BitPackedArrayPool
 {
     static_assert(bit::is_power_of_two(FirstSegmentSize));

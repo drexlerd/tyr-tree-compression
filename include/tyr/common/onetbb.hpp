@@ -20,26 +20,29 @@
 #ifndef TYR_COMMON_ONETBB_HPP_
 #define TYR_COMMON_ONETBB_HPP_
 
+#include <cstddef>
 #include <memory>
 #include <oneapi/tbb/info.h>
 #include <oneapi/tbb/task_arena.h>
 #include <stdexcept>
+#include <string>
 
 namespace tyr
 {
 
 struct ExecutionContext
 {
-    using uint_t = std::size_t;
+    using size_type = std::size_t;
+    using uint_t = size_type;
 
-    explicit ExecutionContext(uint_t num_threads) : m_num_threads(num_threads), m_arena(static_cast<int>(num_threads))
+    explicit ExecutionContext(uint_t num_threads) : m_num_threads(num_threads), m_arena()
     {
         if (num_threads == 0)
         {
             throw std::invalid_argument("num_threads must be at least 1.");
         }
 
-        const auto available_threads = static_cast<uint_t>(oneapi::tbb::info::default_concurrency());
+        const auto available_threads = static_cast<size_type>(oneapi::tbb::info::default_concurrency());
 
         if (num_threads > available_threads)
         {
@@ -47,7 +50,7 @@ struct ExecutionContext
                                         + " are available by default.");
         }
 
-        m_arena.initialize();
+        m_arena.initialize(static_cast<int>(num_threads));
     }
 
     static std::shared_ptr<ExecutionContext> create(uint_t num_threads) { return std::make_shared<ExecutionContext>(num_threads); }

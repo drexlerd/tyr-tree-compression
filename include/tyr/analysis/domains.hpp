@@ -19,7 +19,6 @@
 #define TYR_ANALYSIS_DOMAINS_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/types.hpp"

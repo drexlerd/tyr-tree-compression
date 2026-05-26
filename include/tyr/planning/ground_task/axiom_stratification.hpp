@@ -18,7 +18,6 @@
 #ifndef TYR_PLANNING_GROUND_TASK_AXIOM_STRATIFICATION_HPP_
 #define TYR_PLANNING_GROUND_TASK_AXIOM_STRATIFICATION_HPP_
 
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 

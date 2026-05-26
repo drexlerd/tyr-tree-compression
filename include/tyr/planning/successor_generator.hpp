@@ -18,11 +18,15 @@
 #ifndef TYR_PLANNING_SUCCESSOR_GENERATOR_HPP_
 #define TYR_PLANNING_SUCCESSOR_GENERATOR_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
+#include "tyr/common/config.hpp"
 #include "tyr/common/onetbb.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/node.hpp"
 #include "tyr/planning/state_index.hpp"
+
+#include <concepts>
+#include <vector>
 
 namespace tyr::planning
 {

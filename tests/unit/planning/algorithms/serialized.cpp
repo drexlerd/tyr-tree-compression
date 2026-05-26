@@ -15,7 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json_loader.hpp"
+#include "tyr/common/json.hpp"
+#include "tyr/common/json_suite.hpp"
 
 #include <algorithm>
 #include <deque>

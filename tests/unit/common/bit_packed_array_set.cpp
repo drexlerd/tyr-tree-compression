@@ -19,6 +19,10 @@
 #include <tyr/common/bit_packed_array_set.hpp>
 #include <tyr/common/config.hpp>
 
+#include <array>
+#include <span>
+#include <vector>
+
 namespace tyr::tests
 {
 
@@ -31,6 +35,8 @@ TEST(TyrTests, TyrCommonBitPackedArraySetOutOfRange)
 
     // 3 elements are too much for a pool that stores arrays of length 2.
     EXPECT_THROW(set.insert(std::vector<uint_t>({ 1, 1, 1 })), std::invalid_argument);
+    EXPECT_THROW(set.find(std::vector<uint_t>({ 1, 1, 1 })), std::invalid_argument);
+    EXPECT_THROW(set.contains(std::vector<uint_t>({ 1 })), std::invalid_argument);
 }
 
 TEST(TyrTests, TyrCommonBitPackedArraySet)
@@ -49,14 +55,24 @@ TEST(TyrTests, TyrCommonBitPackedArraySet)
             {
                 const size_t idx = a * 4 + b;
 
-                const auto [i1, inserted1] = set.insert(std::vector<uint8_t>({ a, b }));
+                const auto value = std::vector<uint8_t>({ a, b });
+
+                const auto [i1, inserted1] = set.insert(value);
                 EXPECT_EQ(i1, idx);
                 EXPECT_TRUE(inserted1);
-                const auto [i2, inserted2] = set.insert(std::vector<uint8_t>({ a, b }));
+                EXPECT_TRUE(set.contains(value));
+                EXPECT_EQ(set.find(value), i1);
+                EXPECT_TRUE(set.contains_with_hash(value, BitPackedArraySet<uint8_t, bit::ForwardingBlockCoder<uint8_t>, 1>::hash(value)));
+
+                const auto [i2, inserted2] = set.insert(value);
                 EXPECT_FALSE(inserted2);
                 EXPECT_EQ(i2, idx);
+                EXPECT_EQ(set[i1], std::span<const uint8_t>(value));
             }
         }
+
+        const auto first = std::array<uint8_t, 2> { 0, 0 };
+        EXPECT_EQ(set.front(), std::span<const uint8_t>(first));
 
         // 16 arrays stored.
         EXPECT_EQ(set.size(), 16);

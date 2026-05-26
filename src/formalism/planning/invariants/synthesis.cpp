@@ -20,7 +20,6 @@
 #include "normalization.hpp"
 #include "refinement.hpp"
 #include "tyr/common/comparators.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/formalism/planning/expression_arity.hpp"
@@ -34,9 +33,10 @@
 #include <algorithm>
 #include <map>
 #include <optional>
-#include <unordered_set>
 #include <variant>
 #include <vector>
+
+#include <gtl/phmap.hpp>
 
 namespace tyr::formalism::planning::invariant
 {
@@ -49,7 +49,7 @@ InvariantList synthesize_invariants(DomainView domain)
     auto queue = make_initial_candidates(domain.get_predicates<FluentTag>());
 
     auto accepted = InvariantList {};
-    auto seen = UnorderedSet<Invariant> {};
+    auto seen = gtl::flat_hash_set<Invariant, Hash<Invariant>, EqualTo<Invariant>> {};
 
     while (!queue.empty())
     {

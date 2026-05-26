@@ -10,27 +10,36 @@
 #ifndef TYR_COMMON_RAW_ARRAY_SET_HPP_
 #define TYR_COMMON_RAW_ARRAY_SET_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
+#include "tyr/common/config.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/raw_array_pool.hpp"
 
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstring>
 #include <memory>
 #include <optional>
-#include <type_traits>
-#include <vector>
+#include <span>
+#include <stdexcept>
+#include <utility>
+
+#include <gtl/phmap.hpp>
 
 namespace tyr
 {
 
-template<typename T, size_t ArraysPerSegment = 1024>
-    requires std::is_trivially_copyable_v<T>
+template<TriviallyCopyable T, size_t ArraysPerSegment = 1024>
 class RawArraySet
 {
+private:
+    void ensure_fits(std::span<const T> value) const
+    {
+        if (value.size() != m_array_size)
+            throw std::invalid_argument("RawArraySet: wrong number of elements.");
+    }
+
 public:
     explicit RawArraySet(size_t array_size) :
         m_pool(std::make_shared<RawArrayPool<T, ArraysPerSegment>>(array_size)),
@@ -44,9 +53,9 @@ public:
     RawArraySet(RawArraySet&&) = default;
     RawArraySet& operator=(RawArraySet&&) = default;
 
-    std::optional<uint_t> find(const std::vector<T>& value) const
+    std::optional<uint_t> find(std::span<const T> value) const
     {
-        assert(value.size() == m_array_size);
+        ensure_fits(value);
 
         if (auto it = m_set.find(value); it != m_set.end())
             return *it;
@@ -54,14 +63,20 @@ public:
         return std::nullopt;
     }
 
-    uint_t insert(const std::vector<T>& value)
+    bool contains(std::span<const T> value) const
     {
-        assert(value.size() == m_array_size);
+        ensure_fits(value);
+        return m_set.contains(value);
+    }
+
+    uint_t insert(std::span<const T> value)
+    {
+        ensure_fits(value);
 
         if (auto it = m_set.find(value); it != m_set.end())
             return *it;
 
-        const uint_t idx = static_cast<uint_t>(m_pool->size());
+        const uint_t idx = to_uint_t(m_pool->size());
         auto* arr = m_pool->allocate();
         std::memcpy(arr, value.data(), m_array_size * sizeof(T));
         m_set.emplace(idx);
@@ -72,6 +87,30 @@ public:
 
     const T* operator[](uint_t idx) const noexcept { return (*m_pool)[idx]; }
 
+    T* front() noexcept
+    {
+        assert(!empty());
+        return (*m_pool)[0];
+    }
+
+    const T* front() const noexcept
+    {
+        assert(!empty());
+        return (*m_pool)[0];
+    }
+
+    T* back() noexcept
+    {
+        assert(!empty());
+        return (*m_pool)[size() - 1];
+    }
+
+    const T* back() const noexcept
+    {
+        assert(!empty());
+        return (*m_pool)[size() - 1];
+    }
+
     size_t memory_usage() const noexcept
     {
         size_t bytes = 0;
@@ -81,6 +120,7 @@ public:
     }
 
     size_t size() const noexcept { return m_pool->size(); }
+    bool empty() const noexcept { return m_pool->size() == 0; }
     size_t array_size() const noexcept { return m_pool->array_size(); }
 
     void clear() noexcept
@@ -106,15 +146,12 @@ private:
 
         static size_t hash(const T* arr, size_t len) noexcept
         {
-            size_t seed = len;
-            for (size_t i = 0; i < len; ++i)
-                tyr::hash_combine(seed, arr[i]);
-            return seed;
+            return hash_range(std::span<const T>(arr, len));
         }
 
         size_t operator()(uint_t el) const noexcept { return hash((*pool)[el], array_size); }
 
-        size_t operator()(const std::vector<T>& el) const noexcept
+        size_t operator()(std::span<const T> el) const noexcept
         {
             assert(el.size() == array_size);
             return hash(el.data(), array_size);
@@ -135,23 +172,23 @@ private:
         {
         }
 
-        static bool equal_to(const T* lhs, const T* rhs, size_t len) { return std::equal(lhs, lhs + len, rhs); }
+        static bool equal_to(const T* lhs, const T* rhs, size_t len) { return equal_range(std::span<const T>(lhs, len), std::span<const T>(rhs, len)); }
 
         bool operator()(uint_t lhs, uint_t rhs) const noexcept { return equal_to((*pool)[lhs], (*pool)[rhs], array_size); }
 
-        bool operator()(const std::vector<T>& lhs, uint_t rhs) const noexcept
+        bool operator()(std::span<const T> lhs, uint_t rhs) const noexcept
         {
             assert(lhs.size() == array_size);
             return equal_to(lhs.data(), (*pool)[rhs], array_size);
         }
 
-        bool operator()(uint_t lhs, const std::vector<T>& rhs) const noexcept
+        bool operator()(uint_t lhs, std::span<const T> rhs) const noexcept
         {
             assert(rhs.size() == array_size);
             return equal_to((*pool)[lhs], rhs.data(), array_size);
         }
 
-        bool operator()(const std::vector<T>& lhs, const std::vector<T>& rhs) const noexcept
+        bool operator()(std::span<const T> lhs, std::span<const T> rhs) const noexcept
         {
             assert(lhs.size() == array_size);
             assert(rhs.size() == array_size);

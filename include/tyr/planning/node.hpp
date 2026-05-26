@@ -19,7 +19,6 @@
 #define TYR_PLANNING_NODE_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -29,6 +28,7 @@
 
 #include <concepts>
 #include <ranges>
+#include <vector>
 
 namespace tyr::planning
 {

@@ -15,7 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json_loader.hpp"
+#include "tyr/common/json.hpp"
+#include "tyr/common/json_suite.hpp"
 #include "tyr/formalism/formalism.hpp"
 
 #include <boost/json.hpp>
@@ -34,17 +35,9 @@ namespace
 {
 std::vector<int> parse_parameters(const json::object& atom_object)
 {
-    const auto* value = atom_object.if_contains("parameters");
-    if (!value)
-        throw std::runtime_error("atom.parameters is required.");
-
     auto result = std::vector<int> {};
-    for (const auto& parameter : tyr::common::as_array(*value, "atom.parameters"))
-    {
-        if (!parameter.is_int64() || parameter.as_int64() < 0)
-            throw std::runtime_error("atom.parameters entries must be non-negative integers.");
-        result.push_back(static_cast<int>(parameter.as_int64()));
-    }
+    for (const auto& parameter : tyr::common::as_array(atom_object, "parameters", "atom"))
+        result.push_back(static_cast<int>(tyr::common::as_size(parameter, "atom.parameters entry")));
     return result;
 }
 
@@ -63,11 +56,7 @@ auto atom(fp::Repository& repo, std::string_view predicate_name, const std::vect
 fpi::Invariant parse_invariant(fp::Repository& repository, const json::object& invariant_object)
 {
     auto atoms = std::vector<fp::MutableAtom<f::FluentTag>> {};
-    const auto* atoms_value = invariant_object.if_contains("atoms");
-    if (!atoms_value)
-        throw std::runtime_error("invariant.atoms is required.");
-
-    for (const auto& atom_value : tyr::common::as_array(*atoms_value, "invariant.atoms"))
+    for (const auto& atom_value : tyr::common::as_array(invariant_object, "atoms", "invariant"))
     {
         const auto& atom_object = tyr::common::as_object(atom_value, "atom");
         atoms.push_back(atom(repository, tyr::common::as_string(atom_object, "predicate", "atom"), parse_parameters(atom_object)));
@@ -80,12 +69,8 @@ fpi::Invariant parse_invariant(fp::Repository& repository, const json::object& i
 
 std::vector<fpi::Invariant> parse_invariants(fp::Repository& repository, const json::object& case_object)
 {
-    const auto* invariants_value = case_object.if_contains("invariants");
-    if (!invariants_value)
-        throw std::runtime_error("case.invariants is required.");
-
     auto result = std::vector<fpi::Invariant> {};
-    for (const auto& invariant_value : tyr::common::as_array(*invariants_value, "case.invariants"))
+    for (const auto& invariant_value : tyr::common::as_array(case_object, "invariants", "case"))
         result.push_back(parse_invariant(repository, tyr::common::as_object(invariant_value, "invariant")));
     return result;
 }
@@ -101,10 +86,7 @@ TEST(TyrTests, TyrFormalismPlanningInvariantsSynthesis)
 {
     const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/formalism/planning/invariants/synthesis.json");
     const auto& suite_object = tyr::common::as_object(suite, "suite");
-    const auto* cases_value = suite_object.if_contains("cases");
-    ASSERT_TRUE(cases_value);
-
-    for (const auto& case_value : tyr::common::as_array(*cases_value, "suite.cases"))
+    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
     {
         const auto& case_object = tyr::common::as_object(case_value, "case");
         const auto name = tyr::common::as_string(case_object, "name", "case");

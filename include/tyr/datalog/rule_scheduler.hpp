@@ -20,7 +20,7 @@
 
 #include "tyr/analysis/listeners.hpp"              // for ListenerStratum
 #include "tyr/analysis/stratification.hpp"         // for RuleStratum, Rule...
-#include "tyr/common/declarations.hpp"             // for UnorderedSet
+#include "tyr/common/associative_containers.hpp"
 #include "tyr/common/equal_to.hpp"                 // for EqualTo
 #include "tyr/common/formatter.hpp"
 #include "tyr/common/hash.hpp"                     // for Hash

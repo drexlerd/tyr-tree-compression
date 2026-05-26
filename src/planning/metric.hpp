@@ -18,7 +18,7 @@
 #ifndef TYR_SRC_PLANNING_METRIC_HPP_
 #define TYR_SRC_PLANNING_METRIC_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/config.hpp"
 #include "tyr/common/optional.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/formalism/planning/declarations.hpp"

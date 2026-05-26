@@ -2,6 +2,8 @@
 #define TYR_COMMON_RAW_VECTOR_POOL_HPP_
 
 #include "tyr/common/bit.hpp"
+#include "tyr/common/concepts.hpp"
+#include "tyr/common/config.hpp"
 
 #include <cassert>
 #include <concepts>
@@ -9,15 +11,15 @@
 #include <cstdint>
 #include <cstring>
 #include <limits>
+#include <span>
+#include <stdexcept>
 #include <new>
-#include <type_traits>
 #include <vector>
 
 namespace tyr
 {
 
-template<std::unsigned_integral Size, typename T>
-    requires std::is_trivially_copyable_v<T>
+template<std::unsigned_integral Size, TriviallyCopyable T>
 class RawVectorView
 {
 public:
@@ -32,6 +34,8 @@ public:
         return static_cast<size_t>(value);
     }
 
+    bool empty() const noexcept { return size() == 0; }
+
     T* data() noexcept
     {
         assert(m_ptr);
@@ -42,6 +46,37 @@ public:
     {
         assert(m_ptr);
         return std::launder(reinterpret_cast<const T*>(m_ptr + payload_offset()));
+    }
+
+    T* begin() noexcept { return data(); }
+    const T* begin() const noexcept { return data(); }
+    const T* cbegin() const noexcept { return data(); }
+    T* end() noexcept { return data() + size(); }
+    const T* end() const noexcept { return data() + size(); }
+    const T* cend() const noexcept { return data() + size(); }
+
+    T& front() noexcept
+    {
+        assert(!empty());
+        return data()[0];
+    }
+
+    const T& front() const noexcept
+    {
+        assert(!empty());
+        return data()[0];
+    }
+
+    T& back() noexcept
+    {
+        assert(!empty());
+        return data()[size() - 1];
+    }
+
+    const T& back() const noexcept
+    {
+        assert(!empty());
+        return data()[size() - 1];
     }
 
     T& operator[](size_t i) noexcept
@@ -67,8 +102,7 @@ private:
     std::byte* m_ptr;
 };
 
-template<std::unsigned_integral Size, typename T>
-    requires std::is_trivially_copyable_v<T>
+template<std::unsigned_integral Size, TriviallyCopyable T>
 class RawVectorView<const Size, const T>
 {
 public:
@@ -83,10 +117,29 @@ public:
         return static_cast<size_t>(value);
     }
 
+    bool empty() const noexcept { return size() == 0; }
+
     const T* data() const noexcept
     {
         assert(m_ptr);
         return std::launder(reinterpret_cast<const T*>(m_ptr + payload_offset()));
+    }
+
+    const T* begin() const noexcept { return data(); }
+    const T* cbegin() const noexcept { return data(); }
+    const T* end() const noexcept { return data() + size(); }
+    const T* cend() const noexcept { return data() + size(); }
+
+    const T& front() const noexcept
+    {
+        assert(!empty());
+        return data()[0];
+    }
+
+    const T& back() const noexcept
+    {
+        assert(!empty());
+        return data()[size() - 1];
     }
 
     const T& operator[](size_t i) const noexcept
@@ -105,8 +158,7 @@ private:
     const std::byte* m_ptr;
 };
 
-template<std::unsigned_integral Size, typename T, size_t FirstSegmentBytes = 1024>
-    requires std::is_trivially_copyable_v<T>
+template<std::unsigned_integral Size, TriviallyCopyable T, size_t FirstSegmentBytes = 1024>
 class RawVectorPool
 {
     static_assert(bit::is_power_of_two(FirstSegmentBytes));
@@ -165,11 +217,14 @@ public:
     RawVectorPool(RawVectorPool&&) = default;
     RawVectorPool& operator=(RawVectorPool&&) = default;
 
-    uint_t insert(const std::vector<T>& value) { return insert(value.data(), value.size()); }
+    uint_t insert(std::span<const T> value) { return insert(value.data(), value.size()); }
+
+    uint_t insert(const std::vector<T>& value) { return insert(std::span<const T>(value)); }
 
     uint_t insert(const T* data, size_t size)
     {
-        assert(size <= std::numeric_limits<Size>::max());
+        if (size > std::numeric_limits<Size>::max())
+            throw std::out_of_range("RawVectorPool: vector length exceeds size type.");
 
         const size_t needed_bytes = slot_size_bytes(size);
         ensure_current_segment(needed_bytes);
@@ -181,7 +236,7 @@ public:
             std::memcpy(payload_ptr(slot), data, size * sizeof(T));
 
         m_index.push_back(slot);
-        return static_cast<uint_t>(m_index.size() - 1);
+        return to_uint_t(m_index.size() - 1);
     }
 
     RawVectorView<Size, T> operator[](uint_t index) noexcept
@@ -196,6 +251,30 @@ public:
         return RawVectorView<const Size, const T>(m_index[index]);
     }
 
+    RawVectorView<Size, T> front() noexcept
+    {
+        assert(!empty());
+        return (*this)[0];
+    }
+
+    RawVectorView<const Size, const T> front() const noexcept
+    {
+        assert(!empty());
+        return (*this)[0];
+    }
+
+    RawVectorView<Size, T> back() noexcept
+    {
+        assert(!empty());
+        return (*this)[to_uint_t(size() - 1)];
+    }
+
+    RawVectorView<const Size, const T> back() const noexcept
+    {
+        assert(!empty());
+        return (*this)[to_uint_t(size() - 1)];
+    }
+
     size_t memory_usage() const noexcept
     {
         size_t bytes = 0;
@@ -206,6 +285,7 @@ public:
     }
 
     size_t size() const noexcept { return m_index.size(); }
+    bool empty() const noexcept { return m_index.empty(); }
 
     void clear() noexcept
     {

@@ -18,18 +18,26 @@
 #ifndef TYR_COMMON_HASH_HPP_
 #define TYR_COMMON_HASH_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
 #include "tyr/common/dynamic_bitset.hpp"
 #include "tyr/common/observer_ptr.hpp"
 
+#include <cista/containers/optional.h>
+#include <cista/containers/string.h>
+#include <cista/containers/variant.h>
+#include <cista/containers/vector.h>
+
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <map>
 #include <optional>
+#include <ranges>
 #include <set>
 #include <span>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -50,6 +58,9 @@ inline void hash_combine(size_t& seed, const Rest&... rest) noexcept;
 
 template<typename... Ts>
 inline size_t hash_combine(const Ts&... rest) noexcept;
+
+template<std::ranges::input_range Range>
+inline size_t hash_range(const Range& range) noexcept;
 
 /// @brief `Hash` is our custom hasher, like std::hash.
 ///
@@ -78,13 +89,7 @@ struct Hash<::cista::offset::string>
 {
     using Type = ::cista::offset::string;
 
-    size_t operator()(const Type& el) const noexcept
-    {
-        size_t aggregated_hash = el.size();
-        for (const auto& item : el)
-            hash_combine(aggregated_hash, item);
-        return aggregated_hash;
-    }
+    size_t operator()(const Type& el) const noexcept { return hash_range(el); }
 };
 
 template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
@@ -92,13 +97,7 @@ struct Hash<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Alloc
 {
     using Type = ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>;
 
-    size_t operator()(const Type& el) const noexcept
-    {
-        size_t aggregated_hash = el.size();
-        for (const auto& item : el)
-            hash_combine(aggregated_hash, item);
-        return aggregated_hash;
-    }
+    size_t operator()(const Type& el) const noexcept { return hash_range(el); }
 };
 
 template<typename... Ts>
@@ -141,13 +140,7 @@ struct Hash<T>
 template<typename T, size_t N>
 struct Hash<std::array<T, N>>
 {
-    size_t operator()(const std::array<T, N>& arr) const noexcept
-    {
-        size_t aggregated_hash = N;
-        for (const auto& element : arr)
-            hash_combine(aggregated_hash, element);
-        return aggregated_hash;
-    }
+    size_t operator()(const std::array<T, N>& arr) const noexcept { return hash_range(arr); }
 };
 
 template<typename T>
@@ -159,37 +152,19 @@ struct Hash<std::reference_wrapper<T>>
 template<typename Key, typename Compare, typename Allocator>
 struct Hash<std::set<Key, Compare, Allocator>>
 {
-    size_t operator()(const std::set<Key, Compare, Allocator>& set) const noexcept
-    {
-        std::size_t aggregated_hash = set.size();
-        for (const auto& item : set)
-            hash_combine(aggregated_hash, item);
-        return aggregated_hash;
-    }
+    size_t operator()(const std::set<Key, Compare, Allocator>& set) const noexcept { return hash_range(set); }
 };
 
 template<typename Key, typename T, typename Compare, typename Allocator>
 struct Hash<std::map<Key, T, Compare, Allocator>>
 {
-    size_t operator()(const std::map<Key, T, Compare, Allocator>& map) const noexcept
-    {
-        std::size_t aggregated_hash = map.size();
-        for (const auto& item : map)
-            hash_combine(aggregated_hash, item);
-        return aggregated_hash;
-    }
+    size_t operator()(const std::map<Key, T, Compare, Allocator>& map) const noexcept { return hash_range(map); }
 };
 
 template<typename T, typename Allocator>
 struct Hash<std::vector<T, Allocator>>
 {
-    size_t operator()(const std::vector<T, Allocator>& vec) const noexcept
-    {
-        size_t aggregated_hash = vec.size();
-        for (const auto& element : vec)
-            hash_combine(aggregated_hash, element);
-        return aggregated_hash;
-    }
+    size_t operator()(const std::vector<T, Allocator>& vec) const noexcept { return hash_range(vec); }
 };
 
 template<typename T1, typename T2>
@@ -227,13 +202,7 @@ struct Hash<std::optional<T>>
 template<typename T, std::size_t Extent>
 struct Hash<std::span<T, Extent>>
 {
-    size_t operator()(const std::span<T, Extent>& span) const noexcept
-    {
-        size_t aggregated_hash = span.size();
-        for (const auto& x : span)
-            hash_combine(aggregated_hash, x);
-        return aggregated_hash;
-    }
+    size_t operator()(const std::span<T, Extent>& span) const noexcept { return hash_range(span); }
 };
 
 template<typename T>
@@ -271,6 +240,19 @@ struct Hash<T>
 /**
  * Definitions
  */
+
+template<std::ranges::input_range Range>
+inline size_t hash_range(const Range& range) noexcept
+{
+    size_t seed = 0;
+    if constexpr (std::ranges::sized_range<Range>)
+        seed = std::ranges::size(range);
+
+    for (const auto& value : range)
+        hash_combine(seed, value);
+
+    return seed;
+}
 
 template<typename T>
 inline void hash_combine(size_t& seed, const T& value) noexcept

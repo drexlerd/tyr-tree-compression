@@ -15,7 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/tyr.hpp"
+#include "tyr/buffer/buffer.hpp"
+#include "tyr/formalism/canonicalization.hpp"
 
 #include <gtest/gtest.h>
 
@@ -32,6 +33,9 @@ TEST(TyrTests, TyrBufferIndexedHashSet)
     auto repository = b::IndexedHashSet<f::Predicate<f::FluentTag>>(buffer, arena);
     auto builder = Data<f::Predicate<f::FluentTag>>();
 
+    EXPECT_TRUE(repository.empty());
+    EXPECT_EQ(repository.size(), 0);
+
     // Create a unique predicate
     builder.index.value = 0;
     builder.name = "predicate_0";
@@ -40,6 +44,10 @@ TEST(TyrTests, TyrBufferIndexedHashSet)
     canonicalize(builder);
     auto [predicate_index_0, success_0] = repository.insert(builder);
     const auto& predicate_0 = repository[predicate_index_0];
+
+    EXPECT_TRUE(success_0);
+    EXPECT_FALSE(repository.empty());
+    EXPECT_EQ(repository.size(), 1);
 
     EXPECT_EQ(predicate_0.index.value, 0);
     EXPECT_EQ(predicate_0.name, builder.name);
@@ -54,6 +62,9 @@ TEST(TyrTests, TyrBufferIndexedHashSet)
     auto [predicate_index_1, success_1] = repository.insert(builder);
     const auto& predicate_1 = repository[predicate_index_1];
 
+    EXPECT_TRUE(success_1);
+    EXPECT_EQ(repository.size(), 2);
+
     EXPECT_EQ(predicate_1.index.value, 1);
     EXPECT_EQ(predicate_1.name, builder.name);
     EXPECT_EQ(predicate_1.arity, builder.arity);
@@ -66,6 +77,10 @@ TEST(TyrTests, TyrBufferIndexedHashSet)
     canonicalize(builder);
     auto [predicate_index_2, success_2] = repository.insert(builder);
     const auto& predicate_2 = repository[predicate_index_2];
+
+    EXPECT_FALSE(success_2);
+    EXPECT_EQ(predicate_index_2, predicate_index_1);
+    EXPECT_EQ(repository.size(), 2);
 
     EXPECT_EQ(predicate_2.index.value, 1);
     EXPECT_EQ(predicate_2.name, builder.name);

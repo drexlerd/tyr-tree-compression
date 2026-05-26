@@ -18,7 +18,7 @@
 #ifndef TYR_COMMON_CLOSED_INTERVAL_HPP_
 #define TYR_COMMON_CLOSED_INTERVAL_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
 
 #include <boost/numeric/interval.hpp>
 #include <ostream>

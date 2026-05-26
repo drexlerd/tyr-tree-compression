@@ -18,13 +18,15 @@
 #ifndef TYR_COMMON_VECTOR_HPP_
 #define TYR_COMMON_VECTOR_HPP_
 
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/common/types_utils.hpp"
 
 #include <cista/containers/vector.h>
+#include <array>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
+#include <vector>
 
 namespace tyr
 {

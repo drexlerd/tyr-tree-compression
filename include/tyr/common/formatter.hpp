@@ -19,7 +19,8 @@
 #define TYR_COMMON_FORMATTER_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/equal_to.hpp"
+#include "tyr/common/hash.hpp"
 #include "tyr/common/dynamic_bitset.hpp"
 #include "tyr/common/index_mixins.hpp"
 #include "tyr/common/types.hpp"
@@ -27,6 +28,11 @@
 #include "tyr/common/vector.hpp"
 
 #include <array>
+#include <concepts>
+#include <cista/containers/optional.h>
+#include <cista/containers/string.h>
+#include <cista/containers/variant.h>
+#include <cista/containers/vector.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -34,16 +40,21 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <ostream>
 #include <set>
 #include <span>
 #include <sstream>
+#include <string>
 #include <string_view>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
+
+#include <gtl/phmap.hpp>
 
 namespace tyr
 {
@@ -169,14 +180,13 @@ struct formatter<::cista::optional<T>, char>
     }
 };
 
-template<typename... Ts>
-    requires(sizeof...(Ts) > 0)
-struct formatter<::cista::offset::variant<Ts...>, char>
+template<typename T, typename... Ts>
+struct formatter<::cista::offset::variant<T, Ts...>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const ::cista::offset::variant<Ts...>& value, FormatContext& ctx) const
+    auto format(const ::cista::offset::variant<T, Ts...>& value, FormatContext& ctx) const
     {
         return std::visit(
             [&](auto&& arg)
@@ -243,14 +253,13 @@ struct formatter<tyr::View<::cista::optional<T>, C>, char>
     }
 };
 
-template<typename C, typename... Ts>
-    requires(sizeof...(Ts) > 0)
-struct formatter<tyr::View<::cista::offset::variant<Ts...>, C>, char>
+template<typename C, typename T, typename... Ts>
+struct formatter<tyr::View<::cista::offset::variant<T, Ts...>, C>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::View<::cista::offset::variant<Ts...>, C>& value, FormatContext& ctx) const
+    auto format(const tyr::View<::cista::offset::variant<T, Ts...>, C>& value, FormatContext& ctx) const
     {
         return visit(
             [&](auto&& arg)

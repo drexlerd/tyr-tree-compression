@@ -18,7 +18,7 @@
 #include "module.hpp"
 
 #include <nanobind/stl/shared_ptr.h>
-#include <tyr/tyr.hpp>
+#include <tyr/common/onetbb.hpp>
 
 namespace tyr::common
 {

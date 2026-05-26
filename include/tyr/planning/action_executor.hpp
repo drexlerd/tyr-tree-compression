@@ -18,7 +18,6 @@
 #ifndef TYR_PLANNING_ACTION_EXECUTOR_HPP_
 #define TYR_PLANNING_ACTION_EXECUTOR_HPP_
 
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/itertools.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/formalism/planning/declarations.hpp"

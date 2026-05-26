@@ -18,6 +18,8 @@
 #ifndef TYR_COMMON_DYNAMIC_BITSET_HPP_
 #define TYR_COMMON_DYNAMIC_BITSET_HPP_
 
+#include "tyr/common/concepts.hpp"
+
 #include <boost/dynamic_bitset.hpp>
 #include <cassert>
 #include <concepts>
@@ -202,8 +204,7 @@ public:
         return m_data[n - 1] == last_mask(m_num_bits);
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     bool intersects(const BitsetSpan<OtherBlock>& other) const noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -218,8 +219,7 @@ public:
         return false;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     bool is_subset_of(const BitsetSpan<OtherBlock>& other) const noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -234,8 +234,7 @@ public:
         return true;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     bool is_proper_subset_of(const BitsetSpan<OtherBlock>& other) const noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -254,15 +253,13 @@ public:
         return proper;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     bool is_superset_of(const BitsetSpan<OtherBlock>& other) const noexcept
     {
         return other.is_subset_of(*this);
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     bool is_proper_superset_of(const BitsetSpan<OtherBlock>& other) const noexcept
     {
         return other.is_proper_subset_of(*this);
@@ -432,8 +429,7 @@ public:
      * Operators
      */
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     BitsetSpan& copy_from(const BitsetSpan<OtherBlock>& other) noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -447,8 +443,7 @@ public:
         return *this;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     BitsetSpan& diff_from(const BitsetSpan<OtherBlock>& other) noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -462,8 +457,7 @@ public:
         return *this;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     BitsetSpan& operator&=(const BitsetSpan<OtherBlock>& other) noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -477,8 +471,7 @@ public:
         return *this;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     BitsetSpan& operator|=(const BitsetSpan<OtherBlock>& other) noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -492,8 +485,7 @@ public:
         return *this;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     BitsetSpan& operator^=(const BitsetSpan<OtherBlock>& other) noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -507,8 +499,7 @@ public:
         return *this;
     }
 
-    template<std::unsigned_integral OtherBlock>
-        requires(std::same_as<std::remove_const_t<OtherBlock>, U>)
+    template<UnsignedIntegralSameAsIgnoringConst<U> OtherBlock>
     BitsetSpan& operator-=(const BitsetSpan<OtherBlock>& other) noexcept
     {
         assert(m_num_bits == other.m_num_bits);
@@ -540,8 +531,7 @@ private:
     size_t m_num_bits;
 };
 
-template<std::unsigned_integral B1, std::unsigned_integral B2>
-    requires(std::same_as<std::remove_const_t<B1>, std::remove_const_t<B2>>)
+template<std::unsigned_integral B1, UnsignedIntegralSameAsIgnoringConst<B1> B2>
 constexpr bool operator==(const BitsetSpan<B1>& lhs, const BitsetSpan<B2>& rhs) noexcept
 {
     assert(lhs.trailing_bits_zero());
@@ -561,15 +551,13 @@ constexpr bool operator==(const BitsetSpan<B1>& lhs, const BitsetSpan<B2>& rhs) 
     return true;
 }
 
-template<std::unsigned_integral B1, std::unsigned_integral B2>
-    requires(std::same_as<std::remove_const_t<B1>, std::remove_const_t<B2>>)
+template<std::unsigned_integral B1, UnsignedIntegralSameAsIgnoringConst<B1> B2>
 constexpr bool operator!=(const BitsetSpan<B1>& lhs, const BitsetSpan<B2>& rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
-template<typename Callback, typename BlockCombiner, std::unsigned_integral Block0, std::unsigned_integral... Blocks>
-    requires(std::same_as<std::remove_const_t<Block0>, std::remove_const_t<Blocks>> && ...)
+template<typename Callback, typename BlockCombiner, std::unsigned_integral Block0, UnsignedIntegralSameAsIgnoringConst<Block0>... Blocks>
 void for_each_bit(Callback&& callback, BlockCombiner&& combiner, const BitsetSpan<Block0>& first, const BitsetSpan<Blocks>&... rest)
 {
     using U = std::remove_const_t<Block0>;

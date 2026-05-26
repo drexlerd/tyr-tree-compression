@@ -428,19 +428,25 @@ public:
         return SharedObjectPoolPtr<T, true>(this, element);
     }
 
-    [[nodiscard]] size_t get_size() const noexcept
+    [[nodiscard]] size_t size() const noexcept
     {
         std::lock_guard<std::mutex> lg(m_mutex);
 
         return m_storage.size();
     }
 
-    [[nodiscard]] size_t get_num_free() const noexcept
+    [[nodiscard]] size_t get_size() const noexcept { return size(); }
+
+    [[nodiscard]] bool empty() const noexcept { return size() == 0; }
+
+    [[nodiscard]] size_t free_size() const noexcept
     {
         std::lock_guard<std::mutex> lg(m_mutex);
 
         return m_stack.size();
     }
+
+    [[nodiscard]] size_t get_num_free() const noexcept { return free_size(); }
 };
 
 template<typename T>
@@ -490,9 +496,15 @@ public:
         return SharedObjectPoolPtr<T, false>(this, element);
     }
 
-    [[nodiscard]] size_t get_size() const noexcept { return m_storage.size(); }
+    [[nodiscard]] size_t size() const noexcept { return m_storage.size(); }
 
-    [[nodiscard]] size_t get_num_free() const noexcept { return m_stack.size(); }
+    [[nodiscard]] size_t get_size() const noexcept { return size(); }
+
+    [[nodiscard]] bool empty() const noexcept { return size() == 0; }
+
+    [[nodiscard]] size_t free_size() const noexcept { return m_stack.size(); }
+
+    [[nodiscard]] size_t get_num_free() const noexcept { return free_size(); }
 };
 
 }

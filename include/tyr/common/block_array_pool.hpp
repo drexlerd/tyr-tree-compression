@@ -208,6 +208,7 @@ public:
     const_iterator cend() const noexcept { return const_iterator(*this, size()); }
 
     size_t size() const noexcept { return m_length; }
+    bool empty() const noexcept { return m_length == 0; }
 
 private:
     Block* m_data;
@@ -216,8 +217,7 @@ private:
 
 /// Stores fixed-length arrays where each element occupies one full Block.
 /// Values are encoded and decoded via Coder.
-template<std::unsigned_integral Block, typename Coder = bit::ForwardingBlockCoder<Block>, size_t FirstSegmentSize = 16>
-    requires bit::BlockCoder<Coder, Block>
+template<std::unsigned_integral Block, bit::BlockCoder<Block> Coder = bit::ForwardingBlockCoder<Block>, size_t FirstSegmentSize = 16>
 class BlockArrayPool
 {
     static_assert(bit::is_power_of_two(FirstSegmentSize));

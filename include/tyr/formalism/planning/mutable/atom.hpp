@@ -19,7 +19,6 @@
 #define TYR_FORMALISM_PLANNING_MUTABLE_ATOM_HPP_
 
 #include "tyr/common/comparators.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -27,8 +26,11 @@
 #include "tyr/formalism/unification/structure_traits_impl.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <map>
 #include <optional>
+#include <tuple>
+#include <utility>
 #include <variant>
 #include <vector>
 

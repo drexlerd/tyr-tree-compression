@@ -15,7 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json_loader.hpp"
+#include "tyr/common/json.hpp"
+#include "tyr/common/json_suite.hpp"
 
 #include <filesystem>
 #include <gtest/gtest.h>
@@ -59,12 +60,8 @@ std::vector<GroundTaskCase> load_cases()
 {
     const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/ground_task.json");
     const auto& suite_object = tyr::common::as_object(suite, "suite");
-    const auto* cases_value = suite_object.if_contains("cases");
-    if (!cases_value)
-        throw std::runtime_error("suite.cases is required.");
-
     auto result = std::vector<GroundTaskCase> {};
-    for (const auto& case_value : tyr::common::as_array(*cases_value, "suite.cases"))
+    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
         result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
     return result;
 }

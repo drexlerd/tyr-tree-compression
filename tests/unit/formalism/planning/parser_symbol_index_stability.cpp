@@ -15,12 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json_loader.hpp"
+#include "tyr/common/json.hpp"
+#include "tyr/common/json_suite.hpp"
 
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <ostream>
-#include <stdexcept>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <tyr/formalism/formalism.hpp>
@@ -56,12 +57,8 @@ std::vector<ParserSymbolIndexStabilityCase> load_cases()
     const auto suite =
         tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/formalism/planning/parser_symbol_index_stability.json");
     const auto& suite_object = tyr::common::as_object(suite, "suite");
-    const auto* cases_value = suite_object.if_contains("cases");
-    if (!cases_value)
-        throw std::runtime_error("suite.cases is required.");
-
     auto result = std::vector<ParserSymbolIndexStabilityCase> {};
-    for (const auto& case_value : tyr::common::as_array(*cases_value, "suite.cases"))
+    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
         result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
     return result;
 }
@@ -71,15 +68,18 @@ fp::PlanningTask parse_task(const ParserSymbolIndexStabilityCase& test_case)
     return fp::Parser(test_case.domain_file).parse_task(test_case.task_file);
 }
 
-template<typename Range>
+template<std::ranges::random_access_range Range>
 void expect_same_index_names(const Range& first, const Range& second, std::string_view label)
 {
-    ASSERT_EQ(first.size(), second.size()) << label;
+    const auto size = std::ranges::distance(first);
+    ASSERT_EQ(size, std::ranges::distance(second)) << label;
 
-    for (size_t i = 0; i < first.size(); ++i)
+    const auto first_begin = std::ranges::begin(first);
+    const auto second_begin = std::ranges::begin(second);
+    for (std::ranges::range_difference_t<Range> i = 0; i < size; ++i)
     {
-        const auto first_symbol = first[i];
-        const auto second_symbol = second[i];
+        const auto first_symbol = *(first_begin + i);
+        const auto second_symbol = *(second_begin + i);
 
         EXPECT_EQ(first_symbol.get_index(), second_symbol.get_index()) << label << "[" << i << "]";
         EXPECT_EQ(first_symbol.get_name(), second_symbol.get_name()) << label << "[" << i << "] index " << first_symbol.get_index().get_value();

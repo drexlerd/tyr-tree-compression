@@ -18,10 +18,13 @@
 #ifndef TYR_PLANNING_AXIOM_EVALUATOR_HPP_
 #define TYR_PLANNING_AXIOM_EVALUATOR_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
+#include "tyr/common/config.hpp"
 #include "tyr/common/onetbb.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_builder.hpp"
+
+#include <concepts>
 
 namespace tyr::planning
 {

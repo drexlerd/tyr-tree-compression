@@ -18,7 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_MERGE_DATALOG_HPP_
 #define TYR_FORMALISM_PLANNING_MERGE_DATALOG_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/associative_containers.hpp"
+#include "tyr/common/concepts.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/tuple.hpp"

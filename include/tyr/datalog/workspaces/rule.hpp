@@ -18,7 +18,8 @@
 #ifndef TYR_DATALOG_WORKSPACES_RULE_HPP_
 #define TYR_DATALOG_WORKSPACES_RULE_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/associative_containers.hpp"
+#include "tyr/common/closed_interval.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/datalog/consistency_graph.hpp"
@@ -38,6 +39,7 @@
 #include <chrono>
 #include <oneapi/tbb/enumerable_thread_specific.h>
 #include <oneapi/tbb/spin_mutex.h>
+#include <tuple>
 #include <utility>
 #include <type_traits>
 #include <variant>

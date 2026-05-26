@@ -18,11 +18,11 @@
 #ifndef TYR_COMMON_TYPES_HPP_
 #define TYR_COMMON_TYPES_HPP_
 
-#include "tyr/common/declarations.hpp"
+#include "tyr/common/concepts.hpp"
 
-#include <cista/containers/optional.h>
-#include <cista/containers/variant.h>
 #include <cista/containers/vector.h>
+#include <concepts>
+#include <type_traits>
 
 namespace tyr
 {
@@ -72,9 +72,11 @@ concept CanonicalizableContext = requires(const C& a, const T& e) {
     { a.get_canonical_context(e) } -> std::same_as<const C&>;
 };
 
+template<typename C, typename T>
+concept CanonicalizableContextFor = CanonicalizableContext<T, C>;
+
 /// @brief Helper to create a view
-template<typename T, typename C>
-    requires CanonicalizableContext<T, C>
+template<typename T, CanonicalizableContextFor<T> C>
 auto make_view(const T& element, const C& context) noexcept
 {
     return View<T, C>(element, context.get_canonical_context(element));

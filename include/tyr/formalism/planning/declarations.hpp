@@ -19,7 +19,6 @@
 #define TYR_FORMALISM_PLANNING_DECLARATIONS_HPP_
 
 #include "tyr/common/config.hpp"
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/formalism/declarations.hpp"
 

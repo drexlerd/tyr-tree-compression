@@ -19,8 +19,24 @@
 #include <tyr/common/bit_packed_array_pool.hpp>
 #include <tyr/common/config.hpp>
 
+#include <array>
+#include <vector>
+
 namespace tyr::tests
 {
+
+TEST(TyrTests, TyrCommonBitPackedArrayViewReportsEmpty)
+{
+    auto storage = std::array<uint8_t, 1> {};
+    auto view = BasicBitPackedArrayView<uint8_t, bit::ForwardingBlockCoder<uint8_t>>(storage.data(), 2, 3, 0);
+    auto empty_view = BasicBitPackedArrayView<uint8_t, bit::ForwardingBlockCoder<uint8_t>>(storage.data(), 0, 3, 0);
+
+    EXPECT_EQ(view.size(), 2);
+    EXPECT_FALSE(view.empty());
+    EXPECT_EQ(view.width(), 3);
+    EXPECT_EQ(empty_view.size(), 0);
+    EXPECT_TRUE(empty_view.empty());
+}
 
 TEST(TyrTests, TyrCommonBitPackedArrayPoolOutOfRange)
 {

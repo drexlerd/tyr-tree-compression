@@ -153,8 +153,7 @@ struct ForwardingBlockCoder
 
 static_assert(BlockCoder<ForwardingBlockCoder<uint32_t>, uint32_t>);
 
-template<std::unsigned_integral Block, typename Coder = bit::ForwardingBlockCoder<Block>>
-    requires BlockCoder<Coder, Block>
+template<std::unsigned_integral Block, BlockCoder<Block> Coder = bit::ForwardingBlockCoder<Block>>
 class int_reference
 {
 private:
@@ -188,8 +187,7 @@ private:
     uint8_t m_len;
 };
 
-template<std::unsigned_integral Block, typename Coder = bit::ForwardingBlockCoder<Block>>
-    requires BlockCoder<Coder, Block>
+template<std::unsigned_integral Block, BlockCoder<Block> Coder = bit::ForwardingBlockCoder<Block>>
 class block_reference
 {
 public:

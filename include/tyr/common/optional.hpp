@@ -18,7 +18,6 @@
 #ifndef TYR_COMMON_OPTIONAL_HPP_
 #define TYR_COMMON_OPTIONAL_HPP_
 
-#include "tyr/common/declarations.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/common/types_utils.hpp"
 
