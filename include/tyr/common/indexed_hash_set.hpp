@@ -18,6 +18,7 @@
 #ifndef TYR_COMMON_INDEXED_HASH_SET_HPP_
 #define TYR_COMMON_INDEXED_HASH_SET_HPP_
 
+#include "tyr/common/canonicalization.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/index_mixins.hpp"
