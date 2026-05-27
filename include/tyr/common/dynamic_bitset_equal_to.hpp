@@ -15,21 +15,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
-#define TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
+#ifndef TYR_COMMON_DYNAMIC_BITSET_EQUAL_TO_HPP_
+#define TYR_COMMON_DYNAMIC_BITSET_EQUAL_TO_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/observer_ptr.hpp"
+#include "tyr/common/dynamic_bitset.hpp"
+#include "tyr/common/equal_to.hpp"
 
-#include <type_traits>
+#include <concepts>
 
 namespace tyr
 {
 
-template<typename T>
-struct Less<ObserverPtr<T>>
+template<typename Block, typename Allocator>
+struct EqualTo<boost::dynamic_bitset<Block, Allocator>>
 {
-    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return Less<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
+    using Type = boost::dynamic_bitset<Block, Allocator>;
+
+    bool operator()(const Type& lhs, const Type& rhs) const { return lhs == rhs; }
+};
+
+template<std::unsigned_integral Block>
+struct EqualTo<BitsetSpan<Block>>
+{
+    bool operator()(const BitsetSpan<Block>& lhs, const BitsetSpan<Block>& rhs) const noexcept { return lhs == rhs; }
 };
 
 }

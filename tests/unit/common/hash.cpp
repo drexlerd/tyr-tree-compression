@@ -17,12 +17,15 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/hash.hpp>
+#include <tyr/common/comparators.hpp>
 #include <tyr/common/associative_containers.hpp>
-#include <tyr/common/dynamic_bitset_comparators.hpp>
-#include <tyr/common/cista_comparators.hpp>
+#include <tyr/common/dynamic_bitset_hash.hpp>
+#include <tyr/common/cista_hash.hpp>
 #include <tyr/common/observer_ptr_comparators.hpp>
+#include <tyr/common/observer_ptr_hash.hpp>
 
 #include <array>
+#include <cstdint>
 #include <span>
 #include <vector>
 
@@ -52,6 +55,26 @@ TEST(TyrTests, TyrCommonCistaHashAdaptersHashOffsetVector)
     values.emplace_back(2);
 
     EXPECT_EQ(hash_range(values), Hash<::cista::offset::vector<int>> {}(values));
+}
+
+TEST(TyrTests, TyrCommonCistaHashAdaptersHashOffsetStringOptionalAndVariant)
+{
+    auto lhs_string = ::cista::offset::string {};
+    auto rhs_string = ::cista::offset::string {};
+    lhs_string = "alpha";
+    rhs_string = "alpha";
+    EXPECT_EQ(Hash<::cista::offset::string> {}(lhs_string), Hash<::cista::offset::string> {}(rhs_string));
+
+    auto lhs_optional = ::cista::optional<int> { 7 };
+    auto rhs_optional = ::cista::optional<int> { 7 };
+    auto empty_optional = ::cista::optional<int> {};
+    EXPECT_EQ(Hash<::cista::optional<int>> {}(lhs_optional), Hash<::cista::optional<int>> {}(rhs_optional));
+    EXPECT_NE(Hash<::cista::optional<int>> {}(lhs_optional), Hash<::cista::optional<int>> {}(empty_optional));
+
+    using Variant = ::cista::offset::variant<int, unsigned>;
+    auto lhs_variant = Variant { 9 };
+    auto rhs_variant = Variant { 9 };
+    EXPECT_EQ(Hash<Variant> {}(lhs_variant), Hash<Variant> {}(rhs_variant));
 }
 
 TEST(TyrTests, TyrCommonObserverPtrHashAdaptersHashPointee)
@@ -84,6 +107,20 @@ TEST(TyrTests, TyrCommonDynamicBitsetHashAdaptersHashBoostDynamicBitsets)
     rhs.set(2);
 
     EXPECT_NE(Hash<boost::dynamic_bitset<>> {}(lhs), Hash<boost::dynamic_bitset<>> {}(rhs));
+}
+
+TEST(TyrTests, TyrCommonDynamicBitsetHashAdaptersHashBitsetSpans)
+{
+    const auto lhs_blocks = std::vector<std::uint64_t> { 0b1010 };
+    const auto rhs_blocks = std::vector<std::uint64_t> { 0b1010 };
+    const auto different_blocks = std::vector<std::uint64_t> { 0b0010 };
+
+    const auto lhs = BitsetSpan<const std::uint64_t>(lhs_blocks.data(), 4);
+    const auto rhs = BitsetSpan<const std::uint64_t>(rhs_blocks.data(), 4);
+    const auto different = BitsetSpan<const std::uint64_t>(different_blocks.data(), 4);
+
+    EXPECT_EQ(Hash<BitsetSpan<const std::uint64_t>> {}(lhs), Hash<BitsetSpan<const std::uint64_t>> {}(rhs));
+    EXPECT_NE(Hash<BitsetSpan<const std::uint64_t>> {}(lhs), Hash<BitsetSpan<const std::uint64_t>> {}(different));
 }
 
 }

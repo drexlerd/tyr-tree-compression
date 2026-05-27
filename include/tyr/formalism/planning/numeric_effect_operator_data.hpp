@@ -19,6 +19,7 @@
 #define TYR_FORMALISM_PLANNING_NUMERIC_EFFECT_OPERATOR_DATA_HPP_
 
 #include "tyr/common/cista_comparators.hpp"
+#include "tyr/common/cista_equal_to.hpp"
 #include "tyr/common/types.hpp"
 #include "tyr/common/types_utils.hpp"
 #include "tyr/common/variant.hpp"

@@ -21,6 +21,7 @@
 #include <tyr/common/equal_to.hpp>
 #include <tyr/common/hash.hpp>
 
+#include <cstddef>
 #include <span>
 #include <vector>
 
@@ -30,6 +31,40 @@ namespace tyr::tests
 struct IdentifiableConceptFixture
 {
     auto identifying_members() const noexcept { return 0; }
+};
+
+struct NonIdentifiableConceptFixture
+{
+};
+
+struct InvalidHashFixture
+{
+    bool operator()(int) const { return true; }
+};
+
+struct ValidHashFixture
+{
+    std::size_t operator()(int) const { return 0; }
+};
+
+struct InvalidEqualToFixture
+{
+    int operator()(int, int) const { return 0; }
+};
+
+struct ValidEqualToFixture
+{
+    bool operator()(int, int) const { return true; }
+};
+
+struct InvalidLessFixture
+{
+    int operator()(int, int) const { return 0; }
+};
+
+struct ValidLessFixture
+{
+    bool operator()(int, int) const { return false; }
 };
 
 TEST(TyrTests, TyrCommonConceptsHeaderExposesReusableConcepts)
@@ -44,11 +79,18 @@ TEST(TyrTests, TyrCommonConceptsHeaderExposesReusableConcepts)
     static_assert(!SameAsIgnoringCvref<const int&, double>);
     static_assert(!TriviallyCopyable<std::vector<int>>);
     static_assert(HashFor<Hash<int>, int>);
+    static_assert(HashFor<ValidHashFixture, int>);
+    static_assert(!HashFor<InvalidHashFixture, int>);
     static_assert(EqualToFor<EqualTo<int>, int>);
+    static_assert(EqualToFor<ValidEqualToFixture, int>);
+    static_assert(!EqualToFor<InvalidEqualToFixture, int>);
     static_assert(LessFor<Less<int>, int>);
+    static_assert(LessFor<ValidLessFixture, int>);
+    static_assert(!LessFor<InvalidLessFixture, int>);
     static_assert(Hashable<int>);
     static_assert(EqualityComparableByEqualTo<int>);
     static_assert(OrderedByLess<int>);
+    static_assert(!Identifiable<NonIdentifiableConceptFixture>);
 
     SUCCEED();
 }

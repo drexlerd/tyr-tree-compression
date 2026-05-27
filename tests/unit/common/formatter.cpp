@@ -25,6 +25,7 @@
 #include <tyr/common/equal_to.hpp>
 #include <tyr/common/hash.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
@@ -80,11 +81,56 @@ TEST(TyrTests, TyrCommonCistaFormatterFormatsOffsetString)
     EXPECT_EQ(fmt::format("{}", value), "hello");
 }
 
+TEST(TyrTests, TyrCommonCistaFormatterFormatsOptionalVectorAndVariant)
+{
+    auto empty = ::cista::optional<int> {};
+    auto optional = ::cista::optional<int> { 7 };
+    EXPECT_EQ(fmt::format("{}", empty), "<nullopt>");
+    EXPECT_EQ(fmt::format("{}", optional), "7");
+
+    auto vector = ::cista::offset::vector<int> {};
+    vector.emplace_back(1);
+    vector.emplace_back(2);
+    EXPECT_EQ(fmt::format("{}", vector), "[1, 2]");
+
+    using Variant = ::cista::offset::variant<int, unsigned>;
+    auto variant = Variant { 9U };
+    EXPECT_EQ(fmt::format("{}", variant), "9");
+}
+
+TEST(TyrTests, TyrCommonCistaFormatterFormatsViews)
+{
+    const auto context = 0;
+
+    auto vector = ::cista::offset::vector<int> {};
+    vector.emplace_back(1);
+    vector.emplace_back(2);
+    using VectorView = View<decltype(vector), int>;
+    EXPECT_EQ(fmt::format("{}", VectorView(vector, context)), "[1, 2]");
+
+    auto optional = ::cista::optional<int> { 7 };
+    using OptionalView = View<decltype(optional), int>;
+    EXPECT_EQ(fmt::format("{}", OptionalView(optional, context)), "7");
+
+    using Variant = ::cista::offset::variant<int, unsigned>;
+    auto variant = Variant { 9U };
+    using VariantView = View<Variant, int>;
+    EXPECT_EQ(fmt::format("{}", VariantView(variant, context)), "9");
+}
+
 TEST(TyrTests, TyrCommonDynamicBitsetFormatterFormatsBoostDynamicBitset)
 {
     auto value = boost::dynamic_bitset<>(8);
     value.set(1);
     value.set(3);
+
+    EXPECT_EQ(fmt::format("{}", value), "{1, 3}");
+}
+
+TEST(TyrTests, TyrCommonDynamicBitsetFormatterFormatsBitsetSpan)
+{
+    const auto blocks = std::vector<std::uint64_t> { 0b1010 };
+    const auto value = BitsetSpan<const std::uint64_t>(blocks.data(), 4);
 
     EXPECT_EQ(fmt::format("{}", value), "{1, 3}");
 }

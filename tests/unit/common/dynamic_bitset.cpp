@@ -19,7 +19,9 @@
 #include <tyr/common/config.hpp>
 #include <tyr/common/dynamic_bitset.hpp>
 #include <tyr/common/dynamic_bitset_comparators.hpp>
+#include <tyr/common/dynamic_bitset_equal_to.hpp>
 #include <tyr/common/dynamic_bitset_formatters.hpp>
+#include <tyr/common/dynamic_bitset_hash.hpp>
 #include <vector>
 
 namespace tyr::tests

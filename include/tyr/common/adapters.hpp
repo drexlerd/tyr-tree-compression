@@ -20,13 +20,21 @@
 
 #include "tyr/common/associative_container_formatters.hpp"
 #include "tyr/common/cista_comparators.hpp"
+#include "tyr/common/cista_equal_to.hpp"
+#include "tyr/common/cista_hash.hpp"
 #include "tyr/common/cista_formatters.hpp"
 #include "tyr/common/closed_interval.hpp"
 #include "tyr/common/dynamic_bitset_comparators.hpp"
+#include "tyr/common/dynamic_bitset_equal_to.hpp"
+#include "tyr/common/dynamic_bitset_hash.hpp"
 #include "tyr/common/dynamic_bitset_formatters.hpp"
 #include "tyr/common/formatter.hpp"
 #include "tyr/common/json.hpp"
 #include "tyr/common/observer_ptr_comparators.hpp"
+#include "tyr/common/observer_ptr_equal_to.hpp"
+#include "tyr/common/observer_ptr_hash.hpp"
 #include "tyr/common/onetbb.hpp"
+#include "tyr/common/raw_vector_comparators.hpp"
+#include "tyr/common/segmented_vector_comparators.hpp"
 
 #endif

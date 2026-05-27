@@ -17,11 +17,14 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/equal_to.hpp>
+#include <tyr/common/comparators.hpp>
 #include <tyr/common/associative_containers.hpp>
-#include <tyr/common/dynamic_bitset_comparators.hpp>
-#include <tyr/common/cista_comparators.hpp>
+#include <tyr/common/dynamic_bitset_equal_to.hpp>
+#include <tyr/common/cista_equal_to.hpp>
 #include <tyr/common/observer_ptr_comparators.hpp>
+#include <tyr/common/observer_ptr_equal_to.hpp>
 
+#include <cstdint>
 #include <limits>
 #include <span>
 #include <vector>
@@ -70,6 +73,35 @@ TEST(TyrTests, TyrCommonCistaEqualToAdaptersCompareOffsetVector)
     EXPECT_TRUE(EqualTo<::cista::offset::vector<int>> {}(lhs, rhs));
 }
 
+TEST(TyrTests, TyrCommonCistaEqualToAdaptersCompareOffsetStringOptionalAndVariant)
+{
+    auto lhs_string = ::cista::offset::string {};
+    auto rhs_string = ::cista::offset::string {};
+    auto different_string = ::cista::offset::string {};
+    lhs_string = "alpha";
+    rhs_string = "alpha";
+    different_string = "beta";
+    EXPECT_TRUE(EqualTo<::cista::offset::string> {}(lhs_string, rhs_string));
+    EXPECT_FALSE(EqualTo<::cista::offset::string> {}(lhs_string, different_string));
+
+    auto lhs_optional = ::cista::optional<int> { 7 };
+    auto rhs_optional = ::cista::optional<int> { 7 };
+    auto different_optional = ::cista::optional<int> { 8 };
+    auto empty_optional = ::cista::optional<int> {};
+    EXPECT_TRUE(EqualTo<::cista::optional<int>> {}(lhs_optional, rhs_optional));
+    EXPECT_FALSE(EqualTo<::cista::optional<int>> {}(lhs_optional, different_optional));
+    EXPECT_FALSE(EqualTo<::cista::optional<int>> {}(lhs_optional, empty_optional));
+
+    using Variant = ::cista::offset::variant<int, unsigned>;
+    auto lhs_variant = Variant { 9 };
+    auto rhs_variant = Variant { 9 };
+    auto different_value_variant = Variant { 10 };
+    auto different_type_variant = Variant { 9U };
+    EXPECT_TRUE(EqualTo<Variant> {}(lhs_variant, rhs_variant));
+    EXPECT_FALSE(EqualTo<Variant> {}(lhs_variant, different_value_variant));
+    EXPECT_FALSE(EqualTo<Variant> {}(lhs_variant, different_type_variant));
+}
+
 TEST(TyrTests, TyrCommonObserverPtrEqualToAdaptersComparePointees)
 {
     const auto lhs_value = 7;
@@ -108,6 +140,20 @@ TEST(TyrTests, TyrCommonDynamicBitsetEqualToAdaptersCompareBoostDynamicBitsets)
     rhs.set(2);
 
     EXPECT_FALSE(EqualTo<boost::dynamic_bitset<>> {}(lhs, rhs));
+}
+
+TEST(TyrTests, TyrCommonDynamicBitsetEqualToAdaptersCompareBitsetSpans)
+{
+    const auto lhs_blocks = std::vector<std::uint64_t> { 0b1010 };
+    const auto rhs_blocks = std::vector<std::uint64_t> { 0b1010 };
+    const auto different_blocks = std::vector<std::uint64_t> { 0b0010 };
+
+    const auto lhs = BitsetSpan<const std::uint64_t>(lhs_blocks.data(), 4);
+    const auto rhs = BitsetSpan<const std::uint64_t>(rhs_blocks.data(), 4);
+    const auto different = BitsetSpan<const std::uint64_t>(different_blocks.data(), 4);
+
+    EXPECT_TRUE(EqualTo<BitsetSpan<const std::uint64_t>> {}(lhs, rhs));
+    EXPECT_FALSE(EqualTo<BitsetSpan<const std::uint64_t>> {}(lhs, different));
 }
 
 }

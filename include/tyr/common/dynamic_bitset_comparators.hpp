@@ -20,11 +20,8 @@
 
 #include "tyr/common/comparators.hpp"
 #include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
 
 #include <concepts>
-#include <cstddef>
 #include <iterator>
 #include <vector>
 
@@ -52,32 +49,6 @@ struct Less<boost::dynamic_bitset<Block, Allocator>>
     }
 };
 
-template<typename Block, typename Allocator>
-struct Hash<boost::dynamic_bitset<Block, Allocator>>
-{
-    using Type = boost::dynamic_bitset<Block, Allocator>;
-
-    size_t operator()(const Type& bitset) const
-    {
-        auto blocks = std::vector<Block>();
-        blocks.reserve(bitset.num_blocks());
-        boost::to_block_range(bitset, std::back_inserter(blocks));
-
-        size_t seed = bitset.size();
-        for (const auto& block : blocks)
-            hash_combine(seed, block);
-        return seed;
-    }
-};
-
-template<typename Block, typename Allocator>
-struct EqualTo<boost::dynamic_bitset<Block, Allocator>>
-{
-    using Type = boost::dynamic_bitset<Block, Allocator>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const { return lhs == rhs; }
-};
-
 template<std::unsigned_integral Block>
 struct Less<BitsetSpan<Block>>
 {
@@ -93,23 +64,6 @@ struct Less<BitsetSpan<Block>>
     }
 };
 
-template<std::unsigned_integral Block>
-struct Hash<BitsetSpan<Block>>
-{
-    size_t operator()(const BitsetSpan<Block>& bitset_span) const noexcept
-    {
-        size_t aggregated_hash = bitset_span.num_bits();
-        for (const auto& block : bitset_span.blocks())
-            hash_combine(aggregated_hash, block);
-        return aggregated_hash;
-    }
-};
-
-template<std::unsigned_integral Block>
-struct EqualTo<BitsetSpan<Block>>
-{
-    bool operator()(const BitsetSpan<Block>& lhs, const BitsetSpan<Block>& rhs) const noexcept { return lhs == rhs; }
-};
 }
 
 #endif

@@ -18,11 +18,23 @@
 #include <gtest/gtest.h>
 #include <tyr/common/indexed_hash_set.hpp>
 
+#include <cstddef>
+
 namespace tyr::tests
 {
 
 struct IndexedHashSetTestTag
 {
+};
+
+struct IndexedHashSetCustomHash
+{
+    std::size_t operator()(const Data<IndexedHashSetTestTag>& value) const noexcept;
+};
+
+struct IndexedHashSetCustomEqualTo
+{
+    bool operator()(const Data<IndexedHashSetTestTag>& lhs, const Data<IndexedHashSetTestTag>& rhs) const noexcept;
 };
 
 }
@@ -48,7 +60,20 @@ inline bool is_canonical(const Data<tests::IndexedHashSetTestTag>&) { return tru
 
 inline void canonicalize(Data<tests::IndexedHashSetTestTag>&) {}
 
+inline std::size_t tests::IndexedHashSetCustomHash::operator()(const Data<tests::IndexedHashSetTestTag>& value) const noexcept
+{
+    return static_cast<std::size_t>(value.value);
+}
+
+inline bool tests::IndexedHashSetCustomEqualTo::operator()(const Data<tests::IndexedHashSetTestTag>& lhs,
+                                                           const Data<tests::IndexedHashSetTestTag>& rhs) const noexcept
+{
+    return lhs.value == rhs.value;
+}
+
 static_assert(CanonicalDataTag<tests::IndexedHashSetTestTag>);
+static_assert(HashFor<tests::IndexedHashSetCustomHash, Data<tests::IndexedHashSetTestTag>>);
+static_assert(EqualToFor<tests::IndexedHashSetCustomEqualTo, Data<tests::IndexedHashSetTestTag>>);
 
 }
 
@@ -57,7 +82,7 @@ namespace tyr::tests
 
 TEST(TyrTests, TyrCommonIndexedHashSetFindsAndContainsInsertedValues)
 {
-    auto set = IndexedHashSet<IndexedHashSetTestTag>();
+    auto set = IndexedHashSet<IndexedHashSetTestTag, IndexedHashSetCustomHash, IndexedHashSetCustomEqualTo>();
     const auto first = Data<IndexedHashSetTestTag> { 1 };
     const auto second = Data<IndexedHashSetTestTag> { 2 };
     const auto missing = Data<IndexedHashSetTestTag> { 3 };

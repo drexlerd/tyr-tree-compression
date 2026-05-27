@@ -36,6 +36,39 @@ struct Hash;
 }
 
 #if TYR_ENABLE_FMT_FORMATTERS
+namespace tyr::detail
+{
+
+template<typename OutputIt, typename Range>
+OutputIt format_elements(OutputIt out, const Range& value)
+{
+    auto first = true;
+    for (const auto& element : value)
+    {
+        if (!first)
+            out = fmt::format_to(out, ", ");
+        first = false;
+        out = fmt::format_to(out, "{}", element);
+    }
+    return out;
+}
+
+template<typename OutputIt, typename Range>
+OutputIt format_key_value_elements(OutputIt out, const Range& value)
+{
+    auto first = true;
+    for (const auto& [key, mapped] : value)
+    {
+        if (!first)
+            out = fmt::format_to(out, ", ");
+        first = false;
+        out = fmt::format_to(out, "{}: {}", key, mapped);
+    }
+    return out;
+}
+
+}
+
 namespace fmt
 {
 template<typename K, typename V, typename Allocator, typename Char>
@@ -62,14 +95,7 @@ struct formatter<gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocat
     auto format(const gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocator>& value, FormatContext& ctx) const
     {
         auto out = fmt::format_to(ctx.out(), "{{");
-        auto first = true;
-        for (const auto& [key, mapped] : value)
-        {
-            if (!first)
-                out = fmt::format_to(out, ", ");
-            first = false;
-            out = fmt::format_to(out, "{}: {}", key, mapped);
-        }
+        out = tyr::detail::format_key_value_elements(out, value);
         return fmt::format_to(out, "}}");
     }
 };
@@ -83,14 +109,7 @@ struct formatter<gtl::btree_set<K, C, A>, char>
     auto format(const gtl::btree_set<K, C, A>& value, FormatContext& ctx) const
     {
         auto out = fmt::format_to(ctx.out(), "{{");
-        auto first = true;
-        for (const auto& element : value)
-        {
-            if (!first)
-                out = fmt::format_to(out, ", ");
-            first = false;
-            out = fmt::format_to(out, "{}", element);
-        }
+        out = tyr::detail::format_elements(out, value);
         return fmt::format_to(out, "}}");
     }
 };
@@ -104,14 +123,7 @@ struct formatter<gtl::btree_map<K, V, C, A>, char>
     auto format(const gtl::btree_map<K, V, C, A>& value, FormatContext& ctx) const
     {
         auto out = fmt::format_to(ctx.out(), "{{");
-        auto first = true;
-        for (const auto& [key, mapped] : value)
-        {
-            if (!first)
-                out = fmt::format_to(out, ", ");
-            first = false;
-            out = fmt::format_to(out, "{}: {}", key, mapped);
-        }
+        out = tyr::detail::format_key_value_elements(out, value);
         return fmt::format_to(out, "}}");
     }
 };

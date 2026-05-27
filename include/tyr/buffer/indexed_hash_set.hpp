@@ -24,6 +24,8 @@
 #include "tyr/common/canonicalization.hpp"
 #include "tyr/common/config.hpp"
 #include "tyr/common/cista_comparators.hpp"
+#include "tyr/common/cista_equal_to.hpp"
+#include "tyr/common/cista_hash.hpp"
 #include "tyr/common/equal_to.hpp"
 #include "tyr/common/hash.hpp"
 #include "tyr/common/segmented_vector.hpp"

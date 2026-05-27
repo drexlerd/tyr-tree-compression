@@ -19,6 +19,9 @@
 #define TYR_COMMON_CISTA_FORMATTERS_HPP_
 
 #include "tyr/common/formatter.hpp"
+#include "tyr/common/optional.hpp"
+#include "tyr/common/variant.hpp"
+#include "tyr/common/vector.hpp"
 
 #include <cista/containers/optional.h>
 #include <cista/containers/string.h>

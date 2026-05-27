@@ -22,8 +22,6 @@
 #include "tyr/common/optional.hpp"
 #include "tyr/common/variant.hpp"
 #include "tyr/common/vector.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
 
 #include <cista/containers/optional.h>
 #include <cista/containers/string.h>
@@ -34,101 +32,6 @@
 
 namespace tyr
 {
-
-template<>
-struct Hash<::cista::offset::string>
-{
-    using Type = ::cista::offset::string;
-
-    size_t operator()(const Type& el) const noexcept { return hash_range(el); }
-};
-
-template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
-struct Hash<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>>
-{
-    using Type = ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>;
-
-    size_t operator()(const Type& el) const noexcept { return hash_range(el); }
-};
-
-template<typename... Ts>
-struct Hash<::cista::offset::variant<Ts...>>
-{
-    using Type = ::cista::offset::variant<Ts...>;
-
-    size_t operator()(const Type& el) const noexcept
-    {
-        return el.apply([](auto&& arg) -> size_t { return Hash<std::remove_cvref_t<decltype(arg)>> {}(arg); });
-    }
-};
-
-template<typename T>
-struct Hash<::cista::optional<T>>
-{
-    using Type = ::cista::optional<T>;
-
-    size_t operator()(const Type& el) const noexcept
-    {
-        if (!el.has_value())
-            return 0x9e3779b97f4a7c15ULL;
-
-        return Hash<T> {}(*el);
-    }
-};
-
-template<>
-struct EqualTo<::cista::offset::string>
-{
-    using Type = ::cista::offset::string;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return equal_range(lhs, rhs); }
-};
-
-template<typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
-struct EqualTo<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>>
-{
-    using Type = ::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return equal_range(lhs, rhs); }
-};
-
-template<typename... Ts>
-struct EqualTo<::cista::offset::variant<Ts...>>
-{
-    using Type = ::cista::offset::variant<Ts...>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        return lhs.apply(
-            [&](auto&& l)
-            {
-                return rhs.apply(
-                    [&](auto&& r)
-                    {
-                        if constexpr (std::is_same_v<std::remove_cvref_t<decltype(l)>, std::remove_cvref_t<decltype(r)>>)
-                            return EqualTo<std::remove_cvref_t<decltype(l)>> {}(l, r);
-                        return false;
-                    });
-            });
-    }
-};
-
-template<typename T>
-struct EqualTo<::cista::optional<T>>
-{
-    using Type = ::cista::optional<T>;
-
-    bool operator()(const Type& lhs, const Type& rhs) const noexcept
-    {
-        if (!lhs.has_value() && !rhs.has_value())
-            return true;
-
-        if (lhs.has_value() != rhs.has_value())
-            return false;
-
-        return EqualTo<T> {}(*lhs, *rhs);
-    }
-};
 
 template<typename Ptr>
 struct Less<::cista::basic_string<Ptr>>

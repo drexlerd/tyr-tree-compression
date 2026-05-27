@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
-#define TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
+#ifndef TYR_COMMON_OBSERVER_PTR_HASH_HPP_
+#define TYR_COMMON_OBSERVER_PTR_HASH_HPP_
 
-#include "tyr/common/comparators.hpp"
+#include "tyr/common/hash.hpp"
 #include "tyr/common/observer_ptr.hpp"
 
 #include <type_traits>
@@ -27,9 +27,9 @@ namespace tyr
 {
 
 template<typename T>
-struct Less<ObserverPtr<T>>
+struct Hash<ObserverPtr<T>>
 {
-    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return Less<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
+    size_t operator()(ObserverPtr<T> ptr) const noexcept { return Hash<std::remove_cvref_t<T>> {}(*ptr); }
 };
 
 }
