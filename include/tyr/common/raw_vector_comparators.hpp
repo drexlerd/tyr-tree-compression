@@ -18,24 +18,6 @@
 #ifndef TYR_COMMON_RAW_VECTOR_COMPARATORS_HPP_
 #define TYR_COMMON_RAW_VECTOR_COMPARATORS_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/raw_vector_pool.hpp"
-
-namespace tyr
-{
-
-template<std::unsigned_integral Size, TriviallyCopyable T>
-struct Less<RawVectorView<Size, T>>
-{
-    bool operator()(const RawVectorView<Size, T>& lhs, const RawVectorView<Size, T>& rhs) const noexcept { return less_range(lhs, rhs); }
-};
-
-template<std::unsigned_integral Size, TriviallyCopyable T>
-struct Less<RawVectorView<const Size, const T>>
-{
-    bool operator()(const RawVectorView<const Size, const T>& lhs, const RawVectorView<const Size, const T>& rhs) const noexcept { return less_range(lhs, rhs); }
-};
-
-}
+#include "tyr/common/raw_vector_ordering.hpp"
 
 #endif

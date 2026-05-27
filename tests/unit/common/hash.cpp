@@ -19,9 +19,11 @@
 #include <tyr/common/hash.hpp>
 #include <tyr/common/comparators.hpp>
 #include <tyr/common/associative_containers.hpp>
+#include <tyr/common/block_array_hash.hpp>
 #include <tyr/common/dynamic_bitset_hash.hpp>
+#include <tyr/common/raw_vector_hash.hpp>
+#include <tyr/common/segmented_vector_hash.hpp>
 #include <tyr/common/cista_hash.hpp>
-#include <tyr/common/observer_ptr_comparators.hpp>
 #include <tyr/common/observer_ptr_hash.hpp>
 
 #include <array>
@@ -31,6 +33,10 @@
 
 namespace tyr::tests
 {
+
+struct HashContext
+{
+};
 
 TEST(TyrTests, TyrCommonHashRangeMatchesContainerHash)
 {
@@ -121,6 +127,73 @@ TEST(TyrTests, TyrCommonDynamicBitsetHashAdaptersHashBitsetSpans)
 
     EXPECT_EQ(Hash<BitsetSpan<const std::uint64_t>> {}(lhs), Hash<BitsetSpan<const std::uint64_t>> {}(rhs));
     EXPECT_NE(Hash<BitsetSpan<const std::uint64_t>> {}(lhs), Hash<BitsetSpan<const std::uint64_t>> {}(different));
+}
+
+
+TEST(TyrTests, TyrCommonCistaHashAdaptersHashViews)
+{
+    const auto context = HashContext {};
+
+    auto lhs_vector = ::cista::offset::vector<int> {};
+    auto rhs_vector = ::cista::offset::vector<int> {};
+    lhs_vector.emplace_back(1);
+    rhs_vector.emplace_back(1);
+    using VectorView = View<::cista::offset::vector<int>, HashContext>;
+    EXPECT_EQ(Hash<VectorView> {}(VectorView(lhs_vector, context)), Hash<VectorView> {}(VectorView(rhs_vector, context)));
+
+    auto lhs_optional = ::cista::optional<int> { 7 };
+    auto rhs_optional = ::cista::optional<int> { 7 };
+    using OptionalView = View<::cista::optional<int>, HashContext>;
+    EXPECT_EQ(Hash<OptionalView> {}(OptionalView(lhs_optional, context)), Hash<OptionalView> {}(OptionalView(rhs_optional, context)));
+
+    using Variant = ::cista::offset::variant<int, unsigned>;
+    auto lhs_variant = Variant { 9U };
+    auto rhs_variant = Variant { 9U };
+    using VariantView = View<Variant, HashContext>;
+    EXPECT_EQ(Hash<VariantView> {}(VariantView(lhs_variant, context)), Hash<VariantView> {}(VariantView(rhs_variant, context)));
+}
+
+TEST(TyrTests, TyrCommonBlockArrayHashAdaptersHashViews)
+{
+    auto lhs_storage = std::vector<uint8_t> { 1, 2 };
+    auto rhs_storage = std::vector<uint8_t> { 1, 2 };
+    auto different_storage = std::vector<uint8_t> { 1, 3 };
+
+    using BlockView = BasicBlockArrayView<uint8_t, bit::ForwardingBlockCoder<uint8_t>>;
+    const auto lhs = BlockView(lhs_storage.data(), lhs_storage.size());
+    const auto rhs = BlockView(rhs_storage.data(), rhs_storage.size());
+    const auto different = BlockView(different_storage.data(), different_storage.size());
+
+    EXPECT_EQ(Hash<BlockView> {}(lhs), Hash<BlockView> {}(rhs));
+    EXPECT_NE(Hash<BlockView> {}(lhs), Hash<BlockView> {}(different));
+
+    const auto context = HashContext {};
+    using WrappedView = View<BlockView, HashContext>;
+    EXPECT_EQ(Hash<WrappedView> {}(WrappedView(lhs, context)), Hash<WrappedView> {}(WrappedView(rhs, context)));
+}
+
+TEST(TyrTests, TyrCommonRawAndSegmentedVectorHashAdaptersHashValues)
+{
+    auto pool = RawVectorPool<uint8_t, int, 32>();
+    const auto lhs_index = pool.insert(std::vector<int> { 1, 2 });
+    const auto rhs_index = pool.insert(std::vector<int> { 1, 2 });
+    const auto different_index = pool.insert(std::vector<int> { 1, 3 });
+
+    EXPECT_EQ((Hash<RawVectorView<uint8_t, int>> {}(pool[lhs_index])), (Hash<RawVectorView<uint8_t, int>> {}(pool[rhs_index])));
+    EXPECT_NE((Hash<RawVectorView<uint8_t, int>> {}(pool[lhs_index])), (Hash<RawVectorView<uint8_t, int>> {}(pool[different_index])));
+
+    auto lhs = SegmentedVector<int, 2>();
+    auto rhs = SegmentedVector<int, 2>();
+    auto different = SegmentedVector<int, 2>();
+    lhs.push_back(1);
+    lhs.push_back(2);
+    rhs.push_back(1);
+    rhs.push_back(2);
+    different.push_back(1);
+    different.push_back(3);
+
+    EXPECT_EQ((Hash<SegmentedVector<int, 2>> {}(lhs)), (Hash<SegmentedVector<int, 2>> {}(rhs)));
+    EXPECT_NE((Hash<SegmentedVector<int, 2>> {}(lhs)), (Hash<SegmentedVector<int, 2>> {}(different)));
 }
 
 }

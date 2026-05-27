@@ -15,9 +15,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
-#define TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
+#ifndef TYR_COMMON_OBSERVER_PTR_ORDERING_HPP_
+#define TYR_COMMON_OBSERVER_PTR_ORDERING_HPP_
 
-#include "tyr/common/block_array_ordering.hpp"
+#include "tyr/common/comparators.hpp"
+#include "tyr/common/observer_ptr.hpp"
+
+#include <type_traits>
+
+namespace tyr
+{
+
+template<typename T>
+struct Less<ObserverPtr<T>>
+{
+    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return Less<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
+};
+
+}
 
 #endif

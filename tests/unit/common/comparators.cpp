@@ -18,12 +18,12 @@
 #include <gtest/gtest.h>
 #include <tyr/common/comparators.hpp>
 #include <tyr/common/associative_containers.hpp>
-#include <tyr/common/cista_comparators.hpp>
-#include <tyr/common/block_array_comparators.hpp>
-#include <tyr/common/dynamic_bitset_comparators.hpp>
-#include <tyr/common/observer_ptr_comparators.hpp>
-#include <tyr/common/raw_vector_comparators.hpp>
-#include <tyr/common/segmented_vector_comparators.hpp>
+#include <tyr/common/block_array_ordering.hpp>
+#include <tyr/common/cista_ordering.hpp>
+#include <tyr/common/dynamic_bitset_ordering.hpp>
+#include <tyr/common/observer_ptr_ordering.hpp>
+#include <tyr/common/raw_vector_ordering.hpp>
+#include <tyr/common/segmented_vector_ordering.hpp>
 
 #include <array>
 #include <cstdint>
@@ -48,6 +48,59 @@ struct IdentifiableComparatorValue
 
     auto identifying_members() const noexcept { return std::tie(first, second); }
 };
+
+template<typename T>
+concept OrderedByAllCommonPredicates = LessFor<Less<T>, T> && LessFor<LessEqual<T>, T> && LessFor<Greater<T>, T> && LessFor<GreaterEqual<T>, T>;
+
+
+TEST(TyrTests, TyrCommonOrderingPredicatesCoverHashAndEqualToFamilies)
+{
+    using BlockView = BasicBlockArrayView<uint8_t, bit::ForwardingBlockCoder<uint8_t>>;
+    using BitPackedView = BasicBitPackedArrayView<uint8_t, bit::ForwardingBlockCoder<uint8_t>>;
+    using CistaVector = ::cista::offset::vector<int>;
+    using CistaOptional = ::cista::optional<int>;
+    using CistaVariant = ::cista::offset::variant<int, unsigned>;
+
+    static_assert(OrderedByAllCommonPredicates<std::array<int, 2>>);
+    static_assert(OrderedByAllCommonPredicates<std::vector<int>>);
+    static_assert(OrderedByAllCommonPredicates<std::set<int>>);
+    static_assert(OrderedByAllCommonPredicates<std::map<int, int>>);
+    static_assert(OrderedByAllCommonPredicates<Set<int>>);
+    static_assert(OrderedByAllCommonPredicates<Map<int, int>>);
+    static_assert(OrderedByAllCommonPredicates<std::pair<int, int>>);
+    static_assert(OrderedByAllCommonPredicates<std::tuple<int, int>>);
+    static_assert(OrderedByAllCommonPredicates<std::variant<int, unsigned>>);
+    static_assert(OrderedByAllCommonPredicates<std::optional<int>>);
+    static_assert(OrderedByAllCommonPredicates<std::reference_wrapper<int>>);
+    static_assert(OrderedByAllCommonPredicates<std::span<const int>>);
+    static_assert(OrderedByAllCommonPredicates<::cista::offset::string>);
+    static_assert(OrderedByAllCommonPredicates<CistaVector>);
+    static_assert(OrderedByAllCommonPredicates<View<CistaVector, ComparatorContext>>);
+    static_assert(OrderedByAllCommonPredicates<CistaOptional>);
+    static_assert(OrderedByAllCommonPredicates<View<CistaOptional, ComparatorContext>>);
+    static_assert(OrderedByAllCommonPredicates<CistaVariant>);
+    static_assert(OrderedByAllCommonPredicates<View<CistaVariant, ComparatorContext>>);
+    static_assert(OrderedByAllCommonPredicates<boost::dynamic_bitset<>>);
+    static_assert(OrderedByAllCommonPredicates<BitsetSpan<uint64_t>>);
+    static_assert(OrderedByAllCommonPredicates<BlockView>);
+    static_assert(OrderedByAllCommonPredicates<View<BlockView, ComparatorContext>>);
+    static_assert(OrderedByAllCommonPredicates<BitPackedView>);
+    static_assert(OrderedByAllCommonPredicates<View<BitPackedView, ComparatorContext>>);
+    static_assert(OrderedByAllCommonPredicates<RawVectorView<uint8_t, int>>);
+    static_assert(OrderedByAllCommonPredicates<SegmentedVector<int, 2>>);
+    static_assert(OrderedByAllCommonPredicates<ObserverPtr<const int>>);
+
+    const auto lhs_value = 1;
+    const auto rhs_value = 2;
+    const auto lhs = make_observer(lhs_value);
+    const auto rhs = make_observer(rhs_value);
+
+    EXPECT_TRUE(Less<ObserverPtr<const int>> {}(lhs, rhs));
+    EXPECT_TRUE(LessEqual<ObserverPtr<const int>> {}(lhs, rhs));
+    EXPECT_TRUE(Greater<ObserverPtr<const int>> {}(rhs, lhs));
+    EXPECT_TRUE(GreaterEqual<ObserverPtr<const int>> {}(rhs, lhs));
+    EXPECT_FALSE(Greater<ObserverPtr<const int>> {}(lhs, rhs));
+}
 
 TEST(TyrTests, TyrCommonLessRangeMatchesContainerLess)
 {

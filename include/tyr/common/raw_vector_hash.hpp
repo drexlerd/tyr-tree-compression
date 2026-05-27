@@ -15,9 +15,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
-#define TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
+#ifndef TYR_COMMON_RAW_VECTOR_HASH_HPP_
+#define TYR_COMMON_RAW_VECTOR_HASH_HPP_
 
-#include "tyr/common/block_array_ordering.hpp"
+#include "tyr/common/hash.hpp"
+#include "tyr/common/raw_vector_pool.hpp"
+
+namespace tyr
+{
+
+template<std::unsigned_integral Size, TriviallyCopyable T>
+struct Hash<RawVectorView<Size, T>>
+{
+    size_t operator()(const RawVectorView<Size, T>& value) const noexcept { return hash_range(value); }
+};
+
+template<std::unsigned_integral Size, TriviallyCopyable T>
+struct Hash<RawVectorView<const Size, const T>>
+{
+    size_t operator()(const RawVectorView<const Size, const T>& value) const noexcept { return hash_range(value); }
+};
+
+}
 
 #endif

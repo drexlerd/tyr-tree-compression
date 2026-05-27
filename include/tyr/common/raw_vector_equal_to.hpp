@@ -15,9 +15,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
-#define TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
+#ifndef TYR_COMMON_RAW_VECTOR_EQUAL_TO_HPP_
+#define TYR_COMMON_RAW_VECTOR_EQUAL_TO_HPP_
 
-#include "tyr/common/block_array_ordering.hpp"
+#include "tyr/common/equal_to.hpp"
+#include "tyr/common/raw_vector_pool.hpp"
+
+namespace tyr
+{
+
+template<std::unsigned_integral Size, TriviallyCopyable T>
+struct EqualTo<RawVectorView<Size, T>>
+{
+    bool operator()(const RawVectorView<Size, T>& lhs, const RawVectorView<Size, T>& rhs) const noexcept { return equal_range(lhs, rhs); }
+};
+
+template<std::unsigned_integral Size, TriviallyCopyable T>
+struct EqualTo<RawVectorView<const Size, const T>>
+{
+    bool operator()(const RawVectorView<const Size, const T>& lhs, const RawVectorView<const Size, const T>& rhs) const noexcept { return equal_range(lhs, rhs); }
+};
+
+}
 
 #endif

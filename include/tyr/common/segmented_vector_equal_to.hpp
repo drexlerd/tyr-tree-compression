@@ -15,21 +15,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_COMMON_HPP_
-#define TYR_COMMON_COMMON_HPP_
+#ifndef TYR_COMMON_SEGMENTED_VECTOR_EQUAL_TO_HPP_
+#define TYR_COMMON_SEGMENTED_VECTOR_EQUAL_TO_HPP_
 
-#include "tyr/common/adapters.hpp"
-#include "tyr/common/block_array_ordering.hpp"
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/containers.hpp"
-#include "tyr/common/core.hpp"
 #include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/iostream.hpp"
-#include "tyr/common/path.hpp"
-#include "tyr/common/project_adapters.hpp"
-#include "tyr/common/repository_types.hpp"
-#include "tyr/common/tuple.hpp"
-#include "tyr/common/uint_mixins.hpp"
+#include "tyr/common/segmented_vector.hpp"
+
+#include <cstddef>
+
+namespace tyr
+{
+
+template<typename T, std::size_t FirstSegmentSize>
+struct EqualTo<SegmentedVector<T, FirstSegmentSize>>
+{
+    bool operator()(const SegmentedVector<T, FirstSegmentSize>& lhs, const SegmentedVector<T, FirstSegmentSize>& rhs) const noexcept
+    {
+        if (lhs.size() != rhs.size())
+            return false;
+
+        for (std::size_t i = 0; i < lhs.size(); ++i)
+        {
+            if (!EqualTo<T> {}(lhs[i], rhs[i]))
+                return false;
+        }
+
+        return true;
+    }
+};
+
+}
 
 #endif

@@ -15,9 +15,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
-#define TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
+#ifndef TYR_COMMON_SEGMENTED_VECTOR_HASH_HPP_
+#define TYR_COMMON_SEGMENTED_VECTOR_HASH_HPP_
 
-#include "tyr/common/block_array_ordering.hpp"
+#include "tyr/common/hash.hpp"
+#include "tyr/common/segmented_vector.hpp"
+
+#include <cstddef>
+
+namespace tyr
+{
+
+template<typename T, std::size_t FirstSegmentSize>
+struct Hash<SegmentedVector<T, FirstSegmentSize>>
+{
+    size_t operator()(const SegmentedVector<T, FirstSegmentSize>& value) const noexcept
+    {
+        size_t seed = value.size();
+        for (std::size_t i = 0; i < value.size(); ++i)
+            hash_combine(seed, value[i]);
+        return seed;
+    }
+};
+
+}
 
 #endif

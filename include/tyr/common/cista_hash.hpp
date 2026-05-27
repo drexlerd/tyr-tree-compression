@@ -19,6 +19,9 @@
 #define TYR_COMMON_CISTA_HASH_HPP_
 
 #include "tyr/common/hash.hpp"
+#include "tyr/common/optional.hpp"
+#include "tyr/common/variant.hpp"
+#include "tyr/common/vector.hpp"
 
 #include <cista/containers/optional.h>
 #include <cista/containers/string.h>
@@ -46,10 +49,29 @@ struct Hash<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Alloc
     size_t operator()(const Type& el) const noexcept { return hash_range(el); }
 };
 
+template<typename C, typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator>
+struct Hash<View<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, C>>
+{
+    using Type = View<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, C>;
+
+    size_t operator()(const Type& el) const noexcept { return hash_range(el); }
+};
+
 template<typename... Ts>
 struct Hash<::cista::offset::variant<Ts...>>
 {
     using Type = ::cista::offset::variant<Ts...>;
+
+    size_t operator()(const Type& el) const noexcept
+    {
+        return el.apply([](auto&& arg) -> size_t { return Hash<std::remove_cvref_t<decltype(arg)>> {}(arg); });
+    }
+};
+
+template<typename C, typename... Ts>
+struct Hash<View<::cista::offset::variant<Ts...>, C>>
+{
+    using Type = View<::cista::offset::variant<Ts...>, C>;
 
     size_t operator()(const Type& el) const noexcept
     {
@@ -68,6 +90,20 @@ struct Hash<::cista::optional<T>>
             return 0x9e3779b97f4a7c15ULL;
 
         return Hash<T> {}(*el);
+    }
+};
+
+template<typename C, typename T>
+struct Hash<View<::cista::optional<T>, C>>
+{
+    using Type = View<::cista::optional<T>, C>;
+
+    size_t operator()(const Type& el) const noexcept
+    {
+        if (!el.has_value())
+            return 0x9e3779b97f4a7c15ULL;
+
+        return Hash<std::remove_cvref_t<decltype(el.value())>> {}(el.value());
     }
 };
 

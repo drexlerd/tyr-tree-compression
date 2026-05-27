@@ -19,9 +19,11 @@
 #include <tyr/common/equal_to.hpp>
 #include <tyr/common/comparators.hpp>
 #include <tyr/common/associative_containers.hpp>
+#include <tyr/common/block_array_equal_to.hpp>
 #include <tyr/common/dynamic_bitset_equal_to.hpp>
+#include <tyr/common/raw_vector_equal_to.hpp>
+#include <tyr/common/segmented_vector_equal_to.hpp>
 #include <tyr/common/cista_equal_to.hpp>
-#include <tyr/common/observer_ptr_comparators.hpp>
 #include <tyr/common/observer_ptr_equal_to.hpp>
 
 #include <cstdint>
@@ -31,6 +33,10 @@
 
 namespace tyr::tests
 {
+
+struct EqualToContext
+{
+};
 
 TEST(TyrTests, TyrCommonEqualRangeMatchesContainerEqualTo)
 {
@@ -154,6 +160,81 @@ TEST(TyrTests, TyrCommonDynamicBitsetEqualToAdaptersCompareBitsetSpans)
 
     EXPECT_TRUE(EqualTo<BitsetSpan<const std::uint64_t>> {}(lhs, rhs));
     EXPECT_FALSE(EqualTo<BitsetSpan<const std::uint64_t>> {}(lhs, different));
+}
+
+
+TEST(TyrTests, TyrCommonCistaEqualToAdaptersCompareViews)
+{
+    const auto context = EqualToContext {};
+
+    auto lhs_vector = ::cista::offset::vector<int> {};
+    auto rhs_vector = ::cista::offset::vector<int> {};
+    auto different_vector = ::cista::offset::vector<int> {};
+    lhs_vector.emplace_back(1);
+    rhs_vector.emplace_back(1);
+    different_vector.emplace_back(2);
+    using VectorView = View<::cista::offset::vector<int>, EqualToContext>;
+    EXPECT_TRUE(EqualTo<VectorView> {}(VectorView(lhs_vector, context), VectorView(rhs_vector, context)));
+    EXPECT_FALSE(EqualTo<VectorView> {}(VectorView(lhs_vector, context), VectorView(different_vector, context)));
+
+    auto lhs_optional = ::cista::optional<int> { 7 };
+    auto rhs_optional = ::cista::optional<int> { 7 };
+    auto different_optional = ::cista::optional<int> { 8 };
+    using OptionalView = View<::cista::optional<int>, EqualToContext>;
+    EXPECT_TRUE(EqualTo<OptionalView> {}(OptionalView(lhs_optional, context), OptionalView(rhs_optional, context)));
+    EXPECT_FALSE(EqualTo<OptionalView> {}(OptionalView(lhs_optional, context), OptionalView(different_optional, context)));
+
+    using Variant = ::cista::offset::variant<int, unsigned>;
+    auto lhs_variant = Variant { 9U };
+    auto rhs_variant = Variant { 9U };
+    auto different_variant = Variant { 10U };
+    using VariantView = View<Variant, EqualToContext>;
+    EXPECT_TRUE(EqualTo<VariantView> {}(VariantView(lhs_variant, context), VariantView(rhs_variant, context)));
+    EXPECT_FALSE(EqualTo<VariantView> {}(VariantView(lhs_variant, context), VariantView(different_variant, context)));
+}
+
+TEST(TyrTests, TyrCommonBlockArrayEqualToAdaptersCompareViews)
+{
+    auto lhs_storage = std::vector<uint8_t> { 1, 2 };
+    auto rhs_storage = std::vector<uint8_t> { 1, 2 };
+    auto different_storage = std::vector<uint8_t> { 1, 3 };
+
+    using BlockView = BasicBlockArrayView<uint8_t, bit::ForwardingBlockCoder<uint8_t>>;
+    const auto lhs = BlockView(lhs_storage.data(), lhs_storage.size());
+    const auto rhs = BlockView(rhs_storage.data(), rhs_storage.size());
+    const auto different = BlockView(different_storage.data(), different_storage.size());
+
+    EXPECT_TRUE(EqualTo<BlockView> {}(lhs, rhs));
+    EXPECT_FALSE(EqualTo<BlockView> {}(lhs, different));
+
+    const auto context = EqualToContext {};
+    using WrappedView = View<BlockView, EqualToContext>;
+    EXPECT_TRUE(EqualTo<WrappedView> {}(WrappedView(lhs, context), WrappedView(rhs, context)));
+    EXPECT_FALSE(EqualTo<WrappedView> {}(WrappedView(lhs, context), WrappedView(different, context)));
+}
+
+TEST(TyrTests, TyrCommonRawAndSegmentedVectorEqualToAdaptersCompareValues)
+{
+    auto pool = RawVectorPool<uint8_t, int, 32>();
+    const auto lhs_index = pool.insert(std::vector<int> { 1, 2 });
+    const auto rhs_index = pool.insert(std::vector<int> { 1, 2 });
+    const auto different_index = pool.insert(std::vector<int> { 1, 3 });
+
+    EXPECT_TRUE((EqualTo<RawVectorView<uint8_t, int>> {}(pool[lhs_index], pool[rhs_index])));
+    EXPECT_FALSE((EqualTo<RawVectorView<uint8_t, int>> {}(pool[lhs_index], pool[different_index])));
+
+    auto lhs = SegmentedVector<int, 2>();
+    auto rhs = SegmentedVector<int, 2>();
+    auto different = SegmentedVector<int, 2>();
+    lhs.push_back(1);
+    lhs.push_back(2);
+    rhs.push_back(1);
+    rhs.push_back(2);
+    different.push_back(1);
+    different.push_back(3);
+
+    EXPECT_TRUE((EqualTo<SegmentedVector<int, 2>> {}(lhs, rhs)));
+    EXPECT_FALSE((EqualTo<SegmentedVector<int, 2>> {}(lhs, different)));
 }
 
 }

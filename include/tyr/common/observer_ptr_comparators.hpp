@@ -18,20 +18,6 @@
 #ifndef TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
 #define TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/observer_ptr.hpp"
-
-#include <type_traits>
-
-namespace tyr
-{
-
-template<typename T>
-struct Less<ObserverPtr<T>>
-{
-    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return Less<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
-};
-
-}
+#include "tyr/common/observer_ptr_ordering.hpp"
 
 #endif
