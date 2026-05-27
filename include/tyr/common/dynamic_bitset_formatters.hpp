@@ -29,6 +29,27 @@
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
+template<typename Block, typename Allocator>
+struct formatter<boost::dynamic_bitset<Block, Allocator>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template<typename FormatContext>
+    auto format(const boost::dynamic_bitset<Block, Allocator>& value, FormatContext& ctx) const
+    {
+        auto out = fmt::format_to(ctx.out(), "{{");
+        auto first = true;
+        for (auto pos = value.find_first(); pos != boost::dynamic_bitset<Block, Allocator>::npos; pos = value.find_next(pos))
+        {
+            if (!first)
+                out = fmt::format_to(out, ", ");
+            first = false;
+            out = fmt::format_to(out, "{}", pos);
+        }
+        return fmt::format_to(out, "}}");
+    }
+};
+
 template<std::unsigned_integral Block>
 struct formatter<tyr::BitsetSpan<Block>, char>
 {

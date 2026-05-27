@@ -23,6 +23,7 @@
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+#include <gtl/btree.hpp>
 #include <gtl/phmap.hpp>
 
 namespace tyr
@@ -42,6 +43,16 @@ struct range_format_kind<gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>,
 {
 };
 
+template<typename K, typename C, typename A, typename Char>
+struct range_format_kind<gtl::btree_set<K, C, A>, Char, void> : std::false_type
+{
+};
+
+template<typename K, typename V, typename C, typename A, typename Char>
+struct range_format_kind<gtl::btree_map<K, V, C, A>, Char, void> : std::false_type
+{
+};
+
 template<typename K, typename V, typename Allocator>
 struct formatter<gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocator>, char>
 {
@@ -49,6 +60,48 @@ struct formatter<gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocat
 
     template<typename FormatContext>
     auto format(const gtl::flat_hash_map<K, V, tyr::Hash<K>, tyr::EqualTo<K>, Allocator>& value, FormatContext& ctx) const
+    {
+        auto out = fmt::format_to(ctx.out(), "{{");
+        auto first = true;
+        for (const auto& [key, mapped] : value)
+        {
+            if (!first)
+                out = fmt::format_to(out, ", ");
+            first = false;
+            out = fmt::format_to(out, "{}: {}", key, mapped);
+        }
+        return fmt::format_to(out, "}}");
+    }
+};
+
+template<typename K, typename C, typename A>
+struct formatter<gtl::btree_set<K, C, A>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template<typename FormatContext>
+    auto format(const gtl::btree_set<K, C, A>& value, FormatContext& ctx) const
+    {
+        auto out = fmt::format_to(ctx.out(), "{{");
+        auto first = true;
+        for (const auto& element : value)
+        {
+            if (!first)
+                out = fmt::format_to(out, ", ");
+            first = false;
+            out = fmt::format_to(out, "{}", element);
+        }
+        return fmt::format_to(out, "}}");
+    }
+};
+
+template<typename K, typename V, typename C, typename A>
+struct formatter<gtl::btree_map<K, V, C, A>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template<typename FormatContext>
+    auto format(const gtl::btree_map<K, V, C, A>& value, FormatContext& ctx) const
     {
         auto out = fmt::format_to(ctx.out(), "{{");
         auto first = true;

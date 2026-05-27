@@ -26,6 +26,7 @@
 #include <cista/containers/vector.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+#include <string_view>
 #include <type_traits>
 #include <variant>
 
@@ -46,6 +47,18 @@ struct range_format_kind<::cista::basic_string<Ptr>, Char, void> : std::false_ty
 template<typename C, typename T, template<typename> typename Ptr, bool IndexPointers, typename TemplateSizeType, class Allocator, typename Char>
 struct range_format_kind<tyr::View<::cista::basic_vector<T, Ptr, IndexPointers, TemplateSizeType, Allocator>, C>, Char, void> : std::false_type
 {
+};
+
+template<typename Ptr>
+struct formatter<::cista::basic_string<Ptr>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template<typename FormatContext>
+    auto format(const ::cista::basic_string<Ptr>& value, FormatContext& ctx) const
+    {
+        return fmt::format_to(ctx.out(), "{}", std::string_view(value.data(), value.size()));
+    }
 };
 
 template<typename T>

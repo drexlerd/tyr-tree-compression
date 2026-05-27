@@ -18,6 +18,9 @@
 #include <gtest/gtest.h>
 #include <tyr/common/associative_container_formatters.hpp>
 #include <tyr/common/associative_containers.hpp>
+#include <tyr/common/comparators.hpp>
+#include <tyr/common/cista_formatters.hpp>
+#include <tyr/common/dynamic_bitset_formatters.hpp>
 #include <tyr/common/formatter.hpp>
 #include <tyr/common/equal_to.hpp>
 #include <tyr/common/hash.hpp>
@@ -58,6 +61,32 @@ TEST(TyrTests, TyrCommonAssociativeContainerFormatterFormatsFlatHashMap)
     values.emplace(1, "one");
 
     EXPECT_EQ(fmt::format("{}", values), "{1: one}");
+}
+
+TEST(TyrTests, TyrCommonFormatterFormatsOrderedAssociativeAliases)
+{
+    const auto set = Set<int> { 1, 2 };
+    EXPECT_EQ(fmt::format("{}", set), "{1, 2}");
+
+    const auto map = Map<int, std::string_view> { { 1, "one" }, { 2, "two" } };
+    EXPECT_EQ(fmt::format("{}", map), "{1: one, 2: two}");
+}
+
+TEST(TyrTests, TyrCommonCistaFormatterFormatsOffsetString)
+{
+    auto value = ::cista::offset::string {};
+    value = "hello";
+
+    EXPECT_EQ(fmt::format("{}", value), "hello");
+}
+
+TEST(TyrTests, TyrCommonDynamicBitsetFormatterFormatsBoostDynamicBitset)
+{
+    auto value = boost::dynamic_bitset<>(8);
+    value.set(1);
+    value.set(3);
+
+    EXPECT_EQ(fmt::format("{}", value), "{1, 3}");
 }
 
 }
