@@ -36,6 +36,7 @@ namespace tyr
 {
 
 template<typename Tag, typename H = Hash<Data<Tag>>, typename E = EqualTo<Data<Tag>>, size_t FirstSegmentSize = 32>
+    requires Canonicalizable<Data<Tag>>
 class IndexedHashSet
 {
     static_assert(bit::is_power_of_two(FirstSegmentSize));

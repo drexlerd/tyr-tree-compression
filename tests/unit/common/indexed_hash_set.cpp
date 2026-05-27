@@ -46,6 +46,8 @@ struct Data<tests::IndexedHashSetTestTag>
 
 inline bool is_canonical(const Data<tests::IndexedHashSetTestTag>&) { return true; }
 
+inline void canonicalize(Data<tests::IndexedHashSetTestTag>&) {}
+
 }
 
 namespace tyr::tests

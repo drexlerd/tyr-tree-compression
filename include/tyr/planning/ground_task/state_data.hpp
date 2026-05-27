@@ -18,6 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_STATE_DATA_HPP_
 #define TYR_PLANNING_GROUND_TASK_STATE_DATA_HPP_
 
+#include "tyr/common/canonicalization.hpp"
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_data.hpp"
@@ -86,6 +87,10 @@ private:
     planning::AtomPackedStorage<planning::GroundTag, planning::StateStoragePolicyTag> m_atom_storage;
     planning::NumericPackedStorage<planning::GroundTag, planning::StateStoragePolicyTag> m_numeric_storage;
 };
+
+inline bool is_canonical(const Data<planning::State<planning::GroundTag>>&) { return true; }
+
+inline void canonicalize(Data<planning::State<planning::GroundTag>>&) {}
 }
 
 #endif

@@ -25,6 +25,7 @@
 #include <cista/containers/optional.h>
 
 #include <algorithm>
+#include <concepts>
 #include <type_traits>
 
 namespace tyr
@@ -85,6 +86,12 @@ template<typename T>
 void canonicalize(::cista::optional<T>& element)
 {
 }
+
+template<typename T>
+concept Canonicalizable = requires(T value, const T const_value) {
+    { is_canonical(const_value) } -> std::same_as<bool>;
+    { canonicalize(value) };
+};
 
 }
 

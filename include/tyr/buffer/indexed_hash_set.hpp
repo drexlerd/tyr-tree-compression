@@ -21,6 +21,7 @@
 #include "cista/serialization.h"
 #include "tyr/buffer/declarations.hpp"
 #include "tyr/buffer/segmented_buffer.hpp"
+#include "tyr/common/canonicalization.hpp"
 #include "tyr/common/config.hpp"
 #include "tyr/common/cista_comparators.hpp"
 #include "tyr/common/equal_to.hpp"
@@ -37,6 +38,7 @@
 namespace tyr::buffer
 {
 template<typename Tag, typename H = Hash<Data<Tag>>, typename E = EqualTo<Data<Tag>>>
+    requires Canonicalizable<Data<Tag>>
 class IndexedHashSet
 {
 private:

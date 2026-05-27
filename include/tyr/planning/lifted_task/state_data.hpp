@@ -19,6 +19,7 @@
 #define TYR_PLANNING_LIFTED_TASK_PACKED_STATE_HPP_
 
 #include "tyr/common/config.hpp"
+#include "tyr/common/canonicalization.hpp"
 #include "tyr/common/concepts.hpp"
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/planning/declarations.hpp"
@@ -92,6 +93,10 @@ private:
     planning::AtomPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> m_atom_storage;
     planning::NumericPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> m_numeric_storage;
 };
+
+inline bool is_canonical(const Data<planning::State<planning::LiftedTag>>&) { return true; }
+
+inline void canonicalize(Data<planning::State<planning::LiftedTag>>&) {}
 
 }
 
