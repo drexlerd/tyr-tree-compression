@@ -18,6 +18,7 @@
 #ifndef TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
 #define TYR_COMMON_BLOCK_ARRAY_COMPARATORS_HPP_
 
+#include "tyr/common/bit_packed_array_pool.hpp"
 #include "tyr/common/block_array_pool.hpp"
 #include "tyr/common/comparators.hpp"
 
@@ -26,6 +27,22 @@ namespace tyr
 
 template<typename T, typename C>
 struct View;
+
+template<typename Block, typename Coder>
+struct Less<BasicBitPackedArrayView<Block, Coder>>
+{
+    using Type = BasicBitPackedArrayView<Block, Coder>;
+
+    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
+};
+
+template<typename Block, typename Coder, typename C>
+struct Less<View<BasicBitPackedArrayView<Block, Coder>, C>>
+{
+    using Type = View<BasicBitPackedArrayView<Block, Coder>, C>;
+
+    bool operator()(const Type& lhs, const Type& rhs) const noexcept { return less_range(lhs, rhs); }
+};
 
 template<typename Block, typename Coder>
 struct Less<BasicBlockArrayView<Block, Coder>>

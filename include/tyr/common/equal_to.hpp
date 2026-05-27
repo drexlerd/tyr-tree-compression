@@ -34,6 +34,8 @@
 #include <variant>
 #include <vector>
 
+#include <gtl/btree.hpp>
+
 namespace tyr
 {
 
@@ -99,6 +101,18 @@ template<typename Key, typename T, typename Compare, typename Allocator>
 struct EqualTo<std::map<Key, T, Compare, Allocator>>
 {
     bool operator()(const std::map<Key, T, Compare, Allocator>& lhs, const std::map<Key, T, Compare, Allocator>& rhs) const noexcept { return equal_range(lhs, rhs); }
+};
+
+template<typename Key, typename Compare, typename Allocator>
+struct EqualTo<gtl::btree_set<Key, Compare, Allocator>>
+{
+    bool operator()(const gtl::btree_set<Key, Compare, Allocator>& lhs, const gtl::btree_set<Key, Compare, Allocator>& rhs) const noexcept { return equal_range(lhs, rhs); }
+};
+
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct EqualTo<gtl::btree_map<Key, T, Compare, Allocator>>
+{
+    bool operator()(const gtl::btree_map<Key, T, Compare, Allocator>& lhs, const gtl::btree_map<Key, T, Compare, Allocator>& rhs) const noexcept { return equal_range(lhs, rhs); }
 };
 
 template<typename T, typename Allocator>

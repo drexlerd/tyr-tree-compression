@@ -48,6 +48,8 @@ inline bool is_canonical(const Data<tests::IndexedHashSetTestTag>&) { return tru
 
 inline void canonicalize(Data<tests::IndexedHashSetTestTag>&) {}
 
+static_assert(CanonicalDataTag<tests::IndexedHashSetTestTag>);
+
 }
 
 namespace tyr::tests

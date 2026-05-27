@@ -15,35 +15,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
-#define TYR_COMMON_OBSERVER_PTR_COMPARATORS_HPP_
+#ifndef TYR_COMMON_RAW_VECTOR_COMPARATORS_HPP_
+#define TYR_COMMON_RAW_VECTOR_COMPARATORS_HPP_
 
 #include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/observer_ptr.hpp"
-
-#include <type_traits>
+#include "tyr/common/raw_vector_pool.hpp"
 
 namespace tyr
 {
 
-template<typename T>
-struct Less<ObserverPtr<T>>
+template<std::unsigned_integral Size, TriviallyCopyable T>
+struct Less<RawVectorView<Size, T>>
 {
-    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return Less<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
+    bool operator()(const RawVectorView<Size, T>& lhs, const RawVectorView<Size, T>& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
-template<typename T>
-struct Hash<ObserverPtr<T>>
+template<std::unsigned_integral Size, TriviallyCopyable T>
+struct Less<RawVectorView<const Size, const T>>
 {
-    size_t operator()(ObserverPtr<T> ptr) const noexcept { return Hash<std::remove_cvref_t<T>> {}(*ptr); }
-};
-
-template<typename T>
-struct EqualTo<ObserverPtr<T>>
-{
-    bool operator()(ObserverPtr<T> lhs, ObserverPtr<T> rhs) const noexcept { return EqualTo<std::remove_cvref_t<T>> {}(*lhs, *rhs); }
+    bool operator()(const RawVectorView<const Size, const T>& lhs, const RawVectorView<const Size, const T>& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 }

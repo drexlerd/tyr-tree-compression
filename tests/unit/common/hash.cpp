@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/hash.hpp>
+#include <tyr/common/associative_containers.hpp>
+#include <tyr/common/dynamic_bitset_comparators.hpp>
 #include <tyr/common/cista_comparators.hpp>
 #include <tyr/common/observer_ptr_comparators.hpp>
 
@@ -58,6 +60,30 @@ TEST(TyrTests, TyrCommonObserverPtrHashAdaptersHashPointee)
     const auto ptr = make_observer(value);
 
     EXPECT_EQ(Hash<int> {}(value), Hash<ObserverPtr<const int>> {}(ptr));
+}
+
+TEST(TyrTests, TyrCommonHashAdaptersHashTyrOrderedAssociativeAliases)
+{
+    const auto set = Set<int> { 1, 2 };
+    EXPECT_EQ(hash_range(set), Hash<Set<int>> {}(set));
+
+    const auto map = Map<int, int> { { 1, 2 } };
+    EXPECT_EQ(hash_range(map), (Hash<Map<int, int>> {}(map)));
+}
+
+TEST(TyrTests, TyrCommonDynamicBitsetHashAdaptersHashBoostDynamicBitsets)
+{
+    auto lhs = boost::dynamic_bitset<>(8);
+    auto rhs = boost::dynamic_bitset<>(8);
+
+    lhs.set(1);
+    rhs.set(1);
+
+    EXPECT_EQ(Hash<boost::dynamic_bitset<>> {}(lhs), Hash<boost::dynamic_bitset<>> {}(rhs));
+
+    rhs.set(2);
+
+    EXPECT_NE(Hash<boost::dynamic_bitset<>> {}(lhs), Hash<boost::dynamic_bitset<>> {}(rhs));
 }
 
 }

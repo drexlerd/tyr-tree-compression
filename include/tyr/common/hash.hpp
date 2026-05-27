@@ -35,6 +35,8 @@
 #include <variant>
 #include <vector>
 
+#include <gtl/btree.hpp>
+
 namespace tyr
 {
 
@@ -110,6 +112,18 @@ template<typename Key, typename T, typename Compare, typename Allocator>
 struct Hash<std::map<Key, T, Compare, Allocator>>
 {
     size_t operator()(const std::map<Key, T, Compare, Allocator>& map) const noexcept { return hash_range(map); }
+};
+
+template<typename Key, typename Compare, typename Allocator>
+struct Hash<gtl::btree_set<Key, Compare, Allocator>>
+{
+    size_t operator()(const gtl::btree_set<Key, Compare, Allocator>& set) const noexcept { return hash_range(set); }
+};
+
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct Hash<gtl::btree_map<Key, T, Compare, Allocator>>
+{
+    size_t operator()(const gtl::btree_map<Key, T, Compare, Allocator>& map) const noexcept { return hash_range(map); }
 };
 
 template<typename T, typename Allocator>

@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/equal_to.hpp>
+#include <tyr/common/associative_containers.hpp>
+#include <tyr/common/dynamic_bitset_comparators.hpp>
 #include <tyr/common/cista_comparators.hpp>
 #include <tyr/common/observer_ptr_comparators.hpp>
 
@@ -76,6 +78,36 @@ TEST(TyrTests, TyrCommonObserverPtrEqualToAdaptersComparePointees)
     const auto rhs = make_observer(rhs_value);
 
     EXPECT_TRUE(EqualTo<ObserverPtr<const int>> {}(lhs, rhs));
+}
+
+TEST(TyrTests, TyrCommonEqualToAdaptersCompareTyrOrderedAssociativeAliases)
+{
+    const auto lhs_set = Set<int> { 1, 2 };
+    const auto rhs_set = Set<int> { 1, 2 };
+    const auto different_set = Set<int> { 1, 3 };
+    EXPECT_TRUE(EqualTo<Set<int>> {}(lhs_set, rhs_set));
+    EXPECT_FALSE(EqualTo<Set<int>> {}(lhs_set, different_set));
+
+    const auto lhs_map = Map<int, int> { { 1, 2 } };
+    const auto rhs_map = Map<int, int> { { 1, 2 } };
+    const auto different_map = Map<int, int> { { 1, 3 } };
+    EXPECT_TRUE((EqualTo<Map<int, int>> {}(lhs_map, rhs_map)));
+    EXPECT_FALSE((EqualTo<Map<int, int>> {}(lhs_map, different_map)));
+}
+
+TEST(TyrTests, TyrCommonDynamicBitsetEqualToAdaptersCompareBoostDynamicBitsets)
+{
+    auto lhs = boost::dynamic_bitset<>(8);
+    auto rhs = boost::dynamic_bitset<>(8);
+
+    lhs.set(1);
+    rhs.set(1);
+
+    EXPECT_TRUE(EqualTo<boost::dynamic_bitset<>> {}(lhs, rhs));
+
+    rhs.set(2);
+
+    EXPECT_FALSE(EqualTo<boost::dynamic_bitset<>> {}(lhs, rhs));
 }
 
 }

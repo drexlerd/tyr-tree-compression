@@ -21,11 +21,21 @@
 #include "tyr/common/dependent_false.hpp"
 
 #include <concepts>
+#include <cstddef>
 #include <ranges>
 #include <type_traits>
 
 namespace tyr
 {
+
+template<typename T>
+struct EqualTo;
+
+template<typename T>
+struct Hash;
+
+template<typename T>
+struct Less;
 
 /// @brief Check whether T has a function that returns members that aims to identify the class.
 template<typename T>
@@ -44,6 +54,30 @@ concept SameAsIgnoringCvref = std::same_as<std::remove_cvref_t<T>, U>;
 
 template<typename T, typename U>
 concept UnsignedIntegralSameAsIgnoringConst = std::unsigned_integral<std::remove_const_t<T>> && std::same_as<std::remove_const_t<T>, std::remove_const_t<U>>;
+
+template<typename H, typename T>
+concept HashFor = requires(const H& hash, const T& value) {
+    { hash(value) } -> std::same_as<std::size_t>;
+};
+
+template<typename E, typename Lhs, typename Rhs = Lhs>
+concept EqualToFor = requires(const E& equal_to, const Lhs& lhs, const Rhs& rhs) {
+    { equal_to(lhs, rhs) } -> std::same_as<bool>;
+};
+
+template<typename C, typename Lhs, typename Rhs = Lhs>
+concept LessFor = requires(const C& less, const Lhs& lhs, const Rhs& rhs) {
+    { less(lhs, rhs) } -> std::same_as<bool>;
+};
+
+template<typename T>
+concept Hashable = HashFor<Hash<std::remove_cvref_t<T>>, T>;
+
+template<typename T>
+concept EqualityComparableByEqualTo = EqualToFor<EqualTo<std::remove_cvref_t<T>>, T>;
+
+template<typename T>
+concept OrderedByLess = LessFor<Less<std::remove_cvref_t<T>>, T>;
 
 }
 

@@ -17,6 +17,9 @@
 
 #include <gtest/gtest.h>
 #include <tyr/common/concepts.hpp>
+#include <tyr/common/comparators.hpp>
+#include <tyr/common/equal_to.hpp>
+#include <tyr/common/hash.hpp>
 
 #include <span>
 #include <vector>
@@ -40,6 +43,12 @@ TEST(TyrTests, TyrCommonConceptsHeaderExposesReusableConcepts)
     static_assert(!UnsignedIntegralSameAsIgnoringConst<unsigned int, unsigned long>);
     static_assert(!SameAsIgnoringCvref<const int&, double>);
     static_assert(!TriviallyCopyable<std::vector<int>>);
+    static_assert(HashFor<Hash<int>, int>);
+    static_assert(EqualToFor<EqualTo<int>, int>);
+    static_assert(LessFor<Less<int>, int>);
+    static_assert(Hashable<int>);
+    static_assert(EqualityComparableByEqualTo<int>);
+    static_assert(OrderedByLess<int>);
 
     SUCCEED();
 }

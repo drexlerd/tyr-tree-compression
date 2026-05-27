@@ -23,14 +23,18 @@
 #include <array>
 #include <cstddef>
 #include <functional>
+#include <map>
 #include <optional>
 #include <ranges>
+#include <set>
 #include <span>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
+
+#include <gtl/btree.hpp>
 
 namespace tyr
 {
@@ -98,6 +102,30 @@ template<typename T, typename Allocator>
 struct Less<std::vector<T, Allocator>>
 {
     bool operator()(const std::vector<T, Allocator>& lhs, const std::vector<T, Allocator>& rhs) const noexcept { return less_range(lhs, rhs); }
+};
+
+template<typename Key, typename Compare, typename Allocator>
+struct Less<std::set<Key, Compare, Allocator>>
+{
+    bool operator()(const std::set<Key, Compare, Allocator>& lhs, const std::set<Key, Compare, Allocator>& rhs) const noexcept { return less_range(lhs, rhs); }
+};
+
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct Less<std::map<Key, T, Compare, Allocator>>
+{
+    bool operator()(const std::map<Key, T, Compare, Allocator>& lhs, const std::map<Key, T, Compare, Allocator>& rhs) const noexcept { return less_range(lhs, rhs); }
+};
+
+template<typename Key, typename Compare, typename Allocator>
+struct Less<gtl::btree_set<Key, Compare, Allocator>>
+{
+    bool operator()(const gtl::btree_set<Key, Compare, Allocator>& lhs, const gtl::btree_set<Key, Compare, Allocator>& rhs) const noexcept { return less_range(lhs, rhs); }
+};
+
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct Less<gtl::btree_map<Key, T, Compare, Allocator>>
+{
+    bool operator()(const gtl::btree_map<Key, T, Compare, Allocator>& lhs, const gtl::btree_map<Key, T, Compare, Allocator>& rhs) const noexcept { return less_range(lhs, rhs); }
 };
 
 template<typename T1, typename T2>

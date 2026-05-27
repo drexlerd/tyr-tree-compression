@@ -1,6 +1,10 @@
 enable_testing()
 
 find_package(GTest "1.11.0" REQUIRED COMPONENTS GTest PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(Python 3.8 QUIET COMPONENTS Interpreter Development.Module)
+if(Python_FOUND)
+    find_package(nanobind CONFIG QUIET PATHS ${CMAKE_PREFIX_PATH})
+endif()
 
 # Helper function to create and register a test executable
 function(add_gtest test_name source_file)
@@ -8,6 +12,29 @@ function(add_gtest test_name source_file)
     target_link_libraries(${test_name} PRIVATE tyr::core TBB::tbb GTest::gtest)
     add_test(NAME ${test_name} COMMAND ${test_name})
 endfunction()
+
+file(GLOB_RECURSE TYR_COMMON_PUBLIC_HEADERS CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/tyr/common/*.hpp")
+set(TYR_COMMON_SELF_CONTAINMENT_TARGETS)
+set(TYR_COMMON_SELF_CONTAINMENT_DIR "${CMAKE_CURRENT_BINARY_DIR}/common/self_contained")
+file(MAKE_DIRECTORY "${TYR_COMMON_SELF_CONTAINMENT_DIR}")
+
+foreach(header IN LISTS TYR_COMMON_PUBLIC_HEADERS)
+    file(RELATIVE_PATH header_include "${PROJECT_SOURCE_DIR}/include" "${header}")
+    string(REPLACE "/" "_" header_stem "${header_include}")
+    string(REPLACE "." "_" header_stem "${header_stem}")
+    set(source "${TYR_COMMON_SELF_CONTAINMENT_DIR}/${header_stem}.cpp")
+    set(target "common_self_contained_${header_stem}")
+
+    file(WRITE "${source}" "#include <${header_include}>\nint main() { return 0; }\n")
+    add_library(${target} OBJECT "${source}")
+    target_link_libraries(${target} PRIVATE tyr::core TBB::tbb)
+    if(header_include MATCHES "^tyr/common/python/" AND nanobind_FOUND)
+        target_include_directories(${target} PRIVATE ${Python_INCLUDE_DIRS} ${NB_DIR}/include)
+    endif()
+    list(APPEND TYR_COMMON_SELF_CONTAINMENT_TARGETS ${target})
+endforeach()
+
+add_custom_target(common_self_contained_headers DEPENDS ${TYR_COMMON_SELF_CONTAINMENT_TARGETS})
 
 # Add each test source file as a separate test executable
 

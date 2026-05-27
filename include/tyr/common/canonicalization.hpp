@@ -93,6 +93,9 @@ concept Canonicalizable = requires(T value, const T const_value) {
     { canonicalize(value) };
 };
 
+template<typename Tag>
+concept CanonicalDataTag = Canonicalizable<Data<Tag>>;
+
 }
 
 #endif

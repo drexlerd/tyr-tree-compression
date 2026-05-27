@@ -29,7 +29,10 @@
 #include "tyr/common/segmented_vector.hpp"
 #include "tyr/common/types.hpp"
 
+#include <cassert>
+#include <cstddef>
 #include <functional>
+#include <memory>
 #include <gtl/phmap.hpp>
 #include <optional>
 #include <utility>
@@ -37,8 +40,7 @@
 
 namespace tyr::buffer
 {
-template<typename Tag, typename H = Hash<Data<Tag>>, typename E = EqualTo<Data<Tag>>>
-    requires Canonicalizable<Data<Tag>>
+template<CanonicalDataTag Tag, HashFor<Data<Tag>> H = Hash<Data<Tag>>, EqualToFor<Data<Tag>> E = EqualTo<Data<Tag>>>
 class IndexedHashSet
 {
 private:
