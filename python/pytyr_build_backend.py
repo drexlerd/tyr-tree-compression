@@ -20,16 +20,8 @@ def _num_jobs() -> int:
     return int(os.environ.get("TYR_JOBS", "8"))
 
 
-def _native_prefix(module, header_root: str | None = None) -> Path:
-    candidates = [module.native_prefix().resolve()]
-    if header_root is not None:
-        candidates.append(Path(module.__file__).resolve().parent)
-
-    for candidate in candidates:
-        if header_root is None or (candidate / "include" / header_root).exists():
-            return candidate
-
-    return candidates[0]
+def _native_prefix(module) -> Path:
+    return module.native_prefix().resolve()
 
 
 def _native_prefixes() -> list[Path]:

@@ -27,4 +27,11 @@ except PackageNotFoundError:
 
 
 def native_prefix() -> Path:
-    return Path(__file__).resolve().parent / "native"
+    package_dir = Path(__file__).resolve().parent
+    native_dir = package_dir / "native"
+    if (native_dir / "include" / "tyr").is_dir():
+        return native_dir
+    for parent in package_dir.parents:
+        if (parent / "include" / "tyr").is_dir():
+            return parent
+    return native_dir

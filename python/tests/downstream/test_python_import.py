@@ -15,16 +15,8 @@ ROOT_DIR = Path(__file__).resolve().parents[3]
 DOWNSTREAM_PACKAGE_DIR = Path(__file__).resolve().parent / "minimal_downstream_package"
 
 
-def _native_prefix(module, header_root=None):
-    candidates = [Path(module.native_prefix())]
-    if header_root is not None:
-        candidates.append(Path(module.__file__).resolve().parent)
-
-    for candidate in candidates:
-        if header_root is None or (candidate / "include" / header_root).exists():
-            return candidate
-
-    return candidates[0]
+def _native_prefix(module):
+    return Path(module.native_prefix())
 
 
 def test_downstream_python_binding_imports_public_pytyr_api_and_links_tyr_core(tmp_path):
