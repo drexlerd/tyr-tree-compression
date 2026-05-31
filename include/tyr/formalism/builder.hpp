@@ -18,31 +18,13 @@
 #ifndef TYR_FORMALISM_BUILDER_HPP_
 #define TYR_FORMALISM_BUILDER_HPP_
 
-#include <yggdrasil/containers/tuple.hpp>
-#include "tyr/formalism/basic_builder.hpp"
-
-#include <tuple>
+#include <yggdrasil/formalism/builder.hpp>
 
 namespace tyr::formalism
 {
 
 template<typename... Ts>
-class Builder
-{
-private:
-    using BuilderStorage = std::tuple<BasicBuilder<Ts>...>;
-
-    BuilderStorage m_builder;
-
-public:
-    Builder() = default;
-
-    template<typename T>
-    [[nodiscard]] auto get_builder()
-    {
-        return std::get<BasicBuilder<T>>(m_builder).get_builder();
-    }
-};
+using Builder = ygg::formalism::BuilderStorage<Ts...>;
 
 }
 

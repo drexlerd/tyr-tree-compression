@@ -18,33 +18,13 @@
 #ifndef TYR_FORMALISM_BASIC_BUILDER_HPP_
 #define TYR_FORMALISM_BASIC_BUILDER_HPP_
 
-#include <yggdrasil/containers/tuple.hpp>
-#include <yggdrasil/containers/unique_object_pool.hpp>
-#include "tyr/formalism/declarations.hpp"
+#include <yggdrasil/formalism/builder.hpp>
 
 namespace tyr::formalism
 {
+
 template<typename T>
-class BasicBuilder
-{
-private:
-    struct Slot
-    {
-        using value_type = T;
-        using container_type = ygg::UniqueObjectPool<ygg::Data<T>>;
-
-        container_type container;
-
-        Slot() = default;
-    };
-
-    Slot m_slot;
-
-public:
-    BasicBuilder() = default;
-
-    [[nodiscard]] auto get_builder() { return m_slot.container.get_or_allocate(); }
-};
+using BasicBuilder = ygg::formalism::BasicBuilder<T>;
 
 }
 
