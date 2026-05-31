@@ -12,7 +12,7 @@ VariableDomainView<C> to_variable_domain_view(const VariableDomain& domain, cons
     result.objects.reserve(domain.objects.size());
 
     for (const auto object : domain.objects)
-        result.objects.push_back(make_view(object, context));
+        result.objects.push_back(ygg::make_view(object, context));
 
     return result;
 }
@@ -36,7 +36,7 @@ SimpleScopedDomainViewMap<Element, C> to_simple_scoped_domain_view_map(const Sim
     result.reserve(domains.size());
 
     for (const auto& [element, payload] : domains)
-        result.emplace(make_view(element, context), to_variable_domain_view_list(payload, context));
+        result.emplace(ygg::make_view(element, context), to_variable_domain_view_list(payload, context));
 
     return result;
 }
@@ -49,9 +49,9 @@ ScopedDomainViewMap<Element, C> to_scoped_domain_view_map(const ScopedDomainMap<
 
     for (const auto& [element, domain] : domains)
     {
-        result.emplace(make_view(element, context),
+        result.emplace(ygg::make_view(element, context),
                        SimpleScopedDomainView<Element, C> {
-                           make_view(domain.element, context),
+                           ygg::make_view(domain.element, context),
                            to_variable_domain_view_list(domain.payload, context),
                        });
     }
@@ -63,7 +63,7 @@ template<typename C>
 ConjunctiveConditionDomainView<C> to_conjunctive_condition_domain_view(const ConjunctiveConditionDomain& domain, const C& context)
 {
     return ConjunctiveConditionDomainView<C> {
-        make_view(domain.element, context),
+        ygg::make_view(domain.element, context),
         to_variable_domain_view_list(domain.payload, context),
     };
 }
@@ -72,7 +72,7 @@ template<typename C>
 ConjunctiveEffectDomainView<C> to_conjunctive_effect_domain_view(const ConjunctiveEffectDomain& domain, const C& context)
 {
     return ConjunctiveEffectDomainView<C> {
-        make_view(domain.element, context),
+        ygg::make_view(domain.element, context),
         to_variable_domain_view_list(domain.payload, context),
     };
 }
@@ -81,7 +81,7 @@ template<typename C>
 ConditionalEffectDomainView<C> to_conditional_effect_domain_view(const ConditionalEffectDomain& domain, const C& context)
 {
     return ConditionalEffectDomainView<C> {
-        make_view(domain.element, context),
+        ygg::make_view(domain.element, context),
         ConditionalEffectDomainViewData<C> {
             to_conjunctive_condition_domain_view(domain.payload.condition_domain, context),
             to_conjunctive_effect_domain_view(domain.payload.effect_domain, context),
@@ -96,7 +96,7 @@ ConditionalEffectDomainViewMap<C> to_conditional_effect_domain_view_map(const Co
     result.reserve(domains.size());
 
     for (const auto& [element, domain] : domains)
-        result.emplace(make_view(element, context), to_conditional_effect_domain_view(domain, context));
+        result.emplace(ygg::make_view(element, context), to_conditional_effect_domain_view(domain, context));
 
     return result;
 }
@@ -109,9 +109,9 @@ ActionDomainViewMap<C> to_action_domain_view_map(const ActionDomainMap& domains,
 
     for (const auto& [element, domain] : domains)
     {
-        result.emplace(make_view(element, context),
+        result.emplace(ygg::make_view(element, context),
                        ActionDomainView<C> {
-                           make_view(domain.element, context),
+                           ygg::make_view(domain.element, context),
                            ActionDomainViewData<C> {
                                to_conjunctive_condition_domain_view(domain.payload.precondition_domain, context),
                                to_conditional_effect_domain_view_map(domain.payload.effect_domains, context),
@@ -124,31 +124,31 @@ ActionDomainViewMap<C> to_action_domain_view_map(const ActionDomainMap& domains,
 
 }  // namespace
 
-ProgramVariableDomainsView compute_variable_domain_views(const ProgramVariableDomains& domains, const formalism::datalog::Repository& repository)
+ProgramVariableDomainsView compute_variable_domain_views(const ProgramVariableDomains& domains, const ::tyr::formalism::datalog::Repository& repository)
 {
     using C = ProgramVariableDomainsView::C;
 
     return ProgramVariableDomainsView {
-        to_simple_scoped_domain_view_map<formalism::Predicate<formalism::StaticTag>, C>(domains.static_predicate_domains, repository),
-        to_simple_scoped_domain_view_map<formalism::Predicate<formalism::FluentTag>, C>(domains.fluent_predicate_domains, repository),
-        to_simple_scoped_domain_view_map<formalism::Function<formalism::StaticTag>, C>(domains.static_function_domains, repository),
-        to_simple_scoped_domain_view_map<formalism::Function<formalism::FluentTag>, C>(domains.fluent_function_domains, repository),
-        to_scoped_domain_view_map<formalism::datalog::Rule, C>(domains.rule_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>, C>(domains.static_predicate_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>, C>(domains.fluent_predicate_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Function<::tyr::formalism::StaticTag>, C>(domains.static_function_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Function<::tyr::formalism::FluentTag>, C>(domains.fluent_function_domains, repository),
+        to_scoped_domain_view_map<::tyr::formalism::datalog::Rule, C>(domains.rule_domains, repository),
     };
 }
 
-TaskVariableDomainsView compute_variable_domain_views(const TaskVariableDomains& domains, const formalism::planning::Repository& repository)
+TaskVariableDomainsView compute_variable_domain_views(const TaskVariableDomains& domains, const ::tyr::formalism::planning::Repository& repository)
 {
     using C = TaskVariableDomainsView::C;
 
     return TaskVariableDomainsView {
-        to_simple_scoped_domain_view_map<formalism::Predicate<formalism::StaticTag>, C>(domains.static_predicate_domains, repository),
-        to_simple_scoped_domain_view_map<formalism::Predicate<formalism::FluentTag>, C>(domains.fluent_predicate_domains, repository),
-        to_simple_scoped_domain_view_map<formalism::Predicate<formalism::DerivedTag>, C>(domains.derived_predicate_domains, repository),
-        to_simple_scoped_domain_view_map<formalism::Function<formalism::StaticTag>, C>(domains.static_function_domains, repository),
-        to_simple_scoped_domain_view_map<formalism::Function<formalism::FluentTag>, C>(domains.fluent_function_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>, C>(domains.static_predicate_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>, C>(domains.fluent_predicate_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Predicate<::tyr::formalism::DerivedTag>, C>(domains.derived_predicate_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Function<::tyr::formalism::StaticTag>, C>(domains.static_function_domains, repository),
+        to_simple_scoped_domain_view_map<::tyr::formalism::Function<::tyr::formalism::FluentTag>, C>(domains.fluent_function_domains, repository),
         to_action_domain_view_map<C>(domains.action_domains, repository),
-        to_scoped_domain_view_map<formalism::planning::Axiom, C>(domains.axiom_domains, repository),
+        to_scoped_domain_view_map<::tyr::formalism::planning::Axiom, C>(domains.axiom_domains, repository),
     };
 }
 

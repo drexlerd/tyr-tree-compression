@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_ACTION_EXECUTOR_HPP_
 #define TYR_PLANNING_ACTION_EXECUTOR_HPP_
 
-#include "tyr/common/itertools.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/itertools.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/applicability_lifted_decl.hpp"
@@ -36,29 +36,29 @@ public:
     // Ground action API
 
     template<TaskKind Kind>
-    bool is_applicable(formalism::planning::GroundActionView action, const StateContext<Kind>& state);
+    bool is_applicable(::tyr::formalism::planning::GroundActionView action, const StateContext<Kind>& state);
 
     template<TaskKind Kind>
-    Node<Kind> apply_action(const StateContext<Kind>& state_context, formalism::planning::GroundActionView action, StateRepository<Kind>& state_repository);
+    Node<Kind> apply_action(const StateContext<Kind>& state_context, ::tyr::formalism::planning::GroundActionView action, StateRepository<Kind>& state_repository);
 
     // Lifted action API
 
-    bool is_applicable(formalism::planning::ActionView action,
+    bool is_applicable(::tyr::formalism::planning::ActionView action,
                        const StateContext<LiftedTag>& state_context,
-                       formalism::planning::GrounderContext& grounder,
-                       const formalism::planning::FDRContext& fdr);
+                       ::tyr::formalism::planning::GrounderContext& grounder,
+                       const ::tyr::formalism::planning::FDRContext& fdr);
 
     Node<LiftedTag> apply_action(const StateContext<LiftedTag>& state_context,
-                                 formalism::planning::ActionView action,
-                                 formalism::planning::GrounderContext& grounder,
-                                 formalism::planning::FDRContext& fdr,
+                                 ::tyr::formalism::planning::ActionView action,
+                                 ::tyr::formalism::planning::GrounderContext& grounder,
+                                 ::tyr::formalism::planning::FDRContext& fdr,
                                  StateRepository<LiftedTag>& state_repository);
 
 private:
-    DataList<formalism::planning::FDRFact<formalism::FluentTag>> m_del_effects;
-    DataList<formalism::planning::FDRFact<formalism::FluentTag>> m_add_effects;
-    formalism::planning::EffectFamilyList m_effect_families;
-    itertools::cartesian_set::Workspace<Index<formalism::Object>> m_cartesian_workspace;
+    ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> m_del_effects;
+    ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> m_add_effects;
+    ::tyr::formalism::planning::EffectFamilyList m_effect_families;
+    ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>> m_cartesian_workspace;
 };
 }
 

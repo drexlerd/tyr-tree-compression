@@ -28,8 +28,8 @@ namespace tyr::formalism::planning
 
 struct MergeDatalogContext
 {
-    formalism::datalog::Builder& builder;
-    formalism::datalog::Repository& destination;
+    ::tyr::formalism::datalog::Builder& builder;
+    ::tyr::formalism::datalog::Repository& destination;
 };
 
 template<typename T>
@@ -39,15 +39,15 @@ struct to_datalog_payload
 };
 
 template<>
-struct to_datalog_payload<Data<formalism::planning::FunctionExpression>>
+struct to_datalog_payload<ygg::Data<::tyr::formalism::planning::FunctionExpression>>
 {
-    using type = Data<formalism::datalog::FunctionExpression>;
+    using type = ygg::Data<::tyr::formalism::datalog::FunctionExpression>;
 };
 
 template<>
-struct to_datalog_payload<Data<formalism::planning::GroundFunctionExpression>>
+struct to_datalog_payload<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>
 {
-    using type = Data<formalism::datalog::GroundFunctionExpression>;
+    using type = ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>;
 };
 
 template<typename T>

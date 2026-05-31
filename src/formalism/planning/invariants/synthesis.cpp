@@ -19,9 +19,9 @@
 
 #include "normalization.hpp"
 #include "refinement.hpp"
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/expression_arity.hpp"
 #include "tyr/formalism/planning/grounder.hpp"
 #include "tyr/formalism/planning/invariants/formatter.hpp"
@@ -49,7 +49,7 @@ InvariantList synthesize_invariants(DomainView domain)
     auto queue = make_initial_candidates(domain.get_predicates<FluentTag>());
 
     auto accepted = InvariantList {};
-    auto seen = gtl::flat_hash_set<Invariant, Hash<Invariant>, EqualTo<Invariant>> {};
+    auto seen = gtl::flat_hash_set<Invariant, ygg::Hash<Invariant>, ygg::EqualTo<Invariant>> {};
 
     while (!queue.empty())
     {

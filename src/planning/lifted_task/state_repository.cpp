@@ -17,8 +17,8 @@
 
 #include "tyr/planning/lifted_task/state_repository.hpp"
 
-#include "tyr/common/comparators.hpp"  // for operat...
-#include "tyr/common/vector.hpp"       // for View
+#include <yggdrasil/semantics/comparators.hpp>  // for operat...
+#include <yggdrasil/containers/vector.hpp>       // for ygg::View
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/fdr_context.hpp"  // for Binary...
 #include "tyr/formalism/planning/views.hpp"
@@ -37,7 +37,7 @@ namespace fp = tyr::formalism::planning;
 namespace tyr::planning
 {
 
-StateRepository<LiftedTag>::StateRepository(uint_t index, TaskPtr<LiftedTag> task, AxiomEvaluatorPtr<LiftedTag> axiom_evaluator) :
+StateRepository<LiftedTag>::StateRepository(ygg::uint_t index, TaskPtr<LiftedTag> task, AxiomEvaluatorPtr<LiftedTag> axiom_evaluator) :
     m_index(index),
     m_task(task),
     m_execution_context(axiom_evaluator ? axiom_evaluator->get_execution_context() : nullptr),
@@ -63,7 +63,7 @@ StateView<LiftedTag> StateRepository<LiftedTag>::get_initial_state()
     return register_state(unpacked_state);
 }
 
-StateView<LiftedTag> StateRepository<LiftedTag>::get_registered_state(Index<State<LiftedTag>> state_index)
+StateView<LiftedTag> StateRepository<LiftedTag>::get_registered_state(ygg::Index<State<LiftedTag>> state_index)
 {
     const auto& packed_state = m_packed_states[state_index];
 
@@ -77,8 +77,8 @@ StateView<LiftedTag> StateRepository<LiftedTag>::get_registered_state(Index<Stat
     return StateView<LiftedTag>(shared_from_this(), std::move(unpacked_state));
 }
 
-StateView<LiftedTag> StateRepository<LiftedTag>::create_state(const std::vector<Data<fp::FDRFact<f::FluentTag>>>& fluent_facts,
-                                                              const std::vector<std::pair<Index<fp::GroundFunctionTerm<f::FluentTag>>, float_t>>& fterm_values)
+StateView<LiftedTag> StateRepository<LiftedTag>::create_state(const std::vector<ygg::Data<fp::FDRFact<f::FluentTag>>>& fluent_facts,
+                                                              const std::vector<std::pair<ygg::Index<fp::GroundFunctionTerm<f::FluentTag>>, ygg::float_t>>& fterm_values)
 {
     auto unpacked_state = get_unregistered_state();
 
@@ -91,7 +91,7 @@ StateView<LiftedTag> StateRepository<LiftedTag>::create_state(const std::vector<
 }
 
 StateView<LiftedTag> StateRepository<LiftedTag>::create_state(const std::vector<fp::FDRFactView<f::FluentTag>>& fluent_facts,
-                                                              const std::vector<std::pair<fp::GroundFunctionTermView<f::FluentTag>, float_t>>& fterm_values)
+                                                              const std::vector<std::pair<fp::GroundFunctionTermView<f::FluentTag>, ygg::float_t>>& fterm_values)
 {
     auto unpacked_state = get_unregistered_state();
 
@@ -103,7 +103,7 @@ StateView<LiftedTag> StateRepository<LiftedTag>::create_state(const std::vector<
     return register_state(std::move(unpacked_state));
 }
 
-SharedObjectPoolPtr<UnpackedState<LiftedTag>> StateRepository<LiftedTag>::get_unregistered_state()
+ygg::SharedObjectPoolPtr<UnpackedState<LiftedTag>> StateRepository<LiftedTag>::get_unregistered_state()
 {
     auto state = m_unpacked_state_pool.get_or_allocate();
     state->clear();
@@ -111,13 +111,13 @@ SharedObjectPoolPtr<UnpackedState<LiftedTag>> StateRepository<LiftedTag>::get_un
     return state;
 }
 
-StateView<LiftedTag> StateRepository<LiftedTag>::register_state(SharedObjectPoolPtr<UnpackedState<LiftedTag>> state)
+StateView<LiftedTag> StateRepository<LiftedTag>::register_state(ygg::SharedObjectPoolPtr<UnpackedState<LiftedTag>> state)
 {
     if (m_axiom_evaluator)
         m_axiom_evaluator->compute_extended_state(*state);
 
     state->set(m_packed_states
-                   .insert(Data<State<LiftedTag>>(Index<State<LiftedTag>>(m_packed_states.size()),
+                   .insert(ygg::Data<State<LiftedTag>>(ygg::Index<State<LiftedTag>>(m_packed_states.size()),
                                                   m_fluent_backend.insert(state->template get_atoms<f::FluentTag>()),
                                                   m_derived_backend.insert(state->template get_atoms<f::DerivedTag>()),
                                                   m_numeric_backend.insert(state->get_numeric_variables())))

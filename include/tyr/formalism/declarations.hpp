@@ -18,14 +18,24 @@
 #ifndef TYR_FORMALISM_DECLARATIONS_HPP_
 #define TYR_FORMALISM_DECLARATIONS_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/type_list.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/type_list.hpp>
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/formalism/declarations.hpp>
 
 #include <tuple>
 
+namespace tyr
+{
+}
+
 namespace tyr::formalism
 {
+
 
 /**
  * Tags to distinguish predicates and downstream types
@@ -51,10 +61,10 @@ struct AuxiliaryTag
 template<typename T>
 concept FactKind = std::same_as<T, StaticTag> || std::same_as<T, FluentTag> || std::same_as<T, DerivedTag> || std::same_as<T, AuxiliaryTag>;
 
-using StaticFluentTags = TypeList<StaticTag, FluentTag>;
-using StaticFluentDerivedTags = TypeList<StaticTag, FluentTag, DerivedTag>;
-using StaticFluentAuxiliaryTags = TypeList<StaticTag, FluentTag, AuxiliaryTag>;
-using FluentDerivedTags = TypeList<FluentTag, DerivedTag>;
+using StaticFluentTags = ygg::TypeList<StaticTag, FluentTag>;
+using StaticFluentDerivedTags = ygg::TypeList<StaticTag, FluentTag, DerivedTag>;
+using StaticFluentAuxiliaryTags = ygg::TypeList<StaticTag, FluentTag, AuxiliaryTag>;
+using FluentDerivedTags = ygg::TypeList<FluentTag, DerivedTag>;
 
 /**
  * Tags to dispatch operators
@@ -120,11 +130,11 @@ concept ArithmeticOpKind = std::same_as<T, Add> || std::same_as<T, Mul> || std::
 template<typename T>
 concept OpKind = BooleanOpKind<T> || ArithmeticOpKind<T>;
 
-using BooleanOpKinds = TypeList<Eq, Ne, Le, Lt, Ge, Gt>;
-using ArithmeticOpKinds = TypeList<Add, Sub, Mul, Div>;
-using UnaryArithmeticOpKinds = TypeList<Sub>;
-using BinaryArithmeticOpKinds = TypeList<Add, Sub, Mul, Div>;
-using MultiArithmeticOpKinds = TypeList<Add, Mul>;
+using BooleanOpKinds = ygg::TypeList<Eq, Ne, Le, Lt, Ge, Gt>;
+using ArithmeticOpKinds = ygg::TypeList<Add, Sub, Mul, Div>;
+using UnaryArithmeticOpKinds = ygg::TypeList<Sub>;
+using BinaryArithmeticOpKinds = ygg::TypeList<Add, Sub, Mul, Div>;
+using MultiArithmeticOpKinds = ygg::TypeList<Add, Mul>;
 
 enum class EffectFamily
 {
@@ -169,7 +179,7 @@ template<typename T>
 concept NumericEffectOpKind =
     std::same_as<T, Assign> || std::same_as<T, Increase> || std::same_as<T, Decrease> || std::same_as<T, ScaleUp> || std::same_as<T, ScaleDown>;
 
-using NumericEffectOpKinds = TypeList<Assign, Increase, Decrease, ScaleUp, ScaleDown>;
+using NumericEffectOpKinds = ygg::TypeList<Assign, Increase, Decrease, ScaleUp, ScaleDown>;
 
 /**
  * Formalism tag
@@ -179,37 +189,27 @@ struct Variable
 {
 };
 
-struct Object
+struct ObjectTag
 {
 };
 
-struct Row
-{
-};
+using Object = ::ygg::formalism::Object<ObjectTag>;
+using Row = ::ygg::formalism::Row;
 
 template<typename T>
-struct RelationBinding
-{
-};
+using RelationBinding = ::ygg::formalism::RelationBinding<T, ObjectTag>;
 
 template<typename T>
-struct is_relation_binding : std::false_type
-{
-};
+using is_relation_binding = ::ygg::formalism::is_relation_binding<T>;
 
 template<typename T>
-struct is_relation_binding<RelationBinding<T>> : std::true_type
-{
-};
+inline constexpr bool is_relation_binding_v = ::ygg::formalism::is_relation_binding_v<T>;
 
 template<typename T>
-inline constexpr bool is_relation_binding_v = is_relation_binding<std::remove_cvref_t<T>>::value;
+concept RelationBindingConcept = ::ygg::formalism::RelationBindingConcept<T>;
 
 template<typename T>
-concept RelationBindingConcept = is_relation_binding_v<T>;
-
-template<typename T>
-concept NonRelationBindingConcept = !RelationBindingConcept<T>;
+concept NonRelationBindingConcept = ::ygg::formalism::NonRelationBindingConcept<T>;
 
 struct Term
 {

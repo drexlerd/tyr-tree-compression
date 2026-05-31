@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_FORMATTER_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_FORMATTER_HPP_
 
-#include "tyr/common/cista_formatters.hpp"
-#include "tyr/common/iostream.hpp"
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/io/iostream.hpp>
 #include "tyr/formalism/formatter.hpp"
 #include "tyr/formalism/planning/mutable/action.hpp"
 #include "tyr/formalism/planning/mutable/atom.hpp"
@@ -46,7 +46,7 @@ struct formatter<tyr::formalism::planning::MutableAtom<T>, char>
     template<typename FormatContext>
     auto format(const tyr::formalism::planning::MutableAtom<T>& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "({} {})", value.predicate.get_name(), fmt::join(tyr::to_strings(value.terms), " "));
+        return fmt::format_to(ctx.out(), "({} {})", value.predicate.get_name(), fmt::join(ygg::to_strings(value.terms), " "));
     }
 };
 
@@ -77,17 +77,17 @@ struct formatter<tyr::formalism::planning::MutableConjunctiveCondition, char>
         auto os = std::stringstream {};
         os << "ConjunctiveCondition(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "num parent variables = ", value.num_parent_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "num variables = ", value.num_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static literals = ", value.static_literals);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent literals = ", value.fluent_literals);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -103,15 +103,15 @@ struct formatter<tyr::formalism::planning::MutableConjunctiveEffect, char>
         auto os = std::stringstream {};
         os << "MutableConjunctiveEffect(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "num parent variables = ", value.num_parent_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "num variables = ", value.num_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "literals = ", value.literals);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -127,17 +127,17 @@ struct formatter<tyr::formalism::planning::MutableConditionalEffect, char>
         auto os = std::stringstream {};
         os << "MutableConditionalEffect(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "num parent variables = ", value.num_parent_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "num variables = ", value.num_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "condition = ", value.condition);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "effect = ", value.effect);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -153,15 +153,15 @@ struct formatter<tyr::formalism::planning::MutableAction, char>
         auto os = std::stringstream {};
         os << "Action(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "num variables = ", value.num_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "condition = ", value.condition);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "effects = ", value.effects);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };

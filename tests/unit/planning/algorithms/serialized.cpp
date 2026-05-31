@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json.hpp"
-#include "tyr/common/json_suite.hpp"
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <algorithm>
 #include <deque>
@@ -56,7 +56,7 @@ public:
         static_cast<void>(node);
         m_statistics = p::Statistics();
     }
-    void on_finish_layer(uint_t layer) override { static_cast<void>(layer); }
+    void on_finish_layer(ygg::uint_t layer) override { static_cast<void>(layer); }
     void on_end_search(p::SearchStatus status) override { static_cast<void>(status); }
     void on_solved(const p::Plan<Kind>& plan) override { static_cast<void>(plan); }
     const p::Statistics& get_search_statistics() const override { return m_statistics; }
@@ -71,11 +71,11 @@ struct GroundSearchContext
 
 GroundSearchContext create_gripper_context()
 {
-    const auto root = tyr::common::root_path();
+    const auto root = ygg::common::root_path();
     const auto domain_file = root / "data/planning-benchmarks/tests/classical/gripper/domain.pddl";
     const auto task_file = root / "data/planning-benchmarks/tests/classical/gripper/test-1.pddl";
 
-    auto execution_context = ExecutionContext::create(1);
+    auto execution_context = ygg::ExecutionContext::create(1);
     auto task = p::Task<p::LiftedTag>(fp::Parser(domain_file).parse_task(task_file)).instantiate_ground_task(*execution_context).task;
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::GroundTag>().create(task, axiom_evaluator);

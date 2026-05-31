@@ -39,7 +39,7 @@ namespace
 void process_axiom_body(fp::ConjunctiveConditionView axiom_body,
                         const TranslationContext& translation_context,
                         fp::MergeDatalogContext& context,
-                        Data<fd::ConjunctiveCondition>& conj_cond)
+                        ygg::Data<fd::ConjunctiveCondition>& conj_cond)
 {
     for (const auto literal : axiom_body.get_literals<f::StaticTag>())
         conj_cond.static_literals.push_back(fp::merge_p2d(literal, translation_context.p2d.static_to_static_predicate, context).first.get_index());

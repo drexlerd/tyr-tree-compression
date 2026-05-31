@@ -36,9 +36,9 @@ struct InvariantParameter
 
     auto identifying_members() const noexcept { return std::tie(index); }
 
-    friend bool operator==(const InvariantParameter& lhs, const InvariantParameter& rhs) { return tyr::EqualTo<InvariantParameter> {}(lhs, rhs); }
+    friend bool operator==(const InvariantParameter& lhs, const InvariantParameter& rhs) { return ygg::EqualTo<InvariantParameter> {}(lhs, rhs); }
 
-    friend bool operator<(const InvariantParameter& lhs, const InvariantParameter& rhs) { return tyr::Less<InvariantParameter> {}(lhs, rhs); }
+    friend bool operator<(const InvariantParameter& lhs, const InvariantParameter& rhs) { return ygg::Less<InvariantParameter> {}(lhs, rhs); }
 };
 
 struct VariableTerm
@@ -47,20 +47,20 @@ struct VariableTerm
 
     auto identifying_members() const noexcept { return std::tie(index); }
 
-    friend bool operator==(const VariableTerm& lhs, const VariableTerm& rhs) { return tyr::EqualTo<VariableTerm> {}(lhs, rhs); }
+    friend bool operator==(const VariableTerm& lhs, const VariableTerm& rhs) { return ygg::EqualTo<VariableTerm> {}(lhs, rhs); }
 
-    friend bool operator<(const VariableTerm& lhs, const VariableTerm& rhs) { return tyr::Less<VariableTerm> {}(lhs, rhs); }
+    friend bool operator<(const VariableTerm& lhs, const VariableTerm& rhs) { return ygg::Less<VariableTerm> {}(lhs, rhs); }
 };
 
 struct ObjectTerm
 {
-    Index<Object> index;
+    ygg::Index<Object> index;
 
     auto identifying_members() const noexcept { return std::tie(index); }
 
-    friend bool operator==(const ObjectTerm& lhs, const ObjectTerm& rhs) { return tyr::EqualTo<ObjectTerm> {}(lhs, rhs); }
+    friend bool operator==(const ObjectTerm& lhs, const ObjectTerm& rhs) { return ygg::EqualTo<ObjectTerm> {}(lhs, rhs); }
 
-    friend bool operator<(const ObjectTerm& lhs, const ObjectTerm& rhs) { return tyr::Less<ObjectTerm> {}(lhs, rhs); }
+    friend bool operator<(const ObjectTerm& lhs, const ObjectTerm& rhs) { return ygg::Less<ObjectTerm> {}(lhs, rhs); }
 };
 
 using ConstraintTerm = std::variant<InvariantParameter, VariableTerm, ObjectTerm>;
@@ -79,12 +79,12 @@ struct EqualityConjunction
     explicit EqualityConjunction(std::vector<std::pair<ConstraintTerm, ConstraintTerm>> equalities_);
 
     bool is_consistent() const;
-    const Map<ConstraintTerm, ConstraintTerm>& get_representative() const;
+    const ygg::Map<ConstraintTerm, ConstraintTerm>& get_representative() const;
 
 private:
     mutable bool m_computed = false;
     mutable bool m_consistent = true;
-    mutable Map<ConstraintTerm, ConstraintTerm> m_representative;
+    mutable ygg::Map<ConstraintTerm, ConstraintTerm> m_representative;
 
     void compute() const;
 };
@@ -108,8 +108,8 @@ private:
 };
 
 ConstraintTerm make_constraint_term(ParameterIndex parameter);
-ConstraintTerm make_constraint_term(Index<Object> object);
-ConstraintTerm make_constraint_term(const Data<Term>& term);
+ConstraintTerm make_constraint_term(ygg::Index<Object> object);
+ConstraintTerm make_constraint_term(const ygg::Data<Term>& term);
 ConstraintTerm make_invariant_parameter_term(size_t index);
 EqualityConjunction make_cover_equality_conjunction(const MutableAtom<FluentTag>& pattern, const MutableAtom<FluentTag>& atom, const Invariant& inv);
 

@@ -18,8 +18,8 @@
 #ifndef TYR_SOLVER_BOTTOM_UP_HPP_
 #define TYR_SOLVER_BOTTOM_UP_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/datalog/contexts/program.hpp"
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"

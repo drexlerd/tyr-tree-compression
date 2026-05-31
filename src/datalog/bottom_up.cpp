@@ -17,14 +17,14 @@
 
 #include "tyr/datalog/bottom_up.hpp"
 
-#include "tyr/common/chrono.hpp"
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/config.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/formatter.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/types.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/chrono.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/formatting/formatter.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/applicability.hpp"
 #include "tyr/datalog/assignment_sets.hpp"
 #include "tyr/datalog/consistency_graph.hpp"
@@ -69,18 +69,18 @@ namespace fd = tyr::formalism::datalog;
 namespace tyr::datalog
 {
 
-static void create_nullary_binding(IndexList<f::Object>& binding) { binding.clear(); }
+static void create_nullary_binding(ygg::IndexList<f::Object>& binding) { binding.clear(); }
 
-static void create_general_binding(std::span<const kpkc::Vertex> clique, const StaticConsistencyGraph& consistency_graph, IndexList<f::Object>& binding)
+static void create_general_binding(std::span<const kpkc::Vertex> clique, const StaticConsistencyGraph& consistency_graph, ygg::IndexList<f::Object>& binding)
 {
     const auto k = clique.size();
 
     binding.resize(k);
 
-    for (uint_t p = 0; p < k; ++p)
+    for (ygg::uint_t p = 0; p < k; ++p)
     {
         const auto& vertex = consistency_graph.get_vertex(clique[p].index);
-        assert(uint_t(vertex.get_parameter_index()) == p);
+        assert(ygg::uint_t(vertex.get_parameter_index()) == p);
 
         binding[p] = vertex.get_object_index();
     }
@@ -243,7 +243,7 @@ void generate_nullary_case(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
     return applicable;
 }
 
-[[maybe_unused]] static bool ensure_novel_binding(const IndexList<f::Object>& binding, UnorderedSet<IndexList<f::Object>>& set)
+[[maybe_unused]] static bool ensure_novel_binding(const ygg::IndexList<f::Object>& binding, ygg::UnorderedSet<ygg::IndexList<f::Object>>& set)
 {
     const auto inserted = set.insert(binding).second;
 
@@ -576,36 +576,36 @@ void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
          */
 
         {
-            const auto program_stopwatch = StopwatchScope(program_out.statistics().parallel_time);
+            const auto program_stopwatch = ygg::StopwatchScope(program_out.statistics().parallel_time);
 
             oneapi::tbb::parallel_for_each(active_rules.begin(),
                                            active_rules.end(),
                                            [&](auto&& rule_index)
                                            {
-                                               // std::cout << make_view(rule_index, ws.repository) << std::endl;
+                                               // std::cout << ygg::make_view(rule_index, ws.repository) << std::endl;
 
                                                auto rctx = ctx.get_rule_execution_context(rule_index);
                                                auto& rule_out = rctx.out();
 
-                                               const auto total_time = StopwatchScope(rule_out.statistics().total_time);
+                                               const auto total_time = ygg::StopwatchScope(rule_out.statistics().total_time);
                                                ++rule_out.statistics().num_executions;
 
                                                rctx.clear_iteration();  ///< Clear iteration before process_pending_rule_bindings/generate
 
                                                {
-                                                   const auto initialize_time = StopwatchScope(rule_out.statistics().initialize_time);
+                                                   const auto initialize_time = ygg::StopwatchScope(rule_out.statistics().initialize_time);
 
                                                    rctx.initialize();  ///< Initialize before process_pending_rule_bindings/generate
                                                }
 
                                                {
-                                                   const auto process_pending_time = StopwatchScope(rule_out.statistics().process_pending_time);
+                                                   const auto process_pending_time = ygg::StopwatchScope(rule_out.statistics().process_pending_time);
 
                                                    process_pending_rule_bindings(rctx);
                                                }
 
                                                {
-                                                   const auto process_generate_time = StopwatchScope(rule_out.statistics().process_generate_time);
+                                                   const auto process_generate_time = ygg::StopwatchScope(rule_out.statistics().process_generate_time);
 
                                                    generate(rctx);
                                                }
@@ -622,7 +622,7 @@ void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
         {
             for (const auto rule_index : active_rules)
             {
-                const auto i = uint_t(rule_index);
+                const auto i = ygg::uint_t(rule_index);
                 auto merge_context = fd::MergeContext { program_out.datalog_builder(), program_out.workspace_repository() };
                 const auto& ws_rule = program_out.rules()[i];
 
@@ -638,7 +638,7 @@ void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
                                 for (const auto worker_head_index : head_iteration.rows)
                                 {
                                     const auto worker_head =
-                                        make_view(Index<f::RelationBinding<f::Predicate<f::FluentTag>>> { head_iteration.relation, worker_head_index },
+                                        ygg::make_view(ygg::Index<f::RelationBinding<f::Predicate<f::FluentTag>>> { head_iteration.relation, worker_head_index },
                                                   worker.solve.program_overlay_repository);
 
                                     // Merge head from delta into the program
@@ -656,7 +656,7 @@ void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
                                 for (const auto& update : head_iteration.updates)
                                 {
                                     const auto worker_head =
-                                        make_view(Index<f::RelationBinding<f::Function<f::FluentTag>>> { head_iteration.relation, update.row },
+                                        ygg::make_view(ygg::Index<f::RelationBinding<f::Function<f::FluentTag>>> { head_iteration.relation, update.row },
                                                   worker.solve.program_overlay_repository);
 
                                     const auto program_head = fd::merge_d2d(worker_head, merge_context).first;
@@ -715,7 +715,7 @@ template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, Termi
 void solve_bottom_up(ProgramExecutionContext<OrAP, AndAP, TP>& ctx)
 {
     auto& out = ctx.out();
-    const auto program_stopwatch = StopwatchScope(out.statistics().total_time);
+    const auto program_stopwatch = ygg::StopwatchScope(out.statistics().total_time);
     ++out.statistics().num_executions;
 
     for (auto stratum_ctx : ctx.get_stratum_execution_contexts())

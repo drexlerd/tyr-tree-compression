@@ -18,31 +18,33 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_FUNCTION_EXPRESSION_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_FUNCTION_EXPRESSION_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/arithmetic_operator_data.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_function_term_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::planning::GroundFunctionExpression>
+struct Data<::tyr::formalism::planning::GroundFunctionExpression>
 {
-    using Variant = ::cista::offset::variant<float_t,
-                                             Data<formalism::planning::ArithmeticOperator<Data<formalism::planning::GroundFunctionExpression>>>,
-                                             Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>>,
-                                             Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>,
-                                             Index<formalism::planning::GroundFunctionTerm<formalism::AuxiliaryTag>>>;
+    using Variant = ::cista::offset::variant<ygg::float_t,
+                                             ygg::Data<::tyr::formalism::planning::ArithmeticOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>,
+                                             ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>>,
+                                             ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>>,
+                                             ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::AuxiliaryTag>>>;
 
     Variant value;
 
     template<typename C>
-    using ViewVariant = std::variant<float_t,
-                                     View<Data<formalism::planning::ArithmeticOperator<Data<formalism::planning::GroundFunctionExpression>>>, C>,
-                                     View<Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>>, C>,
-                                     View<Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>, C>,
-                                     View<Index<formalism::planning::GroundFunctionTerm<formalism::AuxiliaryTag>>, C>>;
+    using ViewVariant = std::variant<ygg::float_t,
+                                     ::ygg::View<ygg::Data<::tyr::formalism::planning::ArithmeticOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::AuxiliaryTag>>, C>>;
 
     Data() = default;
     Data(Variant value_) : value(value_) {}
@@ -54,31 +56,31 @@ struct Data<formalism::planning::GroundFunctionExpression>
             {
                 using Alternative = std::decay_t<decltype(arg)>;
 
-                if constexpr (std::is_same_v<Alternative, float_t>)
+                if constexpr (std::is_same_v<Alternative, ygg::float_t>)
                     return Variant(arg);
                 else if constexpr (std::is_same_v<Alternative,
-                                                  View<Data<formalism::planning::ArithmeticOperator<Data<formalism::planning::GroundFunctionExpression>>>, C>>)
+                                                  ::ygg::View<ygg::Data<::tyr::formalism::planning::ArithmeticOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>, C>>)
                     return Variant(arg.get_data());
-                else if constexpr (std::is_same_v<Alternative, View<Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>>, C>>)
+                else if constexpr (std::is_same_v<Alternative, ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>>, C>>)
                     return Variant(arg.get_index());
-                else if constexpr (std::is_same_v<Alternative, View<Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>, C>>)
+                else if constexpr (std::is_same_v<Alternative, ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>>, C>>)
                     return Variant(arg.get_index());
-                else if constexpr (std::is_same_v<Alternative, View<Index<formalism::planning::GroundFunctionTerm<formalism::AuxiliaryTag>>, C>>)
+                else if constexpr (std::is_same_v<Alternative, ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::AuxiliaryTag>>, C>>)
                     return Variant(arg.get_index());
                 else
-                    static_assert(dependent_false<Alternative>::value, "Missing case");
+                    static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             },
             value_))
     {
     }
 
-    void clear() noexcept { tyr::clear(value); }
+    void clear() noexcept { ygg::clear(value); }
 
     auto cista_members() const noexcept { return std::tie(value); }
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::GroundFunctionExpression>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundFunctionExpression>);
 
 }
 

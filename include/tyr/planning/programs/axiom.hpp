@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_PROGRAMS_AXIOM_HPP_
 #define TYR_PLANNING_PROGRAMS_AXIOM_HPP_
 
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/datalog/program_context.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -38,7 +38,7 @@ namespace tyr::planning
 class AxiomEvaluatorProgram
 {
 public:
-    explicit AxiomEvaluatorProgram(formalism::planning::TaskView task);
+    explicit AxiomEvaluatorProgram(::tyr::formalism::planning::TaskView task);
 
     const TranslationContext& get_translation_context() const noexcept;
     datalog::ProgramContext& get_program_context() noexcept;

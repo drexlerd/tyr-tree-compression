@@ -17,11 +17,11 @@
 
 #include "tyr/planning/lifted_task/axiom_evaluator.hpp"
 
-#include "tyr/common/comparators.hpp"  // for operator!=
-#include "tyr/common/equal_to.hpp"     // for EqualTo
-#include "tyr/common/formatter.hpp"
-#include "tyr/common/hash.hpp"        // for Hash
-#include "tyr/common/vector.hpp"      // for View
+#include <yggdrasil/semantics/comparators.hpp>  // for operator!=
+#include <yggdrasil/semantics/equal_to.hpp>     // for EqualTo
+#include <yggdrasil/formatting/formatter.hpp>
+#include <yggdrasil/semantics/hash.hpp>        // for Hash
+#include <yggdrasil/containers/vector.hpp>      // for ygg::View
 #include "tyr/datalog/bottom_up.hpp"  // for solve_bottom_up
 #include "tyr/datalog/contexts/program.hpp"
 #include "tyr/datalog/fact_sets.hpp"  // for FactSets, Pre...
@@ -74,7 +74,7 @@ void read_derived_atoms_from_program_context(const AxiomEvaluatorProgram& axiom_
 }
 }
 
-AxiomEvaluator<LiftedTag>::AxiomEvaluator(uint_t index, TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context) :
+AxiomEvaluator<LiftedTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
     m_index(index),
     m_task(std::move(task)),
     m_execution_context(std::move(execution_context)),

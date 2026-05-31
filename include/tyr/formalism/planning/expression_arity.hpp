@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_EXPRESSION_ARITY_HPP_
 #define TYR_FORMALISM_PLANNING_EXPRESSION_ARITY_HPP_
 
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
@@ -53,7 +53,7 @@ inline void collect_parameters(TermView element, ParameterList& result)
                 result.push_back(arg);
             else if constexpr (std::is_same_v<Alternative, ObjectView>) {}
             else
-                static_assert(dependent_false<Alternative>::value, "Missing case");
+                static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
         },
         element.get_variant());
 }

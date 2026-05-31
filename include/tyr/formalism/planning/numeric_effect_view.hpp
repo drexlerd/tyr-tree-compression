@@ -18,36 +18,37 @@
 #ifndef TYR_FORMALISM_PLANNING_NUMERIC_EFFECT_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_NUMERIC_EFFECT_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/function_expression_view.hpp"
 #include "tyr/formalism/planning/function_term_view.hpp"
 #include "tyr/formalism/planning/numeric_effect_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::NumericEffectOpKind Op, formalism::FactKind T, formalism::planning::Context C>
-class View<Index<formalism::planning::NumericEffect<Op, T>>, C>
+template<::tyr::formalism::NumericEffectOpKind Op, ::tyr::formalism::FactKind T, ::tyr::formalism::planning::Context C>
+class View<ygg::Index<::tyr::formalism::planning::NumericEffect<Op, T>>, C>
 {
-    static_assert(std::same_as<T, formalism::FluentTag> || (std::same_as<T, formalism::AuxiliaryTag> && std::same_as<Op, formalism::Increase>),
+    static_assert(std::same_as<T, ::tyr::formalism::FluentTag> || (std::same_as<T, ::tyr::formalism::AuxiliaryTag> && std::same_as<Op, ::tyr::formalism::Increase>),
                   "Unsupported NumericEffect<Op, T> combination.");
 
 private:
     const C* m_context;
-    Index<formalism::planning::NumericEffect<Op, T>> m_handle;
+    ygg::Index<::tyr::formalism::planning::NumericEffect<Op, T>> m_handle;
 
 public:
-    View(Index<formalism::planning::NumericEffect<Op, T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::planning::NumericEffect<Op, T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
 
     auto get_index() const noexcept { return m_handle; }
-    auto get_fterm() const noexcept { return make_view(get_data().fterm, *m_context); }
-    auto get_fexpr() const noexcept { return make_view(get_data().fexpr, *m_context); }
+    auto get_fterm() const noexcept { return ygg::make_view(get_data().fterm, *m_context); }
+    auto get_fexpr() const noexcept { return ygg::make_view(get_data().fexpr, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

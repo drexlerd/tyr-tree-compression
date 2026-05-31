@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_TASK_GROUNDER_HPP_
 #define TYR_PLANNING_LIFTED_TASK_TASK_GROUNDER_HPP_
 
-#include "tyr/common/onetbb.hpp"
+#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/lifted_task/task_grounder_decl.hpp"
 
@@ -26,7 +26,7 @@ namespace tyr::planning
 {
 
 GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_task,
-                                                      ExecutionContext& execution_context,
+                                                      ygg::ExecutionContext& execution_context,
                                                       const GroundTaskInstantiationOptions& options = GroundTaskInstantiationOptions());
 
 }

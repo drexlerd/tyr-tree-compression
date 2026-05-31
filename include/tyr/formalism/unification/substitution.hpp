@@ -18,10 +18,10 @@
 #ifndef TYR_FORMALISM_UNIFICATION_SUBSTITUTION_HPP_
 #define TYR_FORMALISM_UNIFICATION_SUBSTITUTION_HPP_
 
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/parameter_index.hpp"
 #include "tyr/formalism/term_data.hpp"
 
@@ -52,7 +52,7 @@ public:
         parameters.reserve(size);
 
         for (size_t i = 0; i < size; ++i)
-            parameters.push_back(ParameterIndex(uint_t(offset) + i));
+            parameters.push_back(ParameterIndex(ygg::uint_t(offset) + i));
 
         return SubstitutionFunction(std::move(parameters));
     }
@@ -120,7 +120,7 @@ public:
             slot = value;
             return true;
         }
-        return EqualTo<T> {}(*slot, value);
+        return ygg::EqualTo<T> {}(*slot, value);
     }
 
     /// Returns true iff no parameter in the domain currently has a bound value.
@@ -156,7 +156,7 @@ private:
 
     std::vector<ParameterIndex> m_parameters;
     std::vector<std::optional<T>> m_data;
-    UnorderedMap<ParameterIndex, size_t> m_positions;
+    ygg::UnorderedMap<ParameterIndex, size_t> m_positions;
 };
 
 template<typename S, typename V>
@@ -172,10 +172,10 @@ concept SubstitutionFor = requires(S s, const S cs, ParameterIndex p, const V& v
 };
 
 template<typename S>
-concept ObjectSubstitution = SubstitutionFor<S, Index<Object>>;
+concept ObjectSubstitution = SubstitutionFor<S, ygg::Index<Object>>;
 
 template<typename S>
-concept TermSubstitution = SubstitutionFor<S, Data<Term>>;
+concept TermSubstitution = SubstitutionFor<S, ygg::Data<Term>>;
 
 }
 #endif

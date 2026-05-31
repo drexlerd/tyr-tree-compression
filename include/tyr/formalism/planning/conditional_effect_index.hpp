@@ -18,17 +18,17 @@
 #ifndef TYR_FORMALISM_PLANNING_CONDITIONAL_EFFECT_INDEX_HPP_
 #define TYR_FORMALISM_PLANNING_CONDITIONAL_EFFECT_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
 template<>
-struct Index<formalism::planning::ConditionalEffect> : IndexMixin<Index<formalism::planning::ConditionalEffect>>
+struct Index<tyr::formalism::planning::ConditionalEffect> : ygg::IndexMixin<ygg::Index<tyr::formalism::planning::ConditionalEffect>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::planning::ConditionalEffect>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::planning::ConditionalEffect>>;
     using Base::Base;
 };
 

@@ -18,32 +18,33 @@
 #ifndef TYR_FORMALISM_DATALOG_FUNCTION_TERM_VIEW_HPP_
 #define TYR_FORMALISM_DATALOG_FUNCTION_TERM_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/function_term_index.hpp"
 #include "tyr/formalism/function_view.hpp"
 #include "tyr/formalism/term_view.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T, formalism::datalog::Context C>
-class View<Index<formalism::datalog::FunctionTerm<T>>, C>
+using namespace ::tyr;
+template<::tyr::formalism::FactKind T, ::tyr::formalism::datalog::Context C>
+class View<ygg::Index<::tyr::formalism::datalog::FunctionTerm<T>>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::datalog::FunctionTerm<T>> m_handle;
+    ygg::Index<::tyr::formalism::datalog::FunctionTerm<T>> m_handle;
 
 public:
-    View(Index<formalism::datalog::FunctionTerm<T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::datalog::FunctionTerm<T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
 
     auto get_index() const noexcept { return m_handle; }
-    auto get_function() const noexcept { return make_view(get_data().function, *m_context); }
-    auto get_terms() const noexcept { return make_view(get_data().terms, *m_context); }
+    auto get_function() const noexcept { return ygg::make_view(get_data().function, *m_context); }
+    auto get_terms() const noexcept { return ygg::make_view(get_data().terms, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

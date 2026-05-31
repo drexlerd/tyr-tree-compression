@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json.hpp"
-#include "tyr/common/json_suite.hpp"
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <filesystem>
 #include <gtest/gtest.h>
@@ -47,19 +47,19 @@ void PrintTo(const ParserSymbolIndexStabilityCase& test_case, std::ostream* os)
 
 ParserSymbolIndexStabilityCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
-    return ParserSymbolIndexStabilityCase { tyr::common::as_string(object, "name", "case"),
-                                            tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
-                                            tyr::common::suite_path(suite, tyr::common::as_string(object, "task_file", "case")) };
+    return ParserSymbolIndexStabilityCase { ygg::common::as_string(object, "name", "case"),
+                                            ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                                            ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
 }
 
 std::vector<ParserSymbolIndexStabilityCase> load_cases()
 {
     const auto suite =
-        tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/formalism/planning/parser_symbol_index_stability.json");
-    const auto& suite_object = tyr::common::as_object(suite, "suite");
+        ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/formalism/planning/parser_symbol_index_stability.json");
+    const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<ParserSymbolIndexStabilityCase> {};
-    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
-        result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
+    for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))
+        result.push_back(parse_case(suite_object, ygg::common::as_object(case_value, "case")));
     return result;
 }
 

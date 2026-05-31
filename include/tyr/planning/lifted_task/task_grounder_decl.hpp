@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_TASK_GROUNDER_DECL_HPP_
 #define TYR_PLANNING_LIFTED_TASK_TASK_GROUNDER_DECL_HPP_
 
-#include "tyr/common/onetbb.hpp"
+#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/planning/declarations.hpp"
 
 namespace tyr::planning

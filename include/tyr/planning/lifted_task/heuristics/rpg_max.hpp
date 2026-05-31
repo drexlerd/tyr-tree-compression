@@ -35,11 +35,11 @@ class MaxRPGHeuristic<LiftedTag> :
                    datalog::TerminationPolicy<datalog::MaxAggregation>>
 {
 public:
-    MaxRPGHeuristic(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context);
+    MaxRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context);
 
-    static MaxRPGHeuristicPtr<LiftedTag> create(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context);
+    static MaxRPGHeuristicPtr<LiftedTag> create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context);
 
-    float_t extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state);
+    ygg::float_t extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state);
 };
 
 }

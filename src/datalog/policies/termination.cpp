@@ -17,7 +17,7 @@
 
 #include "tyr/datalog/policies/termination.hpp"
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/datalog/applicability.hpp"
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
@@ -33,8 +33,8 @@
 namespace tyr::datalog
 {
 template<typename AggregationFunction>
-TerminationPolicy<AggregationFunction>::TerminationPolicy(formalism::datalog::PredicateListView<formalism::FluentTag> fluent_predicates,
-                                                          const formalism::datalog::Repository& repository) :
+TerminationPolicy<AggregationFunction>::TerminationPolicy(::tyr::formalism::datalog::PredicateListView<::tyr::formalism::FluentTag> fluent_predicates,
+                                                          const ::tyr::formalism::datalog::Repository& repository) :
     goal(std::nullopt),
     numeric_support_selector_workspace(),
     agg()
@@ -42,7 +42,7 @@ TerminationPolicy<AggregationFunction>::TerminationPolicy(formalism::datalog::Pr
 }
 
 template<typename AggregationFunction>
-void TerminationPolicy<AggregationFunction>::set_goals(formalism::datalog::GroundConjunctiveConditionView goals)
+void TerminationPolicy<AggregationFunction>::set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals)
 {
     clear();
     goal = goals;
@@ -68,7 +68,7 @@ Cost TerminationPolicy<AggregationFunction>::get_total_cost(const FactSets& fact
     if (!goal)
         return cost;
 
-    for (const auto literal : goal->get_literals<formalism::FluentTag>())
+    for (const auto literal : goal->get_literals<::tyr::formalism::FluentTag>())
     {
         assert(literal.get_polarity());
 

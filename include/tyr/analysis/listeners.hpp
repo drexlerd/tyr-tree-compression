@@ -19,14 +19,14 @@
 #define TYR_ANALYSIS_LISTENERS_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"      // for EqualTo
-#include "tyr/common/hash.hpp"          // for Hash
-#include "tyr/common/types.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>      // for EqualTo
+#include <yggdrasil/semantics/hash.hpp>          // for Hash
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"  // for FluentTag, Predicate, Rule
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/function_index.hpp"
-#include "tyr/formalism/predicate_index.hpp"  // for Index
+#include "tyr/formalism/predicate_index.hpp"  // for ygg::Index
 
 #include <vector>  // for vector
 
@@ -35,8 +35,8 @@ namespace tyr::analysis
 
 struct ListenerStratum
 {
-    UnorderedMap<Index<formalism::Predicate<formalism::FluentTag>>, UnorderedSet<Index<formalism::datalog::Rule>>> predicates;
-    UnorderedMap<Index<formalism::Function<formalism::FluentTag>>, UnorderedSet<Index<formalism::datalog::Rule>>> functions;
+    ygg::UnorderedMap<ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>>, ygg::UnorderedSet<ygg::Index<::tyr::formalism::datalog::Rule>>> predicates;
+    ygg::UnorderedMap<ygg::Index<::tyr::formalism::Function<::tyr::formalism::FluentTag>>, ygg::UnorderedSet<ygg::Index<::tyr::formalism::datalog::Rule>>> functions;
 };
 
 struct ListenerStrata
@@ -44,7 +44,7 @@ struct ListenerStrata
     std::vector<ListenerStratum> data;
 };
 
-extern ListenerStrata compute_listeners(const RuleStrata& strata, const formalism::datalog::Repository& context);
+extern ListenerStrata compute_listeners(const RuleStrata& strata, const ::tyr::formalism::datalog::Repository& context);
 }
 
 #endif

@@ -18,25 +18,27 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_function_term_index.hpp"
 #include "tyr/formalism/function_index.hpp"
 #include "tyr/formalism/object_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::datalog::GroundFunctionTerm<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::datalog::GroundFunctionTerm<T>>
 {
-    Index<formalism::datalog::GroundFunctionTerm<T>> index;
-    Index<formalism::RelationBinding<formalism::Function<T>>> binding;
+    ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<T>> index;
+    ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>> binding;
 
     Data() = default;
-    Data(Index<formalism::RelationBinding<formalism::Function<T>>> binding) : binding(binding) {}
+    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>> binding) : binding(binding) {}
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
     Data(Data&& other) = default;
@@ -44,15 +46,15 @@ struct Data<formalism::datalog::GroundFunctionTerm<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(binding);
+        ygg::clear(index);
+        ygg::clear(binding);
     }
 
     auto cista_members() const noexcept { return std::tie(index, binding); }
     auto identifying_members() const noexcept { return std::tie(binding); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::datalog::GroundFunctionTerm<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::StaticTag>>);
 }
 
 #endif

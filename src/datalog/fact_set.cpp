@@ -16,7 +16,7 @@
  */
 
 #include "tyr/datalog/fact_sets.hpp"
-#include "tyr/common/dynamic_bitset.hpp"
+#include <yggdrasil/containers/dynamic_bitset.hpp>
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
@@ -65,11 +65,11 @@ bool PredicateFactSet<T>::insert(fd::GroundAtomView<T> ground_atom)
 template<f::FactKind T>
 bool PredicateFactSet<T>::insert(fd::PredicateBindingView<T> binding)
 {
-    const auto i = uint_t(binding.get_index().row);
+    const auto i = ygg::uint_t(binding.get_index().row);
 
-    if (!tyr::test(i, m_bitset))
+    if (!ygg::test(i, m_bitset))
     {
-        tyr::set(i, true, m_bitset);
+        ygg::set(i, true, m_bitset);
         m_bindings.push_back(binding.get_index().row);
         return true;
     }
@@ -98,13 +98,13 @@ bool PredicateFactSet<T>::insert(const std::vector<fd::PredicateBindingView<T>>&
 template<f::FactKind T>
 bool PredicateFactSet<T>::contains(fd::PredicateBindingView<T> binding) const noexcept
 {
-    return tyr::test(uint_t(binding.get_index().row), m_bitset);
+    return ygg::test(ygg::uint_t(binding.get_index().row), m_bitset);
 }
 
 template<f::FactKind T>
 fd::PredicateBindingForwardRangeView<T> PredicateFactSet<T>::get_bindings() const noexcept
 {
-    return make_view(f::RelationBindingsForwardRange { m_predicate_index, m_bindings }, m_repository);
+    return ygg::make_view(f::RelationBindingsForwardRange { m_predicate_index, m_bindings }, m_repository);
 }
 
 template class PredicateFactSet<f::StaticTag>;
@@ -118,8 +118,8 @@ template<f::FactKind T>
 PredicateFactSets<T>::PredicateFactSets(fd::PredicateListView<T> predicates, const fd::Repository& repository) : m_sets()
 {
     /* Validate inputs. */
-    for (uint_t i = 0; i < predicates.size(); ++i)
-        assert(uint_t(predicates[i].get_index()) == i);
+    for (ygg::uint_t i = 0; i < predicates.size(); ++i)
+        assert(ygg::uint_t(predicates[i].get_index()) == i);
 
     /* Initialize sets. */
     for (const auto predicate : predicates)
@@ -139,7 +139,7 @@ bool PredicateFactSets<T>::insert(const PredicateFactSets<T>& other)
     assert(m_sets.size() == other.m_sets.size());
 
     auto changed = false;
-    for (uint_t i = 0; i < m_sets.size(); ++i)
+    for (ygg::uint_t i = 0; i < m_sets.size(); ++i)
         changed |= m_sets[i].insert(other.m_sets[i]);
     return changed;
 }
@@ -153,7 +153,7 @@ bool PredicateFactSets<T>::insert(fd::GroundAtomView<T> ground_atom)
 template<f::FactKind T>
 bool PredicateFactSets<T>::insert(fd::PredicateBindingView<T> binding)
 {
-    return m_sets[uint_t(binding.get_index().relation)].insert(binding);
+    return m_sets[ygg::uint_t(binding.get_index().relation)].insert(binding);
 }
 
 template<f::FactKind T>
@@ -168,7 +168,7 @@ bool PredicateFactSets<T>::insert(fd::PredicateBindingForwardRangeView<T> bindin
 template<f::FactKind T>
 bool PredicateFactSets<T>::contains(fd::PredicateBindingView<T> binding) const noexcept
 {
-    return m_sets[uint_t(binding.get_index().relation)].contains(binding);
+    return m_sets[ygg::uint_t(binding.get_index().relation)].contains(binding);
 }
 
 template<f::FactKind T>
@@ -209,14 +209,14 @@ bool FunctionFactSet<T>::insert(const FunctionFactSet& other)
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(fd::FunctionBindingView<T> binding, ClosedInterval<float_t> interval)
+bool FunctionFactSet<T>::insert(fd::FunctionBindingView<T> binding, ygg::ClosedInterval<ygg::float_t> interval)
 {
-    const auto i = uint_t(binding.get_index().row);
+    const auto i = ygg::uint_t(binding.get_index().row);
 
     if (i < m_remap.size())
     {
         const auto pos = m_remap[i];
-        if (pos != std::numeric_limits<uint_t>::max())
+        if (pos != std::numeric_limits<ygg::uint_t>::max())
         {
             const auto old_interval = m_values[pos];
             const auto new_interval = hull(old_interval, interval);
@@ -225,8 +225,8 @@ bool FunctionFactSet<T>::insert(fd::FunctionBindingView<T> binding, ClosedInterv
         }
     }
 
-    const auto pos = uint_t(m_bindings.size());
-    tyr::set(i, pos, m_remap, std::numeric_limits<uint_t>::max());
+    const auto pos = ygg::uint_t(m_bindings.size());
+    ygg::set(i, pos, m_remap, std::numeric_limits<ygg::uint_t>::max());
 
     m_bindings.push_back(binding.get_index().row);
     m_values.push_back(interval);
@@ -234,63 +234,63 @@ bool FunctionFactSet<T>::insert(fd::FunctionBindingView<T> binding, ClosedInterv
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(fd::FunctionBindingView<T> binding, float_t value)
+bool FunctionFactSet<T>::insert(fd::FunctionBindingView<T> binding, ygg::float_t value)
 {
-    return insert(binding, ClosedInterval<float_t>(value, value));
+    return insert(binding, ygg::ClosedInterval<ygg::float_t>(value, value));
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(fd::GroundFunctionTermView<T> fterm, ClosedInterval<float_t> interval)
+bool FunctionFactSet<T>::insert(fd::GroundFunctionTermView<T> fterm, ygg::ClosedInterval<ygg::float_t> interval)
 {
     return insert(fterm.get_row(), interval);
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(fd::GroundFunctionTermView<T> fterm, float_t value)
+bool FunctionFactSet<T>::insert(fd::GroundFunctionTermView<T> fterm, ygg::float_t value)
 {
     return insert(fterm.get_row(), value);
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(fd::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<ClosedInterval<float_t>>& intervals)
+bool FunctionFactSet<T>::insert(fd::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<ygg::ClosedInterval<ygg::float_t>>& intervals)
 {
     assert(bindings.size() == intervals.size());
 
     auto changed = false;
-    for (uint_t i = 0; i < bindings.size(); ++i)
+    for (ygg::uint_t i = 0; i < bindings.size(); ++i)
         changed |= insert(bindings[i], intervals[i]);
     return changed;
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(fd::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<float_t>& values)
+bool FunctionFactSet<T>::insert(fd::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<ygg::float_t>& values)
 {
     assert(bindings.size() == values.size());
 
     auto changed = false;
-    for (uint_t i = 0; i < bindings.size(); ++i)
+    for (ygg::uint_t i = 0; i < bindings.size(); ++i)
         changed |= insert(bindings[i], values[i]);
     return changed;
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(const std::vector<fd::FunctionBindingView<T>>& bindings, const std::vector<ClosedInterval<float_t>>& intervals)
+bool FunctionFactSet<T>::insert(const std::vector<fd::FunctionBindingView<T>>& bindings, const std::vector<ygg::ClosedInterval<ygg::float_t>>& intervals)
 {
     assert(bindings.size() == intervals.size());
 
     auto changed = false;
-    for (uint_t i = 0; i < bindings.size(); ++i)
+    for (ygg::uint_t i = 0; i < bindings.size(); ++i)
         changed |= insert(bindings[i], intervals[i]);
     return changed;
 }
 
 template<f::FactKind T>
-bool FunctionFactSet<T>::insert(const std::vector<fd::FunctionBindingView<T>>& bindings, const std::vector<float_t>& values)
+bool FunctionFactSet<T>::insert(const std::vector<fd::FunctionBindingView<T>>& bindings, const std::vector<ygg::float_t>& values)
 {
     assert(bindings.size() == values.size());
 
     auto changed = false;
-    for (uint_t i = 0; i < bindings.size(); ++i)
+    for (ygg::uint_t i = 0; i < bindings.size(); ++i)
         changed |= insert(bindings[i], values[i]);
     return changed;
 }
@@ -311,25 +311,25 @@ bool FunctionFactSet<T>::insert(fd::GroundFunctionTermValueListView<T> fterm_val
 }
 
 template<f::FactKind T>
-ClosedInterval<float_t> FunctionFactSet<T>::operator[](formalism::datalog::FunctionBindingView<T> binding) const noexcept
+ygg::ClosedInterval<ygg::float_t> FunctionFactSet<T>::operator[](::tyr::formalism::datalog::FunctionBindingView<T> binding) const noexcept
 {
     const auto row = binding.get_index().row;
-    const auto i = uint_t(row);
+    const auto i = ygg::uint_t(row);
 
     if (i >= m_remap.size())
         return {};
 
-    return tyr::get(m_remap[i], m_values, ClosedInterval<float_t>());
+    return ygg::get(m_remap[i], m_values, ygg::ClosedInterval<ygg::float_t>());
 }
 
 template<f::FactKind T>
-ClosedInterval<float_t> FunctionFactSet<T>::operator[](fd::GroundFunctionTermView<T> fterm) const noexcept
+ygg::ClosedInterval<ygg::float_t> FunctionFactSet<T>::operator[](fd::GroundFunctionTermView<T> fterm) const noexcept
 {
     return (*this)[fterm.get_row()];
 }
 
 template<f::FactKind T>
-const std::vector<uint_t>& FunctionFactSet<T>::get_remap() const noexcept
+const std::vector<ygg::uint_t>& FunctionFactSet<T>::get_remap() const noexcept
 {
     return m_remap;
 }
@@ -337,11 +337,11 @@ const std::vector<uint_t>& FunctionFactSet<T>::get_remap() const noexcept
 template<f::FactKind T>
 fd::FunctionBindingRandomAccessRangeView<T> FunctionFactSet<T>::get_bindings() const noexcept
 {
-    return make_view(f::RelationBindingsRandomAccessRange { m_function_index, m_bindings }, m_repository);
+    return ygg::make_view(f::RelationBindingsRandomAccessRange { m_function_index, m_bindings }, m_repository);
 }
 
 template<f::FactKind T>
-const std::vector<ClosedInterval<float_t>>& FunctionFactSet<T>::get_values() const noexcept
+const std::vector<ygg::ClosedInterval<ygg::float_t>>& FunctionFactSet<T>::get_values() const noexcept
 {
     return m_values;
 }
@@ -357,8 +357,8 @@ template<f::FactKind T>
 FunctionFactSets<T>::FunctionFactSets(fd::FunctionListView<T> functions, const fd::Repository& repository) : m_sets()
 {
     /* Validate inputs. */
-    for (uint_t i = 0; i < functions.size(); ++i)
-        assert(uint_t(functions[i].get_index()) == i);
+    for (ygg::uint_t i = 0; i < functions.size(); ++i)
+        assert(ygg::uint_t(functions[i].get_index()) == i);
 
     /* Initialize sets. */
     for (const auto function : functions)
@@ -378,37 +378,37 @@ bool FunctionFactSets<T>::insert(const FunctionFactSets& other)
     assert(m_sets.size() == other.m_sets.size());
 
     auto changed = false;
-    for (uint_t i = 0; i < m_sets.size(); ++i)
+    for (ygg::uint_t i = 0; i < m_sets.size(); ++i)
         changed |= m_sets[i].insert(other.m_sets[i]);
     return changed;
 }
 
 template<f::FactKind T>
-bool FunctionFactSets<T>::insert(fd::GroundFunctionTermView<T> function_term, ClosedInterval<float_t> interval)
+bool FunctionFactSets<T>::insert(fd::GroundFunctionTermView<T> function_term, ygg::ClosedInterval<ygg::float_t> interval)
 {
-    return m_sets[uint_t(function_term.get_function().get_index())].insert(function_term, interval);
+    return m_sets[ygg::uint_t(function_term.get_function().get_index())].insert(function_term, interval);
 }
 
 template<f::FactKind T>
-bool FunctionFactSets<T>::insert(fd::FunctionBindingView<T> binding, ClosedInterval<float_t> interval)
+bool FunctionFactSets<T>::insert(fd::FunctionBindingView<T> binding, ygg::ClosedInterval<ygg::float_t> interval)
 {
-    return m_sets[uint_t(binding.get_relation().get_index())].insert(binding, interval);
+    return m_sets[ygg::uint_t(binding.get_relation().get_index())].insert(binding, interval);
 }
 
 template<f::FactKind T>
-bool FunctionFactSets<T>::insert(fd::FunctionBindingView<T> binding, float_t value)
+bool FunctionFactSets<T>::insert(fd::FunctionBindingView<T> binding, ygg::float_t value)
 {
-    return insert(binding, ClosedInterval<float_t>(value, value));
+    return insert(binding, ygg::ClosedInterval<ygg::float_t>(value, value));
 }
 
 template<f::FactKind T>
-bool FunctionFactSets<T>::insert(fd::GroundFunctionTermView<T> function_term, float_t value)
+bool FunctionFactSets<T>::insert(fd::GroundFunctionTermView<T> function_term, ygg::float_t value)
 {
-    return insert(function_term, ClosedInterval<float_t>(value, value));
+    return insert(function_term, ygg::ClosedInterval<ygg::float_t>(value, value));
 }
 
 template<f::FactKind T>
-bool FunctionFactSets<T>::insert(fd::GroundFunctionTermListView<T> function_terms, const std::vector<float_t>& values)
+bool FunctionFactSets<T>::insert(fd::GroundFunctionTermListView<T> function_terms, const std::vector<ygg::float_t>& values)
 {
     assert(function_terms.size() == values.size());
 
@@ -421,7 +421,7 @@ bool FunctionFactSets<T>::insert(fd::GroundFunctionTermListView<T> function_term
 template<f::FactKind T>
 bool FunctionFactSets<T>::insert(fd::GroundFunctionTermValueView<T> fterm_value)
 {
-    return m_sets[uint_t(fterm_value.get_fterm().get_function().get_index())].insert(fterm_value.get_fterm(), fterm_value.get_value());
+    return m_sets[ygg::uint_t(fterm_value.get_fterm().get_function().get_index())].insert(fterm_value.get_fterm(), fterm_value.get_value());
 }
 
 template<f::FactKind T>
@@ -434,13 +434,13 @@ bool FunctionFactSets<T>::insert(fd::GroundFunctionTermValueListView<T> fterm_va
 }
 
 template<f::FactKind T>
-ClosedInterval<float_t> FunctionFactSets<T>::operator[](formalism::datalog::FunctionBindingView<T> binding) const noexcept
+ygg::ClosedInterval<ygg::float_t> FunctionFactSets<T>::operator[](::tyr::formalism::datalog::FunctionBindingView<T> binding) const noexcept
 {
-    return m_sets[uint_t(binding.get_relation().get_index())][binding];
+    return m_sets[ygg::uint_t(binding.get_relation().get_index())][binding];
 }
 
 template<f::FactKind T>
-ClosedInterval<float_t> FunctionFactSets<T>::operator[](fd::GroundFunctionTermView<T> fterm) const noexcept
+ygg::ClosedInterval<ygg::float_t> FunctionFactSets<T>::operator[](fd::GroundFunctionTermView<T> fterm) const noexcept
 {
     return (*this)[fterm.get_row()];
 }
@@ -513,7 +513,7 @@ const TaggedFactSets<T>& FactSets::get() const noexcept
     else if constexpr (std::is_same_v<T, f::FluentTag>)
         return fluent_sets;
     else
-        static_assert(dependent_false<T>::value, "Missing case");
+        static_assert(ygg::dependent_false<T>::value, "Missing case");
 }
 
 template const TaggedFactSets<f::StaticTag>& FactSets::get<f::StaticTag>() const noexcept;

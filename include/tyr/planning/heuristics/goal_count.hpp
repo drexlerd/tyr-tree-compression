@@ -32,14 +32,14 @@ public:
 
     static std::shared_ptr<GoalCountHeuristic<Kind>> create(std::shared_ptr<const Task<Kind>> task);
 
-    void set_goal(formalism::planning::GroundConjunctiveConditionView goal) override;
+    void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) override;
 
-    float_t evaluate(const StateView<Kind>& state) override;
+    ygg::float_t evaluate(const StateView<Kind>& state) override;
 
 protected:
     std::shared_ptr<const Task<Kind>> m_task;
 
-    formalism::planning::GroundConjunctiveConditionView m_goal;
+    ::tyr::formalism::planning::GroundConjunctiveConditionView m_goal;
 };
 
 }

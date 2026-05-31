@@ -18,27 +18,29 @@
 #ifndef TYR_FORMALISM_PLANNING_FUNCTION_TERM_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_FUNCTION_TERM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/function_term_index.hpp"
 #include "tyr/formalism/term_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::planning::FunctionTerm<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::FunctionTerm<T>>
 {
-    Index<formalism::planning::FunctionTerm<T>> index;
-    Index<formalism::Function<T>> function;
-    DataList<formalism::Term> terms;
+    ygg::Index<::tyr::formalism::planning::FunctionTerm<T>> index;
+    ygg::Index<::tyr::formalism::Function<T>> function;
+    ygg::DataList<::tyr::formalism::Term> terms;
 
     Data() = default;
-    Data(Index<formalism::Function<T>> function_, DataList<formalism::Term> terms_) : index(), function(function_), terms(std::move(terms_)) {}
+    Data(ygg::Index<::tyr::formalism::Function<T>> function_, ygg::DataList<::tyr::formalism::Term> terms_) : index(), function(function_), terms(std::move(terms_)) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::Function<T>>, C> function_, const std::vector<View<Data<formalism::Term>, C>>& terms_) : index(), function(), terms()
+    Data(::ygg::View<ygg::Index<::tyr::formalism::Function<T>>, C> function_, const std::vector<::ygg::View<ygg::Data<::tyr::formalism::Term>, C>>& terms_) : index(), function(), terms()
     {
         set(function_, function);
         set(terms_, terms);
@@ -50,16 +52,16 @@ struct Data<formalism::planning::FunctionTerm<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(function);
-        tyr::clear(terms);
+        ygg::clear(index);
+        ygg::clear(function);
+        ygg::clear(terms);
     }
 
     auto cista_members() const noexcept { return std::tie(index, function, terms); }
     auto identifying_members() const noexcept { return std::tie(function, terms); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::FunctionTerm<formalism::StaticTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::FunctionTerm<::tyr::formalism::StaticTag>>);
 }
 
 #endif

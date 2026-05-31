@@ -18,24 +18,25 @@
 #ifndef TYR_FORMALISM_DATALOG_UNARY_OPERATOR_VIEW_HPP_
 #define TYR_FORMALISM_DATALOG_UNARY_OPERATOR_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/unary_operator_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T, formalism::datalog::Context C>
-class View<Index<formalism::datalog::UnaryOperator<Op, T>>, C>
+using namespace ::tyr;
+template<::tyr::formalism::OpKind Op, typename T, ::tyr::formalism::datalog::Context C>
+class View<ygg::Index<::tyr::formalism::datalog::UnaryOperator<Op, T>>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::datalog::UnaryOperator<Op, T>> m_handle;
+    ygg::Index<::tyr::formalism::datalog::UnaryOperator<Op, T>> m_handle;
 
 public:
     using OpType = Op;
 
-    View(Index<formalism::datalog::UnaryOperator<Op, T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::datalog::UnaryOperator<Op, T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
@@ -44,9 +45,9 @@ public:
     auto get_index() const noexcept { return m_handle; }
     auto get_arg() const noexcept
     {
-        if constexpr (ViewConcept<T, C>)
+        if constexpr (ygg::ViewConcept<T, C>)
         {
-            return make_view(get_data().arg, *m_context);
+            return ygg::make_view(get_data().arg, *m_context);
         }
         else
         {

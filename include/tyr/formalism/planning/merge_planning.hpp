@@ -18,11 +18,11 @@
 #ifndef TYR_FORMALISM_PLANNING_MERGE_PLANNING_HPP_
 #define TYR_FORMALISM_PLANNING_MERGE_PLANNING_HPP_
 
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/concepts.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/tuple.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/core/concepts.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/containers/tuple.hpp>
 #include "tyr/formalism/datalog/builder.hpp"
 #include "tyr/formalism/datalog/canonicalization.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -39,88 +39,88 @@ namespace tyr::formalism::planning
 
 // Common
 
-std::pair<VariableView, bool> merge_d2p(formalism::datalog::VariableView element, MergePlanningContext& context);
+std::pair<VariableView, bool> merge_d2p(::tyr::formalism::datalog::VariableView element, MergePlanningContext& context);
 
-std::pair<ObjectView, bool> merge_d2p(formalism::datalog::ObjectView element, MergePlanningContext& context);
+std::pair<ObjectView, bool> merge_d2p(::tyr::formalism::datalog::ObjectView element, MergePlanningContext& context);
 
-Data<formalism::Term> merge_d2p(formalism::datalog::TermView element, MergePlanningContext& context);
+ygg::Data<::tyr::formalism::Term> merge_d2p(::tyr::formalism::datalog::TermView element, MergePlanningContext& context);
 
 // Propositional
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<PredicateView<T_DST>, bool> merge_d2p(formalism::datalog::PredicateView<T_SRC> element, MergePlanningContext& context);
+std::pair<PredicateView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::PredicateView<T_SRC> element, MergePlanningContext& context);
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<AtomView<T_DST>, bool> merge_d2p(formalism::datalog::AtomView<T_SRC> element,
-                                           const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<AtomView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::AtomView<T_SRC> element,
+                                           const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                            MergePlanningContext& context);
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<PredicateBindingView<T_DST>, bool> merge_d2p(formalism::datalog::PredicateBindingView<T_SRC> element,
-                                                       const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<PredicateBindingView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::PredicateBindingView<T_SRC> element,
+                                                       const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                        MergePlanningContext& context);
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<GroundAtomView<T_DST>, bool> merge_atom_d2p(formalism::datalog::PredicateBindingView<T_SRC> element,
-                                                      const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<GroundAtomView<T_DST>, bool> merge_atom_d2p(::tyr::formalism::datalog::PredicateBindingView<T_SRC> element,
+                                                      const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                       MergePlanningContext& context);
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<GroundAtomView<T_DST>, bool> merge_d2p(formalism::datalog::GroundAtomView<T_SRC> element,
-                                                 const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<GroundAtomView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::GroundAtomView<T_SRC> element,
+                                                 const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                  MergePlanningContext& context);
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<LiteralView<T_DST>, bool> merge_d2p(formalism::datalog::LiteralView<T_SRC> element,
-                                              const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<LiteralView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::LiteralView<T_SRC> element,
+                                              const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                               MergePlanningContext& context);
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<GroundLiteralView<T_DST>, bool> merge_d2p(formalism::datalog::GroundLiteralView<T_SRC> element,
-                                                    const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<GroundLiteralView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::GroundLiteralView<T_SRC> element,
+                                                    const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                     MergePlanningContext& context);
 
 // Numeric
 
 template<FactKind T>
-std::pair<FunctionView<T>, bool> merge_d2p(formalism::datalog::FunctionView<T> element, MergePlanningContext& context);
+std::pair<FunctionView<T>, bool> merge_d2p(::tyr::formalism::datalog::FunctionView<T> element, MergePlanningContext& context);
 
 template<FactKind T>
-std::pair<FunctionTermView<T>, bool> merge_d2p(formalism::datalog::FunctionTermView<T> element, MergePlanningContext& context);
+std::pair<FunctionTermView<T>, bool> merge_d2p(::tyr::formalism::datalog::FunctionTermView<T> element, MergePlanningContext& context);
 
 template<FactKind T>
-std::pair<FunctionBindingView<T>, bool> merge_d2p(formalism::datalog::FunctionBindingView<T> element, MergePlanningContext& context);
+std::pair<FunctionBindingView<T>, bool> merge_d2p(::tyr::formalism::datalog::FunctionBindingView<T> element, MergePlanningContext& context);
 
 template<FactKind T>
-std::pair<GroundFunctionTermView<T>, bool> merge_d2p(formalism::datalog::GroundFunctionTermView<T> element, MergePlanningContext& context);
+std::pair<GroundFunctionTermView<T>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermView<T> element, MergePlanningContext& context);
 
 template<FactKind T>
-std::pair<GroundFunctionTermValueView<T>, bool> merge_d2p(formalism::datalog::GroundFunctionTermValueView<T> element, MergePlanningContext& context);
+std::pair<GroundFunctionTermValueView<T>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermValueView<T> element, MergePlanningContext& context);
 
-Data<FunctionExpression> merge_d2p(formalism::datalog::FunctionExpressionView element, MergePlanningContext& context);
+ygg::Data<FunctionExpression> merge_d2p(::tyr::formalism::datalog::FunctionExpressionView element, MergePlanningContext& context);
 
-Data<GroundFunctionExpression> merge_d2p(formalism::datalog::GroundFunctionExpressionView element, MergePlanningContext& context);
+ygg::Data<GroundFunctionExpression> merge_d2p(::tyr::formalism::datalog::GroundFunctionExpressionView element, MergePlanningContext& context);
 
 template<OpKind O, typename T>
-std::pair<UnaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formalism::datalog::UnaryOperatorView<O, T> element, MergePlanningContext& context);
+std::pair<UnaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(::tyr::formalism::datalog::UnaryOperatorView<O, T> element, MergePlanningContext& context);
 
 template<OpKind O, typename T>
-std::pair<BinaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formalism::datalog::BinaryOperatorView<O, T> element, MergePlanningContext& context);
+std::pair<BinaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<O, T> element, MergePlanningContext& context);
 
 template<OpKind O, typename T>
-std::pair<MultiOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formalism::datalog::MultiOperatorView<O, T> element, MergePlanningContext& context);
+std::pair<MultiOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(::tyr::formalism::datalog::MultiOperatorView<O, T> element, MergePlanningContext& context);
 
 template<typename T>
-Data<ArithmeticOperator<to_planning_payload_t<T>>> merge_d2p(formalism::datalog::ArithmeticOperatorView<T> element, MergePlanningContext& context);
+ygg::Data<ArithmeticOperator<to_planning_payload_t<T>>> merge_d2p(::tyr::formalism::datalog::ArithmeticOperatorView<T> element, MergePlanningContext& context);
 
 template<typename T>
-Data<BooleanOperator<to_planning_payload_t<T>>> merge_d2p(formalism::datalog::BooleanOperatorView<T> element, MergePlanningContext& context);
+ygg::Data<BooleanOperator<to_planning_payload_t<T>>> merge_d2p(::tyr::formalism::datalog::BooleanOperatorView<T> element, MergePlanningContext& context);
 
 // Common
 
-inline std::pair<VariableView, bool> merge_d2p(formalism::datalog::VariableView element, MergePlanningContext& context)
+inline std::pair<VariableView, bool> merge_d2p(::tyr::formalism::datalog::VariableView element, MergePlanningContext& context)
 {
-    auto variable_ptr = context.builder.template get_builder<formalism::Variable>();
+    auto variable_ptr = context.builder.template get_builder<::tyr::formalism::Variable>();
     auto& variable = *variable_ptr;
     variable.clear();
 
@@ -130,9 +130,9 @@ inline std::pair<VariableView, bool> merge_d2p(formalism::datalog::VariableView 
     return context.destination.get_or_create(variable);
 }
 
-inline std::pair<ObjectView, bool> merge_d2p(formalism::datalog::ObjectView element, MergePlanningContext& context)
+inline std::pair<ObjectView, bool> merge_d2p(::tyr::formalism::datalog::ObjectView element, MergePlanningContext& context)
 {
-    auto object_ptr = context.builder.template get_builder<formalism::Object>();
+    auto object_ptr = context.builder.template get_builder<::tyr::formalism::Object>();
     auto& object = *object_ptr;
     object.clear();
 
@@ -142,19 +142,19 @@ inline std::pair<ObjectView, bool> merge_d2p(formalism::datalog::ObjectView elem
     return context.destination.get_or_create(object);
 }
 
-inline Data<formalism::Term> merge_d2p(formalism::datalog::TermView element, MergePlanningContext& context)
+inline ygg::Data<::tyr::formalism::Term> merge_d2p(::tyr::formalism::datalog::TermView element, MergePlanningContext& context)
 {
     return visit(
         [&](auto&& arg)
         {
             using Alternative = std::decay_t<decltype(arg)>;
 
-            if constexpr (std::is_same_v<Alternative, formalism::ParameterIndex>)
-                return Data<formalism::Term>(arg);
-            else if constexpr (std::is_same_v<Alternative, formalism::datalog::ObjectView>)
-                return Data<formalism::Term>(merge_d2p(arg, context).first.get_index());
+            if constexpr (std::is_same_v<Alternative, ::tyr::formalism::ParameterIndex>)
+                return ygg::Data<::tyr::formalism::Term>(arg);
+            else if constexpr (std::is_same_v<Alternative, ::tyr::formalism::datalog::ObjectView>)
+                return ygg::Data<::tyr::formalism::Term>(merge_d2p(arg, context).first.get_index());
             else
-                static_assert(dependent_false<Alternative>::value, "Missing case");
+                static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
         },
         element.get_variant());
 }
@@ -162,9 +162,9 @@ inline Data<formalism::Term> merge_d2p(formalism::datalog::TermView element, Mer
 // Propositional
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<PredicateView<T_DST>, bool> merge_d2p(formalism::datalog::PredicateView<T_SRC> element, MergePlanningContext& context)
+std::pair<PredicateView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::PredicateView<T_SRC> element, MergePlanningContext& context)
 {
-    auto predicate_ptr = context.builder.template get_builder<formalism::Predicate<T_DST>>();
+    auto predicate_ptr = context.builder.template get_builder<::tyr::formalism::Predicate<T_DST>>();
     auto& predicate = *predicate_ptr;
     predicate.clear();
 
@@ -176,8 +176,8 @@ std::pair<PredicateView<T_DST>, bool> merge_d2p(formalism::datalog::PredicateVie
 }
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<AtomView<T_DST>, bool> merge_d2p(formalism::datalog::AtomView<T_SRC> element,  //
-                                           const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<AtomView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::AtomView<T_SRC> element,  //
+                                           const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                            MergePlanningContext& context)
 {
     auto atom_ptr = context.builder.template get_builder<Atom<T_DST>>();
@@ -193,8 +193,8 @@ std::pair<AtomView<T_DST>, bool> merge_d2p(formalism::datalog::AtomView<T_SRC> e
 }
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<PredicateBindingView<T_DST>, bool> merge_d2p(formalism::datalog::PredicateBindingView<T_SRC> element,  //
-                                                       const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<PredicateBindingView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::PredicateBindingView<T_SRC> element,  //
+                                                       const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                        MergePlanningContext& context)
 {
     auto binding_ptr = context.builder.template get_builder<RelationBinding<Predicate<T_DST>>>();
@@ -210,8 +210,8 @@ std::pair<PredicateBindingView<T_DST>, bool> merge_d2p(formalism::datalog::Predi
 }
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<GroundAtomView<T_DST>, bool> merge_atom_d2p(formalism::datalog::PredicateBindingView<T_SRC> element,  //
-                                                      const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<GroundAtomView<T_DST>, bool> merge_atom_d2p(::tyr::formalism::datalog::PredicateBindingView<T_SRC> element,  //
+                                                      const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                       MergePlanningContext& context)
 {
     auto atom_ptr = context.builder.template get_builder<GroundAtom<T_DST>>();
@@ -225,8 +225,8 @@ std::pair<GroundAtomView<T_DST>, bool> merge_atom_d2p(formalism::datalog::Predic
 }
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<GroundAtomView<T_DST>, bool> merge_d2p(formalism::datalog::GroundAtomView<T_SRC> element,  //
-                                                 const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<GroundAtomView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::GroundAtomView<T_SRC> element,  //
+                                                 const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                  MergePlanningContext& context)
 {
     auto atom_ptr = context.builder.template get_builder<GroundAtom<T_DST>>();
@@ -240,8 +240,8 @@ std::pair<GroundAtomView<T_DST>, bool> merge_d2p(formalism::datalog::GroundAtomV
 }
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<LiteralView<T_DST>, bool> merge_d2p(formalism::datalog::LiteralView<T_SRC> element,  //
-                                              const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<LiteralView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::LiteralView<T_SRC> element,  //
+                                              const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                               MergePlanningContext& context)
 {
     auto literal_ptr = context.builder.template get_builder<Literal<T_DST>>();
@@ -256,8 +256,8 @@ std::pair<LiteralView<T_DST>, bool> merge_d2p(formalism::datalog::LiteralView<T_
 }
 
 template<FactKind T_SRC, FactKind T_DST>
-std::pair<GroundLiteralView<T_DST>, bool> merge_d2p(formalism::datalog::GroundLiteralView<T_SRC> element,  //
-                                                    const UnorderedMap<formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
+std::pair<GroundLiteralView<T_DST>, bool> merge_d2p(::tyr::formalism::datalog::GroundLiteralView<T_SRC> element,  //
+                                                    const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<T_SRC>, PredicateView<T_DST>>& predicate_mapping,
                                                     MergePlanningContext& context)
 {
     auto literal_ptr = context.builder.template get_builder<GroundLiteral<T_DST>>();
@@ -274,9 +274,9 @@ std::pair<GroundLiteralView<T_DST>, bool> merge_d2p(formalism::datalog::GroundLi
 // Numeric
 
 template<FactKind T>
-std::pair<FunctionView<T>, bool> merge_d2p(formalism::datalog::FunctionView<T> element, MergePlanningContext& context)
+std::pair<FunctionView<T>, bool> merge_d2p(::tyr::formalism::datalog::FunctionView<T> element, MergePlanningContext& context)
 {
-    auto function_ptr = context.builder.template get_builder<formalism::Function<T>>();
+    auto function_ptr = context.builder.template get_builder<::tyr::formalism::Function<T>>();
     auto& function = *function_ptr;
     function.clear();
 
@@ -288,7 +288,7 @@ std::pair<FunctionView<T>, bool> merge_d2p(formalism::datalog::FunctionView<T> e
 }
 
 template<FactKind T>
-std::pair<FunctionTermView<T>, bool> merge_d2p(formalism::datalog::FunctionTermView<T> element, MergePlanningContext& context)
+std::pair<FunctionTermView<T>, bool> merge_d2p(::tyr::formalism::datalog::FunctionTermView<T> element, MergePlanningContext& context)
 {
     auto fterm_ptr = context.builder.template get_builder<FunctionTerm<T>>();
     auto& fterm = *fterm_ptr;
@@ -303,7 +303,7 @@ std::pair<FunctionTermView<T>, bool> merge_d2p(formalism::datalog::FunctionTermV
 }
 
 template<FactKind T>
-std::pair<FunctionBindingView<T>, bool> merge_d2p(formalism::datalog::FunctionBindingView<T> element, MergePlanningContext& context)
+std::pair<FunctionBindingView<T>, bool> merge_d2p(::tyr::formalism::datalog::FunctionBindingView<T> element, MergePlanningContext& context)
 {
     auto binding_ptr = context.builder.template get_builder<RelationBinding<Function<T>>>();
     auto& binding = *binding_ptr;
@@ -318,7 +318,7 @@ std::pair<FunctionBindingView<T>, bool> merge_d2p(formalism::datalog::FunctionBi
 }
 
 template<FactKind T>
-std::pair<GroundFunctionTermView<T>, bool> merge_d2p(formalism::datalog::GroundFunctionTermView<T> element, MergePlanningContext& context)
+std::pair<GroundFunctionTermView<T>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermView<T> element, MergePlanningContext& context)
 {
     auto fterm_ptr = context.builder.template get_builder<GroundFunctionTerm<T>>();
     auto& fterm = *fterm_ptr;
@@ -331,7 +331,7 @@ std::pair<GroundFunctionTermView<T>, bool> merge_d2p(formalism::datalog::GroundF
 }
 
 template<FactKind T>
-std::pair<GroundFunctionTermValueView<T>, bool> merge_d2p(formalism::datalog::GroundFunctionTermValueView<T> element, MergePlanningContext& context)
+std::pair<GroundFunctionTermValueView<T>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermValueView<T> element, MergePlanningContext& context)
 {
     auto fterm_value_ptr = context.builder.template get_builder<GroundFunctionTermValue<T>>();
     auto& fterm_value = *fterm_value_ptr;
@@ -344,46 +344,46 @@ std::pair<GroundFunctionTermValueView<T>, bool> merge_d2p(formalism::datalog::Gr
     return context.destination.get_or_create(fterm_value);
 }
 
-inline Data<FunctionExpression> merge_d2p(formalism::datalog::FunctionExpressionView element, MergePlanningContext& context)
+inline ygg::Data<FunctionExpression> merge_d2p(::tyr::formalism::datalog::FunctionExpressionView element, MergePlanningContext& context)
 {
     return visit(
         [&](auto&& arg)
         {
             using Alternative = std::decay_t<decltype(arg)>;
 
-            if constexpr (std::is_same_v<Alternative, float_t>)
-                return Data<FunctionExpression>(arg);
-            else if constexpr (std::is_same_v<Alternative, formalism::datalog::LiftedArithmeticOperatorView>)
-                return Data<FunctionExpression>(merge_d2p(arg, context));
-            else if constexpr (std::is_same_v<Alternative, formalism::datalog::FunctionTermView<AuxiliaryTag>>)
+            if constexpr (std::is_same_v<Alternative, ygg::float_t>)
+                return ygg::Data<FunctionExpression>(arg);
+            else if constexpr (std::is_same_v<Alternative, ::tyr::formalism::datalog::LiftedArithmeticOperatorView>)
+                return ygg::Data<FunctionExpression>(merge_d2p(arg, context));
+            else if constexpr (std::is_same_v<Alternative, ::tyr::formalism::datalog::FunctionTermView<AuxiliaryTag>>)
                 throw std::logic_error("AuxiliaryTag FunctionTerm must not be merged.");
             else
-                return Data<FunctionExpression>(merge_d2p(arg, context).first.get_index());
+                return ygg::Data<FunctionExpression>(merge_d2p(arg, context).first.get_index());
         },
         element.get_variant());
 }
 
-inline Data<GroundFunctionExpression> merge_d2p(formalism::datalog::GroundFunctionExpressionView element, MergePlanningContext& context)
+inline ygg::Data<GroundFunctionExpression> merge_d2p(::tyr::formalism::datalog::GroundFunctionExpressionView element, MergePlanningContext& context)
 {
     return visit(
         [&](auto&& arg)
         {
             using Alternative = std::decay_t<decltype(arg)>;
 
-            if constexpr (std::is_same_v<Alternative, float_t>)
-                return Data<GroundFunctionExpression>(arg);
-            else if constexpr (std::is_same_v<Alternative, formalism::datalog::GroundArithmeticOperatorView>)
-                return Data<GroundFunctionExpression>(merge_d2p(arg, context));
-            else if constexpr (std::is_same_v<Alternative, formalism::datalog::GroundFunctionTermView<AuxiliaryTag>>)
+            if constexpr (std::is_same_v<Alternative, ygg::float_t>)
+                return ygg::Data<GroundFunctionExpression>(arg);
+            else if constexpr (std::is_same_v<Alternative, ::tyr::formalism::datalog::GroundArithmeticOperatorView>)
+                return ygg::Data<GroundFunctionExpression>(merge_d2p(arg, context));
+            else if constexpr (std::is_same_v<Alternative, ::tyr::formalism::datalog::GroundFunctionTermView<AuxiliaryTag>>)
                 throw std::logic_error("AuxiliaryTag GroundFunctionTerm must not be merged.");
             else
-                return Data<GroundFunctionExpression>(merge_d2p(arg, context).first.get_index());
+                return ygg::Data<GroundFunctionExpression>(merge_d2p(arg, context).first.get_index());
         },
         element.get_variant());
 }
 
 template<OpKind O, typename T>
-std::pair<UnaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formalism::datalog::UnaryOperatorView<O, T> element, MergePlanningContext& context)
+std::pair<UnaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(::tyr::formalism::datalog::UnaryOperatorView<O, T> element, MergePlanningContext& context)
 {
     using T_DST = to_planning_payload_t<T>;
 
@@ -398,7 +398,7 @@ std::pair<UnaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formal
 }
 
 template<OpKind O, typename T>
-std::pair<BinaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formalism::datalog::BinaryOperatorView<O, T> element, MergePlanningContext& context)
+std::pair<BinaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<O, T> element, MergePlanningContext& context)
 {
     using T_DST = to_planning_payload_t<T>;
 
@@ -414,7 +414,7 @@ std::pair<BinaryOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(forma
 }
 
 template<OpKind O, typename T>
-std::pair<MultiOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formalism::datalog::MultiOperatorView<O, T> element, MergePlanningContext& context)
+std::pair<MultiOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(::tyr::formalism::datalog::MultiOperatorView<O, T> element, MergePlanningContext& context)
 {
     using T_DST = to_planning_payload_t<T>;
 
@@ -430,19 +430,19 @@ std::pair<MultiOperatorView<O, to_planning_payload_t<T>>, bool> merge_d2p(formal
 }
 
 template<typename T>
-Data<ArithmeticOperator<to_planning_payload_t<T>>> merge_d2p(formalism::datalog::ArithmeticOperatorView<T> element, MergePlanningContext& context)
+ygg::Data<ArithmeticOperator<to_planning_payload_t<T>>> merge_d2p(::tyr::formalism::datalog::ArithmeticOperatorView<T> element, MergePlanningContext& context)
 {
     using T_DST = to_planning_payload_t<T>;
 
-    return visit([&](auto&& arg) { return Data<ArithmeticOperator<T_DST>>(merge_d2p(arg, context).first.get_index()); }, element.get_variant());
+    return visit([&](auto&& arg) { return ygg::Data<ArithmeticOperator<T_DST>>(merge_d2p(arg, context).first.get_index()); }, element.get_variant());
 }
 
 template<typename T>
-Data<BooleanOperator<to_planning_payload_t<T>>> merge_d2p(formalism::datalog::BooleanOperatorView<T> element, MergePlanningContext& context)
+ygg::Data<BooleanOperator<to_planning_payload_t<T>>> merge_d2p(::tyr::formalism::datalog::BooleanOperatorView<T> element, MergePlanningContext& context)
 {
     using T_DST = to_planning_payload_t<T>;
 
-    return visit([&](auto&& arg) { return Data<BooleanOperator<T_DST>>(merge_d2p(arg, context).first.get_index()); }, element.get_variant());
+    return visit([&](auto&& arg) { return ygg::Data<BooleanOperator<T_DST>>(merge_d2p(arg, context).first.get_index()); }, element.get_variant());
 }
 
 }
@@ -451,175 +451,175 @@ Data<BooleanOperator<to_planning_payload_t<T>>> merge_d2p(formalism::datalog::Bo
 
 namespace tyr::formalism::planning
 {
-extern template std::pair<PredicateView<StaticTag>, bool> merge_d2p(formalism::datalog::PredicateView<StaticTag> element, MergePlanningContext& context);
-extern template std::pair<PredicateView<FluentTag>, bool> merge_d2p(formalism::datalog::PredicateView<FluentTag> element, MergePlanningContext& context);
-extern template std::pair<PredicateView<DerivedTag>, bool> merge_d2p(formalism::datalog::PredicateView<FluentTag> element, MergePlanningContext& context);
+extern template std::pair<PredicateView<StaticTag>, bool> merge_d2p(::tyr::formalism::datalog::PredicateView<StaticTag> element, MergePlanningContext& context);
+extern template std::pair<PredicateView<FluentTag>, bool> merge_d2p(::tyr::formalism::datalog::PredicateView<FluentTag> element, MergePlanningContext& context);
+extern template std::pair<PredicateView<DerivedTag>, bool> merge_d2p(::tyr::formalism::datalog::PredicateView<FluentTag> element, MergePlanningContext& context);
 
 extern template std::pair<AtomView<StaticTag>, bool>
-merge_d2p(formalism::datalog::AtomView<StaticTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::AtomView<StaticTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<AtomView<FluentTag>, bool>
-merge_d2p(formalism::datalog::AtomView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::AtomView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<AtomView<DerivedTag>, bool>
-merge_d2p(formalism::datalog::AtomView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::AtomView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
           MergePlanningContext& context);
 
 extern template std::pair<PredicateBindingView<StaticTag>, bool>
-merge_d2p(formalism::datalog::PredicateBindingView<StaticTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::PredicateBindingView<StaticTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<PredicateBindingView<FluentTag>, bool>
-merge_d2p(formalism::datalog::PredicateBindingView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::PredicateBindingView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<PredicateBindingView<DerivedTag>, bool>
-merge_d2p(formalism::datalog::PredicateBindingView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::PredicateBindingView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
           MergePlanningContext& context);
 
 extern template std::pair<GroundAtomView<StaticTag>, bool>
-merge_atom_d2p<StaticTag, StaticTag>(formalism::datalog::PredicateBindingView<StaticTag> element,
-                                     const UnorderedMap<formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
+merge_atom_d2p<StaticTag, StaticTag>(::tyr::formalism::datalog::PredicateBindingView<StaticTag> element,
+                                     const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
                                      MergePlanningContext& context);
 extern template std::pair<GroundAtomView<FluentTag>, bool>
-merge_atom_d2p<FluentTag, FluentTag>(formalism::datalog::PredicateBindingView<FluentTag> element,
-                                     const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
+merge_atom_d2p<FluentTag, FluentTag>(::tyr::formalism::datalog::PredicateBindingView<FluentTag> element,
+                                     const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
                                      MergePlanningContext& context);
 extern template std::pair<GroundAtomView<DerivedTag>, bool>
-merge_atom_d2p<FluentTag, DerivedTag>(formalism::datalog::PredicateBindingView<FluentTag> element,
-                                      const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
+merge_atom_d2p<FluentTag, DerivedTag>(::tyr::formalism::datalog::PredicateBindingView<FluentTag> element,
+                                      const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
                                       MergePlanningContext& context);
 
 extern template std::pair<GroundAtomView<StaticTag>, bool>
-merge_d2p(formalism::datalog::GroundAtomView<StaticTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::GroundAtomView<StaticTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<GroundAtomView<FluentTag>, bool>
-merge_d2p(formalism::datalog::GroundAtomView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::GroundAtomView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<GroundAtomView<DerivedTag>, bool>
-merge_d2p(formalism::datalog::GroundAtomView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::GroundAtomView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
           MergePlanningContext& context);
 
 extern template std::pair<LiteralView<StaticTag>, bool>
-merge_d2p(formalism::datalog::LiteralView<StaticTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::LiteralView<StaticTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<LiteralView<FluentTag>, bool>
-merge_d2p(formalism::datalog::LiteralView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::LiteralView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<LiteralView<DerivedTag>, bool>
-merge_d2p(formalism::datalog::LiteralView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::LiteralView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
           MergePlanningContext& context);
 
 extern template std::pair<GroundLiteralView<StaticTag>, bool>
-merge_d2p(formalism::datalog::GroundLiteralView<StaticTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::GroundLiteralView<StaticTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<StaticTag>, PredicateView<StaticTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<GroundLiteralView<FluentTag>, bool>
-merge_d2p(formalism::datalog::GroundLiteralView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::GroundLiteralView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<FluentTag>>& predicate_mapping,
           MergePlanningContext& context);
 extern template std::pair<GroundLiteralView<DerivedTag>, bool>
-merge_d2p(formalism::datalog::GroundLiteralView<FluentTag> element,
-          const UnorderedMap<formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
+merge_d2p(::tyr::formalism::datalog::GroundLiteralView<FluentTag> element,
+          const ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<FluentTag>, PredicateView<DerivedTag>>& predicate_mapping,
           MergePlanningContext& context);
 
 // Numeric
 
-extern template std::pair<FunctionView<StaticTag>, bool> merge_d2p(formalism::datalog::FunctionView<StaticTag> element, MergePlanningContext& context);
-extern template std::pair<FunctionView<FluentTag>, bool> merge_d2p(formalism::datalog::FunctionView<FluentTag> element, MergePlanningContext& context);
+extern template std::pair<FunctionView<StaticTag>, bool> merge_d2p(::tyr::formalism::datalog::FunctionView<StaticTag> element, MergePlanningContext& context);
+extern template std::pair<FunctionView<FluentTag>, bool> merge_d2p(::tyr::formalism::datalog::FunctionView<FluentTag> element, MergePlanningContext& context);
 
-extern template std::pair<FunctionTermView<StaticTag>, bool> merge_d2p(formalism::datalog::FunctionTermView<StaticTag> element, MergePlanningContext& context);
-extern template std::pair<FunctionTermView<FluentTag>, bool> merge_d2p(formalism::datalog::FunctionTermView<FluentTag> element, MergePlanningContext& context);
+extern template std::pair<FunctionTermView<StaticTag>, bool> merge_d2p(::tyr::formalism::datalog::FunctionTermView<StaticTag> element, MergePlanningContext& context);
+extern template std::pair<FunctionTermView<FluentTag>, bool> merge_d2p(::tyr::formalism::datalog::FunctionTermView<FluentTag> element, MergePlanningContext& context);
 
-extern template std::pair<FunctionBindingView<StaticTag>, bool> merge_d2p(formalism::datalog::FunctionBindingView<StaticTag> element,
+extern template std::pair<FunctionBindingView<StaticTag>, bool> merge_d2p(::tyr::formalism::datalog::FunctionBindingView<StaticTag> element,
                                                                           MergePlanningContext& context);
-extern template std::pair<FunctionBindingView<FluentTag>, bool> merge_d2p(formalism::datalog::FunctionBindingView<FluentTag> element,
+extern template std::pair<FunctionBindingView<FluentTag>, bool> merge_d2p(::tyr::formalism::datalog::FunctionBindingView<FluentTag> element,
                                                                           MergePlanningContext& context);
 
-extern template std::pair<GroundFunctionTermView<StaticTag>, bool> merge_d2p(formalism::datalog::GroundFunctionTermView<StaticTag> element,
+extern template std::pair<GroundFunctionTermView<StaticTag>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermView<StaticTag> element,
                                                                              MergePlanningContext& context);
-extern template std::pair<GroundFunctionTermView<FluentTag>, bool> merge_d2p(formalism::datalog::GroundFunctionTermView<FluentTag> element,
+extern template std::pair<GroundFunctionTermView<FluentTag>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermView<FluentTag> element,
                                                                              MergePlanningContext& context);
 
-extern template std::pair<GroundFunctionTermValueView<StaticTag>, bool> merge_d2p(formalism::datalog::GroundFunctionTermValueView<StaticTag> element,
+extern template std::pair<GroundFunctionTermValueView<StaticTag>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermValueView<StaticTag> element,
                                                                                   MergePlanningContext& context);
-extern template std::pair<GroundFunctionTermValueView<FluentTag>, bool> merge_d2p(formalism::datalog::GroundFunctionTermValueView<FluentTag> element,
+extern template std::pair<GroundFunctionTermValueView<FluentTag>, bool> merge_d2p(::tyr::formalism::datalog::GroundFunctionTermValueView<FluentTag> element,
                                                                                   MergePlanningContext& context);
 
-extern template std::pair<UnaryOperatorView<Sub, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::UnaryOperatorView<Sub, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<UnaryOperatorView<Sub, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::UnaryOperatorView<Sub, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<UnaryOperatorView<Sub, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::UnaryOperatorView<Sub, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<UnaryOperatorView<Sub, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::UnaryOperatorView<Sub, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
 
-extern template std::pair<BinaryOperatorView<Eq, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Eq, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Ne, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Ne, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Ge, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Ge, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Gt, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Gt, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Le, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Le, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Lt, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Lt, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Add, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Add, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Sub, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Sub, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Mul, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Mul, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Div, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Div, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Eq, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Eq, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Ne, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Ne, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Ge, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Ge, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Gt, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Gt, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Le, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Le, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Lt, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Lt, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Add, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Add, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Sub, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Sub, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Mul, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Mul, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<BinaryOperatorView<Div, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::BinaryOperatorView<Div, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Eq, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Eq, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Ne, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Ne, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Ge, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Ge, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Gt, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Gt, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Le, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Le, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Lt, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Lt, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Add, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Add, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Sub, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Sub, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Mul, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Mul, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Div, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Div, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Eq, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Eq, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Ne, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Ne, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Ge, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Ge, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Gt, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Gt, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Le, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Le, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Lt, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Lt, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Add, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Add, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Sub, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Sub, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Mul, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Mul, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<BinaryOperatorView<Div, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::BinaryOperatorView<Div, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
 
-extern template std::pair<MultiOperatorView<Add, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::MultiOperatorView<Add, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<MultiOperatorView<Mul, Data<FunctionExpression>>, bool>
-merge_d2p(formalism::datalog::MultiOperatorView<Mul, Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<MultiOperatorView<Add, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::MultiOperatorView<Add, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
-extern template std::pair<MultiOperatorView<Mul, Data<GroundFunctionExpression>>, bool>
-merge_d2p(formalism::datalog::MultiOperatorView<Mul, Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<MultiOperatorView<Add, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::MultiOperatorView<Add, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<MultiOperatorView<Mul, ygg::Data<FunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::MultiOperatorView<Mul, ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<MultiOperatorView<Add, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::MultiOperatorView<Add, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template std::pair<MultiOperatorView<Mul, ygg::Data<GroundFunctionExpression>>, bool>
+merge_d2p(::tyr::formalism::datalog::MultiOperatorView<Mul, ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
 
-extern template Data<ArithmeticOperator<Data<FunctionExpression>>>
-merge_d2p(formalism::datalog::ArithmeticOperatorView<Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template Data<ArithmeticOperator<Data<GroundFunctionExpression>>>
-merge_d2p(formalism::datalog::ArithmeticOperatorView<Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template ygg::Data<ArithmeticOperator<ygg::Data<FunctionExpression>>>
+merge_d2p(::tyr::formalism::datalog::ArithmeticOperatorView<ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>
+merge_d2p(::tyr::formalism::datalog::ArithmeticOperatorView<ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
 
-extern template Data<BooleanOperator<Data<FunctionExpression>>>
-merge_d2p(formalism::datalog::BooleanOperatorView<Data<formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
-extern template Data<BooleanOperator<Data<GroundFunctionExpression>>>
-merge_d2p(formalism::datalog::BooleanOperatorView<Data<formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
+extern template ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>>
+merge_d2p(::tyr::formalism::datalog::BooleanOperatorView<ygg::Data<::tyr::formalism::datalog::FunctionExpression>> element, MergePlanningContext& context);
+extern template ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>>
+merge_d2p(::tyr::formalism::datalog::BooleanOperatorView<ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>> element, MergePlanningContext& context);
 }
 
 #endif

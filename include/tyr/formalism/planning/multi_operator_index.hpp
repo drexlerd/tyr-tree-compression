@@ -18,19 +18,19 @@
 #ifndef TYR_FORMALISM_PLANNING_MULTI_OPERATOR_INDEX_HPP_
 #define TYR_FORMALISM_PLANNING_MULTI_OPERATOR_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T>
-struct Index<formalism::planning::MultiOperator<Op, T>> : IndexMixin<Index<formalism::planning::MultiOperator<Op, T>>>
+template<tyr::formalism::OpKind Op, typename T>
+struct Index<tyr::formalism::planning::MultiOperator<Op, T>> : ygg::IndexMixin<ygg::Index<tyr::formalism::planning::MultiOperator<Op, T>>>
 {
     using OpType = Op;
 
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::planning::MultiOperator<Op, T>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::planning::MultiOperator<Op, T>>>;
     using Base::Base;
 };
 }

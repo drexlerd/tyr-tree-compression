@@ -33,7 +33,7 @@
 
 namespace tyr::planning
 {
-FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context) :
+FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
     RPGBase<FFRPGHeuristic<LiftedTag>,
             datalog::OrAnnotationPolicy,
             datalog::AndAnnotationPolicy<datalog::SumAggregation>,
@@ -42,10 +42,10 @@ FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ExecutionCont
         std::move(execution_context),
         datalog::OrAnnotationPolicy(),
         datalog::AndAnnotationPolicy<datalog::SumAggregation>(),
-        datalog::TerminationPolicy<datalog::SumAggregation>(task->get_rpg_program().get_program_context().get_program().get_predicates<formalism::FluentTag>(),
+        datalog::TerminationPolicy<datalog::SumAggregation>(task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>(),
                                                             task->get_rpg_program().get_program_context().get_workspace_repository())),
-    m_markings(task->get_rpg_program().get_program_context().get_program().get_predicates<formalism::FluentTag>().size()),
-    m_function_markings(task->get_rpg_program().get_program_context().get_program().get_functions<formalism::FluentTag>().size()),
+    m_markings(task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>().size()),
+    m_function_markings(task->get_rpg_program().get_program_context().get_program().get_functions<::tyr::formalism::FluentTag>().size()),
     m_binding(),
     m_iter_workspace(),
     m_effect_families(),
@@ -57,12 +57,12 @@ FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ExecutionCont
 {
 }
 
-FFRPGHeuristicPtr<LiftedTag> FFRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context)
+FFRPGHeuristicPtr<LiftedTag> FFRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context)
 {
     return std::make_shared<FFRPGHeuristic<LiftedTag>>(std::move(task), std::move(execution_context));
 }
 
-float_t FFRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state)
+ygg::float_t FFRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state)
 {
     m_preferred_action_views_dirty = true;
     m_relaxed_plan.clear();
@@ -73,12 +73,12 @@ float_t FFRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(c
     for (auto& bitset : m_function_markings)
         bitset.reset();
 
-    auto state_context = StateContext<LiftedTag>(*this->m_task, state.get_unpacked_state(), float_t(0));
-    auto grounder_context = formalism::planning::GrounderContext { this->m_workspace.planning_builder, *this->m_task->get_repository(), m_binding };
+    auto state_context = StateContext<LiftedTag>(*this->m_task, state.get_unpacked_state(), ygg::float_t(0));
+    auto grounder_context = ::tyr::formalism::planning::GrounderContext { this->m_workspace.planning_builder, *this->m_task->get_repository(), m_binding };
 
     if (const auto& goal = m_workspace.tp.get_goal())
     {
-        for (const auto literal : goal->get_literals<formalism::FluentTag>())
+        for (const auto literal : goal->get_literals<::tyr::formalism::FluentTag>())
         {
             assert(literal.get_polarity());
 
@@ -92,9 +92,9 @@ float_t FFRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(c
     return m_relaxed_plan.size();
 }
 
-const UnorderedSet<Index<formalism::planning::GroundAction>>& FFRPGHeuristic<LiftedTag>::get_preferred_actions() { return m_preferred_actions; }
+const ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>>& FFRPGHeuristic<LiftedTag>::get_preferred_actions() { return m_preferred_actions; }
 
-const UnorderedSet<formalism::planning::GroundActionView>& FFRPGHeuristic<LiftedTag>::get_preferred_action_views()
+const ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView>& FFRPGHeuristic<LiftedTag>::get_preferred_action_views()
 {
     if (m_preferred_action_views_dirty)
     {
@@ -102,39 +102,39 @@ const UnorderedSet<formalism::planning::GroundActionView>& FFRPGHeuristic<Lifted
         m_preferred_action_views.clear();
         const auto& repository = *this->m_task->get_repository();
         for (const auto action_index : m_preferred_actions)
-            m_preferred_action_views.insert(make_view(action_index, repository));
+            m_preferred_action_views.insert(ygg::make_view(action_index, repository));
     }
 
     return m_preferred_action_views;
 }
 
-bool FFRPGHeuristic<LiftedTag>::mark_atom(formalism::datalog::PredicateBindingView<formalism::FluentTag> binding)
+bool FFRPGHeuristic<LiftedTag>::mark_atom(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> binding)
 {
-    const auto g = uint_t(binding.get_index().relation);
-    const auto i = uint_t(binding.get_index().row);
+    const auto g = ygg::uint_t(binding.get_index().relation);
+    const auto i = ygg::uint_t(binding.get_index().row);
 
     assert(g < m_markings.size());
-    if (tyr::test(i, m_markings[g]))
+    if (ygg::test(i, m_markings[g]))
         return true;
-    tyr::set(i, true, m_markings[g]);
+    ygg::set(i, true, m_markings[g]);
     return false;
 }
 
-bool FFRPGHeuristic<LiftedTag>::mark_function(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding)
+bool FFRPGHeuristic<LiftedTag>::mark_function(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding)
 {
-    const auto g = uint_t(binding.get_index().relation);
-    const auto i = uint_t(binding.get_index().row);
+    const auto g = ygg::uint_t(binding.get_index().relation);
+    const auto i = ygg::uint_t(binding.get_index().row);
 
     assert(g < m_function_markings.size());
-    if (tyr::test(i, m_function_markings[g]))
+    if (ygg::test(i, m_function_markings[g]))
         return true;
-    tyr::set(i, true, m_function_markings[g]);
+    ygg::set(i, true, m_function_markings[g]);
     return false;
 }
 
-void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(formalism::datalog::PredicateBindingView<formalism::FluentTag> binding,
+void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> binding,
                                                                            const StateContext<LiftedTag>& state_context,
-                                                                           formalism::planning::GrounderContext& grounder_context)
+                                                                           ::tyr::formalism::planning::GrounderContext& grounder_context)
 {
     // Base case 1: atom is already marked => do not recurse again
     if (mark_atom(binding))
@@ -152,9 +152,9 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(forma
     extract_relaxed_plan_and_preferred_actions(*witness, state_context, grounder_context);
 }
 
-void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding,
+void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                                                            const StateContext<LiftedTag>& state_context,
-                                                                           formalism::planning::GrounderContext& grounder_context)
+                                                                           ::tyr::formalism::planning::GrounderContext& grounder_context)
 {
     const auto* annotation = m_workspace.numeric_and_annot.find(binding);
     if (!annotation)
@@ -163,10 +163,10 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(forma
     extract_relaxed_plan_and_preferred_actions(binding, *annotation, state_context, grounder_context);
 }
 
-void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding,
+void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                                                            const datalog::Annotation& annotation,
                                                                            const StateContext<LiftedTag>& state_context,
-                                                                           formalism::planning::GrounderContext& grounder_context)
+                                                                           ::tyr::formalism::planning::GrounderContext& grounder_context)
 {
     // Base case 1: function binding is already marked => do not recurse again
     if (mark_function(binding))
@@ -180,9 +180,9 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(forma
     extract_relaxed_plan_and_preferred_actions(*witness, state_context, grounder_context);
 }
 
-void FFRPGHeuristic<LiftedTag>::extract_numeric_constraint_support(formalism::datalog::GroundBooleanOperatorView constraint,
+void FFRPGHeuristic<LiftedTag>::extract_numeric_constraint_support(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
                                                                    const StateContext<LiftedTag>& state_context,
-                                                                   formalism::planning::GrounderContext& grounder_context)
+                                                                   ::tyr::formalism::planning::GrounderContext& grounder_context)
 {
     m_workspace.numeric_support_selector->for_each_constraint_support(
         constraint,
@@ -194,12 +194,12 @@ void FFRPGHeuristic<LiftedTag>::extract_numeric_constraint_support(formalism::da
 
 void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const datalog::WitnessAnnotation& witness,
                                                                            const StateContext<LiftedTag>& state_context,
-                                                                           formalism::planning::GrounderContext& grounder_context)
+                                                                           ::tyr::formalism::planning::GrounderContext& grounder_context)
 {
     const auto& mapping = this->m_task->get_rpg_program().get_rule_to_action_mapping();
 
     const auto rule_row = witness.get_rule_row();
-    const auto rule = make_view(rule_row.get_relation().get_index(), this->m_task->get_rpg_program().get_program_context().get_program_repository());
+    const auto rule = ygg::make_view(rule_row.get_relation().get_index(), this->m_task->get_rpg_program().get_program_context().get_program_repository());
     const auto row = rule_row.get_objects();
 
     if (const auto it = mapping.find(rule); it != mapping.end())
@@ -210,7 +210,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
         for (const auto object : row)
             grounder_context.binding.push_back(object.get_index());
 
-        const auto ground_action = formalism::planning::ground(action,
+        const auto ground_action = ::tyr::formalism::planning::ground(action,
                                                                grounder_context,
                                                                m_task->get_grounder_cache(),
                                                                m_task->get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
@@ -228,19 +228,19 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
 
     // Divide case: recursively call for preconditions.
 
-    auto datalog_grounder_context = formalism::datalog::GrounderContext { m_workspace.datalog_builder, m_workspace.workspace_repository, m_workspace.binding };
-    const auto& const_rule_workspace = *m_task->get_rpg_program().get_const_program_workspace().rules[uint_t(rule.get_index())];
+    auto datalog_grounder_context = ::tyr::formalism::datalog::GrounderContext { m_workspace.datalog_builder, m_workspace.workspace_repository, m_workspace.binding };
+    const auto& const_rule_workspace = *m_task->get_rpg_program().get_const_program_workspace().rules[ygg::uint_t(rule.get_index())];
 
     const auto witness_condition = const_rule_workspace.get_witness_rule().get_body();
 
-    for (const auto literal : witness_condition.get_literals<formalism::FluentTag>())
+    for (const auto literal : witness_condition.get_literals<::tyr::formalism::FluentTag>())
     {
         // Cannot do this before the loop because of overwrites during recursion; we could binding from a builder and place it into the grounder context.
         datalog_grounder_context.binding.clear();
         for (const auto object : row)
             datalog_grounder_context.binding.push_back(object.get_index());
 
-        const auto witness_atom = formalism::datalog::ground(literal.get_atom(), datalog_grounder_context).first;
+        const auto witness_atom = ::tyr::formalism::datalog::ground(literal.get_atom(), datalog_grounder_context).first;
 
         extract_relaxed_plan_and_preferred_actions(witness_atom.get_row(), state_context, grounder_context);
     }
@@ -252,8 +252,8 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
         for (const auto object : row)
             datalog_grounder_context.binding.push_back(object.get_index());
 
-        const auto ground_constraint_data = formalism::datalog::ground(constraint, datalog_grounder_context);
-        const auto ground_constraint = make_view(ground_constraint_data, datalog_grounder_context.destination);
+        const auto ground_constraint_data = ::tyr::formalism::datalog::ground(constraint, datalog_grounder_context);
+        const auto ground_constraint = ygg::make_view(ground_constraint_data, datalog_grounder_context.destination);
         extract_numeric_constraint_support(ground_constraint, state_context, grounder_context);
     }
 }

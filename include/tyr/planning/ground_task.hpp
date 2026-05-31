@@ -18,13 +18,13 @@
 #ifndef TYR_PLANNING_GROUND_TASK_HPP_
 #define TYR_PLANNING_GROUND_TASK_HPP_
 
-#include "tyr/common/config.hpp"                    // for float_t, uint_t
-#include "tyr/common/dynamic_bitset.hpp"            // for test
-#include "tyr/common/vector.hpp"                    // for get
+#include <yggdrasil/core/config.hpp>                    // for ygg::float_t, ygg::uint_t
+#include <yggdrasil/containers/dynamic_bitset.hpp>            // for test
+#include <yggdrasil/containers/vector.hpp>                    // for get
 #include "tyr/formalism/planning/declarations.hpp"  // for OverlayRepos...
 #include "tyr/formalism/planning/fdr_context.hpp"
 #include "tyr/formalism/planning/planning_fdr_task.hpp"
-#include "tyr/formalism/planning/views.hpp"  // for View
+#include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task/match_tree/match_tree.hpp"  // for Matc...
 #include "tyr/planning/task.hpp"
@@ -42,19 +42,19 @@ template<>
 class Task<GroundTag>
 {
 public:
-    explicit Task(formalism::planning::PlanningFDRTask task);
+    explicit Task(::tyr::formalism::planning::PlanningFDRTask task);
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     size_t get_num_atoms() const noexcept;
     size_t get_num_actions() const noexcept;
     size_t get_num_axioms() const noexcept;
 
     const auto& get_static_atoms_bitset() const noexcept { return m_static_atoms_bitset; }
     const auto& get_static_numeric_variables() const noexcept { return m_static_numeric_variables; }
-    bool test(Index<formalism::planning::GroundAtom<formalism::StaticTag>> index) const { return tyr::test(uint_t(index), m_static_atoms_bitset); }
-    float_t get(Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>> index) const noexcept
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const { return ygg::test(ygg::uint_t(index), m_static_atoms_bitset); }
+    ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>> index) const noexcept
     {
-        return tyr::get(uint_t(index), m_static_numeric_variables, std::numeric_limits<float_t>::quiet_NaN());
+        return ygg::get(ygg::uint_t(index), m_static_numeric_variables, std::numeric_limits<ygg::float_t>::quiet_NaN());
     }
 
     const auto& get_formalism_task() const noexcept { return m_task; }
@@ -65,20 +65,20 @@ public:
     bool has_axioms() const noexcept { return !get_task().get_ground_axioms().empty(); }
 
     const auto& get_action_match_tree() const noexcept { return m_action_match_tree; }
-    std::optional<formalism::planning::GroundActionView> find_ground_action(formalism::planning::ActionBindingView binding) const;
-    formalism::planning::GroundActionView get_ground_action(formalism::planning::ActionBindingView binding) const;
+    std::optional<::tyr::formalism::planning::GroundActionView> find_ground_action(::tyr::formalism::planning::ActionBindingView binding) const;
+    ::tyr::formalism::planning::GroundActionView get_ground_action(::tyr::formalism::planning::ActionBindingView binding) const;
     const auto& get_axiom_match_tree_strata() const noexcept { return m_axiom_match_tree_strata; }
 
 private:
-    formalism::planning::PlanningFDRTask m_task;
+    ::tyr::formalism::planning::PlanningFDRTask m_task;
 
     boost::dynamic_bitset<> m_static_atoms_bitset;
-    std::vector<float_t> m_static_numeric_variables;
+    std::vector<ygg::float_t> m_static_numeric_variables;
 
-    match_tree::MatchTreePtr<formalism::planning::GroundAction> m_action_match_tree;
-    UnorderedMap<formalism::planning::ActionBindingView, formalism::planning::GroundActionView> m_action_binding_to_ground_action;
+    match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAction> m_action_match_tree;
+    ygg::UnorderedMap<::tyr::formalism::planning::ActionBindingView, ::tyr::formalism::planning::GroundActionView> m_action_binding_to_ground_action;
 
-    std::vector<match_tree::MatchTreePtr<formalism::planning::GroundAxiom>> m_axiom_match_tree_strata;
+    std::vector<match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAxiom>> m_axiom_match_tree_strata;
 };
 
 }

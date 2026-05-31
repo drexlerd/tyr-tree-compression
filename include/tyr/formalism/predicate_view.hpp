@@ -18,21 +18,22 @@
 #ifndef TYR_FORMALISM_PREDICATE_VIEW_HPP_
 #define TYR_FORMALISM_PREDICATE_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T, typename C>
-class View<Index<formalism::Predicate<T>>, C>
+using namespace ::tyr;
+template<::tyr::formalism::FactKind T, typename C>
+class View<ygg::Index<::tyr::formalism::Predicate<T>>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::Predicate<T>> m_handle;
+    ygg::Index<::tyr::formalism::Predicate<T>> m_handle;
 
 public:
-    View(Index<formalism::Predicate<T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::Predicate<T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }

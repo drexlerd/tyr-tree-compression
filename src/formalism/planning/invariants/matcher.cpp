@@ -32,7 +32,7 @@
 namespace tyr::formalism::planning::invariant
 {
 
-InvariantMatchData::InvariantMatchData(Invariant inv, std::vector<unification::SubstitutionFunction<Index<Object>>> rigid_variable_bindings) :
+InvariantMatchData::InvariantMatchData(Invariant inv, std::vector<unification::SubstitutionFunction<ygg::Index<Object>>> rigid_variable_bindings) :
     m_inv(std::move(inv)),
     m_rigid_variable_bindings(std::move(rigid_variable_bindings)),
     m_postings()
@@ -54,7 +54,7 @@ void InvariantMatchData::build_postings()
 
         for (size_t p = 0; p < num_rigid; ++p)
         {
-            const auto parameter = ParameterIndex(static_cast<uint_t>(p));
+            const auto parameter = ParameterIndex(static_cast<ygg::uint_t>(p));
 
             // Optional but recommended: validate domain consistency.
             assert(binding.contains_parameter(parameter));
@@ -86,7 +86,7 @@ bool intersect_matching_bindings(const InvariantMatchData& data, const Invariant
 
     for (size_t p = 0; p < inv.num_rigid_variables; ++p)
     {
-        const auto parameter = ParameterIndex(static_cast<uint_t>(p));
+        const auto parameter = ParameterIndex(static_cast<ygg::uint_t>(p));
 
         if (!sigma.is_bound(parameter))
             continue;
@@ -130,7 +130,7 @@ void Matcher::query(const MutableAtom<FluentTag>& atom, QueryResult& result, Que
 
         for (const auto& pattern : inv.atoms)
         {
-            if (!tyr::EqualTo<PredicateView<FluentTag>> {}(pattern.predicate, atom.predicate))
+            if (!ygg::EqualTo<PredicateView<FluentTag>> {}(pattern.predicate, atom.predicate))
                 continue;
 
             if (pattern.terms.size() != atom.terms.size())

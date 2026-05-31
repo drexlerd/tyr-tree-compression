@@ -19,7 +19,7 @@
 
 #include "common.hpp"
 #include "tyr/analysis/domains.hpp"
-#include "tyr/common/unordered_set.hpp"
+#include <yggdrasil/containers/unordered_set.hpp>
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -40,15 +40,15 @@ namespace
 void fill_delete_free_condition(fp::ActionView action,
                                 fp::ConditionalEffectView cond_eff,
                                 TranslationContext& translation_context,
-                                formalism::planning::MergeDatalogContext& context,
-                                Data<formalism::datalog::ConjunctiveCondition>& conj_cond)
+                                ::tyr::formalism::planning::MergeDatalogContext& context,
+                                ygg::Data<::tyr::formalism::datalog::ConjunctiveCondition>& conj_cond)
 {
     // Action parameter may get deleted.
     for (const auto& variable : action.get_variables())
         conj_cond.variables.push_back(merge_p2d(variable, context).first.get_index());
-    for (const auto literal : action.get_condition().get_literals<formalism::StaticTag>())
+    for (const auto literal : action.get_condition().get_literals<::tyr::formalism::StaticTag>())
         conj_cond.static_literals.push_back(merge_p2d(literal, translation_context.p2d.static_to_static_predicate, context).first.get_index());
-    for (const auto literal : action.get_condition().get_literals<formalism::FluentTag>())
+    for (const auto literal : action.get_condition().get_literals<::tyr::formalism::FluentTag>())
         if (literal.get_polarity())
             conj_cond.fluent_literals.push_back(merge_p2d(literal, translation_context.p2d.fluent_to_fluent_predicate, context).first.get_index());
     for (const auto numeric_constraint : action.get_condition().get_numeric_constraints())
@@ -56,9 +56,9 @@ void fill_delete_free_condition(fp::ActionView action,
 
     for (const auto variable : cond_eff.get_variables())
         conj_cond.variables.push_back(merge_p2d(variable, context).first.get_index());
-    for (const auto literal : cond_eff.get_condition().template get_literals<formalism::StaticTag>())
+    for (const auto literal : cond_eff.get_condition().template get_literals<::tyr::formalism::StaticTag>())
         conj_cond.static_literals.push_back(merge_p2d(literal, translation_context.p2d.static_to_static_predicate, context).first.get_index());
-    for (const auto literal : cond_eff.get_condition().template get_literals<formalism::FluentTag>())
+    for (const auto literal : cond_eff.get_condition().template get_literals<::tyr::formalism::FluentTag>())
         if (literal.get_polarity())
             conj_cond.fluent_literals.push_back(merge_p2d(literal, translation_context.p2d.fluent_to_fluent_predicate, context).first.get_index());
     for (const auto numeric_constraint : cond_eff.get_condition().get_numeric_constraints())
@@ -67,13 +67,13 @@ void fill_delete_free_condition(fp::ActionView action,
 
 auto create_delete_free_goal(fp::GroundConjunctiveConditionView goal,
                              TranslationContext& translation_context,
-                             formalism::planning::MergeDatalogContext& context)
+                             ::tyr::formalism::planning::MergeDatalogContext& context)
 {
-    auto conj_cond_ptr = context.builder.get_builder<formalism::datalog::GroundConjunctiveCondition>();
+    auto conj_cond_ptr = context.builder.get_builder<::tyr::formalism::datalog::GroundConjunctiveCondition>();
     auto& conj_cond = *conj_cond_ptr;
     conj_cond.clear();
 
-    for (const auto fact : goal.get_facts<formalism::PositiveTag>())
+    for (const auto fact : goal.get_facts<::tyr::formalism::PositiveTag>())
         if (const auto literal = merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_predicate, context))
             conj_cond.fluent_literals.push_back(literal->get_index());
 
@@ -86,15 +86,15 @@ auto create_delete_free_goal(fp::GroundConjunctiveConditionView goal,
 
 auto create_cond_effect_rule(fp::ActionView action,
                              fp::ConditionalEffectView cond_eff,
-                             fp::AtomView<formalism::FluentTag> effect,
+                             fp::AtomView<::tyr::formalism::FluentTag> effect,
                              TranslationContext& translation_context,
-                             formalism::planning::MergeDatalogContext& context)
+                             ::tyr::formalism::planning::MergeDatalogContext& context)
 {
-    auto rule_ptr = context.builder.get_builder<formalism::datalog::Rule>();
+    auto rule_ptr = context.builder.get_builder<::tyr::formalism::datalog::Rule>();
     auto& rule = *rule_ptr;
     rule.clear();
 
-    auto conj_cond_ptr = context.builder.get_builder<formalism::datalog::ConjunctiveCondition>();
+    auto conj_cond_ptr = context.builder.get_builder<::tyr::formalism::datalog::ConjunctiveCondition>();
     auto& conj_cond = *conj_cond_ptr;
     conj_cond.clear();
 
@@ -114,15 +114,15 @@ auto create_cond_effect_rule(fp::ActionView action,
 
 auto create_cond_numeric_effect_rule(fp::ActionView action,
                                      fp::ConditionalEffectView cond_eff,
-                                     fp::NumericEffectOperatorView<formalism::FluentTag> effect,
+                                     fp::NumericEffectOperatorView<::tyr::formalism::FluentTag> effect,
                                      TranslationContext& translation_context,
-                                     formalism::planning::MergeDatalogContext& context)
+                                     ::tyr::formalism::planning::MergeDatalogContext& context)
 {
-    auto rule_ptr = context.builder.get_builder<formalism::datalog::Rule>();
+    auto rule_ptr = context.builder.get_builder<::tyr::formalism::datalog::Rule>();
     auto& rule = *rule_ptr;
     rule.clear();
 
-    auto conj_cond_ptr = context.builder.get_builder<formalism::datalog::ConjunctiveCondition>();
+    auto conj_cond_ptr = context.builder.get_builder<::tyr::formalism::datalog::ConjunctiveCondition>();
     auto& conj_cond = *conj_cond_ptr;
     conj_cond.clear();
 
@@ -141,7 +141,7 @@ auto create_cond_numeric_effect_rule(fp::ActionView action,
 }
 
 void translate_action_to_delete_free_rules(fp::ActionView action,
-                                           Data<fd::Program>& program,
+                                           ygg::Data<fd::Program>& program,
                                            TranslationContext& translation_context,
                                            fp::MergeDatalogContext& context,
                                            RPGProgram::RuleToActionMapping& rule_to_action)
@@ -254,6 +254,6 @@ const datalog::ProgramContext& RPGProgram::get_program_context() const noexcept 
 
 const datalog::ConstProgramWorkspace& RPGProgram::get_const_program_workspace() const noexcept { return m_program_workspace; }
 
-formalism::datalog::GroundConjunctiveConditionView RPGProgram::get_goal() const noexcept { return m_program_context.get_program().get_goal().value(); }
+::tyr::formalism::datalog::GroundConjunctiveConditionView RPGProgram::get_goal() const noexcept { return m_program_context.get_program().get_goal().value(); }
 
 }

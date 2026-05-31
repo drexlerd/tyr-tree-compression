@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_VIEW_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_VIEW_HPP_
 
-#include "tyr/common/shared_object_pool.hpp"
+#include <yggdrasil/containers/shared_object_pool.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
@@ -30,53 +30,55 @@
 #include <boost/dynamic_bitset.hpp>
 #include <tuple>
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+namespace planning = ::tyr::planning;
 template<>
-struct View<Index<planning::State<planning::LiftedTag>>, std::shared_ptr<planning::StateRepository<planning::LiftedTag>>>
+struct View<ygg::Index<planning::State<planning::LiftedTag>>, std::shared_ptr<planning::StateRepository<planning::LiftedTag>>>
 {
 public:
     using TaskType = planning::Task<planning::LiftedTag>;
 
     View(std::shared_ptr<planning::StateRepository<planning::LiftedTag>> owner,
-         SharedObjectPoolPtr<planning::UnpackedState<planning::LiftedTag>> unpacked) noexcept;
+         ygg::SharedObjectPoolPtr<planning::UnpackedState<planning::LiftedTag>> unpacked) noexcept;
     View(const View&);
     View(View&&) noexcept;
     View& operator=(const View&);
     View& operator=(View&&) noexcept;
     ~View();
 
-    Index<planning::State<planning::LiftedTag>> get_index() const;
+    ygg::Index<planning::State<planning::LiftedTag>> get_index() const;
 
     /**
      * IndexableStateConcept
      */
 
-    bool test(Index<formalism::planning::GroundAtom<formalism::StaticTag>> index) const;
-    float_t get(Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>> index) const;
-    formalism::planning::FDRValue get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const;
-    float_t get(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index) const;
-    bool test(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index) const;
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const;
+    ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>> index) const;
+    ::tyr::formalism::planning::FDRValue get(ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> index) const;
+    ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index) const;
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index) const;
 
     /**
      * IndexableViewStateConcept
      */
 
-    bool test(formalism::planning::GroundAtomView<formalism::StaticTag> view) const;
-    float_t get(formalism::planning::GroundFunctionTermView<formalism::StaticTag> view) const;
-    formalism::planning::FDRValue get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const;
-    float_t get(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view) const;
-    bool test(formalism::planning::GroundAtomView<formalism::DerivedTag> view) const;
+    bool test(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::StaticTag> view) const;
+    ygg::float_t get(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::StaticTag> view) const;
+    ::tyr::formalism::planning::FDRValue get(::tyr::formalism::planning::FDRVariableView<::tyr::formalism::FluentTag> view) const;
+    ygg::float_t get(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> view) const;
+    bool test(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag> view) const;
 
     /**
      * IterableStateConcept
      */
 
-    planning::AtomRange<formalism::StaticTag> get_static_atoms() const noexcept;
-    planning::FDRFactRange<planning::LiftedTag, formalism::FluentTag> get_fluent_facts() const noexcept;
-    planning::AtomRange<formalism::DerivedTag> get_derived_atoms() const noexcept;
-    planning::FunctionTermValueRange<formalism::StaticTag> get_static_fterm_values() const noexcept;
-    planning::FunctionTermValueRange<formalism::FluentTag> get_fluent_fterm_values() const noexcept;
+    planning::AtomRange<::tyr::formalism::StaticTag> get_static_atoms() const noexcept;
+    planning::FDRFactRange<planning::LiftedTag, ::tyr::formalism::FluentTag> get_fluent_facts() const noexcept;
+    planning::AtomRange<::tyr::formalism::DerivedTag> get_derived_atoms() const noexcept;
+    planning::FunctionTermValueRange<::tyr::formalism::StaticTag> get_static_fterm_values() const noexcept;
+    planning::FunctionTermValueRange<::tyr::formalism::FluentTag> get_fluent_fterm_values() const noexcept;
 
     /**
      * IterableStateViewConcept
@@ -92,47 +94,52 @@ public:
      * Getters
      */
 
-    const std::shared_ptr<formalism::planning::Repository>& get_repository() const noexcept;
+    const std::shared_ptr<::tyr::formalism::planning::Repository>& get_repository() const noexcept;
     const std::shared_ptr<planning::StateRepository<planning::LiftedTag>>& get_state_repository() const noexcept;
     const planning::UnpackedState<planning::LiftedTag>& get_unpacked_state() const noexcept;
 
-    std::tuple<Index<planning::State<planning::LiftedTag>>, uint_t> identifying_members() const noexcept;
+    std::tuple<ygg::Index<planning::State<planning::LiftedTag>>, ygg::uint_t> identifying_members() const noexcept;
 
 private:
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const boost::dynamic_bitset<>& get_atoms() const noexcept;
 
-    template<formalism::FactKind T>
-    const std::vector<float_t>& get_numeric_variables() const noexcept;
+    template<::tyr::formalism::FactKind T>
+    const std::vector<ygg::float_t>& get_numeric_variables() const noexcept;
 
     std::shared_ptr<planning::StateRepository<planning::LiftedTag>> m_state_repository;
-    SharedObjectPoolPtr<planning::UnpackedState<planning::LiftedTag>> m_unpacked;
+    ygg::SharedObjectPoolPtr<planning::UnpackedState<planning::LiftedTag>> m_unpacked;
 };
 
-using LiftedStateView = View<Index<planning::State<planning::LiftedTag>>, std::shared_ptr<planning::StateRepository<planning::LiftedTag>>>;
+using LiftedStateView = ygg::View<ygg::Index<planning::State<planning::LiftedTag>>, std::shared_ptr<planning::StateRepository<planning::LiftedTag>>>;
 
 inline auto LiftedStateView::get_static_atoms_view() const noexcept
 {
-    return get_static_atoms() | std::views::transform([context = this->get_repository()](auto id) { return make_view(id, *context); });
+    return get_static_atoms() | std::views::transform([context = this->get_repository()](auto id) { return ygg::make_view(id, *context); });
 }
 inline auto LiftedStateView::get_fluent_facts_view() const noexcept
 {
-    return get_fluent_facts() | std::views::transform([context = this->get_repository()](auto id) { return make_view(id, *context); });
+    return get_fluent_facts() | std::views::transform([context = this->get_repository()](auto id) { return ygg::make_view(id, *context); });
 }
 inline auto LiftedStateView::get_derived_atoms_view() const noexcept
 {
-    return get_derived_atoms() | std::views::transform([context = this->get_repository()](auto id) { return make_view(id, *context); });
+    return get_derived_atoms() | std::views::transform([context = this->get_repository()](auto id) { return ygg::make_view(id, *context); });
 }
 inline auto LiftedStateView::get_static_fterm_values_view() const noexcept
 {
     return get_static_fterm_values()
-           | std::views::transform([context = this->get_repository()](auto&& pair) { return std::make_pair(make_view(pair.first, *context), pair.second); });
+           | std::views::transform([context = this->get_repository()](auto&& pair) { return std::make_pair(ygg::make_view(pair.first, *context), pair.second); });
 }
 inline auto LiftedStateView::get_fluent_fterm_values_view() const noexcept
 {
     return get_fluent_fterm_values()
-           | std::views::transform([context = this->get_repository()](auto&& pair) { return std::make_pair(make_view(pair.first, *context), pair.second); });
+           | std::views::transform([context = this->get_repository()](auto&& pair) { return std::make_pair(ygg::make_view(pair.first, *context), pair.second); });
 }
+}
+
+namespace tyr
+{
+using LiftedStateView = ygg::LiftedStateView;
 }
 
 #endif

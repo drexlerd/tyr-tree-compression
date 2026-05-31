@@ -18,30 +18,32 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_FUNCTION_TERM_VALUE_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_FUNCTION_TERM_VALUE_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_function_term_index.hpp"
 #include "tyr/formalism/planning/ground_function_term_value_index.hpp"
 #include "tyr/formalism/term_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::planning::GroundFunctionTermValue<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::GroundFunctionTermValue<T>>
 {
-    Index<formalism::planning::GroundFunctionTermValue<T>> index;
-    Index<formalism::planning::GroundFunctionTerm<T>> fterm;
-    float_t value;
+    ygg::Index<::tyr::formalism::planning::GroundFunctionTermValue<T>> index;
+    ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<T>> fterm;
+    ygg::float_t value;
 
     Data() = default;
-    Data(Index<formalism::planning::GroundFunctionTerm<T>> fterm_, float_t value_) : index(), fterm(fterm_), value(value_) {}
+    Data(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<T>> fterm_, ygg::float_t value_) : index(), fterm(fterm_), value(value_) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::planning::GroundFunctionTerm<T>>, C> fterm_, float_t value_) : index(), fterm(), value(value_)
+    Data(::ygg::View<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<T>>, C> fterm_, ygg::float_t value_) : index(), fterm(), value(value_)
     {
-        set(fterm_, fterm);
+        ygg::set(fterm_, fterm);
     }
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
@@ -50,16 +52,16 @@ struct Data<formalism::planning::GroundFunctionTermValue<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(fterm);
-        tyr::clear(value);
+        ygg::clear(index);
+        ygg::clear(fterm);
+        ygg::clear(value);
     }
 
     auto cista_members() const noexcept { return std::tie(index, fterm, value); }
     auto identifying_members() const noexcept { return std::tie(fterm, value); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::planning::GroundFunctionTermValue<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundFunctionTermValue<::tyr::formalism::StaticTag>>);
 }
 
 #endif

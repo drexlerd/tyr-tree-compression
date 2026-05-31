@@ -33,7 +33,7 @@ typename NumericStorageBackend<Kind, HashSet>::Packed
 NumericStorageBackend<Kind, HashSet>::insert(typename NumericStorageBackend<Kind, HashSet>::Unpacked& unpacked)
 {
     for (auto& value : unpacked.values)
-        value = FloatTolerance<float_t>::canonicalize(value);
+        value = ygg::FloatTolerance<ygg::float_t>::canonicalize(value);
 
     return NumericStorageBackend<Kind, HashSet>::Packed { m_float_vec_set.insert(unpacked.values) };
 }
@@ -45,7 +45,7 @@ void NumericStorageBackend<Kind, HashSet>::unpack(const typename NumericStorageB
     const auto view = m_float_vec_set[packed.index];
 
     unpacked.values.resize(view.size());
-    for (uint_t i = 0; i < view.size(); ++i)
+    for (ygg::uint_t i = 0; i < view.size(); ++i)
         unpacked.values[i] = view[i];
 }
 

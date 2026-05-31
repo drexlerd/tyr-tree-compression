@@ -34,7 +34,7 @@ class AxiomEvaluator<GroundTag>
     friend class AxiomEvaluatorFactory<GroundTag>;
 
 private:
-    AxiomEvaluator(uint_t index, TaskPtr<GroundTag> task, ExecutionContextPtr execution_context);
+    AxiomEvaluator(ygg::uint_t index, TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context);
 
 public:
     void compute_extended_state(UnpackedState<GroundTag>& unpacked_state);
@@ -42,10 +42,10 @@ public:
     auto get_index() const noexcept { return m_index; }
 
 private:
-    uint_t m_index;
+    ygg::uint_t m_index;
     TaskPtr<GroundTag> m_task;
 
-    IndexList<formalism::planning::GroundAxiom> m_applicable_axioms;
+    ygg::IndexList<::tyr::formalism::planning::GroundAxiom> m_applicable_axioms;
 };
 }
 

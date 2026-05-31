@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json.hpp"
-#include "tyr/common/json_suite.hpp"
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -43,48 +43,48 @@ struct LiftedSuccessorCountCase
 
 LiftedSuccessorCountCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
-    return LiftedSuccessorCountCase { tyr::common::as_string(object, "name", "case"),
-                                      tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
-                                      tyr::common::suite_path(suite, tyr::common::as_string(object, "task_file", "case")),
-                                      tyr::common::as_size(object, "expected_successors", "case") };
+    return LiftedSuccessorCountCase { ygg::common::as_string(object, "name", "case"),
+                                      ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                                      ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")),
+                                      ygg::common::as_size(object, "expected_successors", "case") };
 }
 
 std::vector<LiftedSuccessorCountCase> load_cases()
 {
-    const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/lifted_task.json");
-    const auto& suite_object = tyr::common::as_object(suite, "suite");
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/lifted_task.json");
+    const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<LiftedSuccessorCountCase> {};
-    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
-        result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
+    for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))
+        result.push_back(parse_case(suite_object, ygg::common::as_object(case_value, "case")));
     return result;
 }
 
 void expect_same_node(const p::Node<p::LiftedTag>& expected, const p::Node<p::LiftedTag>& actual)
 {
-    EXPECT_EQ(uint_t(expected.get_state().get_index()), uint_t(actual.get_state().get_index()));
+    EXPECT_EQ(ygg::uint_t(expected.get_state().get_index()), ygg::uint_t(actual.get_state().get_index()));
     EXPECT_TRUE(f::apply(f::Eq {}, expected.get_metric(), actual.get_metric()))
         << "expected metric " << expected.get_metric() << ", actual metric " << actual.get_metric();
 }
 
 void expect_same_binding(fp::ActionBindingView expected, fp::ActionBindingView actual)
 {
-    EXPECT_EQ(uint_t(expected.get_relation().get_index()), uint_t(actual.get_relation().get_index()));
+    EXPECT_EQ(ygg::uint_t(expected.get_relation().get_index()), ygg::uint_t(actual.get_relation().get_index()));
 
     const auto expected_objects = expected.get_data();
     const auto actual_objects = actual.get_data();
     ASSERT_EQ(expected_objects.size(), actual_objects.size());
     for (size_t i = 0; i < expected_objects.size(); ++i)
-        EXPECT_EQ(uint_t(expected_objects[i]), uint_t(actual_objects[i]));
+        EXPECT_EQ(ygg::uint_t(expected_objects[i]), ygg::uint_t(actual_objects[i]));
 }
 
-void expect_same_binding(fp::ActionBindingView expected, const Data<formalism::RelationBinding<formalism::planning::Action>>& actual)
+void expect_same_binding(fp::ActionBindingView expected, const ygg::Data<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>>& actual)
 {
-    EXPECT_EQ(uint_t(expected.get_relation().get_index()), uint_t(actual.relation));
+    EXPECT_EQ(ygg::uint_t(expected.get_relation().get_index()), ygg::uint_t(actual.relation));
 
     const auto expected_objects = expected.get_data();
     ASSERT_EQ(expected_objects.size(), actual.objects.size());
     for (size_t i = 0; i < expected_objects.size(); ++i)
-        EXPECT_EQ(uint_t(expected_objects[i]), uint_t(actual.objects[i]));
+        EXPECT_EQ(ygg::uint_t(expected_objects[i]), ygg::uint_t(actual.objects[i]));
 }
 
 bool are_same_binding(fp::ActionBindingView lhs, fp::ActionBindingView rhs)
@@ -97,7 +97,7 @@ bool are_same_binding(fp::ActionBindingView lhs, fp::ActionBindingView rhs)
     return std::ranges::equal(lhs_objects, rhs_objects);
 }
 
-bool are_same_binding(fp::ActionBindingView lhs, const Data<formalism::RelationBinding<formalism::planning::Action>>& rhs)
+bool are_same_binding(fp::ActionBindingView lhs, const ygg::Data<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>>& rhs)
 {
     if (lhs.get_relation().get_index() != rhs.relation)
         return false;
@@ -108,7 +108,7 @@ bool are_same_binding(fp::ActionBindingView lhs, const Data<formalism::RelationB
 void expect_action_binding_apis_match_ground_actions(const LiftedSuccessorCountCase& test_case)
 {
     auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(test_case.domain_file).parse_task(test_case.task_file));
-    auto execution_context = ExecutionContext::create(1);
+    auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
     auto successor_generator = p::SuccessorGeneratorFactory<p::LiftedTag>().create(lifted_task, execution_context, state_repository);
@@ -154,7 +154,7 @@ TEST_P(LiftedTaskSuccessorCountTest, InitialNodeHasExpectedSuccessorCount)
 {
     const auto& param = GetParam();
     auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
-    auto execution_context = ExecutionContext::create(1);
+    auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
     auto successor_generator = p::SuccessorGeneratorFactory<p::LiftedTag>().create(lifted_task, execution_context, state_repository);
@@ -168,7 +168,7 @@ TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryIndexForIdentity)
 {
     const auto& param = GetParam();
     auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
-    auto execution_context = ExecutionContext::create(1);
+    auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::LiftedTag>();
     auto state_repository_factory = p::StateRepositoryFactory<p::LiftedTag>();
     auto successor_generator_factory = p::SuccessorGeneratorFactory<p::LiftedTag>();
@@ -194,8 +194,8 @@ TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryIndexForIdentity)
     EXPECT_EQ(first_successor_generator->get_state_repository(), first_repository);
     EXPECT_EQ(second_successor_generator->get_state_repository(), second_repository);
     EXPECT_EQ(first_state.get_index(), second_state.get_index());
-    EXPECT_FALSE(EqualTo<p::StateView<p::LiftedTag>> {}(first_state, second_state));
-    EXPECT_NE(Hash<p::StateView<p::LiftedTag>> {}(first_state), Hash<p::StateView<p::LiftedTag>> {}(second_state));
+    EXPECT_FALSE(ygg::EqualTo<p::StateView<p::LiftedTag>> {}(first_state, second_state));
+    EXPECT_NE(ygg::Hash<p::StateView<p::LiftedTag>> {}(first_state), ygg::Hash<p::StateView<p::LiftedTag>> {}(second_state));
 }
 
 INSTANTIATE_TEST_SUITE_P(TyrPlanningLiftedTask,

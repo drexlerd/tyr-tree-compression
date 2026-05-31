@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_STATE_STORAGE_HPP_
 #define TYR_PLANNING_STATE_STORAGE_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/task.hpp"
 
 #include <concepts>
@@ -73,7 +73,7 @@ struct FactUnpackedStorage;
 template<TaskKind Kind>
 struct NumericUnpackedStorage
 {
-    std::vector<float_t> values;
+    std::vector<ygg::float_t> values;
 };
 
 }

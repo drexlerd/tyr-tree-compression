@@ -18,24 +18,25 @@
 #ifndef TYR_FORMALISM_PLANNING_METRIC_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_METRIC_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_function_expression_data.hpp"
 #include "tyr/formalism/planning/metric_data.hpp"
 #include "tyr/formalism/planning/metric_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::planning::Context C>
-class View<Index<formalism::planning::Metric>, C>
+template<::tyr::formalism::planning::Context C>
+class View<ygg::Index<::tyr::formalism::planning::Metric>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::planning::Metric> m_handle;
+    ygg::Index<::tyr::formalism::planning::Metric> m_handle;
 
 public:
-    View(Index<formalism::planning::Metric> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::planning::Metric> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
@@ -43,7 +44,7 @@ public:
 
     auto get_index() const noexcept { return m_handle; }
     auto get_objective() const noexcept { return get_data().objective; }
-    auto get_fexpr() const noexcept { return make_view(get_data().fexpr, *m_context); }
+    auto get_fexpr() const noexcept { return ygg::make_view(get_data().fexpr, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

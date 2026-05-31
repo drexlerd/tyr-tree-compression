@@ -22,11 +22,7 @@
 #include "tyr/analysis/analysis.hpp"
 
 // Cista
-#include "tyr/buffer/buffer.hpp"
-
-// Common
-#include "tyr/common/core.hpp"
-#include "tyr/common/common.hpp"
+#include <yggdrasil/buffer/buffer.hpp>
 
 // Formalism
 #include "tyr/formalism/formalism.hpp"

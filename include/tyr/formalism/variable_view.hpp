@@ -18,21 +18,22 @@
 #ifndef TYR_FORMALISM_VARIABLE_VIEW_HPP_
 #define TYR_FORMALISM_VARIABLE_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 template<typename C>
-class View<Index<formalism::Variable>, C>
+class View<ygg::Index<::tyr::formalism::Variable>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::Variable> m_handle;
+    ygg::Index<::tyr::formalism::Variable> m_handle;
 
 public:
-    View(Index<formalism::Variable> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::Variable> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }

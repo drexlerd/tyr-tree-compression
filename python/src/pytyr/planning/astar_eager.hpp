@@ -59,9 +59,9 @@ public:
         NB_OVERRIDE_PURE(on_prune_node, source_node, labeled_succ_node);
     }
 
-    void on_start_search(const Node<Kind>& node, float_t f_value) override { NB_OVERRIDE_PURE(on_start_search, node, f_value); }
+    void on_start_search(const Node<Kind>& node, ygg::float_t f_value) override { NB_OVERRIDE_PURE(on_start_search, node, f_value); }
 
-    void on_finish_f_layer(float_t f_value) override { NB_OVERRIDE_PURE(on_finish_f_layer, f_value); }
+    void on_finish_f_layer(ygg::float_t f_value) override { NB_OVERRIDE_PURE(on_finish_f_layer, f_value); }
 
     void on_end_search(tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_search, status); }
 

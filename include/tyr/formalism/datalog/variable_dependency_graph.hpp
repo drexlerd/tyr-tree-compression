@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_DATALOG_VARIABLE_DEPENDENCY_GRAPH_HPP_
 #define TYR_FORMALISM_DATALOG_VARIABLE_DEPENDENCY_GRAPH_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/variant.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/variable_dependency_graph_details.hpp"
@@ -44,7 +44,7 @@ public:
     auto k() const noexcept { return m_k; }
 
 private:
-    uint_t m_k;
+    ygg::uint_t m_k;
 
     details::UnaryDependencies m_unary_dependencies;
     details::BinaryDependencies m_binary_dependencies;

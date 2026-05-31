@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json.hpp"
-#include "tyr/common/json_suite.hpp"
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <filesystem>
 #include <gtest/gtest.h>
@@ -40,7 +40,7 @@ struct SearchSummary
 {
     std::optional<uint64_t> expanded_last_snapshot;
     p::SearchStatus status;
-    float_t plan_cost;
+    ygg::float_t plan_cost;
 
     bool operator==(const SearchSummary& other) const
     {
@@ -57,18 +57,18 @@ struct GroundVsLiftedCase
 
 GroundVsLiftedCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
-    return GroundVsLiftedCase { tyr::common::as_string(object, "name", "case"),
-                                tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
-                                tyr::common::suite_path(suite, tyr::common::as_string(object, "task_file", "case")) };
+    return GroundVsLiftedCase { ygg::common::as_string(object, "name", "case"),
+                                ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                                ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
 }
 
 std::vector<GroundVsLiftedCase> load_cases()
 {
-    const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/algorithms/ground_vs_lifted.json");
-    const auto& suite_object = tyr::common::as_object(suite, "suite");
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/algorithms/ground_vs_lifted.json");
+    const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<GroundVsLiftedCase> {};
-    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
-        result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
+    for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))
+        result.push_back(parse_case(suite_object, ygg::common::as_object(case_value, "case")));
     return result;
 }
 
@@ -77,7 +77,7 @@ SearchSummary run_blind_astar(const fs::path& domain_filepath, const fs::path& p
 {
     using TaskPtr = std::shared_ptr<p::Task<Kind>>;
 
-    auto execution_context = ExecutionContext::create(1);
+    auto execution_context = ygg::ExecutionContext::create(1);
 
     TaskPtr task;
     if constexpr (std::same_as<Kind, p::GroundTag>)
@@ -85,7 +85,7 @@ SearchSummary run_blind_astar(const fs::path& domain_filepath, const fs::path& p
     else if constexpr (std::same_as<Kind, p::LiftedTag>)
         task = p::Task<p::LiftedTag>::create(fp::Parser(domain_filepath).parse_task(problem_filepath));
     else
-        static_assert(tyr::dependent_false<Kind>::value, "Missing case");
+        static_assert(ygg::dependent_false<Kind>::value, "Missing case");
 
     auto axiom_evaluator = p::AxiomEvaluatorFactory<Kind>().create(task, execution_context);
     auto state_repository = p::StateRepositoryFactory<Kind>().create(task, axiom_evaluator);

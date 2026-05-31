@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_STATE_VIEW_HPP_
 #define TYR_PLANNING_STATE_VIEW_HPP_
 
-#include "tyr/common/shared_object_pool.hpp"
+#include <yggdrasil/containers/shared_object_pool.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/declarations.hpp"
@@ -29,19 +29,21 @@
 #include <concepts>
 #include <ranges>
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
 template<planning::TaskKind Kind, typename C>
-class View<Index<planning::State<Kind>>, C>
+class View<ygg::Index<planning::State<Kind>>, C>
 {
-    static_assert(dependent_false<Kind>::value, "State is not defined for type Kind.");
+    static_assert(ygg::dependent_false<Kind>::value, "State is not defined for type Kind.");
 };
+}
 
-namespace planning
+namespace tyr::planning
 {
 template<TaskKind Kind>
-using StateView = View<Index<State<Kind>>, std::shared_ptr<StateRepository<Kind>>>;
+using StateView = ygg::View<ygg::Index<State<Kind>>, std::shared_ptr<StateRepository<Kind>>>;
 
 /**
  * IterableStateConcept
@@ -49,24 +51,24 @@ using StateView = View<Index<State<Kind>>, std::shared_ptr<StateRepository<Kind>
 
 template<class R, class Tag>
 concept AtomRangeConcept =
-    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, Index<formalism::planning::GroundAtom<Tag>>>;
+    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ygg::Index<::tyr::formalism::planning::GroundAtom<Tag>>>;
 
 template<class R, class Tag>
 concept FactRangeConcept =
-    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, Data<formalism::planning::FDRFact<Tag>>>;
+    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ygg::Data<::tyr::formalism::planning::FDRFact<Tag>>>;
 
 template<class R, class Tag>
 concept FunctionTermValueRangeConcept =
     std::ranges::input_range<R>
-    && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, std::pair<Index<formalism::planning::GroundFunctionTerm<Tag>>, float_t>>;
+    && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, std::pair<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<Tag>>, ygg::float_t>>;
 
 template<typename T>
 concept IterableStateConcept = requires(const T& cs) {
-    requires AtomRangeConcept<decltype(cs.get_static_atoms()), formalism::StaticTag>;
-    requires FactRangeConcept<decltype(cs.get_fluent_facts()), formalism::FluentTag>;
-    requires AtomRangeConcept<decltype(cs.get_derived_atoms()), formalism::DerivedTag>;
-    requires FunctionTermValueRangeConcept<decltype(cs.get_static_fterm_values()), formalism::StaticTag>;
-    requires FunctionTermValueRangeConcept<decltype(cs.get_fluent_fterm_values()), formalism::FluentTag>;
+    requires AtomRangeConcept<decltype(cs.get_static_atoms()), ::tyr::formalism::StaticTag>;
+    requires FactRangeConcept<decltype(cs.get_fluent_facts()), ::tyr::formalism::FluentTag>;
+    requires AtomRangeConcept<decltype(cs.get_derived_atoms()), ::tyr::formalism::DerivedTag>;
+    requires FunctionTermValueRangeConcept<decltype(cs.get_static_fterm_values()), ::tyr::formalism::StaticTag>;
+    requires FunctionTermValueRangeConcept<decltype(cs.get_fluent_fterm_values()), ::tyr::formalism::FluentTag>;
 };
 
 /**
@@ -75,23 +77,23 @@ concept IterableStateConcept = requires(const T& cs) {
 
 template<class R, class Tag>
 concept AtomViewRangeConcept =
-    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, formalism::planning::GroundAtomView<Tag>>;
+    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ::tyr::formalism::planning::GroundAtomView<Tag>>;
 
 template<class R, class Tag>
 concept FactViewRangeConcept =
-    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, formalism::planning::FDRFactView<Tag>>;
+    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ::tyr::formalism::planning::FDRFactView<Tag>>;
 
 template<class R, class Tag>
 concept FunctionTermViewValueRangeConcept =
-    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, formalism::planning::GroundFunctionTermViewValuePair<Tag>>;
+    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ::tyr::formalism::planning::GroundFunctionTermViewValuePair<Tag>>;
 
 template<typename T>
 concept IterableViewStateConcept = requires(const T& cs) {
-    requires AtomViewRangeConcept<decltype(cs.get_static_atoms_view()), formalism::StaticTag>;
-    requires FactViewRangeConcept<decltype(cs.get_fluent_facts_view()), formalism::FluentTag>;
-    requires AtomViewRangeConcept<decltype(cs.get_derived_atoms_view()), formalism::DerivedTag>;
-    requires FunctionTermViewValueRangeConcept<decltype(cs.get_static_fterm_values_view()), formalism::StaticTag>;
-    requires FunctionTermViewValueRangeConcept<decltype(cs.get_fluent_fterm_values_view()), formalism::FluentTag>;
+    requires AtomViewRangeConcept<decltype(cs.get_static_atoms_view()), ::tyr::formalism::StaticTag>;
+    requires FactViewRangeConcept<decltype(cs.get_fluent_facts_view()), ::tyr::formalism::FluentTag>;
+    requires AtomViewRangeConcept<decltype(cs.get_derived_atoms_view()), ::tyr::formalism::DerivedTag>;
+    requires FunctionTermViewValueRangeConcept<decltype(cs.get_static_fterm_values_view()), ::tyr::formalism::StaticTag>;
+    requires FunctionTermViewValueRangeConcept<decltype(cs.get_fluent_fterm_values_view()), ::tyr::formalism::FluentTag>;
 };
 
 /**
@@ -100,17 +102,17 @@ concept IterableViewStateConcept = requires(const T& cs) {
 
 template<typename T, typename Kind>
 concept IndexableStateConcept = requires(const T& cs,
-                                         Index<formalism::planning::FDRVariable<formalism::FluentTag>> variable,
-                                         Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>> static_fterm,
-                                         Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> fluent_fterm,
-                                         Index<formalism::planning::GroundAtom<formalism::StaticTag>> static_atom,
-                                         Index<formalism::planning::GroundAtom<formalism::DerivedTag>> derived_atom) {
+                                         ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> variable,
+                                         ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>> static_fterm,
+                                         ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> fluent_fterm,
+                                         ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> static_atom,
+                                         ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> derived_atom) {
     requires TaskKind<Kind>;
     requires std::same_as<typename T::TaskType, Task<Kind>>;
-    { cs.get_index() } -> std::same_as<Index<State<Kind>>>;
-    { cs.get(variable) } -> std::same_as<formalism::planning::FDRValue>;
-    { cs.get(static_fterm) } -> std::same_as<float_t>;
-    { cs.get(fluent_fterm) } -> std::same_as<float_t>;
+    { cs.get_index() } -> std::same_as<ygg::Index<State<Kind>>>;
+    { cs.get(variable) } -> std::same_as<::tyr::formalism::planning::FDRValue>;
+    { cs.get(static_fterm) } -> std::same_as<ygg::float_t>;
+    { cs.get(fluent_fterm) } -> std::same_as<ygg::float_t>;
     { cs.test(static_atom) } -> std::same_as<bool>;
     { cs.test(derived_atom) } -> std::same_as<bool>;
     { cs.get_state_repository() } -> std::same_as<const std::shared_ptr<StateRepository<Kind>>&>;
@@ -122,23 +124,21 @@ concept IndexableStateConcept = requires(const T& cs,
 
 template<typename T, typename Kind>
 concept IndexableViewStateConcept = requires(const T& cs,
-                                             formalism::planning::FDRVariableView<formalism::FluentTag> variable,
-                                             formalism::planning::GroundFunctionTermView<formalism::StaticTag> static_fterm,
-                                             formalism::planning::GroundFunctionTermView<formalism::FluentTag> fluent_fterm,
-                                             formalism::planning::GroundAtomView<formalism::StaticTag> static_atom,
-                                             formalism::planning::GroundAtomView<formalism::DerivedTag> derived_atom) {
+                                             ::tyr::formalism::planning::FDRVariableView<::tyr::formalism::FluentTag> variable,
+                                             ::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::StaticTag> static_fterm,
+                                             ::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> fluent_fterm,
+                                             ::tyr::formalism::planning::GroundAtomView<::tyr::formalism::StaticTag> static_atom,
+                                             ::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag> derived_atom) {
     requires TaskKind<Kind>;
     requires std::same_as<typename T::TaskType, Task<Kind>>;
-    { cs.get_index() } -> std::same_as<Index<State<Kind>>>;
-    { cs.get(variable) } -> std::same_as<formalism::planning::FDRValue>;
-    { cs.get(static_fterm) } -> std::same_as<float_t>;
-    { cs.get(fluent_fterm) } -> std::same_as<float_t>;
+    { cs.get_index() } -> std::same_as<ygg::Index<State<Kind>>>;
+    { cs.get(variable) } -> std::same_as<::tyr::formalism::planning::FDRValue>;
+    { cs.get(static_fterm) } -> std::same_as<ygg::float_t>;
+    { cs.get(fluent_fterm) } -> std::same_as<ygg::float_t>;
     { cs.test(static_atom) } -> std::same_as<bool>;
     { cs.test(derived_atom) } -> std::same_as<bool>;
     { cs.get_state_repository() } -> std::same_as<const std::shared_ptr<StateRepository<Kind>>&>;
 };
-
-}
 
 }
 

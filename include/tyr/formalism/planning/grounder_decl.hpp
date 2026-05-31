@@ -18,7 +18,7 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUNDER_DECL_HPP_
 #define TYR_FORMALISM_PLANNING_GROUNDER_DECL_HPP_
 
-#include "tyr/common/associative_containers.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 
@@ -28,7 +28,7 @@ struct GrounderContext
 {
     Builder& builder;
     Repository& destination;
-    IndexList<Object>& binding;
+    ygg::IndexList<Object>& binding;
 };
 
 template<typename T>
@@ -37,7 +37,7 @@ struct GrounderCacheEntry;
 template<>
 struct GrounderCacheEntry<Action>
 {
-    using container_type = UnorderedMap<Index<RelationBinding<Action>>, Index<GroundAction>>;
+    using container_type = ygg::UnorderedMap<ygg::Index<RelationBinding<Action>>, ygg::Index<GroundAction>>;
 
     container_type container;
 };
@@ -45,7 +45,7 @@ struct GrounderCacheEntry<Action>
 template<>
 struct GrounderCacheEntry<Axiom>
 {
-    using container_type = UnorderedMap<Index<RelationBinding<Axiom>>, Index<GroundAxiom>>;
+    using container_type = ygg::UnorderedMap<ygg::Index<RelationBinding<Axiom>>, ygg::Index<GroundAxiom>>;
 
     container_type container;
 };

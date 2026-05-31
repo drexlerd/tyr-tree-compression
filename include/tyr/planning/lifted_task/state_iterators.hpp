@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_ITERATORS_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_ITERATORS_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/indices.hpp"
 #include "tyr/planning/declarations.hpp"
@@ -41,7 +41,7 @@ template<class Tag>
 class FDRFactIterator<LiftedTag, Tag>
 {
 public:
-    using value_type = Data<formalism::planning::FDRFact<Tag>>;
+    using value_type = ygg::Data<::tyr::formalism::planning::FDRFact<Tag>>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
@@ -60,8 +60,8 @@ public:
     {
         assert(m_data);
         assert(m_data->test(m_i));
-        return Data<formalism::planning::FDRFact<Tag>> { Index<formalism::planning::FDRVariable<Tag>> { static_cast<uint_t>(m_i) },
-                                                         formalism::planning::FDRValue { 1 } };
+        return ygg::Data<::tyr::formalism::planning::FDRFact<Tag>> { ygg::Index<::tyr::formalism::planning::FDRVariable<Tag>> { static_cast<ygg::uint_t>(m_i) },
+                                                         ::tyr::formalism::planning::FDRValue { 1 } };
     }
 
     FDRFactIterator& operator++() noexcept

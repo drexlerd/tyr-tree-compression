@@ -19,7 +19,7 @@
 
 namespace tyr::planning
 {
-AddRPGHeuristic<LiftedTag>::AddRPGHeuristic(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context) :
+AddRPGHeuristic<LiftedTag>::AddRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
     RPGBase<AddRPGHeuristic<LiftedTag>,
             datalog::OrAnnotationPolicy,
             datalog::AndAnnotationPolicy<datalog::SumAggregation>,
@@ -28,17 +28,17 @@ AddRPGHeuristic<LiftedTag>::AddRPGHeuristic(TaskPtr<LiftedTag> task, ExecutionCo
         std::move(execution_context),
         datalog::OrAnnotationPolicy(),
         datalog::AndAnnotationPolicy<datalog::SumAggregation>(),
-        datalog::TerminationPolicy<datalog::SumAggregation>(task->get_rpg_program().get_program_context().get_program().get_predicates<formalism::FluentTag>(),
+        datalog::TerminationPolicy<datalog::SumAggregation>(task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>(),
                                                             task->get_rpg_program().get_program_context().get_workspace_repository()))
 {
 }
 
-AddRPGHeuristicPtr<LiftedTag> AddRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context)
+AddRPGHeuristicPtr<LiftedTag> AddRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context)
 {
     return std::make_shared<AddRPGHeuristic<LiftedTag>>(std::move(task), std::move(execution_context));
 }
 
-float_t AddRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state)
+ygg::float_t AddRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state)
 {
     return m_workspace.tp.get_total_cost(
         datalog::FactSets { m_task->get_rpg_program().get_const_program_workspace().facts.fact_sets, m_workspace.facts.fact_sets },

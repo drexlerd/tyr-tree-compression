@@ -15,6 +15,18 @@ ROOT_DIR = Path(__file__).resolve().parents[3]
 DOWNSTREAM_PACKAGE_DIR = Path(__file__).resolve().parent / "minimal_downstream_package"
 
 
+def _native_prefix(module, header_root=None):
+    candidates = [Path(module.native_prefix())]
+    if header_root is not None:
+        candidates.append(Path(module.__file__).resolve().parent)
+
+    for candidate in candidates:
+        if header_root is None or (candidate / "include" / header_root).exists():
+            return candidate
+
+    return candidates[0]
+
+
 def test_downstream_python_binding_imports_public_pytyr_api_and_links_tyr_core(tmp_path):
     cmake = shutil.which("cmake")
     if cmake is None:
@@ -22,7 +34,7 @@ def test_downstream_python_binding_imports_public_pytyr_api_and_links_tyr_core(t
 
     pytyr_prefix = Path(pytyr.native_prefix())
     pypddl_prefix = Path(pypddl.native_prefix())
-    pyyggdrasil_prefix = Path(pyyggdrasil.native_prefix())
+    pyyggdrasil_prefix = _native_prefix(pyyggdrasil)
     tyr_library_dir = pytyr_prefix / "lib"
     dependency_library_dirs = [
         tyr_library_dir,
@@ -34,7 +46,7 @@ def test_downstream_python_binding_imports_public_pytyr_api_and_links_tyr_core(t
         pytest.skip("pytyr was not installed with a shared tyr::core library")
 
     tyr_include_dir = pytyr_prefix / "include"
-    if not (tyr_include_dir / "tyr" / "common" / "config.hpp").exists():
+    if not (tyr_include_dir / "tyr" / "formalism" / "planning" / "repository.hpp").exists():
         pytest.skip("pytyr was not installed with Tyr C++ public headers")
 
     tyr_cmake_dir = pytyr_prefix / "lib" / "cmake" / "tyr"
@@ -77,7 +89,7 @@ def test_downstream_python_binding_imports_public_pytyr_api_and_links_tyr_core(t
         check=True,
         env=env,
     )
-    subprocess.run([cmake, "--build", str(build_dir), "-j8"], check=True)
+    subprocess.run([cmake, "--build", str(build_dir), "-j3"], check=True)
 
     env["PYTHONPATH"] = str(project_dir / "src") + os.pathsep + env.get("PYTHONPATH", "")
     runtime_library_path = os.pathsep.join(str(path) for path in dependency_library_dirs)

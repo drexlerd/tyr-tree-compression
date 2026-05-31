@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_ALGORITHMS_SIW_STATISTICS_HPP_
 #define TYR_PLANNING_ALGORITHMS_SIW_STATISTICS_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/declarations.hpp"
 
 #include <algorithm>
@@ -31,9 +31,9 @@ template<TaskKind Kind>
 class Statistics
 {
 private:
-    std::optional<uint_t> m_maximum_effective_width;
+    std::optional<ygg::uint_t> m_maximum_effective_width;
     double m_total_effective_width = 0.;
-    uint_t m_num_solved_subsearches = 0;
+    ygg::uint_t m_num_solved_subsearches = 0;
 
 public:
     void clear() noexcept
@@ -43,21 +43,21 @@ public:
         m_num_solved_subsearches = 0;
     }
 
-    void add_effective_width(uint_t width)
+    void add_effective_width(ygg::uint_t width)
     {
         m_maximum_effective_width = m_maximum_effective_width ? std::max(*m_maximum_effective_width, width) : width;
         m_total_effective_width += static_cast<double>(width);
         ++m_num_solved_subsearches;
     }
 
-    std::optional<uint_t> get_maximum_effective_width() const { return m_maximum_effective_width; }
+    std::optional<ygg::uint_t> get_maximum_effective_width() const { return m_maximum_effective_width; }
     std::optional<double> get_average_effective_width() const
     {
         if (m_num_solved_subsearches == 0)
             return std::nullopt;
         return m_total_effective_width / static_cast<double>(m_num_solved_subsearches);
     }
-    uint_t get_num_solved_subsearches() const { return m_num_solved_subsearches; }
+    ygg::uint_t get_num_solved_subsearches() const { return m_num_solved_subsearches; }
 };
 
 }  // namespace tyr::planning::siw

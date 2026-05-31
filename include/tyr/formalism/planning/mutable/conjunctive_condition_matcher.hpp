@@ -18,10 +18,10 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_CONJUNCTIVE_CONDITION_MATCHER_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_CONJUNCTIVE_CONDITION_MATCHER_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/mutable/conjunctive_condition.hpp"
 #include "tyr/formalism/planning/mutable/literal.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -42,10 +42,10 @@ struct TaggedMutableAtomMatchData
         std::vector<MutableAtom<T>> atoms;
 
         // postings[pos][obj] = bitset of atom indices with obj at argument position pos
-        std::vector<UnorderedMap<Index<Object>, boost::dynamic_bitset<>>> postings;
+        std::vector<ygg::UnorderedMap<ygg::Index<Object>, boost::dynamic_bitset<>>> postings;
     };
 
-    UnorderedMap<Index<Predicate<T>>, PredicateData> data;
+    ygg::UnorderedMap<ygg::Index<Predicate<T>>, PredicateData> data;
 };
 
 struct MutableAtomMatchData

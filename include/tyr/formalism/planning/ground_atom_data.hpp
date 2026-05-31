@@ -18,27 +18,29 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_ATOM_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_ATOM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_atom_index.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Data<formalism::planning::GroundAtom<T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::GroundAtom<T>>
 {
-    Index<formalism::planning::GroundAtom<T>> index;
-    Index<formalism::RelationBinding<formalism::Predicate<T>>> binding;
+    ygg::Index<::tyr::formalism::planning::GroundAtom<T>> index;
+    ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Predicate<T>>> binding;
 
     Data() = default;
-    Data(Index<formalism::RelationBinding<formalism::Predicate<T>>> binding_) : index(), binding(binding_) {}
+    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Predicate<T>>> binding_) : index(), binding(binding_) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::RelationBinding<formalism::Predicate<T>>>, C> binding_) : index(), binding()
+    Data(::ygg::View<ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Predicate<T>>>, C> binding_) : index(), binding()
     {
         set(binding_, binding);
     }
@@ -49,15 +51,15 @@ struct Data<formalism::planning::GroundAtom<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(binding);
+        ygg::clear(index);
+        ygg::clear(binding);
     }
 
     auto cista_members() const noexcept { return std::tie(index, binding); }
     auto identifying_members() const noexcept { return std::tie(binding); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::planning::GroundAtom<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>>);
 
 }
 

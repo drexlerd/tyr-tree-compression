@@ -18,33 +18,34 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_VARIABLE_VIEW_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_VARIABLE_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/fdr_variable_view.hpp"
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/node_view.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/variable_data.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 template<typename Tag, planning::match_tree::Context<Tag> C>
-class View<Index<planning::match_tree::VariableSelectorNode<Tag>>, C>
+class View<ygg::Index<planning::match_tree::VariableSelectorNode<Tag>>, C>
 {
 private:
     const C* m_context;
-    Index<planning::match_tree::VariableSelectorNode<Tag>> m_handle;
+    ygg::Index<planning::match_tree::VariableSelectorNode<Tag>> m_handle;
 
 public:
-    View(Index<planning::match_tree::VariableSelectorNode<Tag>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<planning::match_tree::VariableSelectorNode<Tag>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
 
-    auto get_variable() const noexcept { return make_view(get_data().variable, m_context->get_formalism_repository()); }
-    auto get_domain_children() const noexcept { return make_view(get_data().domain_children, *m_context); }
-    auto get_dontcare_child() const noexcept { return make_view(get_data().dontcare_child, *m_context); }
+    auto get_variable() const noexcept { return ygg::make_view(get_data().variable, m_context->get_formalism_repository()); }
+    auto get_domain_children() const noexcept { return ygg::make_view(get_data().domain_children, *m_context); }
+    auto get_dontcare_child() const noexcept { return ygg::make_view(get_data().dontcare_child, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

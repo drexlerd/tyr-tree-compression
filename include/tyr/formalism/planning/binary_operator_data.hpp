@@ -18,21 +18,23 @@
 #ifndef TYR_FORMALISM_PLANNING_BINARY_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_BINARY_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/binary_operator_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/function_expression_data.hpp"
 #include "tyr/formalism/planning/ground_function_expression_data.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T>
-struct Data<formalism::planning::BinaryOperator<Op, T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::OpKind Op, typename T>
+struct Data<::tyr::formalism::planning::BinaryOperator<Op, T>>
 {
     using OpType = Op;
 
-    Index<formalism::planning::BinaryOperator<Op, T>> index;
+    ygg::Index<::tyr::formalism::planning::BinaryOperator<Op, T>> index;
     T lhs;
     T rhs;
 
@@ -40,7 +42,7 @@ struct Data<formalism::planning::BinaryOperator<Op, T>>
     Data(T lhs_, T rhs_) : index(), lhs(lhs_), rhs(rhs_) {}
     // Python constructor
     template<typename C>
-    Data(View<T, C> lhs_, View<T, C> rhs_) : index(), lhs(), rhs()
+    Data(::ygg::View<T, C> lhs_, ::ygg::View<T, C> rhs_) : index(), lhs(), rhs()
     {
         set(lhs_, lhs);
         set(rhs_, rhs);
@@ -52,16 +54,16 @@ struct Data<formalism::planning::BinaryOperator<Op, T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(lhs);
-        tyr::clear(rhs);
+        ygg::clear(index);
+        ygg::clear(lhs);
+        ygg::clear(rhs);
     }
 
     auto cista_members() const noexcept { return std::tie(index, lhs, rhs); }
     auto identifying_members() const noexcept { return std::tie(Op::kind, lhs, rhs); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::BinaryOperator<formalism::Add, Data<formalism::planning::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Add, ygg::Data<::tyr::formalism::planning::FunctionExpression>>>);
 
 }
 

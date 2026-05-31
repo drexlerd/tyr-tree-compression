@@ -31,15 +31,15 @@ public:
 
     NB_TRAMPOLINE(Base, 7);
 
-    void on_start_search(uint_t max_arity) override { NB_OVERRIDE_PURE(on_start_search, max_arity); }
+    void on_start_search(ygg::uint_t max_arity) override { NB_OVERRIDE_PURE(on_start_search, max_arity); }
 
-    void on_start_arity(uint_t arity) override { NB_OVERRIDE_PURE(on_start_arity, arity); }
+    void on_start_arity(ygg::uint_t arity) override { NB_OVERRIDE_PURE(on_start_arity, arity); }
 
-    void on_end_arity(uint_t arity, tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_arity, arity, status); }
+    void on_end_arity(ygg::uint_t arity, tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_arity, arity, status); }
 
     void on_end_search(tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_search, status); }
 
-    void on_solved(uint_t arity) override { NB_OVERRIDE_PURE(on_solved, arity); }
+    void on_solved(ygg::uint_t arity) override { NB_OVERRIDE_PURE(on_solved, arity); }
 
     const tyr::planning::Statistics& get_search_statistics() const override { NB_OVERRIDE_PURE(get_search_statistics); }
 
@@ -89,7 +89,7 @@ void bind_find_solution(nb::module_& m, const std::string& py_name)
 {
     m.def(
         py_name.c_str(),
-        [](brfs::Solver<Kind>& brfs_solver, uint_t max_arity, const Options<Kind>& options) { return find_solution(brfs_solver, max_arity, options); },
+        [](brfs::Solver<Kind>& brfs_solver, ygg::uint_t max_arity, const Options<Kind>& options) { return find_solution(brfs_solver, max_arity, options); },
         nb::call_guard<nb::gil_scoped_release>(),
         "brfs_solver"_a,
         "max_arity"_a,

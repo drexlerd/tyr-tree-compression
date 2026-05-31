@@ -30,8 +30,8 @@
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <tyr/common/python/bindings.hpp>
-#include <tyr/common/python/type_casters.hpp>
+#include "pytyr/bindings.hpp"
+#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
 
 namespace tyr::formalism::planning
@@ -41,7 +41,7 @@ namespace
 template<typename T>
 auto bind_get_or_create_canonical()
 {
-    return [](Repository& self, Data<T>& builder)
+    return [](Repository& self, ygg::Data<T>& builder)
     {
         canonicalize(builder);
         return self.template get_or_create<T>(builder);
@@ -77,13 +77,13 @@ void bind_module_definitions(nb::module_& m)
 
     nb::class_<Minimize>(m, "Minimize")
         .def(nb::init<>())
-        .def("__str__", [](const Minimize& self) { return to_string(self); })
-        .def("__repr__", [](const Minimize& self) { return to_string(self); });
+        .def("__str__", [](const Minimize& self) { return ygg::to_string(self); })
+        .def("__repr__", [](const Minimize& self) { return ygg::to_string(self); });
 
     nb::class_<Maximize>(m, "Maximize")
         .def(nb::init<>())
-        .def("__str__", [](const Maximize& self) { return to_string(self); })
-        .def("__repr__", [](const Maximize& self) { return to_string(self); });
+        .def("__str__", [](const Maximize& self) { return ygg::to_string(self); })
+        .def("__repr__", [](const Maximize& self) { return ygg::to_string(self); });
 
     /**
      * Common
@@ -111,13 +111,13 @@ void bind_module_definitions(nb::module_& m)
     bind_variable_domains(m);
 
     /**
-     * Index
+     * ygg::Index
      */
 
     bind_indices(m);
 
     /**
-     * Data
+     * ygg::Data
      */
 
     bind_datas(m);
@@ -144,71 +144,71 @@ void bind_module_definitions(nb::module_& m)
         auto cls = nb::class_<Repository>(m, "Repository")  //
                        .def(
                            "create",
-                           [](Repository& self, const Data<Term>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<Term>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<FunctionExpression>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<FunctionExpression>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<GroundFunctionExpression>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<GroundFunctionExpression>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<BooleanOperator<Data<FunctionExpression>>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<BooleanOperator<Data<GroundFunctionExpression>>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<ArithmeticOperator<Data<FunctionExpression>>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<ArithmeticOperator<ygg::Data<FunctionExpression>>>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<ArithmeticOperator<Data<GroundFunctionExpression>>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<NumericEffectOperator<FluentTag>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<NumericEffectOperator<FluentTag>>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<NumericEffectOperator<AuxiliaryTag>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<NumericEffectOperator<AuxiliaryTag>>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<GroundNumericEffectOperator<FluentTag>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<GroundNumericEffectOperator<FluentTag>>& builder) { return make_view(builder, self); },
                            "builder"_a)
                        .def(
                            "create",
-                           [](Repository& self, const Data<GroundNumericEffectOperator<AuxiliaryTag>>& builder) { return make_view(builder, self); },
+                           [](Repository& self, const ygg::Data<GroundNumericEffectOperator<AuxiliaryTag>>& builder) { return make_view(builder, self); },
                            "builder"_a)
 
                        .def("get_or_create", bind_get_or_create_canonical<Object>(), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<Variable>(), "builder"_a)
                        .def("get_or_create",
-                            nb::overload_cast<const Data<RelationBinding<Predicate<StaticTag>>>&>(&Repository::get_or_create<Predicate<StaticTag>>),
+                            nb::overload_cast<const ygg::Data<RelationBinding<Predicate<StaticTag>>>&>(&Repository::get_or_create<Predicate<StaticTag>>),
                             "builder"_a)
                        .def("get_or_create",
-                            nb::overload_cast<const Data<RelationBinding<Predicate<FluentTag>>>&>(&Repository::get_or_create<Predicate<FluentTag>>),
+                            nb::overload_cast<const ygg::Data<RelationBinding<Predicate<FluentTag>>>&>(&Repository::get_or_create<Predicate<FluentTag>>),
                             "builder"_a)
                        .def("get_or_create",
-                            nb::overload_cast<const Data<RelationBinding<Predicate<DerivedTag>>>&>(&Repository::get_or_create<Predicate<DerivedTag>>),
+                            nb::overload_cast<const ygg::Data<RelationBinding<Predicate<DerivedTag>>>&>(&Repository::get_or_create<Predicate<DerivedTag>>),
                             "builder"_a)
                        .def("get_or_create",
-                            nb::overload_cast<const Data<RelationBinding<Function<StaticTag>>>&>(&Repository::get_or_create<Function<StaticTag>>),
+                            nb::overload_cast<const ygg::Data<RelationBinding<Function<StaticTag>>>&>(&Repository::get_or_create<Function<StaticTag>>),
                             "builder"_a)
                        .def("get_or_create",
-                            nb::overload_cast<const Data<RelationBinding<Function<FluentTag>>>&>(&Repository::get_or_create<Function<FluentTag>>),
+                            nb::overload_cast<const ygg::Data<RelationBinding<Function<FluentTag>>>&>(&Repository::get_or_create<Function<FluentTag>>),
                             "builder"_a)
                        .def("get_or_create",
-                            nb::overload_cast<const Data<RelationBinding<Function<AuxiliaryTag>>>&>(&Repository::get_or_create<Function<AuxiliaryTag>>),
+                            nb::overload_cast<const ygg::Data<RelationBinding<Function<AuxiliaryTag>>>&>(&Repository::get_or_create<Function<AuxiliaryTag>>),
                             "builder"_a)
-                       .def("get_or_create", nb::overload_cast<const Data<RelationBinding<Action>>&>(&Repository::get_or_create<Action>), "builder"_a)
-                       .def("get_or_create", nb::overload_cast<const Data<RelationBinding<Axiom>>&>(&Repository::get_or_create<Axiom>), "builder"_a)
+                       .def("get_or_create", nb::overload_cast<const ygg::Data<RelationBinding<Action>>&>(&Repository::get_or_create<Action>), "builder"_a)
+                       .def("get_or_create", nb::overload_cast<const ygg::Data<RelationBinding<Axiom>>&>(&Repository::get_or_create<Axiom>), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<Predicate<StaticTag>>(), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<Predicate<FluentTag>>(), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<Predicate<DerivedTag>>(), "builder"_a)
@@ -239,19 +239,19 @@ void bind_module_definitions(nb::module_& m)
                        .def("get_or_create", bind_get_or_create_canonical<GroundFunctionTermValue<FluentTag>>(), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<GroundFunctionTermValue<AuxiliaryTag>>(), "builder"_a)
 
-                       .def("get_or_create", bind_get_or_create_canonical<UnaryOperator<Sub, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Add, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Sub, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Mul, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Div, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Eq, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ne, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ge, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Gt, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Le, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Lt, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Add, Data<FunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Mul, Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<UnaryOperator<Sub, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Add, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Sub, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Mul, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Div, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Eq, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ne, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ge, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Gt, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Le, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Lt, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Add, ygg::Data<FunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Mul, ygg::Data<FunctionExpression>>>(), "builder"_a)
 
                        .def("get_or_create", bind_get_or_create_canonical<NumericEffect<Assign, FluentTag>>(), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<NumericEffect<Increase, FluentTag>>(), "builder"_a)
@@ -266,19 +266,19 @@ void bind_module_definitions(nb::module_& m)
                        .def("get_or_create", bind_get_or_create_canonical<Action>(), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<Axiom>(), "builder"_a)
 
-                       .def("get_or_create", bind_get_or_create_canonical<UnaryOperator<Sub, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Add, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Sub, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Mul, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Div, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Eq, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ne, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ge, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Gt, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Le, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Lt, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Add, Data<GroundFunctionExpression>>>(), "builder"_a)
-                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Mul, Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<UnaryOperator<Sub, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Add, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Sub, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Mul, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Div, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Eq, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ne, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Ge, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Gt, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Le, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<BinaryOperator<Lt, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Add, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
+                       .def("get_or_create", bind_get_or_create_canonical<MultiOperator<Mul, ygg::Data<GroundFunctionExpression>>>(), "builder"_a)
 
                        .def("get_or_create", bind_get_or_create_canonical<GroundNumericEffect<Assign, FluentTag>>(), "builder"_a)
                        .def("get_or_create", bind_get_or_create_canonical<GroundNumericEffect<Increase, FluentTag>>(), "builder"_a)

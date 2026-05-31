@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_CONJUNCTIVE_CONDITION_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_CONJUNCTIVE_CONDITION_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/mutable/literal.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/unification/structure_traits.hpp"
@@ -67,12 +67,12 @@ struct MutableConjunctiveCondition
 
     friend bool operator==(const MutableConjunctiveCondition& lhs, const MutableConjunctiveCondition& rhs)
     {
-        return EqualTo<MutableConjunctiveCondition> {}(lhs, rhs);
+        return ygg::EqualTo<MutableConjunctiveCondition> {}(lhs, rhs);
     }
 
     friend bool operator<(const MutableConjunctiveCondition& lhs, const MutableConjunctiveCondition& rhs)
     {
-        return Less<MutableConjunctiveCondition> {}(lhs, rhs);
+        return ygg::Less<MutableConjunctiveCondition> {}(lhs, rhs);
     }
 };
 

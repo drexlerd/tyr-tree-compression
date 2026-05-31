@@ -1,9 +1,9 @@
 #ifndef TYR_SOLVER_POLICIES_NUMERIC_SUPPORT_HPP_
 #define TYR_SOLVER_POLICIES_NUMERIC_SUPPORT_HPP_
 
-#include "tyr/common/closed_interval.hpp"
-#include "tyr/common/config.hpp"
-#include "tyr/common/equal_to.hpp"
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -21,8 +21,8 @@ class NumericSupportSelectorWorkspace
 public:
     struct SelectionEntry
     {
-        formalism::datalog::FunctionBindingView<formalism::FluentTag> binding;
-        ClosedInterval<float_t> interval;
+        ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding;
+        ygg::ClosedInterval<ygg::float_t> interval;
         const NumericIntervalAnnotation* annotation;
         Cost cost;
 
@@ -39,18 +39,18 @@ class NumericSupportSelector
 public:
     NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations& annotations);
 
-    ClosedInterval<float_t> select_fluent_interval(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding,
+    ygg::ClosedInterval<ygg::float_t> select_fluent_interval(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                                    std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
 
     template<typename AggregationFunction>
     Cost
-    get_constraint_cost(formalism::datalog::GroundBooleanOperatorView constraint, NumericSupportSelectorWorkspace& workspace, AggregationFunction agg) const
+    get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint, NumericSupportSelectorWorkspace& workspace, AggregationFunction agg) const
     {
         return get_greedy_support_cost(workspace.selection, agg, [&](auto& selection) { return is_supported(constraint, selection); });
     }
 
     template<typename AggregationFunction, typename Callback>
-    Cost for_each_constraint_support(formalism::datalog::GroundBooleanOperatorView constraint,
+    Cost for_each_constraint_support(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
                                      NumericSupportSelectorWorkspace& workspace,
                                      AggregationFunction agg,
                                      Callback callback) const
@@ -137,18 +137,18 @@ private:
         return cost;
     }
 
-    bool is_supported(formalism::datalog::GroundBooleanOperatorView element, std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
+    bool is_supported(::tyr::formalism::datalog::GroundBooleanOperatorView element, std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
 
-    const NumericIntervalAnnotations::Entries* find_entries(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding) const;
-    ClosedInterval<float_t> current_interval(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding) const;
-    Cost get_current_interval_cost(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding, ClosedInterval<float_t> current) const;
-    bool is_available(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding, ClosedInterval<float_t> interval) const;
-    NumericSupportSelectorWorkspace::SelectionEntry* find_selection_entry(formalism::datalog::FunctionBindingView<formalism::FluentTag> binding,
+    const NumericIntervalAnnotations::Entries* find_entries(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
+    ygg::ClosedInterval<ygg::float_t> current_interval(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
+    Cost get_current_interval_cost(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding, ygg::ClosedInterval<ygg::float_t> current) const;
+    bool is_available(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding, ygg::ClosedInterval<ygg::float_t> interval) const;
+    NumericSupportSelectorWorkspace::SelectionEntry* find_selection_entry(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                                                           std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
 
     FactSets m_fact_sets;
     const NumericIntervalAnnotations& m_annotations;
-    EqualTo<formalism::datalog::FunctionBindingView<formalism::FluentTag>> m_binding_equal;
+    ygg::EqualTo<::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>> m_binding_equal;
 };
 }
 

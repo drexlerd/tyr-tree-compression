@@ -18,7 +18,7 @@
 #ifndef TYR_DATALOG_CONTEXTS_PROGRAM_HPP_
 #define TYR_DATALOG_CONTEXTS_PROGRAM_HPP_
 
-#include "tyr/common/onetbb.hpp"
+#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/datalog/contexts/stratum.hpp"
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/fact_sets.hpp"
@@ -66,7 +66,7 @@ struct ProgramExecutionContext
             assert(m_ws.numeric_support_selector.has_value());
             return *m_ws.numeric_support_selector;
         }
-        void rebuild_numeric_support_selector(const TaggedFactSets<formalism::StaticTag>& static_fact_sets)
+        void rebuild_numeric_support_selector(const TaggedFactSets<::tyr::formalism::StaticTag>& static_fact_sets)
         {
             m_ws.numeric_support_selector.emplace(FactSets { static_fact_sets, m_ws.facts.fact_sets }, m_ws.numeric_and_annot);
         }
@@ -127,7 +127,7 @@ struct ProgramExecutionContext
             const auto bindings = set.get_bindings();
             const auto& values = set.get_values();
 
-            for (uint_t i = 0; i < bindings.size(); ++i)
+            for (ygg::uint_t i = 0; i < bindings.size(); ++i)
             {
                 out.or_ap().initialize_annotation(bindings[i], values[i], out.numeric_and_annot());
                 out.facts().assignment_sets.function.insert(bindings[i], values[i]);

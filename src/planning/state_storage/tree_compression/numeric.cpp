@@ -38,7 +38,7 @@ typename NumericStorageBackend<Kind, TreeCompression>::Packed
 NumericStorageBackend<Kind, TreeCompression>::insert(typename NumericStorageBackend<Kind, TreeCompression>::Unpacked& unpacked)
 {
     for (auto& value : unpacked.values)
-        value = FloatTolerance<float_t>::canonicalize(value);
+        value = ygg::FloatTolerance<ygg::float_t>::canonicalize(value);
 
     m_uint_node_buffer.clear();
     valla::encode_as_unsigned_integrals(unpacked.values, m_float_nodes, std::back_inserter(m_uint_node_buffer));

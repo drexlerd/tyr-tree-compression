@@ -18,32 +18,34 @@
 #ifndef TYR_FORMALISM_PLANNING_CONJUNCTIVE_CONDITION_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_CONJUNCTIVE_CONDITION_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/boolean_operator_data.hpp"
 #include "tyr/formalism/planning/conjunctive_condition_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/literal_index.hpp"
 #include "tyr/formalism/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::planning::ConjunctiveCondition>
+struct Data<::tyr::formalism::planning::ConjunctiveCondition>
 {
-    Index<formalism::planning::ConjunctiveCondition> index;
-    IndexList<formalism::Variable> variables;
-    IndexList<formalism::planning::Literal<formalism::StaticTag>> static_literals;
-    IndexList<formalism::planning::Literal<formalism::FluentTag>> fluent_literals;
-    IndexList<formalism::planning::Literal<formalism::DerivedTag>> derived_literals;
-    DataList<formalism::planning::BooleanOperator<Data<formalism::planning::FunctionExpression>>> numeric_constraints;
+    ygg::Index<::tyr::formalism::planning::ConjunctiveCondition> index;
+    ygg::IndexList<::tyr::formalism::Variable> variables;
+    ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::StaticTag>> static_literals;
+    ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::FluentTag>> fluent_literals;
+    ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::DerivedTag>> derived_literals;
+    ygg::DataList<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::FunctionExpression>>> numeric_constraints;
 
     Data() = default;
-    Data(IndexList<formalism::Variable> variables_,
-         IndexList<formalism::planning::Literal<formalism::StaticTag>> static_literals_,
-         IndexList<formalism::planning::Literal<formalism::FluentTag>> fluent_literals_,
-         IndexList<formalism::planning::Literal<formalism::DerivedTag>> derived_literals_,
-         DataList<formalism::planning::BooleanOperator<Data<formalism::planning::FunctionExpression>>> numeric_constraints_) :
+    Data(ygg::IndexList<::tyr::formalism::Variable> variables_,
+         ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::StaticTag>> static_literals_,
+         ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::FluentTag>> fluent_literals_,
+         ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::DerivedTag>> derived_literals_,
+         ygg::DataList<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::FunctionExpression>>> numeric_constraints_) :
         index(),
         variables(std::move(variables_)),
         static_literals(std::move(static_literals_)),
@@ -54,11 +56,11 @@ struct Data<formalism::planning::ConjunctiveCondition>
     }
     // Python constructor
     template<typename C>
-    Data(const std::vector<View<Index<formalism::Variable>, C>>& variables_,
-         const std::vector<View<Index<formalism::planning::Literal<formalism::StaticTag>>, C>>& static_literals_,
-         const std::vector<View<Index<formalism::planning::Literal<formalism::FluentTag>>, C>>& fluent_literals_,
-         const std::vector<View<Index<formalism::planning::Literal<formalism::DerivedTag>>, C>>& derived_literals_,
-         const std::vector<View<Data<formalism::planning::BooleanOperator<Data<formalism::planning::FunctionExpression>>>, C>>& numeric_constraints_) :
+    Data(const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Variable>, C>>& variables_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::Literal<::tyr::formalism::StaticTag>>, C>>& static_literals_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::Literal<::tyr::formalism::FluentTag>>, C>>& fluent_literals_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::Literal<::tyr::formalism::DerivedTag>>, C>>& derived_literals_,
+         const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::FunctionExpression>>>, C>>& numeric_constraints_) :
         index(),
         variables(),
         static_literals(),
@@ -79,32 +81,32 @@ struct Data<formalism::planning::ConjunctiveCondition>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(variables);
-        tyr::clear(static_literals);
-        tyr::clear(fluent_literals);
-        tyr::clear(derived_literals);
-        tyr::clear(numeric_constraints);
+        ygg::clear(index);
+        ygg::clear(variables);
+        ygg::clear(static_literals);
+        ygg::clear(fluent_literals);
+        ygg::clear(derived_literals);
+        ygg::clear(numeric_constraints);
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_literals() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_literals;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_literals;
-        else if constexpr (std::same_as<T, formalism::DerivedTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::DerivedTag>)
             return derived_literals;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     auto cista_members() const noexcept { return std::tie(index, variables, static_literals, fluent_literals, derived_literals, numeric_constraints); }
     auto identifying_members() const noexcept { return std::tie(variables, static_literals, fluent_literals, derived_literals, numeric_constraints); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::ConjunctiveCondition>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::ConjunctiveCondition>);
 }
 
 #endif

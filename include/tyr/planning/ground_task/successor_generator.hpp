@@ -21,7 +21,7 @@
 #include "tyr/planning/ground_task/node.hpp"        // for Node
 #include "tyr/planning/ground_task/state_view.hpp"  // for State
 //
-#include "tyr/formalism/planning/ground_action_index.hpp"  // for Index
+#include "tyr/formalism/planning/ground_action_index.hpp"  // for ygg::Index
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/planning/action_executor.hpp"
 #include "tyr/planning/declarations.hpp"
@@ -36,7 +36,7 @@ class SuccessorGenerator<GroundTag>
     friend class SuccessorGeneratorFactory<GroundTag>;
 
 private:
-    SuccessorGenerator(uint_t index, TaskPtr<GroundTag> task, ExecutionContextPtr execution_context, StateRepositoryPtr<GroundTag> state_repository);
+    SuccessorGenerator(ygg::uint_t index, TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, StateRepositoryPtr<GroundTag> state_repository);
 
 public:
     Node<GroundTag> get_initial_node();
@@ -44,19 +44,19 @@ public:
     std::vector<LabeledNode<GroundTag>> get_labeled_successor_nodes(const Node<GroundTag>& node);
     void get_labeled_successor_nodes(const Node<GroundTag>& node, std::vector<LabeledNode<GroundTag>>& out_nodes);
 
-    Node<GroundTag> get_successor_node(const Node<GroundTag>& node, formalism::planning::GroundActionView action);
-    formalism::planning::GroundActionView get_ground_action(formalism::planning::ActionBindingView binding) const;
+    Node<GroundTag> get_successor_node(const Node<GroundTag>& node, ::tyr::formalism::planning::GroundActionView action);
+    ::tyr::formalism::planning::GroundActionView get_ground_action(::tyr::formalism::planning::ActionBindingView binding) const;
 
-    Node<GroundTag> get_node(Index<State<GroundTag>> state_index);
+    Node<GroundTag> get_node(ygg::Index<State<GroundTag>> state_index);
 
     const auto& get_state_repository() const noexcept { return m_state_repository; }
     auto get_index() const noexcept { return m_index; }
 
 private:
-    uint_t m_index;
+    ygg::uint_t m_index;
     TaskPtr<GroundTag> m_task;
 
-    IndexList<formalism::planning::GroundAction> m_applicable_actions;
+    ygg::IndexList<::tyr::formalism::planning::GroundAction> m_applicable_actions;
 
     StateRepositoryPtr<GroundTag> m_state_repository;
 

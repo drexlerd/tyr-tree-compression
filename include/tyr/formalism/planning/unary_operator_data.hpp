@@ -18,28 +18,30 @@
 #ifndef TYR_FORMALISM_PLANNING_UNARY_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_UNARY_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/function_expression_data.hpp"
 #include "tyr/formalism/planning/ground_function_expression_data.hpp"
 #include "tyr/formalism/planning/unary_operator_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T>
-struct Data<formalism::planning::UnaryOperator<Op, T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::OpKind Op, typename T>
+struct Data<::tyr::formalism::planning::UnaryOperator<Op, T>>
 {
     using OpType = Op;
 
-    Index<formalism::planning::UnaryOperator<Op, T>> index;
+    ygg::Index<::tyr::formalism::planning::UnaryOperator<Op, T>> index;
     T arg;
 
     Data() = default;
     Data(T arg_) : index(), arg(arg_) {}
     // Python constructor
     template<typename C>
-    Data(View<T, C> arg_) : index(), arg()
+    Data(::ygg::View<T, C> arg_) : index(), arg()
     {
         set(arg_, arg);
     }
@@ -50,15 +52,15 @@ struct Data<formalism::planning::UnaryOperator<Op, T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(arg);
+        ygg::clear(index);
+        ygg::clear(arg);
     }
 
     auto cista_members() const noexcept { return std::tie(index, arg); }
     auto identifying_members() const noexcept { return std::tie(Op::kind, arg); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::UnaryOperator<formalism::Add, Data<formalism::planning::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::UnaryOperator<::tyr::formalism::Add, ygg::Data<::tyr::formalism::planning::FunctionExpression>>>);
 
 }
 

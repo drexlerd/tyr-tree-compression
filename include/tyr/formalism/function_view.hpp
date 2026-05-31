@@ -18,21 +18,22 @@
 #ifndef TYR_FORMALISM_FUNCTION_VIEW_HPP_
 #define TYR_FORMALISM_FUNCTION_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/function_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T, typename C>
-class View<Index<formalism::Function<T>>, C>
+using namespace ::tyr;
+template<::tyr::formalism::FactKind T, typename C>
+class View<ygg::Index<::tyr::formalism::Function<T>>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::Function<T>> m_handle;
+    ygg::Index<::tyr::formalism::Function<T>> m_handle;
 
 public:
-    View(Index<formalism::Function<T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::Function<T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }

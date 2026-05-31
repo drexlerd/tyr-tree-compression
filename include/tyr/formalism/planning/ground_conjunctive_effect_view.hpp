@@ -18,40 +18,41 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_CONJUNCTIVE_EFFECT_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_CONJUNCTIVE_EFFECT_VIEW_HPP_
 
-#include "tyr/common/optional.hpp"
-#include "tyr/common/types.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/fdr_fact_view.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_effect_index.hpp"
 #include "tyr/formalism/planning/ground_literal_view.hpp"
 #include "tyr/formalism/planning/ground_numeric_effect_operator_view.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::planning::Context C>
-class View<Index<formalism::planning::GroundConjunctiveEffect>, C>
+template<::tyr::formalism::planning::Context C>
+class View<ygg::Index<::tyr::formalism::planning::GroundConjunctiveEffect>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::planning::GroundConjunctiveEffect> m_handle;
+    ygg::Index<::tyr::formalism::planning::GroundConjunctiveEffect> m_handle;
 
 public:
-    View(Index<formalism::planning::GroundConjunctiveEffect> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::planning::GroundConjunctiveEffect> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
 
     auto get_index() const noexcept { return m_handle; }
-    template<formalism::PolarityKind T>
+    template<::tyr::formalism::PolarityKind T>
     auto get_facts() const noexcept
     {
-        return make_view(get_data().template get_facts<T>(), *m_context);
+        return ygg::make_view(get_data().template get_facts<T>(), *m_context);
     }
-    auto get_numeric_effects() const noexcept { return make_view(get_data().numeric_effects, *m_context); }
-    auto get_auxiliary_numeric_effect() const noexcept { return make_view(get_data().auxiliary_numeric_effect, *m_context); }
+    auto get_numeric_effects() const noexcept { return ygg::make_view(get_data().numeric_effects, *m_context); }
+    auto get_auxiliary_numeric_effect() const noexcept { return ygg::make_view(get_data().auxiliary_numeric_effect, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

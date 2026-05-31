@@ -18,34 +18,36 @@
 #ifndef TYR_FORMALISM_PLANNING_BOOLEAN_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_BOOLEAN_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/binary_operator_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 
 #include <variant>
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<typename T>
-struct Data<formalism::planning::BooleanOperator<T>>
+struct Data<::tyr::formalism::planning::BooleanOperator<T>>
 {
-    using Variant = ::cista::offset::variant<Index<formalism::planning::BinaryOperator<formalism::Eq, T>>,
-                                             Index<formalism::planning::BinaryOperator<formalism::Ne, T>>,
-                                             Index<formalism::planning::BinaryOperator<formalism::Le, T>>,
-                                             Index<formalism::planning::BinaryOperator<formalism::Lt, T>>,
-                                             Index<formalism::planning::BinaryOperator<formalism::Ge, T>>,
-                                             Index<formalism::planning::BinaryOperator<formalism::Gt, T>>>;
+    using Variant = ::cista::offset::variant<ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Eq, T>>,
+                                             ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Ne, T>>,
+                                             ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Le, T>>,
+                                             ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Lt, T>>,
+                                             ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Ge, T>>,
+                                             ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Gt, T>>>;
 
     Variant value;
 
     template<typename C>
-    using ViewVariant = std::variant<View<Index<formalism::planning::BinaryOperator<formalism::Eq, T>>, C>,
-                                     View<Index<formalism::planning::BinaryOperator<formalism::Ne, T>>, C>,
-                                     View<Index<formalism::planning::BinaryOperator<formalism::Le, T>>, C>,
-                                     View<Index<formalism::planning::BinaryOperator<formalism::Lt, T>>, C>,
-                                     View<Index<formalism::planning::BinaryOperator<formalism::Ge, T>>, C>,
-                                     View<Index<formalism::planning::BinaryOperator<formalism::Gt, T>>, C>>;
+    using ViewVariant = std::variant<::ygg::View<ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Eq, T>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Ne, T>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Le, T>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Lt, T>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Ge, T>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::BinaryOperator<::tyr::formalism::Gt, T>>, C>>;
 
     Data() = default;
     Data(Variant value_) : value(value_) {}
@@ -55,13 +57,13 @@ struct Data<formalism::planning::BooleanOperator<T>>
     {
     }
 
-    void clear() noexcept { tyr::clear(value); }
+    void clear() noexcept { ygg::clear(value); }
 
     auto cista_members() const noexcept { return std::tie(value); }
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::BooleanOperator<Data<formalism::planning::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::FunctionExpression>>>);
 }
 
 #endif

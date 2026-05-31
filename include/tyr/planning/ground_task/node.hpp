@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_NODE_HPP_
 #define TYR_PLANNING_GROUND_TASK_NODE_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task/state_view.hpp"
 #include "tyr/planning/node.hpp"
@@ -37,16 +37,16 @@ class Node<GroundTag>
 public:
     using TaskType = Task<GroundTag>;
 
-    Node(StateView<GroundTag> state, float_t metric) noexcept : m_state(std::move(state)), m_metric(metric) {}
+    Node(StateView<GroundTag> state, ygg::float_t metric) noexcept : m_state(std::move(state)), m_metric(metric) {}
 
     const StateView<GroundTag>& get_state() const noexcept { return m_state; }
-    float_t get_metric() const noexcept { return m_metric; }
+    ygg::float_t get_metric() const noexcept { return m_metric; }
 
     auto identifying_members() const noexcept { return std::tie(m_state, m_metric); }
 
 private:
     StateView<GroundTag> m_state;
-    float_t m_metric;
+    ygg::float_t m_metric;
 };
 
 }

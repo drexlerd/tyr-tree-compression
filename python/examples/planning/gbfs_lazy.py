@@ -21,9 +21,7 @@ from queue import PriorityQueue
 from dataclasses import dataclass
 from enum import Enum
 
-from pytyr.common import (
-    ExecutionContext
-)
+from pyyggdrasil import ExecutionContext
 
 from pytyr.formalism.planning import (
     ParserOptions, 

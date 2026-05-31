@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_DOMAIN_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_DOMAIN_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/function_index.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/planning/action_index.hpp"
@@ -29,35 +29,37 @@
 #include "tyr/formalism/planning/task_index.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::Domain>
+struct Data<::tyr::formalism::planning::Domain>
 {
-    Index<formalism::planning::Domain> index;
+    ygg::Index<::tyr::formalism::planning::Domain> index;
     ::cista::offset::string name;
-    IndexList<formalism::Predicate<formalism::StaticTag>> static_predicates;
-    IndexList<formalism::Predicate<formalism::FluentTag>> fluent_predicates;
-    IndexList<formalism::Predicate<formalism::DerivedTag>> derived_predicates;
-    IndexList<formalism::Function<formalism::StaticTag>> static_functions;
-    IndexList<formalism::Function<formalism::FluentTag>> fluent_functions;
-    ::cista::optional<Index<formalism::Function<formalism::AuxiliaryTag>>> auxiliary_function;
-    IndexList<formalism::Object> constants;
-    IndexList<formalism::planning::Action> actions;
-    IndexList<formalism::planning::Axiom> axioms;
+    ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>> static_predicates;
+    ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> fluent_predicates;
+    ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::DerivedTag>> derived_predicates;
+    ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::StaticTag>> static_functions;
+    ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::FluentTag>> fluent_functions;
+    ::cista::optional<ygg::Index<::tyr::formalism::Function<::tyr::formalism::AuxiliaryTag>>> auxiliary_function;
+    ygg::IndexList<::tyr::formalism::Object> constants;
+    ygg::IndexList<::tyr::formalism::planning::Action> actions;
+    ygg::IndexList<::tyr::formalism::planning::Axiom> axioms;
 
     Data() = default;
     Data(::cista::offset::string name_,
-         IndexList<formalism::Predicate<formalism::StaticTag>> static_predicates_,
-         IndexList<formalism::Predicate<formalism::FluentTag>> fluent_predicates_,
-         IndexList<formalism::Predicate<formalism::DerivedTag>> derived_predicates_,
-         IndexList<formalism::Function<formalism::StaticTag>> static_functions_,
-         IndexList<formalism::Function<formalism::FluentTag>> fluent_functions_,
-         ::cista::optional<Index<formalism::Function<formalism::AuxiliaryTag>>> auxiliary_function_,
-         IndexList<formalism::Object> constants_,
-         IndexList<formalism::planning::Action> actions_,
-         IndexList<formalism::planning::Axiom> axioms_) :
+         ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>> static_predicates_,
+         ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> fluent_predicates_,
+         ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::DerivedTag>> derived_predicates_,
+         ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::StaticTag>> static_functions_,
+         ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::FluentTag>> fluent_functions_,
+         ::cista::optional<ygg::Index<::tyr::formalism::Function<::tyr::formalism::AuxiliaryTag>>> auxiliary_function_,
+         ygg::IndexList<::tyr::formalism::Object> constants_,
+         ygg::IndexList<::tyr::formalism::planning::Action> actions_,
+         ygg::IndexList<::tyr::formalism::planning::Axiom> axioms_) :
         index(),
         name(std::move(name_)),
         static_predicates(std::move(static_predicates_)),
@@ -74,15 +76,15 @@ struct Data<formalism::planning::Domain>
     // Python constructor
     template<typename C>
     Data(const std::string& name_,
-         const std::vector<View<Index<formalism::Predicate<formalism::StaticTag>>, C>>& static_predicates_,
-         const std::vector<View<Index<formalism::Predicate<formalism::FluentTag>>, C>>& fluent_predicates_,
-         const std::vector<View<Index<formalism::Predicate<formalism::DerivedTag>>, C>>& derived_predicates_,
-         const std::vector<View<Index<formalism::Function<formalism::StaticTag>>, C>>& static_functions_,
-         const std::vector<View<Index<formalism::Function<formalism::FluentTag>>, C>>& fluent_functions_,
-         const std::optional<View<Index<formalism::Function<formalism::AuxiliaryTag>>, C>>& auxiliary_function_,
-         const std::vector<View<Index<formalism::Object>, C>>& constants_,
-         const std::vector<View<Index<formalism::planning::Action>, C>>& actions_,
-         const std::vector<View<Index<formalism::planning::Axiom>, C>>& axioms_) :
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>>, C>>& static_predicates_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>>, C>>& fluent_predicates_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::DerivedTag>>, C>>& derived_predicates_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Function<::tyr::formalism::StaticTag>>, C>>& static_functions_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Function<::tyr::formalism::FluentTag>>, C>>& fluent_functions_,
+         const std::optional<::ygg::View<ygg::Index<::tyr::formalism::Function<::tyr::formalism::AuxiliaryTag>>, C>>& auxiliary_function_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Object>, C>>& constants_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::Action>, C>>& actions_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::Axiom>, C>>& axioms_) :
         index(),
         name(name_),
         static_predicates(),
@@ -112,41 +114,41 @@ struct Data<formalism::planning::Domain>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(name);
-        tyr::clear(static_predicates);
-        tyr::clear(fluent_predicates);
-        tyr::clear(derived_predicates);
-        tyr::clear(static_functions);
-        tyr::clear(fluent_functions);
-        tyr::clear(auxiliary_function);
-        tyr::clear(constants);
-        tyr::clear(actions);
-        tyr::clear(axioms);
+        ygg::clear(index);
+        ygg::clear(name);
+        ygg::clear(static_predicates);
+        ygg::clear(fluent_predicates);
+        ygg::clear(derived_predicates);
+        ygg::clear(static_functions);
+        ygg::clear(fluent_functions);
+        ygg::clear(auxiliary_function);
+        ygg::clear(constants);
+        ygg::clear(actions);
+        ygg::clear(axioms);
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_predicates() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_predicates;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_predicates;
-        else if constexpr (std::same_as<T, formalism::DerivedTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::DerivedTag>)
             return derived_predicates;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_functions() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_functions;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_functions;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     auto cista_members() const noexcept
@@ -178,7 +180,7 @@ struct Data<formalism::planning::Domain>
     }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::Domain>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::Domain>);
 }
 
 #endif

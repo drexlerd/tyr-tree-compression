@@ -61,10 +61,10 @@ public:
     virtual void on_prune_node(const Node<Kind>& source_node, const LabeledNode<Kind>& labeled_succ_node) = 0;
 
     /// @brief React on starting a search.
-    virtual void on_start_search(const Node<Kind>& node, float_t h_value) = 0;
+    virtual void on_start_search(const Node<Kind>& node, ygg::float_t h_value) = 0;
 
     /// @brief React on new best h_value
-    virtual void on_new_best_h_value(float_t h_value) = 0;
+    virtual void on_new_best_h_value(ygg::float_t h_value) = 0;
 
     /// @brief React on ending a search.
     virtual void on_end_search(tyr::planning::SearchStatus status) = 0;
@@ -147,7 +147,7 @@ public:
         }
     }
 
-    void on_start_search(const Node<Kind>& node, float_t h_value) override
+    void on_start_search(const Node<Kind>& node, ygg::float_t h_value) override
     {
         m_statistics = tyr::planning::Statistics();
 
@@ -159,7 +159,7 @@ public:
         }
     }
 
-    void on_new_best_h_value(float_t h_value) override
+    void on_new_best_h_value(ygg::float_t h_value) override
     {
         if (verbosity(1))
         {
@@ -207,9 +207,9 @@ private:
 
     void on_prune_node_impl(const Node<Kind>& node) const;
 
-    void on_start_search_impl(const Node<Kind>& node, float_t h_value) const;
+    void on_start_search_impl(const Node<Kind>& node, ygg::float_t h_value) const;
 
-    void on_new_best_h_value_impl(float_t h_value, uint64_t num_expanded_states, uint64_t num_generated_states) const;
+    void on_new_best_h_value_impl(ygg::float_t h_value, uint64_t num_expanded_states, uint64_t num_generated_states) const;
 
     void on_end_search_impl(tyr::planning::SearchStatus status) const;
 

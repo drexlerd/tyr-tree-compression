@@ -18,11 +18,11 @@
 #ifndef TYR_FORMALISM_FDR_CONTEXT_HPP_
 #define TYR_FORMALISM_FDR_CONTEXT_HPP_
 
-#include "tyr/buffer/declarations.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/types.hpp"
-#include "tyr/common/associative_containers.hpp"
+#include <yggdrasil/buffer/declarations.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/associative_containers.hpp>
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -48,21 +48,21 @@ public:
     // Copy the FDRContext.
     FDRContext(const FDRContext& other, Builder& builder, RepositoryPtr context);
 
-    Data<FDRFact<FluentTag>> get_fact(Index<GroundAtom<FluentTag>> atom);
-    Data<FDRFact<FluentTag>> get_fact(GroundAtomView<FluentTag> atom);
+    ygg::Data<FDRFact<FluentTag>> get_fact(ygg::Index<GroundAtom<FluentTag>> atom);
+    ygg::Data<FDRFact<FluentTag>> get_fact(GroundAtomView<FluentTag> atom);
     FDRFactView<FluentTag> get_fact_view(GroundAtomView<FluentTag> atom);
 
-    std::optional<Data<FDRFact<FluentTag>>> get_fact(Index<GroundAtom<FluentTag>> atom) const;
-    std::optional<Data<FDRFact<FluentTag>>> get_fact(GroundAtomView<FluentTag> atom) const;
+    std::optional<ygg::Data<FDRFact<FluentTag>>> get_fact(ygg::Index<GroundAtom<FluentTag>> atom) const;
+    std::optional<ygg::Data<FDRFact<FluentTag>>> get_fact(GroundAtomView<FluentTag> atom) const;
     std::optional<FDRFactView<FluentTag>> get_fact_view(GroundAtomView<FluentTag> atom) const;
 
     FDRVariableListView<FluentTag> get_variables() const;
 
 private:
     RepositoryPtr m_context;
-    Data<FDRVariable<FluentTag>> m_builder;
-    IndexList<FDRVariable<FluentTag>> m_variables;
-    UnorderedMap<Index<GroundAtom<FluentTag>>, Data<FDRFact<FluentTag>>> m_mapping;
+    ygg::Data<FDRVariable<FluentTag>> m_builder;
+    ygg::IndexList<FDRVariable<FluentTag>> m_variables;
+    ygg::UnorderedMap<ygg::Index<GroundAtom<FluentTag>>, ygg::Data<FDRFact<FluentTag>>> m_mapping;
 };
 
 }

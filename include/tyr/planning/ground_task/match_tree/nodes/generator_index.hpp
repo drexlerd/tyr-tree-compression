@@ -18,17 +18,17 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_GENERATOR_INDEX_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_GENERATOR_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
 template<typename Tag>
-struct Index<planning::match_tree::ElementGeneratorNode<Tag>> : IndexMixin<Index<planning::match_tree::ElementGeneratorNode<Tag>>>
+struct Index<tyr::planning::match_tree::ElementGeneratorNode<Tag>> : ygg::IndexMixin<ygg::Index<tyr::planning::match_tree::ElementGeneratorNode<Tag>>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<planning::match_tree::ElementGeneratorNode<Tag>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::planning::match_tree::ElementGeneratorNode<Tag>>>;
     using Base::Base;
 };
 

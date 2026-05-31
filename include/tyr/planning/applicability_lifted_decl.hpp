@@ -28,8 +28,8 @@ namespace tyr::planning
 struct ApplicabilityContext
 {
     const StateContext<LiftedTag>& state;
-    formalism::planning::GrounderContext& grounder;
-    const formalism::planning::FDRContext& fdr;
+    ::tyr::formalism::planning::GrounderContext& grounder;
+    const ::tyr::formalism::planning::FDRContext& fdr;
 };
 }
 

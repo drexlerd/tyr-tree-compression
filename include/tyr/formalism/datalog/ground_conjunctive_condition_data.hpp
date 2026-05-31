@@ -18,29 +18,31 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_CONJUNCTIVE_CONDITION_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_CONJUNCTIVE_CONDITION_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/boolean_operator_data.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_conjunctive_condition_index.hpp"
 #include "tyr/formalism/datalog/ground_literal_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::datalog::GroundConjunctiveCondition>
+struct Data<::tyr::formalism::datalog::GroundConjunctiveCondition>
 {
-    Index<formalism::datalog::GroundConjunctiveCondition> index;
-    IndexList<formalism::datalog::GroundLiteral<formalism::StaticTag>> static_literals;
-    IndexList<formalism::datalog::GroundLiteral<formalism::FluentTag>> fluent_literals;
-    DataList<formalism::datalog::BooleanOperator<Data<formalism::datalog::GroundFunctionExpression>>> numeric_constraints;
+    ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition> index;
+    ygg::IndexList<::tyr::formalism::datalog::GroundLiteral<::tyr::formalism::StaticTag>> static_literals;
+    ygg::IndexList<::tyr::formalism::datalog::GroundLiteral<::tyr::formalism::FluentTag>> fluent_literals;
+    ygg::DataList<::tyr::formalism::datalog::BooleanOperator<ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>>> numeric_constraints;
 
     Data() = default;
-    Data(Index<formalism::datalog::GroundConjunctiveCondition> index,
-         IndexList<formalism::datalog::GroundLiteral<formalism::StaticTag>> static_literals,
-         IndexList<formalism::datalog::GroundLiteral<formalism::FluentTag>> fluent_literals,
-         DataList<formalism::datalog::BooleanOperator<Data<formalism::datalog::GroundFunctionExpression>>> numeric_constraints) :
+    Data(ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition> index,
+         ygg::IndexList<::tyr::formalism::datalog::GroundLiteral<::tyr::formalism::StaticTag>> static_literals,
+         ygg::IndexList<::tyr::formalism::datalog::GroundLiteral<::tyr::formalism::FluentTag>> fluent_literals,
+         ygg::DataList<::tyr::formalism::datalog::BooleanOperator<ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>>> numeric_constraints) :
         index(index),
         static_literals(std::move(static_literals)),
         fluent_literals(std::move(fluent_literals)),
@@ -54,28 +56,28 @@ struct Data<formalism::datalog::GroundConjunctiveCondition>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(static_literals);
-        tyr::clear(fluent_literals);
-        tyr::clear(numeric_constraints);
+        ygg::clear(index);
+        ygg::clear(static_literals);
+        ygg::clear(fluent_literals);
+        ygg::clear(numeric_constraints);
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_literals() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_literals;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_literals;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     auto cista_members() const noexcept { return std::tie(index, static_literals, fluent_literals, numeric_constraints); }
     auto identifying_members() const noexcept { return std::tie(static_literals, fluent_literals, numeric_constraints); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::GroundConjunctiveCondition>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::GroundConjunctiveCondition>);
 }
 
 #endif

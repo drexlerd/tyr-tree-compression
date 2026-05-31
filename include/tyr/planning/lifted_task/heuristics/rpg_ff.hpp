@@ -44,50 +44,50 @@ class FFRPGHeuristic<LiftedTag> :
                    datalog::TerminationPolicy<datalog::SumAggregation>>
 {
 public:
-    FFRPGHeuristic(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context);
+    FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context);
 
-    static FFRPGHeuristicPtr<LiftedTag> create(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context);
+    static FFRPGHeuristicPtr<LiftedTag> create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context);
 
-    float_t extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state);
+    ygg::float_t extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state);
 
-    const UnorderedSet<Index<formalism::planning::GroundAction>>& get_preferred_actions() override;
+    const ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>>& get_preferred_actions() override;
 
-    const UnorderedSet<formalism::planning::GroundActionView>& get_preferred_action_views() override;
+    const ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView>& get_preferred_action_views() override;
 
-    bool mark_atom(formalism::datalog::PredicateBindingView<formalism::FluentTag> atom);
-    bool mark_function(formalism::datalog::FunctionBindingView<formalism::FluentTag> function);
+    bool mark_atom(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> atom);
+    bool mark_function(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> function);
 
 private:
-    void extract_relaxed_plan_and_preferred_actions(formalism::datalog::PredicateBindingView<formalism::FluentTag> atom,
+    void extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> atom,
                                                     const StateContext<LiftedTag>& state_context,
-                                                    formalism::planning::GrounderContext& grounder_context);
-    void extract_relaxed_plan_and_preferred_actions(formalism::datalog::FunctionBindingView<formalism::FluentTag> function,
+                                                    ::tyr::formalism::planning::GrounderContext& grounder_context);
+    void extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> function,
                                                     const StateContext<LiftedTag>& state_context,
-                                                    formalism::planning::GrounderContext& grounder_context);
-    void extract_relaxed_plan_and_preferred_actions(formalism::datalog::FunctionBindingView<formalism::FluentTag> function,
+                                                    ::tyr::formalism::planning::GrounderContext& grounder_context);
+    void extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> function,
                                                     const datalog::Annotation& annotation,
                                                     const StateContext<LiftedTag>& state_context,
-                                                    formalism::planning::GrounderContext& grounder_context);
-    void extract_numeric_constraint_support(formalism::datalog::GroundBooleanOperatorView constraint,
+                                                    ::tyr::formalism::planning::GrounderContext& grounder_context);
+    void extract_numeric_constraint_support(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
                                             const StateContext<LiftedTag>& state_context,
-                                            formalism::planning::GrounderContext& grounder_context);
+                                            ::tyr::formalism::planning::GrounderContext& grounder_context);
     void extract_relaxed_plan_and_preferred_actions(const datalog::WitnessAnnotation& witness,
                                                     const StateContext<LiftedTag>& state_context,
-                                                    formalism::planning::GrounderContext& grounder_context);
+                                                    ::tyr::formalism::planning::GrounderContext& grounder_context);
 
 private:
     std::vector<boost::dynamic_bitset<>> m_markings;
     std::vector<boost::dynamic_bitset<>> m_function_markings;
 
     /// For grounding actions
-    IndexList<formalism::Object> m_binding;
-    itertools::cartesian_set::Workspace<Index<formalism::Object>> m_iter_workspace;
-    formalism::planning::EffectFamilyList m_effect_families;
+    ygg::IndexList<::tyr::formalism::Object> m_binding;
+    ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>> m_iter_workspace;
+    ::tyr::formalism::planning::EffectFamilyList m_effect_families;
     datalog::NumericSupportSelectorWorkspace m_numeric_support_selector_workspace;
 
-    UnorderedSet<Index<formalism::planning::GroundAction>> m_relaxed_plan;
-    UnorderedSet<Index<formalism::planning::GroundAction>> m_preferred_actions;
-    UnorderedSet<formalism::planning::GroundActionView> m_preferred_action_views;
+    ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_relaxed_plan;
+    ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_preferred_actions;
+    ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView> m_preferred_action_views;
     bool m_preferred_action_views_dirty;
 };
 

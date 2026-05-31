@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_GROUND_TASK_STATE_STORAGE_TREE_COMPRESSION_CONTEXT_HPP_
 #define TYR_PLANNING_GROUND_TASK_STATE_STORAGE_TREE_COMPRESSION_CONTEXT_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/raw_array_set.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/raw_array_set.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
@@ -42,7 +42,7 @@ struct StateStorageContext<GroundTag, TreeCompression>
 
     struct VariableInfo
     {
-        uint_t begin;
+        ygg::uint_t begin;
         uint8_t offset;
         uint8_t length;
     };
@@ -50,19 +50,19 @@ struct StateStorageContext<GroundTag, TreeCompression>
     struct LayoutData
     {
         std::vector<VariableInfo> fluent_infos;
-        uint_t fluent_array_size;
-        uint_t derived_num_bits;
-        uint_t derived_array_size;
+        ygg::uint_t fluent_array_size;
+        ygg::uint_t derived_num_bits;
+        ygg::uint_t derived_array_size;
     };
 
     std::vector<VariableInfo> fluent_infos;
-    RawArraySet<uint_t> fluent_array_set;
+    ygg::RawArraySet<ygg::uint_t> fluent_array_set;
 
-    uint_t derived_num_bits;
-    RawArraySet<uint_t> derived_array_set;
+    ygg::uint_t derived_num_bits;
+    ygg::RawArraySet<ygg::uint_t> derived_array_set;
 
-    valla::IndexedHashSet<valla::Slot<uint_t>, uint_t> uint_nodes;
-    valla::IndexedHashSet<float_t, uint_t> float_nodes;
+    valla::IndexedHashSet<valla::Slot<ygg::uint_t>, ygg::uint_t> uint_nodes;
+    valla::IndexedHashSet<ygg::float_t, ygg::uint_t> float_nodes;
 
     size_t memory_usage() const noexcept
     {

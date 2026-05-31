@@ -18,25 +18,27 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_VALUE_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_VALUE_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_function_term_index.hpp"
 #include "tyr/formalism/datalog/ground_function_term_value_index.hpp"
 #include "tyr/formalism/term_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::datalog::GroundFunctionTermValue<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::datalog::GroundFunctionTermValue<T>>
 {
-    Index<formalism::datalog::GroundFunctionTermValue<T>> index;
-    Index<formalism::datalog::GroundFunctionTerm<T>> fterm;
-    float_t value;
+    ygg::Index<::tyr::formalism::datalog::GroundFunctionTermValue<T>> index;
+    ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<T>> fterm;
+    ygg::float_t value;
 
     Data() = default;
-    Data(Index<formalism::datalog::GroundFunctionTermValue<T>> index, Index<formalism::datalog::GroundFunctionTerm<T>> fterm, float_t value) :
+    Data(ygg::Index<::tyr::formalism::datalog::GroundFunctionTermValue<T>> index, ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<T>> fterm, ygg::float_t value) :
         index(index),
         fterm(fterm),
         value(value)
@@ -49,16 +51,16 @@ struct Data<formalism::datalog::GroundFunctionTermValue<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(fterm);
-        tyr::clear(value);
+        ygg::clear(index);
+        ygg::clear(fterm);
+        ygg::clear(value);
     }
 
     auto cista_members() const noexcept { return std::tie(index, fterm, value); }
     auto identifying_members() const noexcept { return std::tie(fterm, value); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::datalog::GroundFunctionTermValue<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::StaticTag>>);
 }
 
 #endif

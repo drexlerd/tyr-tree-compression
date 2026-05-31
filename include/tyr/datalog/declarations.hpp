@@ -22,26 +22,26 @@
 
 namespace tyr::datalog
 {
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class PredicateAssignmentSet;
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class PredicateAssignmentSets;
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class FunctionAssignmentSet;
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class FunctionAssignmentSets;
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 struct TaggedAssignmentSets;
 
 struct AssignmentSets;
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class PredicateFactSet;
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class FunctionFactSet;
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 struct TaggedFactSets;
 
 struct FactSets;
@@ -74,9 +74,9 @@ class Edge;
 
 struct RuleToLiteralInfoMappings;
 struct RuleToLiteralPositionMappings;
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 struct RuleToLiteralInfo;
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 struct TaggedRuleToLiteralInfos;
 struct RuleToLiteralInfos;
 }

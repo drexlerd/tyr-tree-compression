@@ -49,15 +49,15 @@ void DeltaKPKC::seed_without_anchor(Workspace& workspace) const
 {
     workspace.partial_solution_size = 0;
     workspace.partition_bits.reset();
-    workspace.anchor_pi = std::numeric_limits<uint_t>::max();  // unused
-    workspace.anchor_pj = std::numeric_limits<uint_t>::max();  // unused
+    workspace.anchor_pi = std::numeric_limits<ygg::uint_t>::max();  // unused
+    workspace.anchor_pj = std::numeric_limits<ygg::uint_t>::max();  // unused
 
     auto cv_0_row = workspace.compatible_vertices_span(0);
 
-    for (uint_t p = 0; p < m_layout.k; ++p)
+    for (ygg::uint_t p = 0; p < m_layout.k; ++p)
     {
         const auto& info = m_layout.info.infos[p];
-        auto cv_0 = BitsetSpan<uint64_t>(cv_0_row.data() + info.block_offset, info.num_bits);
+        auto cv_0 = ygg::BitsetSpan<uint64_t>(cv_0_row.data() + info.block_offset, info.num_bits);
 
         auto partition = m_full_graph.matrix.affected_partitions().get_bitset(info);
         cv_0.copy_from(partition);
@@ -66,8 +66,8 @@ void DeltaKPKC::seed_without_anchor(Workspace& workspace) const
 
 bool DeltaKPKC::seed_from_anchor(const Edge& edge, Workspace& workspace) const
 {
-    const uint_t pi = m_layout.vertex_to_partition[edge.src.index];
-    const uint_t pj = m_layout.vertex_to_partition[edge.dst.index];
+    const ygg::uint_t pi = m_layout.vertex_to_partition[edge.src.index];
+    const ygg::uint_t pj = m_layout.vertex_to_partition[edge.dst.index];
     assert(pi < pj);
 
     workspace.partial_solution[pi] = edge.src;
@@ -82,13 +82,13 @@ bool DeltaKPKC::seed_from_anchor(const Edge& edge, Workspace& workspace) const
 
     auto cv_0_row = workspace.compatible_vertices_span(0);
 
-    for (uint_t p = 0; p < m_layout.k; ++p)
+    for (ygg::uint_t p = 0; p < m_layout.k; ++p)
     {
         if (p == pi || p == pj)
             continue;
 
         const auto& info = m_layout.info.infos[p];
-        auto cv_0 = BitsetSpan<uint64_t>(cv_0_row.data() + info.block_offset, info.num_bits);
+        auto cv_0 = ygg::BitsetSpan<uint64_t>(cv_0_row.data() + info.block_offset, info.num_bits);
         auto full_src_adj_list = m_full_graph.matrix.get_bitset(edge.src.index, p);
         auto full_dst_adj_list = m_full_graph.matrix.get_bitset(edge.dst.index, p);
 
@@ -118,21 +118,21 @@ bool DeltaKPKC::seed_from_anchor(const Edge& edge, Workspace& workspace) const
     return true;
 }
 
-uint_t DeltaKPKC::choose_best_partition(size_t depth, const Workspace& workspace) const
+ygg::uint_t DeltaKPKC::choose_best_partition(size_t depth, const Workspace& workspace) const
 {
-    const uint_t k = m_layout.k;
+    const ygg::uint_t k = m_layout.k;
     const auto& partition_bits = workspace.partition_bits;
 
-    uint_t best_partition = std::numeric_limits<uint_t>::max();
-    uint_t best_set_bits = std::numeric_limits<uint_t>::max();
+    ygg::uint_t best_partition = std::numeric_limits<ygg::uint_t>::max();
+    ygg::uint_t best_set_bits = std::numeric_limits<ygg::uint_t>::max();
     const auto cv_curr_row = workspace.compatible_vertices_span(depth);
-    for (uint_t p = 0; p < k; ++p)
+    for (ygg::uint_t p = 0; p < k; ++p)
     {
         if (partition_bits.test(p))
             continue;
 
         const auto& info = m_layout.info.infos[p];
-        auto cv_curr = BitsetSpan<const uint64_t>(cv_curr_row.data() + info.block_offset, info.num_bits);
+        auto cv_curr = ygg::BitsetSpan<const uint64_t>(cv_curr_row.data() + info.block_offset, info.num_bits);
 
         const auto num_set_bits = cv_curr.count();
         if (num_set_bits < best_set_bits)

@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_FORMATTER_HPP_
 #define TYR_FORMALISM_FORMATTER_HPP_
 
-#include "tyr/common/cista_formatters.hpp"
-#include "tyr/common/iostream.hpp"
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/io/iostream.hpp>
 #include "tyr/formalism/datas.hpp"
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/views.hpp"
@@ -41,7 +41,7 @@ struct formatter<tyr::formalism::ParameterIndex, char>
     template<typename FormatContext>
     auto format(const tyr::formalism::ParameterIndex& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "V{}", tyr::uint_t(value));
+        return fmt::format_to(ctx.out(), "V{}", ygg::uint_t(value));
     }
 };
 
@@ -211,156 +211,156 @@ struct formatter<tyr::formalism::ScaleDown, char>
 };
 
 template<>
-struct formatter<tyr::Data<tyr::formalism::Variable>, char>
+struct formatter<ygg::Data<tyr::formalism::Variable>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::formalism::Variable>& value, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::formalism::Variable>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}", value.name);
     }
 };
 
 template<typename C>
-struct formatter<tyr::View<tyr::Index<tyr::formalism::Variable>, C>, char>
+struct formatter<ygg::View<ygg::Index<tyr::formalism::Variable>, C>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::View<tyr::Index<tyr::formalism::Variable>, C>& value, FormatContext& ctx) const
+    auto format(const ygg::View<ygg::Index<tyr::formalism::Variable>, C>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}", value.get_name());
     }
 };
 
 template<>
-struct formatter<tyr::Data<tyr::formalism::Object>, char>
+struct formatter<ygg::Data<tyr::formalism::Object>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::formalism::Object>& value, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::formalism::Object>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}", value.name);
     }
 };
 
 template<typename C>
-struct formatter<tyr::View<tyr::Index<tyr::formalism::Object>, C>, char>
+struct formatter<ygg::View<ygg::Index<tyr::formalism::Object>, C>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::View<tyr::Index<tyr::formalism::Object>, C>& value, FormatContext& ctx) const
+    auto format(const ygg::View<ygg::Index<tyr::formalism::Object>, C>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}", value.get_name());
     }
 };
 
 template<typename Tag>
-struct formatter<tyr::Data<tyr::formalism::RelationBinding<Tag>>, char>
+struct formatter<ygg::Data<tyr::formalism::RelationBinding<Tag>>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::formalism::RelationBinding<Tag>>& value, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::formalism::RelationBinding<Tag>>& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "{} {}", value.relation, fmt::join(tyr::to_strings(value.objects), " "));
+        return fmt::format_to(ctx.out(), "{} {}", value.relation, fmt::join(ygg::to_strings(value.objects), " "));
     }
 };
 
 template<typename Tag>
-struct formatter<tyr::Index<tyr::formalism::RelationBinding<Tag>>, char>
+struct formatter<ygg::Index<tyr::formalism::RelationBinding<Tag>>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::Index<tyr::formalism::RelationBinding<Tag>>& value, FormatContext& ctx) const
+    auto format(const ygg::Index<tyr::formalism::RelationBinding<Tag>>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "<{},{}>", value.relation, value.row);
     }
 };
 
 template<typename Tag, typename C>
-struct formatter<tyr::View<tyr::Index<tyr::formalism::RelationBinding<Tag>>, C>, char>
+struct formatter<ygg::View<ygg::Index<tyr::formalism::RelationBinding<Tag>>, C>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::View<tyr::Index<tyr::formalism::RelationBinding<Tag>>, C>& value, FormatContext& ctx) const
+    auto format(const ygg::View<ygg::Index<tyr::formalism::RelationBinding<Tag>>, C>& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "({})", fmt::join(tyr::to_strings(value.get_objects()), " "));
+        return fmt::format_to(ctx.out(), "({})", fmt::join(ygg::to_strings(value.get_objects()), " "));
     }
 };
 
 template<>
-struct formatter<tyr::Data<tyr::formalism::Term>, char>
+struct formatter<ygg::Data<tyr::formalism::Term>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::formalism::Term>& value, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::formalism::Term>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}", value.value);
     }
 };
 
 template<typename C>
-struct formatter<tyr::View<tyr::Data<tyr::formalism::Term>, C>, char>
+struct formatter<ygg::View<ygg::Data<tyr::formalism::Term>, C>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::View<tyr::Data<tyr::formalism::Term>, C>& value, FormatContext& ctx) const
+    auto format(const ygg::View<ygg::Data<tyr::formalism::Term>, C>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}", value.get_variant());
     }
 };
 
 template<tyr::formalism::FactKind T>
-struct formatter<tyr::Data<tyr::formalism::Predicate<T>>, char>
+struct formatter<ygg::Data<tyr::formalism::Predicate<T>>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::formalism::Predicate<T>>& value, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::formalism::Predicate<T>>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}/{}", value.name, value.arity);
     }
 };
 
 template<tyr::formalism::FactKind T, typename C>
-struct formatter<tyr::View<tyr::Index<tyr::formalism::Predicate<T>>, C>, char>
+struct formatter<ygg::View<ygg::Index<tyr::formalism::Predicate<T>>, C>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::View<tyr::Index<tyr::formalism::Predicate<T>>, C>& value, FormatContext& ctx) const
+    auto format(const ygg::View<ygg::Index<tyr::formalism::Predicate<T>>, C>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}/{}", value.get_name(), value.get_arity());
     }
 };
 
 template<tyr::formalism::FactKind T>
-struct formatter<tyr::Data<tyr::formalism::Function<T>>, char>
+struct formatter<ygg::Data<tyr::formalism::Function<T>>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::formalism::Function<T>>& value, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::formalism::Function<T>>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}/{}", value.name, value.arity);
     }
 };
 
 template<tyr::formalism::FactKind T, typename C>
-struct formatter<tyr::View<tyr::Index<tyr::formalism::Function<T>>, C>, char>
+struct formatter<ygg::View<ygg::Index<tyr::formalism::Function<T>>, C>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template<typename FormatContext>
-    auto format(const tyr::View<tyr::Index<tyr::formalism::Function<T>>, C>& value, FormatContext& ctx) const
+    auto format(const ygg::View<ygg::Index<tyr::formalism::Function<T>>, C>& value, FormatContext& ctx) const
     {
         return fmt::format_to(ctx.out(), "{}/{}", value.get_name(), value.get_arity());
     }

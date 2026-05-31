@@ -18,17 +18,17 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_VALUE_INDEX_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_VALUE_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Index<formalism::datalog::GroundFunctionTermValue<T>> : IndexMixin<Index<formalism::datalog::GroundFunctionTermValue<T>>>
+template<tyr::formalism::FactKind T>
+struct Index<tyr::formalism::datalog::GroundFunctionTermValue<T>> : ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::GroundFunctionTermValue<T>>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::datalog::GroundFunctionTermValue<T>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::GroundFunctionTermValue<T>>>;
     using Base::Base;
 };
 

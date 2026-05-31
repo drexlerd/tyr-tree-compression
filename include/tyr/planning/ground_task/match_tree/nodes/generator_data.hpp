@@ -18,24 +18,26 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_GENERATOR_DATA_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_GENERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/formalism/planning/ground_axiom_index.hpp"
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/generator_index.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/node_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<typename Tag>
 struct Data<planning::match_tree::ElementGeneratorNode<Tag>>
 {
-    Index<planning::match_tree::ElementGeneratorNode<Tag>> index;
-    IndexList<Tag> elements;
+    ygg::Index<planning::match_tree::ElementGeneratorNode<Tag>> index;
+    ygg::IndexList<Tag> elements;
 
     Data() = default;
-    Data(Index<planning::match_tree::ElementGeneratorNode<Tag>> index, IndexList<Tag> elements) : index(index), elements(std::move(elements)) {}
+    Data(ygg::Index<planning::match_tree::ElementGeneratorNode<Tag>> index, ygg::IndexList<Tag> elements) : index(index), elements(std::move(elements)) {}
     Data(const Data& other) = delete;
     Data& operator=(const Data& other) = delete;
     Data(Data&& other) = default;
@@ -43,8 +45,8 @@ struct Data<planning::match_tree::ElementGeneratorNode<Tag>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(elements);
+        ygg::clear(index);
+        ygg::clear(elements);
     }
 
     auto cista_members() const noexcept { return std::tie(index, elements); }

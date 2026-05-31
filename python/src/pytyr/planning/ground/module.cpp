@@ -50,7 +50,7 @@ void bind_ground_module_definitions(nb::module_& m)
         .def("get_task", &Task<GroundTag>::get_task)
         .def("get_fdr_context", &Task<GroundTag>::get_fdr_context);
 
-    bind_index<Index<State<GroundTag>>>(m, "StateIndex");
+    bind_index<ygg::Index<State<GroundTag>>>(m, "StateIndex");
     bind_state<GroundTag>(m, "State");
     bind_node<GroundTag>(m, "Node");
     bind_labeled_node<GroundTag>(m, "LabeledNode");

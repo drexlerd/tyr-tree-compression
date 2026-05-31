@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_BUILDER_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_BUILDER_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/dynamic_bitset.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
@@ -37,22 +37,22 @@
 
 namespace tyr::planning
 {
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 struct LiftedUnpackedAtomStorageType;
 
 template<>
-struct LiftedUnpackedAtomStorageType<formalism::FluentTag>
+struct LiftedUnpackedAtomStorageType<::tyr::formalism::FluentTag>
 {
     using type = planning::FactUnpackedStorage<LiftedTag>;
 };
 
 template<>
-struct LiftedUnpackedAtomStorageType<formalism::DerivedTag>
+struct LiftedUnpackedAtomStorageType<::tyr::formalism::DerivedTag>
 {
     using type = planning::AtomUnpackedStorage<LiftedTag>;
 };
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 using LiftedUnpackedAtomStorage = typename LiftedUnpackedAtomStorageType<T>::type;
 
 }
@@ -68,8 +68,8 @@ public:
 
     Builder() = default;
 
-    Index<planning::State<planning::LiftedTag>> get_index() const;
-    void set(Index<planning::State<planning::LiftedTag>> index);
+    ygg::Index<planning::State<planning::LiftedTag>> get_index() const;
+    void set(ygg::Index<planning::State<planning::LiftedTag>> index);
 
     void clear();
     void clear_unextended_part();
@@ -80,38 +80,38 @@ public:
      * UnpackedStateConcept
      */
 
-    formalism::planning::FDRValue get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const;
-    void set(Data<formalism::planning::FDRFact<formalism::FluentTag>> fact);
-    float_t get(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index) const;
-    void set(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index, float_t value);
-    bool test(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index) const;
-    void set(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index);
+    ::tyr::formalism::planning::FDRValue get(ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> index) const;
+    void set(ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> fact);
+    ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index) const;
+    void set(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index, ygg::float_t value);
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index) const;
+    void set(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index);
 
-    formalism::planning::FDRValue get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const;
-    void set(formalism::planning::FDRFactView<formalism::FluentTag> view);
-    float_t get(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view) const;
-    void set(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view, float_t value);
-    bool test(formalism::planning::GroundAtomView<formalism::DerivedTag> view) const;
-    void set(formalism::planning::GroundAtomView<formalism::DerivedTag> view);
+    ::tyr::formalism::planning::FDRValue get(::tyr::formalism::planning::FDRVariableView<::tyr::formalism::FluentTag> view) const;
+    void set(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> view);
+    ygg::float_t get(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> view) const;
+    void set(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> view, ygg::float_t value);
+    bool test(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag> view) const;
+    void set(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag> view);
 
-    planning::FDRFactRange<planning::LiftedTag, formalism::FluentTag> get_fluent_facts() const noexcept;
-    planning::AtomRange<formalism::DerivedTag> get_derived_atoms() const noexcept;
-    planning::FunctionTermValueRange<formalism::FluentTag> get_fluent_fterm_values() const noexcept;
+    planning::FDRFactRange<planning::LiftedTag, ::tyr::formalism::FluentTag> get_fluent_facts() const noexcept;
+    planning::AtomRange<::tyr::formalism::DerivedTag> get_derived_atoms() const noexcept;
+    planning::FunctionTermValueRange<::tyr::formalism::FluentTag> get_fluent_fterm_values() const noexcept;
 
-    auto get_fluent_facts_view(const formalism::planning::Repository& repository) const noexcept;
-    auto get_derived_atoms_view(const formalism::planning::Repository& repository) const noexcept;
-    auto get_fluent_fterm_values_view(const formalism::planning::Repository& repository) const noexcept;
+    auto get_fluent_facts_view(const ::tyr::formalism::planning::Repository& repository) const noexcept;
+    auto get_derived_atoms_view(const ::tyr::formalism::planning::Repository& repository) const noexcept;
+    auto get_fluent_fterm_values_view(const ::tyr::formalism::planning::Repository& repository) const noexcept;
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     planning::LiftedUnpackedAtomStorage<T>& get_atoms() noexcept;
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const planning::LiftedUnpackedAtomStorage<T>& get_atoms() const noexcept;
 
     planning::NumericUnpackedStorage<planning::LiftedTag>& get_numeric_variables() noexcept;
     const planning::NumericUnpackedStorage<planning::LiftedTag>& get_numeric_variables() const noexcept;
 
 private:
-    Index<planning::State<planning::LiftedTag>> m_index;
+    ygg::Index<planning::State<planning::LiftedTag>> m_index;
 
     planning::FactUnpackedStorage<planning::LiftedTag> m_fact_storage;
     planning::AtomUnpackedStorage<planning::LiftedTag> m_atom_storage;
@@ -120,20 +120,20 @@ private:
 
 static_assert(planning::UnpackedStateConcept<planning::UnpackedState<planning::LiftedTag>, planning::LiftedTag>);
 
-inline auto Builder<planning::State<planning::LiftedTag>>::get_fluent_facts_view(const formalism::planning::Repository& repository_) const noexcept
+inline auto Builder<planning::State<planning::LiftedTag>>::get_fluent_facts_view(const ::tyr::formalism::planning::Repository& repository_) const noexcept
 {
-    return get_fluent_facts() | std::views::transform([repository = &repository_](auto id) { return make_view(id, *repository); });
+    return get_fluent_facts() | std::views::transform([repository = &repository_](auto id) { return ygg::make_view(id, *repository); });
 }
 
-inline auto Builder<planning::State<planning::LiftedTag>>::get_derived_atoms_view(const formalism::planning::Repository& repository_) const noexcept
+inline auto Builder<planning::State<planning::LiftedTag>>::get_derived_atoms_view(const ::tyr::formalism::planning::Repository& repository_) const noexcept
 {
-    return get_derived_atoms() | std::views::transform([repository = &repository_](auto id) { return make_view(id, *repository); });
+    return get_derived_atoms() | std::views::transform([repository = &repository_](auto id) { return ygg::make_view(id, *repository); });
 }
 
-inline auto Builder<planning::State<planning::LiftedTag>>::get_fluent_fterm_values_view(const formalism::planning::Repository& repository_) const noexcept
+inline auto Builder<planning::State<planning::LiftedTag>>::get_fluent_fterm_values_view(const ::tyr::formalism::planning::Repository& repository_) const noexcept
 {
     return get_fluent_fterm_values()
-           | std::views::transform([repository = &repository_](auto&& pair) { return std::make_pair(make_view(pair.first, *repository), pair.second); });
+           | std::views::transform([repository = &repository_](auto&& pair) { return std::make_pair(ygg::make_view(pair.first, *repository), pair.second); });
 }
 
 }

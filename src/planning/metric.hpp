@@ -18,9 +18,9 @@
 #ifndef TYR_SRC_PLANNING_METRIC_HPP_
 #define TYR_SRC_PLANNING_METRIC_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/optional.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/applicability.hpp"
@@ -33,8 +33,8 @@ namespace tyr::planning
 {
 
 template<TaskKind Kind>
-float_t evaluate_metric(View<::cista::optional<Index<formalism::planning::Metric>>, formalism::planning::Repository> metric,
-                        View<::cista::optional<Index<formalism::planning::GroundFunctionTermValue<formalism::AuxiliaryTag>>>, formalism::planning::Repository>
+ygg::float_t evaluate_metric(ygg::View<::cista::optional<ygg::Index<::tyr::formalism::planning::Metric>>, ::tyr::formalism::planning::Repository> metric,
+                        ygg::View<::cista::optional<ygg::Index<::tyr::formalism::planning::GroundFunctionTermValue<::tyr::formalism::AuxiliaryTag>>>, ::tyr::formalism::planning::Repository>
                             auxiliary_fterm_value,
                         const StateContext<Kind>& state_context)
 {
@@ -43,7 +43,7 @@ float_t evaluate_metric(View<::cista::optional<Index<formalism::planning::Metric
 
     const auto value = metric ? evaluate(metric.value().get_fexpr(), state_context) : 0.;
 
-    return FloatTolerance<float_t>::canonicalize(value);
+    return ygg::FloatTolerance<ygg::float_t>::canonicalize(value);
 }
 }
 

@@ -25,9 +25,9 @@ namespace fd = tyr::formalism::datalog;
 namespace tyr::datalog::kpkc
 {
 
-[[maybe_unused]] static bool verify_vertex_partitions(const std::vector<std::vector<uint_t>>& vertex_partitions)
+[[maybe_unused]] static bool verify_vertex_partitions(const std::vector<std::vector<ygg::uint_t>>& vertex_partitions)
 {
-    uint_t i = 0;
+    ygg::uint_t i = 0;
     for (const auto& partition : vertex_partitions)
         for (const auto& v : partition)
             if (v != i++)
@@ -35,19 +35,19 @@ namespace tyr::datalog::kpkc
     return true;
 }
 
-[[maybe_unused]] static bool verify_vertex_to_partition(size_t nv, size_t k, const std::vector<uint_t>& vertex_to_partition)
+[[maybe_unused]] static bool verify_vertex_to_partition(size_t nv, size_t k, const std::vector<ygg::uint_t>& vertex_to_partition)
 {
     if (vertex_to_partition.size() != nv)
         return false;
 
-    for (uint_t v = 0; v < nv; ++v)
+    for (ygg::uint_t v = 0; v < nv; ++v)
         if (vertex_to_partition[v] >= k)
             return false;
 
     return true;
 }
 
-GraphLayout::GraphLayout(size_t nv, const std::vector<std::vector<uint_t>>& vertex_partitions_) :
+GraphLayout::GraphLayout(size_t nv, const std::vector<std::vector<ygg::uint_t>>& vertex_partitions_) :
     nv(nv),
     k(vertex_partitions_.size()),
     vertex_partitions(vertex_partitions_),
@@ -61,19 +61,19 @@ GraphLayout::GraphLayout(size_t nv, const std::vector<std::vector<uint_t>>& vert
     vertex_to_bit.resize(nv);
     info.infos.reserve(k);
 
-    uint_t block_offset = uint_t(0);
-    uint_t bit_offset = uint_t(0);
+    ygg::uint_t block_offset = ygg::uint_t(0);
+    ygg::uint_t bit_offset = ygg::uint_t(0);
 
     for (size_t p = 0; p < k; ++p)
     {
         const auto& partition = vertex_partitions[p];
 
-        const auto partition_size = static_cast<uint_t>(partition.size());
-        const auto partition_blocks = static_cast<uint_t>(BitsetSpan<uint64_t>::num_blocks(partition_size));
+        const auto partition_size = static_cast<ygg::uint_t>(partition.size());
+        const auto partition_blocks = static_cast<ygg::uint_t>(ygg::BitsetSpan<uint64_t>::num_blocks(partition_size));
         info.infos.push_back(GraphLayout::BitsetInfo { bit_offset, partition_size, block_offset, partition_blocks });
         block_offset += partition_blocks;
 
-        uint_t bit = 0;
+        ygg::uint_t bit = 0;
         for (const auto& v : partition)
         {
             vertex_to_bit[v] = bit++;

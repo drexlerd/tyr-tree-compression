@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_ALGORITHMS_UTILS_HPP_
 #define TYR_PLANNING_ALGORITHMS_UTILS_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/node.hpp"
 #include "tyr/planning/plan.hpp"
 
@@ -48,12 +48,12 @@ enum class ActionCostMode
     GENERAL
 };
 
-inline float_t compute_successor_g_value(float_t source_g_value, float_t generated_successor_g_value, ActionCostMode mode)
+inline ygg::float_t compute_successor_g_value(ygg::float_t source_g_value, ygg::float_t generated_successor_g_value, ActionCostMode mode)
 {
     switch (mode)
     {
-        case ActionCostMode::UNIT: return FloatTolerance<float_t>::canonicalize(source_g_value + 1);
-        case ActionCostMode::GENERAL: return FloatTolerance<float_t>::canonicalize(generated_successor_g_value);
+        case ActionCostMode::UNIT: return ygg::FloatTolerance<ygg::float_t>::canonicalize(source_g_value + 1);
+        case ActionCostMode::GENERAL: return ygg::FloatTolerance<ygg::float_t>::canonicalize(generated_successor_g_value);
     }
 
     throw std::runtime_error("compute_successor_g_value(...): unknown action cost mode.");

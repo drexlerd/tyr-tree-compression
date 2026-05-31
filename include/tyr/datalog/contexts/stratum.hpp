@@ -71,7 +71,7 @@ struct StratumExecutionContext
      * Subcontext
      */
 
-    auto get_rule_execution_context(Index<formalism::datalog::Rule> rule) { return RuleExecutionContext<OrAP, AndAP, TP> { rule, *this }; }
+    auto get_rule_execution_context(ygg::Index<::tyr::formalism::datalog::Rule> rule) { return RuleExecutionContext<OrAP, AndAP, TP> { rule, *this }; }
 
     const auto& in() const noexcept { return m_in; }
     auto& out() noexcept { return m_out; }

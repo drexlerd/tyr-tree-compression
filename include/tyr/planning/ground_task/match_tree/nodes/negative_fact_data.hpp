@@ -18,28 +18,30 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_NEGATIVE_FACT_DATA_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_NEGATIVE_FACT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/fdr_variable_index.hpp"
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/negative_fact_index.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/node_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<typename Tag>
 struct Data<planning::match_tree::NegativeFactSelectorNode<Tag>>
 {
-    Index<planning::match_tree::NegativeFactSelectorNode<Tag>> index;
-    Data<formalism::planning::FDRFact<formalism::FluentTag>> fact;
-    ::cista::optional<Data<planning::match_tree::Node<Tag>>> true_child;
-    ::cista::optional<Data<planning::match_tree::Node<Tag>>> dontcare_child;
+    ygg::Index<planning::match_tree::NegativeFactSelectorNode<Tag>> index;
+    ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> fact;
+    ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> true_child;
+    ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> dontcare_child;
 
     Data() = default;
-    Data(Index<planning::match_tree::NegativeFactSelectorNode<Tag>> index,
-         Data<formalism::planning::FDRFact<formalism::FluentTag>> fact,
-         ::cista::optional<Data<planning::match_tree::Node<Tag>>> true_child,
-         ::cista::optional<Data<planning::match_tree::Node<Tag>>> dontcare_child) :
+    Data(ygg::Index<planning::match_tree::NegativeFactSelectorNode<Tag>> index,
+         ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> fact,
+         ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> true_child,
+         ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> dontcare_child) :
         index(index),
         fact(fact),
         true_child(std::move(true_child)),
@@ -53,10 +55,10 @@ struct Data<planning::match_tree::NegativeFactSelectorNode<Tag>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(fact);
-        tyr::clear(true_child);
-        tyr::clear(dontcare_child);
+        ygg::clear(index);
+        ygg::clear(fact);
+        ygg::clear(true_child);
+        ygg::clear(dontcare_child);
     }
 
     auto cista_members() const noexcept { return std::tie(index, fact, true_child, dontcare_child); }

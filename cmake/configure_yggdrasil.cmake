@@ -13,14 +13,26 @@ function(configure_yggdrasil)
   endif()
 
   execute_process(
-    COMMAND "${Python3_EXECUTABLE}" -c "import pyyggdrasil; print(pyyggdrasil.native_prefix())"
+    COMMAND "${Python3_EXECUTABLE}" -c "import pathlib, pyyggdrasil
+
+candidates = []
+try:
+    candidates.append(pathlib.Path(pyyggdrasil.native_prefix()))
+except Exception:
+    pass
+candidates.append(pathlib.Path(pyyggdrasil.__file__).resolve().parent)
+for candidate in candidates:
+    if (candidate / 'include' / 'yggdrasil').exists():
+        print(candidate)
+        raise SystemExit(0)
+raise SystemExit(1)"
     RESULT_VARIABLE yggdrasil_result
     OUTPUT_VARIABLE yggdrasil_prefix
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
 
-  if(yggdrasil_result EQUAL 0 AND EXISTS "${yggdrasil_prefix}")
+  if(yggdrasil_result EQUAL 0 AND EXISTS "${yggdrasil_prefix}/include/yggdrasil")
     file(GLOB yggdrasil_cmake_dirs LIST_DIRECTORIES true "${yggdrasil_prefix}/lib*/cmake")
     foreach(yggdrasil_cmake_dir IN LISTS yggdrasil_cmake_dirs)
       get_filename_component(yggdrasil_lib_dir "${yggdrasil_cmake_dir}" DIRECTORY)

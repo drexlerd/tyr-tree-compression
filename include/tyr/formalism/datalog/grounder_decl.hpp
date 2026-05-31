@@ -27,7 +27,7 @@ struct GrounderContext
 {
     Builder& builder;
     Repository& destination;
-    IndexList<Object>& binding;
+    ygg::IndexList<Object>& binding;
 };
 
 }

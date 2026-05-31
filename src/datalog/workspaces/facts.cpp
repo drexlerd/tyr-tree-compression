@@ -26,12 +26,12 @@ namespace tyr::datalog
 
 FactsWorkspace::FactsWorkspace(fd::PredicateListView<f::FluentTag> predicates,
                                fd::FunctionListView<f::FluentTag> functions,
-                               const analysis::PredicateDomainMap<formalism::FluentTag>& predicate_domains,
-                               const analysis::FunctionDomainMap<formalism::FluentTag>& function_domains,
+                               const analysis::PredicateDomainMap<::tyr::formalism::FluentTag>& predicate_domains,
+                               const analysis::FunctionDomainMap<::tyr::formalism::FluentTag>& function_domains,
                                size_t num_objects,
-                               fd::GroundAtomListView<formalism::FluentTag> atoms,
-                               fd::GroundFunctionTermValueListView<formalism::FluentTag> fterm_values,
-                               const formalism::datalog::Repository& workspace_repository) :
+                               fd::GroundAtomListView<::tyr::formalism::FluentTag> atoms,
+                               fd::GroundFunctionTermValueListView<::tyr::formalism::FluentTag> fterm_values,
+                               const ::tyr::formalism::datalog::Repository& workspace_repository) :
     fact_sets(predicates, functions, atoms, fterm_values, workspace_repository),
     assignment_sets(predicates, functions, predicate_domains, function_domains, num_objects, fact_sets)
 {
@@ -45,12 +45,12 @@ void FactsWorkspace::reset()
 
 ConstFactsWorkspace::ConstFactsWorkspace(fd::PredicateListView<f::StaticTag> predicates,
                                          fd::FunctionListView<f::StaticTag> functions,
-                                         const analysis::PredicateDomainMap<formalism::StaticTag>& predicate_domains,
-                                         const analysis::FunctionDomainMap<formalism::StaticTag>& function_domains,
+                                         const analysis::PredicateDomainMap<::tyr::formalism::StaticTag>& predicate_domains,
+                                         const analysis::FunctionDomainMap<::tyr::formalism::StaticTag>& function_domains,
                                          size_t num_objects,
                                          fd::GroundAtomListView<f::StaticTag> atoms,
                                          fd::GroundFunctionTermValueListView<f::StaticTag> fterm_values,
-                                         const formalism::datalog::Repository& program_repository) :
+                                         const ::tyr::formalism::datalog::Repository& program_repository) :
     fact_sets(predicates, functions, atoms, fterm_values, program_repository),
     assignment_sets(predicates, functions, predicate_domains, function_domains, num_objects, fact_sets)
 {

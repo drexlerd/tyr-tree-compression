@@ -67,10 +67,10 @@ public:
     virtual void on_prune_node(const Node<Kind>& source_node, const LabeledNode<Kind>& labeled_succ_node) = 0;
 
     /// @brief React on starting a search.
-    virtual void on_start_search(const Node<Kind>& node, float_t f_value) = 0;
+    virtual void on_start_search(const Node<Kind>& node, ygg::float_t f_value) = 0;
 
     /// @brief React on finish f-layer.
-    virtual void on_finish_f_layer(float_t f_value) = 0;
+    virtual void on_finish_f_layer(ygg::float_t f_value) = 0;
 
     /// @brief React on ending a search.
     virtual void on_end_search(tyr::planning::SearchStatus status) = 0;
@@ -180,7 +180,7 @@ public:
         }
     }
 
-    void on_start_search(const Node<Kind>& node, float_t f_value) override
+    void on_start_search(const Node<Kind>& node, ygg::float_t f_value) override
     {
         m_statistics = tyr::planning::Statistics();
 
@@ -192,7 +192,7 @@ public:
         }
     }
 
-    void on_finish_f_layer(float_t f_value) override
+    void on_finish_f_layer(ygg::float_t f_value) override
     {
         m_progress_statistics.add_snap_shot(m_statistics);
 
@@ -249,9 +249,9 @@ private:
 
     void on_prune_node_impl(const Node<Kind>& node) const;
 
-    void on_start_search_impl(const Node<Kind>& node, float_t f_value) const;
+    void on_start_search_impl(const Node<Kind>& node, ygg::float_t f_value) const;
 
-    void on_finish_f_layer_impl(float_t f_value, uint64_t num_expanded_states, uint64_t num_generated_states) const;
+    void on_finish_f_layer_impl(ygg::float_t f_value, uint64_t num_expanded_states, uint64_t num_generated_states) const;
 
     void on_end_search_impl(tyr::planning::SearchStatus status) const;
 

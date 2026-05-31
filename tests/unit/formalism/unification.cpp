@@ -28,15 +28,15 @@ namespace tyr::tests
 {
 namespace
 {
-using TermSubstitution = fu::SubstitutionFunction<Data<f::Term>>;
+using TermSubstitution = fu::SubstitutionFunction<ygg::Data<f::Term>>;
 
-static_assert(fu::TermUnifiableStructure<Data<f::Term>>);
+static_assert(fu::TermUnifiableStructure<ygg::Data<f::Term>>);
 
-Data<f::Term> parameter(size_t index) { return Data<f::Term>(f::ParameterIndex(index)); }
+ygg::Data<f::Term> parameter(size_t index) { return ygg::Data<f::Term>(f::ParameterIndex(index)); }
 
-Data<f::Term> object(size_t index) { return Data<f::Term>(Index<f::Object>(index)); }
+ygg::Data<f::Term> object(size_t index) { return ygg::Data<f::Term>(ygg::Index<f::Object>(index)); }
 
-void expect_term_eq(const Data<f::Term>& lhs, const Data<f::Term>& rhs) { EXPECT_TRUE(EqualTo<Data<f::Term>> {}(lhs, rhs)); }
+void expect_term_eq(const ygg::Data<f::Term>& lhs, const ygg::Data<f::Term>& rhs) { EXPECT_TRUE(ygg::EqualTo<ygg::Data<f::Term>> {}(lhs, rhs)); }
 }
 
 TEST(TyrTests, TyrFormalismUnificationApplySubstitutionFixpoint)
@@ -118,7 +118,7 @@ TEST(TyrTests, TyrFormalismUnificationSubstitutionForEachBindingAndIdentity)
     EXPECT_TRUE(sigma.assign(f::ParameterIndex(2), object(2)));
     EXPECT_FALSE(sigma.is_identity());
 
-    auto seen = std::vector<std::pair<f::ParameterIndex, Data<f::Term>>> {};
+    auto seen = std::vector<std::pair<f::ParameterIndex, ygg::Data<f::Term>>> {};
     sigma.for_each_binding([&](const auto parameter, const auto& value) { seen.emplace_back(parameter, value); });
 
     ASSERT_EQ(seen.size(), 2);

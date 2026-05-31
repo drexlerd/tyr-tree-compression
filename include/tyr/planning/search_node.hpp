@@ -38,8 +38,8 @@ enum SearchNodeStatus : uint8_t
 template<typename T, typename Kind>
 concept SearchNodeConcept = requires(const T a) {
     requires TaskKind<Kind>;
-    { a.parent_state } -> std::convertible_to<Index<State<Kind>>>;
-    { a.g_value } -> std::convertible_to<float_t>;
+    { a.parent_state } -> std::convertible_to<ygg::Index<State<Kind>>>;
+    { a.g_value } -> std::convertible_to<ygg::float_t>;
 };
 
 }

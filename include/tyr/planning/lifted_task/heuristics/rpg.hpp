@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_HEURISTICS_RPG_HPP_
 #define TYR_PLANNING_LIFTED_TASK_HEURISTICS_RPG_HPP_
 
-#include "tyr/common/onetbb.hpp"
+#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/datalog/bottom_up.hpp"
 #include "tyr/datalog/contexts/program.hpp"
 #include "tyr/datalog/formatter.hpp"
@@ -45,7 +45,7 @@ private:
     constexpr auto& self() { return static_cast<Derived&>(*this); }
 
 public:
-    explicit RPGBase(TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context, const OrAP& or_ap, const AndAP& and_ap, const TP& tp) :
+    explicit RPGBase(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, const OrAP& or_ap, const AndAP& and_ap, const TP& tp) :
         m_task(std::move(task)),
         m_execution_context(std::move(execution_context)),
         m_workspace(m_task->get_rpg_program().get_program_context(), m_task->get_rpg_program().get_const_program_workspace(), or_ap, and_ap, tp)
@@ -53,18 +53,18 @@ public:
         m_workspace.tp.set_goals(m_task->get_rpg_program().get_goal());
     }
 
-    void set_goal(formalism::planning::GroundConjunctiveConditionView goal) override
+    void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) override
     {
-        auto merge_context = formalism::planning::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
+        auto merge_context = ::tyr::formalism::planning::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
         const auto& p2d = m_task->get_rpg_program().get_translation_context().p2d;
-        m_workspace.tp.set_goals(formalism::planning::merge_p2d(goal, p2d.fluent_to_fluent_predicate, p2d.derived_to_fluent_predicate, merge_context).first);
+        m_workspace.tp.set_goals(::tyr::formalism::planning::merge_p2d(goal, p2d.fluent_to_fluent_predicate, p2d.derived_to_fluent_predicate, merge_context).first);
     }
 
-    float_t evaluate(const StateView<LiftedTag>& state) override
+    ygg::float_t evaluate(const StateView<LiftedTag>& state) override
     {
         m_workspace.facts.reset();
 
-        auto merge_context = formalism::planning::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
+        auto merge_context = ::tyr::formalism::planning::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
 
         insert_fluent_atoms_to_fact_set(state.get_unpacked_state(),
                                         *m_task->get_repository(),
@@ -81,7 +81,7 @@ public:
         return (m_workspace.tp.check(
                    datalog::FactSets { m_task->get_rpg_program().get_const_program_workspace().facts.fact_sets, m_workspace.facts.fact_sets })) ?
                    self().extract_cost_and_set_preferred_actions_impl(state) :
-                   std::numeric_limits<float_t>::infinity();
+                   std::numeric_limits<ygg::float_t>::infinity();
     }
 
     const auto& get_workspace() const noexcept { return m_workspace; }
@@ -106,7 +106,7 @@ public:
 
 protected:
     TaskPtr<LiftedTag> m_task;
-    ExecutionContextPtr m_execution_context;
+    ygg::ExecutionContextPtr m_execution_context;
 
     datalog::ProgramWorkspace<OrAP, AndAP, TP> m_workspace;
 };

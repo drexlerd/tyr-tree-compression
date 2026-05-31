@@ -48,7 +48,7 @@ void AtomStorageBackend<LiftedTag, TreeCompression>::unpack(const typename AtomS
     valla::read_sequence(packed.slot, m_uint_nodes, std::back_inserter(m_uint_node_buffer));
 
     for (const auto i : m_uint_node_buffer)
-        tyr::set(i, true, indices);
+        ygg::set(i, true, indices);
 }
 
 }

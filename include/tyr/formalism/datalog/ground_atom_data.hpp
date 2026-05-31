@@ -18,24 +18,26 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_ATOM_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_ATOM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Data<formalism::datalog::GroundAtom<T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::datalog::GroundAtom<T>>
 {
-    Index<formalism::datalog::GroundAtom<T>> index;
-    Index<formalism::RelationBinding<formalism::Predicate<T>>> binding;
+    ygg::Index<::tyr::formalism::datalog::GroundAtom<T>> index;
+    ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Predicate<T>>> binding;
 
     Data() = default;
-    Data(Index<formalism::RelationBinding<formalism::Predicate<T>>> binding) : index(), binding(binding) {}
+    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Predicate<T>>> binding) : index(), binding(binding) {}
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
     Data(Data&& other) = default;
@@ -43,15 +45,15 @@ struct Data<formalism::datalog::GroundAtom<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(binding);
+        ygg::clear(index);
+        ygg::clear(binding);
     }
 
     auto cista_members() const noexcept { return std::tie(index, binding); }
     auto identifying_members() const noexcept { return std::tie(binding); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::datalog::GroundAtom<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::datalog::GroundAtom<::tyr::formalism::StaticTag>>);
 }
 
 #endif

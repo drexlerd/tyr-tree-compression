@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_PACKED_STATE_HPP_
 #define TYR_PLANNING_LIFTED_TASK_PACKED_STATE_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/canonicalization.hpp"
-#include "tyr/common/concepts.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/canonicalization.hpp>
+#include <yggdrasil/core/concepts.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_data.hpp"
@@ -45,8 +45,10 @@
  * Definitions
  */
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
 struct Data<planning::State<planning::LiftedTag>>
 {
@@ -54,7 +56,7 @@ public:
     using TaskType = planning::Task<planning::LiftedTag>;
 
     Data() noexcept = default;
-    Data(Index<planning::State<planning::LiftedTag>> index,
+    Data(ygg::Index<planning::State<planning::LiftedTag>> index,
          planning::FactPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> fact_storage,
          planning::AtomPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> atom_storage,
          planning::NumericPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> numeric_storage) noexcept :
@@ -65,21 +67,21 @@ public:
     {
     }
 
-    Index<planning::State<planning::LiftedTag>> get_index() const noexcept { return m_index; }
+    ygg::Index<planning::State<planning::LiftedTag>> get_index() const noexcept { return m_index; }
 
     /**
      * New
      */
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     auto get_atoms() const noexcept
     {
-        if constexpr (std::same_as<T, formalism::FluentTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return m_fact_storage;
-        else if constexpr (std::same_as<T, formalism::DerivedTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::DerivedTag>)
             return m_atom_storage;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     auto get_numeric_variables() const noexcept { return m_numeric_storage; }
@@ -87,16 +89,16 @@ public:
     auto identifying_members() const noexcept { return std::tie(m_fact_storage, m_atom_storage, m_numeric_storage); }
 
 private:
-    Index<planning::State<planning::LiftedTag>> m_index;
+    ygg::Index<planning::State<planning::LiftedTag>> m_index;
 
     planning::FactPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> m_fact_storage;
     planning::AtomPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> m_atom_storage;
     planning::NumericPackedStorage<planning::LiftedTag, planning::StateStoragePolicyTag> m_numeric_storage;
 };
 
-inline bool is_canonical(const Data<planning::State<planning::LiftedTag>>&) { return true; }
+inline bool is_canonical(const ygg::Data<planning::State<planning::LiftedTag>>&) { return true; }
 
-inline void canonicalize(Data<planning::State<planning::LiftedTag>>&) {}
+inline void canonicalize(ygg::Data<planning::State<planning::LiftedTag>>&) {}
 
 }
 

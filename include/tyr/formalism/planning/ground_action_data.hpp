@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_ACTION_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_ACTION_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/function_index.hpp"
 #include "tyr/formalism/planning/action_index.hpp"
@@ -28,21 +28,23 @@
 #include "tyr/formalism/planning/ground_conjunctive_condition_index.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_effect_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::GroundAction>
+struct Data<::tyr::formalism::planning::GroundAction>
 {
-    Index<formalism::planning::GroundAction> index;
-    Index<formalism::RelationBinding<formalism::planning::Action>> binding;
-    Index<formalism::planning::GroundConjunctiveCondition> condition;
-    IndexList<formalism::planning::GroundConditionalEffect> effects;
+    ygg::Index<::tyr::formalism::planning::GroundAction> index;
+    ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>> binding;
+    ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition> condition;
+    ygg::IndexList<::tyr::formalism::planning::GroundConditionalEffect> effects;
 
     Data() = default;
-    Data(Index<formalism::RelationBinding<formalism::planning::Action>> binding_,
-         Index<formalism::planning::GroundConjunctiveCondition> condition_,
-         IndexList<formalism::planning::GroundConditionalEffect> effects_) :
+    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>> binding_,
+         ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition> condition_,
+         ygg::IndexList<::tyr::formalism::planning::GroundConditionalEffect> effects_) :
         index(),
         binding(binding_),
         condition(condition_),
@@ -51,9 +53,9 @@ struct Data<formalism::planning::GroundAction>
     }
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::RelationBinding<formalism::planning::Action>>, C> binding_,
-         View<Index<formalism::planning::GroundConjunctiveCondition>, C> condition_,
-         const std::vector<View<Index<formalism::planning::GroundConditionalEffect>, C>>& effects_) :
+    Data(::ygg::View<ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>>, C> binding_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition>, C> condition_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::GroundConditionalEffect>, C>>& effects_) :
         index(),
         binding(),
         condition(),
@@ -70,10 +72,10 @@ struct Data<formalism::planning::GroundAction>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(binding);
-        tyr::clear(condition);
-        tyr::clear(effects);
+        ygg::clear(index);
+        ygg::clear(binding);
+        ygg::clear(condition);
+        ygg::clear(effects);
     }
 
     auto cista_members() const noexcept { return std::tie(index, binding, condition, effects); }
@@ -81,7 +83,7 @@ struct Data<formalism::planning::GroundAction>
     auto identifying_members() const noexcept { return std::tie(binding, condition, effects); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::GroundAction>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundAction>);
 }
 
 #endif

@@ -16,13 +16,13 @@
  */
 
 #include "tyr/analysis/domains.hpp"
-#include "tyr/common/config.hpp"
-#include "tyr/common/formatter.hpp"
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
-#include "tyr/common/unordered_set.hpp"
-#include "tyr/common/variant.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/formatting/formatter.hpp>
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/unordered_set.hpp>
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -49,13 +49,13 @@ namespace
 template<typename Element, typename Payload>
 struct TmpScoped
 {
-    Index<Element> element;
+    ygg::Index<Element> element;
     Payload payload;
 };
 
 struct TmpVariableDomain
 {
-    UnorderedSet<Index<formalism::Object>> objects;
+    ygg::UnorderedSet<ygg::Index<::tyr::formalism::Object>> objects;
 };
 
 using TmpVariableDomainList = std::vector<TmpVariableDomain>;
@@ -64,15 +64,15 @@ template<typename Element>
 using TmpSimpleScopedDomain = TmpScoped<Element, TmpVariableDomainList>;
 
 template<typename Element>
-using TmpSimpleScopedDomainMap = UnorderedMap<Index<Element>, TmpVariableDomainList>;
+using TmpSimpleScopedDomainMap = ygg::UnorderedMap<ygg::Index<Element>, TmpVariableDomainList>;
 
-template<formalism::FactKind T>
-using TmpPredicateDomainMap = TmpSimpleScopedDomainMap<formalism::Predicate<T>>;
+template<::tyr::formalism::FactKind T>
+using TmpPredicateDomainMap = TmpSimpleScopedDomainMap<::tyr::formalism::Predicate<T>>;
 
-template<formalism::FactKind T>
-using TmpFunctionDomainMap = TmpSimpleScopedDomainMap<formalism::Function<T>>;
+template<::tyr::formalism::FactKind T>
+using TmpFunctionDomainMap = TmpSimpleScopedDomainMap<::tyr::formalism::Function<T>>;
 
-using TmpRuleDomainMap = TmpSimpleScopedDomainMap<formalism::datalog::Rule>;
+using TmpRuleDomainMap = TmpSimpleScopedDomainMap<::tyr::formalism::datalog::Rule>;
 
 /**
  * Conversion helpers to public representation.
@@ -80,7 +80,7 @@ using TmpRuleDomainMap = TmpSimpleScopedDomainMap<formalism::datalog::Rule>;
 
 VariableDomain to_variable_domain(const TmpVariableDomain& domain)
 {
-    auto objects = std::vector<Index<f::Object>>(domain.objects.begin(), domain.objects.end());
+    auto objects = std::vector<ygg::Index<f::Object>>(domain.objects.begin(), domain.objects.end());
     std::sort(objects.begin(), objects.end());
     return VariableDomain { std::move(objects) };
 }
@@ -128,7 +128,7 @@ RuleDomainMap to_rule_domain_map(const TmpRuleDomainMap& domains)
     for (const auto& [rule, variable_domains] : domains)
     {
         result.emplace(rule,
-                       SimpleScopedDomain<formalism::datalog::Rule> {
+                       SimpleScopedDomain<::tyr::formalism::datalog::Rule> {
                            rule,
                            to_variable_domain_list(variable_domains),
                        });
@@ -279,9 +279,9 @@ struct RestrictPolicy
     template<typename Symbol>
     void on_parameter(size_t pos, f::ParameterIndex param, Symbol symbol)
     {
-        auto& parameter_domain = parameter_domains[uint_t(param)];
+        auto& parameter_domain = parameter_domains[ygg::uint_t(param)];
         const auto& symbol_domain = get_domains(symbol).at(symbol.get_index())[pos];
-        intersect_inplace(parameter_domain.objects, symbol_domain.objects);
+        ygg::intersect_inplace(parameter_domain.objects, symbol_domain.objects);
     }
 };
 
@@ -320,7 +320,7 @@ struct LiftPolicy
     void on_parameter(size_t pos, f::ParameterIndex param, Symbol symbol)
     {
         auto& domain = get_domains(symbol).at(symbol.get_index())[pos];
-        union_inplace(domain.objects, parameter_domains[uint_t(param)].objects);
+        ygg::union_inplace(domain.objects, parameter_domains[ygg::uint_t(param)].objects);
     }
 };
 
@@ -332,7 +332,7 @@ template<typename Policy>
 void apply_policy(fd::FunctionExpressionView element, Policy& policy);
 
 template<typename Policy>
-void apply_policy(float_t, Policy&)
+void apply_policy(ygg::float_t, Policy&)
 {
 }
 
@@ -379,7 +379,7 @@ void apply_policy(fd::AtomView<T> element, Policy& policy)
             }
             else
             {
-                static_assert(dependent_false<Alternative>::value, "Missing case");
+                static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             }
         },
         element.get_terms());
@@ -417,7 +417,7 @@ void apply_policy(fd::FunctionTermView<T> element, Policy& policy)
             }
             else
             {
-                static_assert(dependent_false<Alternative>::value, "Missing case");
+                static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             }
         },
         element.get_terms());
@@ -458,7 +458,7 @@ void apply_policy(fd::NumericEffectOperatorView<T> element, Policy& policy)
 
 ProgramVariableDomains compute_variable_domains(fd::ProgramView program)
 {
-    auto universe = UnorderedSet<Index<f::Object>> {};
+    auto universe = ygg::UnorderedSet<ygg::Index<f::Object>> {};
     for (const auto object : program.get_objects())
         universe.insert(object.get_index());
 

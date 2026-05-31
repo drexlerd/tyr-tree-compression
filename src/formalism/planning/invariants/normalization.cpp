@@ -23,7 +23,7 @@ namespace tyr::formalism::planning::invariant
 {
 namespace
 {
-bool uses_parameter(const Data<Term>& term, ParameterIndex parameter)
+bool uses_parameter(const ygg::Data<Term>& term, ParameterIndex parameter)
 {
     return std::visit(
         [&](auto&& arg) -> bool
@@ -32,10 +32,10 @@ bool uses_parameter(const Data<Term>& term, ParameterIndex parameter)
 
             if constexpr (std::is_same_v<T, ParameterIndex>)
                 return arg == parameter;
-            else if constexpr (std::is_same_v<T, Index<Object>>)
+            else if constexpr (std::is_same_v<T, ygg::Index<Object>>)
                 return false;
             else
-                static_assert(dependent_false<T>::value, "Missing case");
+                static_assert(ygg::dependent_false<T>::value, "Missing case");
         },
         term.value);
 }
@@ -108,16 +108,16 @@ void remove_unused_parameters(Invariant& inv)
         for (auto& term : atom.terms)
         {
             term = std::visit(
-                [&](auto&& arg) -> Data<Term>
+                [&](auto&& arg) -> ygg::Data<Term>
                 {
                     using T = std::decay_t<decltype(arg)>;
 
                     if constexpr (std::is_same_v<T, ParameterIndex>)
-                        return Data<Term>(*remap[static_cast<uint_t>(arg)]);
-                    else if constexpr (std::is_same_v<T, Index<Object>>)
-                        return Data<Term>(arg);
+                        return ygg::Data<Term>(*remap[static_cast<ygg::uint_t>(arg)]);
+                    else if constexpr (std::is_same_v<T, ygg::Index<Object>>)
+                        return ygg::Data<Term>(arg);
                     else
-                        static_assert(dependent_false<T>::value, "Missing case");
+                        static_assert(ygg::dependent_false<T>::value, "Missing case");
                 },
                 term.value);
         }

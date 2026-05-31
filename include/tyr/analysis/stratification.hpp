@@ -18,8 +18,8 @@
 #ifndef TYR_ANALYSIS_STRATIFICATION_HPP_
 #define TYR_ANALYSIS_STRATIFICATION_HPP_
 
-#include "tyr/common/cista_formatters.hpp"
-#include "tyr/common/types.hpp"                    // for IndexList
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/core/types.hpp>                    // for ygg::IndexList
 #include "tyr/formalism/datalog/declarations.hpp"  // for Program (ptr only), Rule
 #include "tyr/formalism/datalog/repository.hpp"
 
@@ -28,14 +28,14 @@
 namespace tyr::analysis
 {
 
-using RuleStratum = IndexList<formalism::datalog::Rule>;
+using RuleStratum = ygg::IndexList<::tyr::formalism::datalog::Rule>;
 
 struct RuleStrata
 {
     std::vector<RuleStratum> data;
 };
 
-extern RuleStrata compute_rule_stratification(formalism::datalog::ProgramView program);
+extern RuleStrata compute_rule_stratification(::tyr::formalism::datalog::ProgramView program);
 }
 
 #endif

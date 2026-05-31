@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_PROGRAMS_RPG_HPP_
 #define TYR_PLANNING_PROGRAMS_RPG_HPP_
 
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/datalog/program_context.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -35,16 +35,16 @@ namespace tyr::planning
 class RPGProgram
 {
 public:
-    using RuleToActionMapping = UnorderedMap<formalism::datalog::RuleView, formalism::planning::ActionView>;
+    using RuleToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::RuleView, ::tyr::formalism::planning::ActionView>;
 
-    explicit RPGProgram(formalism::planning::TaskView task);
+    explicit RPGProgram(::tyr::formalism::planning::TaskView task);
 
     const TranslationContext& get_translation_context() const noexcept;
     const RuleToActionMapping& get_rule_to_action_mapping() const noexcept;
     datalog::ProgramContext& get_program_context() noexcept;
     const datalog::ProgramContext& get_program_context() const noexcept;
     const datalog::ConstProgramWorkspace& get_const_program_workspace() const noexcept;
-    formalism::datalog::GroundConjunctiveConditionView get_goal() const noexcept;
+    ::tyr::formalism::datalog::GroundConjunctiveConditionView get_goal() const noexcept;
 
 private:
     TranslationContext m_translation_context;

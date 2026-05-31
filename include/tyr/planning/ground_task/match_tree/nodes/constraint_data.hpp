@@ -18,27 +18,29 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_CONSTRAINT_DATA_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_CONSTRAINT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/boolean_operator_data.hpp"
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/node_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<typename Tag>
 struct Data<planning::match_tree::NumericConstraintSelectorNode<Tag>>
 {
-    Index<planning::match_tree::NumericConstraintSelectorNode<Tag>> index;
-    Data<formalism::planning::BooleanOperator<Data<formalism::planning::GroundFunctionExpression>>> constraint;
-    ::cista::optional<Data<planning::match_tree::Node<Tag>>> true_child;
-    ::cista::optional<Data<planning::match_tree::Node<Tag>>> dontcare_child;
+    ygg::Index<planning::match_tree::NumericConstraintSelectorNode<Tag>> index;
+    ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>> constraint;
+    ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> true_child;
+    ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> dontcare_child;
 
     Data() = default;
-    Data(Index<planning::match_tree::NumericConstraintSelectorNode<Tag>> index,
-         Data<formalism::planning::BooleanOperator<Data<formalism::planning::GroundFunctionExpression>>> constraint,
-         ::cista::optional<Data<planning::match_tree::Node<Tag>>> true_child,
-         ::cista::optional<Data<planning::match_tree::Node<Tag>>> dontcare_child) :
+    Data(ygg::Index<planning::match_tree::NumericConstraintSelectorNode<Tag>> index,
+         ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>> constraint,
+         ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> true_child,
+         ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> dontcare_child) :
         index(index),
         constraint(constraint),
         true_child(true_child),
@@ -52,10 +54,10 @@ struct Data<planning::match_tree::NumericConstraintSelectorNode<Tag>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(constraint);
-        tyr::clear(true_child);
-        tyr::clear(dontcare_child);
+        ygg::clear(index);
+        ygg::clear(constraint);
+        ygg::clear(true_child);
+        ygg::clear(dontcare_child);
     }
 
     auto cista_members() const noexcept { return std::tie(index, constraint, true_child, dontcare_child); }

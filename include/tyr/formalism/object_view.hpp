@@ -18,21 +18,22 @@
 #ifndef TYR_FORMALISM_OBJECT_VIEW_HPP_
 #define TYR_FORMALISM_OBJECT_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/object_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 template<typename C>
-class View<Index<formalism::Object>, C>
+class View<ygg::Index<::tyr::formalism::Object>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::Object> m_handle;
+    ygg::Index<::tyr::formalism::Object> m_handle;
 
 public:
-    View(Index<formalism::Object> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::Object> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }

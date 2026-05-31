@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_HASH_SET_CONTEXT_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_HASH_SET_CONTEXT_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/raw_vector_set.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/raw_vector_set.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
@@ -38,8 +38,8 @@ namespace tyr::planning
 template<>
 struct StateStorageContext<LiftedTag, HashSet>
 {
-    RawVectorSet<uint_t, uint_t> uint_vec_set;
-    RawVectorSet<uint_t, float_t> float_vec_set;
+    ygg::RawVectorSet<ygg::uint_t, ygg::uint_t> uint_vec_set;
+    ygg::RawVectorSet<ygg::uint_t, ygg::float_t> float_vec_set;
 
     size_t memory_usage() const noexcept
     {

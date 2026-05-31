@@ -40,15 +40,15 @@ namespace tyr::formalism::planning::invariant
 
 namespace
 {
-tyr::formalism::unification::SubstitutionFunction<Data<Term>> make_effect_alpha_renaming(const MutableConditionalEffect& effect, size_t fresh_base)
+tyr::formalism::unification::SubstitutionFunction<ygg::Data<Term>> make_effect_alpha_renaming(const MutableConditionalEffect& effect, size_t fresh_base)
 {
     auto sigma =
-        tyr::formalism::unification::SubstitutionFunction<Data<Term>>::from_range(ParameterIndex { uint_t(effect.num_parent_variables) }, effect.num_variables);
+        tyr::formalism::unification::SubstitutionFunction<ygg::Data<Term>>::from_range(ParameterIndex { ygg::uint_t(effect.num_parent_variables) }, effect.num_variables);
 
     for (size_t i = 0; i < effect.num_variables; ++i)
     {
         [[maybe_unused]] const auto inserted =
-            sigma.assign(ParameterIndex { uint_t(effect.num_parent_variables + i) }, Data<Term>(ParameterIndex { uint_t(fresh_base + i) }));
+            sigma.assign(ParameterIndex { ygg::uint_t(effect.num_parent_variables + i) }, ygg::Data<Term>(ParameterIndex { ygg::uint_t(fresh_base + i) }));
         assert(inserted);
     }
 
@@ -80,10 +80,10 @@ std::vector<EffectAtomRef> collect_relevant_effect_atoms(const MutableAction& op
     return result;
 }
 
-Map<PredicateView<FluentTag>, MutableLiteralList<FluentTag>>
+ygg::Map<PredicateView<FluentTag>, MutableLiteralList<FluentTag>>
 build_add_effect_produced_by_pred(const MutableAction& op, const MutableConditionalEffect& add_effect, const MutableAtom<FluentTag>& add_atom)
 {
-    Map<PredicateView<FluentTag>, MutableLiteralList<FluentTag>> produced_by_pred;
+    ygg::Map<PredicateView<FluentTag>, MutableLiteralList<FluentTag>> produced_by_pred;
 
     for (const auto& lit : op.condition.fluent_literals)
         produced_by_pred[lit.atom.predicate].push_back(lit);
@@ -137,7 +137,7 @@ ConstraintSystem make_param_system(const MutableAction& op, const MutableConditi
             const auto r1 = representative_of(t1);
             const auto r2 = representative_of(t2);
 
-            if (!tyr::EqualTo<ConstraintTerm> {}(r1, r2))
+            if (!ygg::EqualTo<ConstraintTerm> {}(r1, r2))
                 param_system.add_inequality_disjunction(InequalityDisjunction({ { t1, t2 } }));
         }
     }
@@ -149,7 +149,7 @@ std::optional<ConstraintSystem> make_balance_system(const MutableConditionalEffe
                                                     const MutableAtom<FluentTag>& add_atom,
                                                     const MutableConditionalEffect& del_effect,
                                                     const MutableAtom<FluentTag>& del_atom,
-                                                    const Map<PredicateView<FluentTag>, MutableLiteralList<FluentTag>>& produced_by_pred)
+                                                    const ygg::Map<PredicateView<FluentTag>, MutableLiteralList<FluentTag>>& produced_by_pred)
 {
     ConstraintSystem system;
 

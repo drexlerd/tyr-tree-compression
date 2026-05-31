@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_DATALOG_PROGRAM_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_PROGRAM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
 #include "tyr/formalism/datalog/ground_conjunctive_condition_index.hpp"
@@ -30,37 +30,39 @@
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::datalog::Program>
+struct Data<::tyr::formalism::datalog::Program>
 {
-    Index<formalism::datalog::Program> index;
-    IndexList<formalism::Predicate<formalism::StaticTag>> static_predicates;
-    IndexList<formalism::Predicate<formalism::FluentTag>> fluent_predicates;
-    IndexList<formalism::Function<formalism::StaticTag>> static_functions;
-    IndexList<formalism::Function<formalism::FluentTag>> fluent_functions;
-    IndexList<formalism::Object> objects;
-    IndexList<formalism::datalog::GroundAtom<formalism::StaticTag>> static_atoms;
-    IndexList<formalism::datalog::GroundAtom<formalism::FluentTag>> fluent_atoms;
-    IndexList<formalism::datalog::GroundFunctionTermValue<formalism::StaticTag>> static_fterm_values;
-    IndexList<formalism::datalog::GroundFunctionTermValue<formalism::FluentTag>> fluent_fterm_values;
-    ::cista::optional<Index<formalism::datalog::GroundConjunctiveCondition>> goal;
-    IndexList<formalism::datalog::Rule> rules;
+    ygg::Index<::tyr::formalism::datalog::Program> index;
+    ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>> static_predicates;
+    ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> fluent_predicates;
+    ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::StaticTag>> static_functions;
+    ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::FluentTag>> fluent_functions;
+    ygg::IndexList<::tyr::formalism::Object> objects;
+    ygg::IndexList<::tyr::formalism::datalog::GroundAtom<::tyr::formalism::StaticTag>> static_atoms;
+    ygg::IndexList<::tyr::formalism::datalog::GroundAtom<::tyr::formalism::FluentTag>> fluent_atoms;
+    ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::StaticTag>> static_fterm_values;
+    ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::FluentTag>> fluent_fterm_values;
+    ::cista::optional<ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition>> goal;
+    ygg::IndexList<::tyr::formalism::datalog::Rule> rules;
 
     Data() = default;
-    Data(Index<formalism::datalog::Program> index,
-         IndexList<formalism::Predicate<formalism::StaticTag>> static_predicates,
-         IndexList<formalism::Predicate<formalism::FluentTag>> fluent_predicates,
-         IndexList<formalism::Function<formalism::StaticTag>> static_functions,
-         IndexList<formalism::Function<formalism::FluentTag>> fluent_functions,
-         IndexList<formalism::Object> objects,
-         IndexList<formalism::datalog::GroundAtom<formalism::StaticTag>> static_atoms,
-         IndexList<formalism::datalog::GroundAtom<formalism::FluentTag>> fluent_atoms,
-         IndexList<formalism::datalog::GroundFunctionTermValue<formalism::StaticTag>> static_fterm_values,
-         IndexList<formalism::datalog::GroundFunctionTermValue<formalism::FluentTag>> fluent_fterm_values,
-         ::cista::optional<Index<formalism::datalog::GroundConjunctiveCondition>> goal,
-         IndexList<formalism::datalog::Rule> rules) :
+    Data(ygg::Index<::tyr::formalism::datalog::Program> index,
+         ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>> static_predicates,
+         ygg::IndexList<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> fluent_predicates,
+         ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::StaticTag>> static_functions,
+         ygg::IndexList<::tyr::formalism::Function<::tyr::formalism::FluentTag>> fluent_functions,
+         ygg::IndexList<::tyr::formalism::Object> objects,
+         ygg::IndexList<::tyr::formalism::datalog::GroundAtom<::tyr::formalism::StaticTag>> static_atoms,
+         ygg::IndexList<::tyr::formalism::datalog::GroundAtom<::tyr::formalism::FluentTag>> fluent_atoms,
+         ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::StaticTag>> static_fterm_values,
+         ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::FluentTag>> fluent_fterm_values,
+         ::cista::optional<ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition>> goal,
+         ygg::IndexList<::tyr::formalism::datalog::Rule> rules) :
         index(index),
         static_predicates(std::move(static_predicates)),
         fluent_predicates(std::move(fluent_predicates)),
@@ -82,62 +84,62 @@ struct Data<formalism::datalog::Program>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(static_predicates);
-        tyr::clear(fluent_predicates);
-        tyr::clear(static_functions);
-        tyr::clear(fluent_functions);
-        tyr::clear(objects);
-        tyr::clear(static_atoms);
-        tyr::clear(fluent_atoms);
-        tyr::clear(static_fterm_values);
-        tyr::clear(fluent_fterm_values);
-        tyr::clear(goal);
-        tyr::clear(rules);
+        ygg::clear(index);
+        ygg::clear(static_predicates);
+        ygg::clear(fluent_predicates);
+        ygg::clear(static_functions);
+        ygg::clear(fluent_functions);
+        ygg::clear(objects);
+        ygg::clear(static_atoms);
+        ygg::clear(fluent_atoms);
+        ygg::clear(static_fterm_values);
+        ygg::clear(fluent_fterm_values);
+        ygg::clear(goal);
+        ygg::clear(rules);
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_predicates() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_predicates;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_predicates;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_functions() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_functions;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_functions;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_atoms() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_atoms;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_atoms;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_fterm_values() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_fterm_values;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_fterm_values;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     auto cista_members() const noexcept
@@ -171,7 +173,7 @@ struct Data<formalism::datalog::Program>
     }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::Program>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::Program>);
 
 }
 

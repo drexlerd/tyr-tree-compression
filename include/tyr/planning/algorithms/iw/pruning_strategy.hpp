@@ -33,15 +33,15 @@ template<TaskKind Kind>
 class NoveltyPruningStrategy : public PruningStrategy<Kind>
 {
 public:
-    explicit NoveltyPruningStrategy(uint_t max_arity) : m_max_arity(max_arity)
+    explicit NoveltyPruningStrategy(ygg::uint_t max_arity) : m_max_arity(max_arity)
     {
         if (max_arity > MaxArity)
             throw std::invalid_argument("NoveltyPruningStrategy(...): max_arity exceeds iw::MaxArity.");
     }
 
-    static std::shared_ptr<NoveltyPruningStrategy<Kind>> create(uint_t max_arity) { return std::make_shared<NoveltyPruningStrategy<Kind>>(max_arity); }
+    static std::shared_ptr<NoveltyPruningStrategy<Kind>> create(ygg::uint_t max_arity) { return std::make_shared<NoveltyPruningStrategy<Kind>>(max_arity); }
 
-    uint_t get_max_arity() const noexcept { return m_max_arity; }
+    ygg::uint_t get_max_arity() const noexcept { return m_max_arity; }
 
     const DynamicNoveltyTable<MaxArity>& get_novelty_table() const noexcept { return m_novelty_table; }
 
@@ -75,8 +75,8 @@ public:
     }
 
 private:
-    uint_t m_max_arity;
-    std::optional<Index<State<Kind>>> m_root_state;
+    ygg::uint_t m_max_arity;
+    std::optional<ygg::Index<State<Kind>>> m_root_state;
     DynamicNoveltyTable<MaxArity> m_novelty_table;
 };
 

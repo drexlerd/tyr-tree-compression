@@ -18,31 +18,33 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_CONJUNCTIVE_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_CONJUNCTIVE_EFFECT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/fdr_fact_data.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_effect_index.hpp"
 #include "tyr/formalism/planning/ground_literal_index.hpp"
 #include "tyr/formalism/planning/ground_numeric_effect_operator_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::GroundConjunctiveEffect>
+struct Data<::tyr::formalism::planning::GroundConjunctiveEffect>
 {
-    Index<formalism::planning::GroundConjunctiveEffect> index;
-    DataList<formalism::planning::FDRFact<formalism::FluentTag>> add_facts;
-    DataList<formalism::planning::FDRFact<formalism::FluentTag>> del_facts;
-    DataList<formalism::planning::GroundNumericEffectOperator<formalism::FluentTag>> numeric_effects;
-    ::cista::optional<Data<formalism::planning::GroundNumericEffectOperator<formalism::AuxiliaryTag>>> auxiliary_numeric_effect;  // :action-cost
+    ygg::Index<::tyr::formalism::planning::GroundConjunctiveEffect> index;
+    ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> add_facts;
+    ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> del_facts;
+    ygg::DataList<::tyr::formalism::planning::GroundNumericEffectOperator<::tyr::formalism::FluentTag>> numeric_effects;
+    ::cista::optional<ygg::Data<::tyr::formalism::planning::GroundNumericEffectOperator<::tyr::formalism::AuxiliaryTag>>> auxiliary_numeric_effect;  // :action-cost
 
     Data() = default;
-    Data(DataList<formalism::planning::FDRFact<formalism::FluentTag>> add_facts_,
-         DataList<formalism::planning::FDRFact<formalism::FluentTag>> del_facts_,
-         DataList<formalism::planning::GroundNumericEffectOperator<formalism::FluentTag>> numeric_effects_,
-         ::cista::optional<Data<formalism::planning::GroundNumericEffectOperator<formalism::AuxiliaryTag>>> auxiliary_numeric_effect_) :
+    Data(ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> add_facts_,
+         ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> del_facts_,
+         ygg::DataList<::tyr::formalism::planning::GroundNumericEffectOperator<::tyr::formalism::FluentTag>> numeric_effects_,
+         ::cista::optional<ygg::Data<::tyr::formalism::planning::GroundNumericEffectOperator<::tyr::formalism::AuxiliaryTag>>> auxiliary_numeric_effect_) :
         index(),
         add_facts(std::move(add_facts_)),
         del_facts(std::move(del_facts_)),
@@ -52,10 +54,10 @@ struct Data<formalism::planning::GroundConjunctiveEffect>
     }
     // Python constructor
     template<typename C>
-    Data(const std::vector<View<Data<formalism::planning::FDRFact<formalism::FluentTag>>, C>>& add_facts_,
-         const std::vector<View<Data<formalism::planning::FDRFact<formalism::FluentTag>>, C>>& del_facts_,
-         const std::vector<View<Data<formalism::planning::GroundNumericEffectOperator<formalism::FluentTag>>, C>>& numeric_effects_,
-         const std::optional<View<Data<formalism::planning::GroundNumericEffectOperator<formalism::AuxiliaryTag>>, C>>& auxiliary_numeric_effect_) :
+    Data(const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>, C>>& add_facts_,
+         const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>, C>>& del_facts_,
+         const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::GroundNumericEffectOperator<::tyr::formalism::FluentTag>>, C>>& numeric_effects_,
+         const std::optional<::ygg::View<ygg::Data<::tyr::formalism::planning::GroundNumericEffectOperator<::tyr::formalism::AuxiliaryTag>>, C>>& auxiliary_numeric_effect_) :
         index(),
         add_facts(),
         del_facts(),
@@ -72,31 +74,31 @@ struct Data<formalism::planning::GroundConjunctiveEffect>
     Data(Data&& other) = default;
     Data& operator=(Data&& other) = default;
 
-    template<formalism::PolarityKind T>
+    template<::tyr::formalism::PolarityKind T>
     const auto& get_facts() const
     {
-        if constexpr (std::same_as<T, formalism::PositiveTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::PositiveTag>)
             return add_facts;
-        else if constexpr (std::same_as<T, formalism::NegativeTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::NegativeTag>)
             return del_facts;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(add_facts);
-        tyr::clear(del_facts);
-        tyr::clear(numeric_effects);
-        tyr::clear(auxiliary_numeric_effect);
+        ygg::clear(index);
+        ygg::clear(add_facts);
+        ygg::clear(del_facts);
+        ygg::clear(numeric_effects);
+        ygg::clear(auxiliary_numeric_effect);
     }
 
     auto cista_members() const noexcept { return std::tie(index, add_facts, del_facts, numeric_effects, auxiliary_numeric_effect); }
     auto identifying_members() const noexcept { return std::tie(add_facts, del_facts, numeric_effects, auxiliary_numeric_effect); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::GroundConjunctiveEffect>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundConjunctiveEffect>);
 }
 
 #endif

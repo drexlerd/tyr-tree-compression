@@ -18,9 +18,9 @@
 #ifndef TYR_SRC_ANALYSIS_STRATIFICATION_UTILS_HPP_
 #define TYR_SRC_ANALYSIS_STRATIFICATION_UTILS_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 #include <algorithm>
 #include <boost/graph/adjacency_list.hpp>
@@ -59,9 +59,9 @@ using DagV = boost::graph_traits<Dag>::vertex_descriptor;
 using DagE = boost::graph_traits<Dag>::edge_descriptor;
 
 // Run SCCs, check stratifiability, return component id per vertex and #components
-inline std::pair<std::vector<uint_t>, uint_t> compute_scc_and_check(const DepGraph& g)
+inline std::pair<std::vector<ygg::uint_t>, ygg::uint_t> compute_scc_and_check(const DepGraph& g)
 {
-    auto comp = std::vector<uint_t>(boost::num_vertices(g), std::numeric_limits<uint_t>::max());
+    auto comp = std::vector<ygg::uint_t>(boost::num_vertices(g), std::numeric_limits<ygg::uint_t>::max());
     const auto num = boost::strong_components(g, boost::make_iterator_property_map(comp.begin(), boost::get(boost::vertex_index, g)));
 
     // Stratifiable iff no STRICT edge stays within the same SCC
@@ -81,11 +81,11 @@ inline std::pair<std::vector<uint_t>, uint_t> compute_scc_and_check(const DepGra
 }
 
 // Build condensed DAG of SCCs, with edge weight inc=1 if any strict edge exists between SCCs
-inline Dag build_condensation_dag(const DepGraph& g, const std::vector<uint_t>& comp, uint_t num_comps)
+inline Dag build_condensation_dag(const DepGraph& g, const std::vector<ygg::uint_t>& comp, ygg::uint_t num_comps)
 {
     Dag dag(num_comps);
 
-    using EdgeMap = gtl::flat_hash_map<std::pair<uint_t, uint_t>, EdgeKind, Hash<std::pair<uint_t, uint_t>>, EqualTo<std::pair<uint_t, uint_t>>>;
+    using EdgeMap = gtl::flat_hash_map<std::pair<ygg::uint_t, ygg::uint_t>, EdgeKind, ygg::Hash<std::pair<ygg::uint_t, ygg::uint_t>>, ygg::EqualTo<std::pair<ygg::uint_t, ygg::uint_t>>>;
     auto best = EdgeMap {};
     best.reserve(boost::num_edges(g));
 
@@ -119,7 +119,7 @@ inline Dag build_condensation_dag(const DepGraph& g, const std::vector<uint_t>& 
 }
 
 // Compute minimal strata on SCC DAG: s[dst] = max(s[dst], s[src] + inc)
-inline std::vector<uint_t> compute_component_strata(const Dag& dag)
+inline std::vector<ygg::uint_t> compute_component_strata(const Dag& dag)
 {
     auto topo = std::vector<DagV> {};
     topo.reserve(boost::num_vertices(dag));
@@ -127,7 +127,7 @@ inline std::vector<uint_t> compute_component_strata(const Dag& dag)
 
     std::reverse(topo.begin(), topo.end());
 
-    auto s = std::vector<uint_t>(boost::num_vertices(dag), 0);
+    auto s = std::vector<ygg::uint_t>(boost::num_vertices(dag), 0);
 
     for (const auto u : topo)
     {

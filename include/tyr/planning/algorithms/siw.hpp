@@ -39,7 +39,7 @@ struct Options
     EventHandlerPtr<Kind> event_handler = nullptr;
     GoalStrategyPtr<Kind> subgoal_strategy = nullptr;
     GoalStrategyPtr<Kind> goal_strategy = nullptr;
-    uint_t max_num_subsearches = std::numeric_limits<uint_t>::max();
+    ygg::uint_t max_num_subsearches = std::numeric_limits<ygg::uint_t>::max();
 
     Options() = default;
 };

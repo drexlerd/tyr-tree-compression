@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_ACTION_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_ACTION_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/mutable/conditional_effect.hpp"
 #include "tyr/formalism/planning/mutable/conjunctive_condition.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -55,9 +55,9 @@ struct MutableAction
 
     auto identifying_members() const noexcept { return std::tie(num_variables, condition, effects); }
 
-    friend bool operator==(const MutableAction& lhs, const MutableAction& rhs) { return EqualTo<MutableAction> {}(lhs, rhs); }
+    friend bool operator==(const MutableAction& lhs, const MutableAction& rhs) { return ygg::EqualTo<MutableAction> {}(lhs, rhs); }
 
-    friend bool operator<(const MutableAction& lhs, const MutableAction& rhs) { return Less<MutableAction> {}(lhs, rhs); }
+    friend bool operator<(const MutableAction& lhs, const MutableAction& rhs) { return ygg::Less<MutableAction> {}(lhs, rhs); }
 };
 
 using MutableActionList = std::vector<MutableAction>;

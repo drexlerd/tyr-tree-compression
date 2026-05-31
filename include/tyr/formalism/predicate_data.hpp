@@ -18,24 +18,26 @@
 #ifndef TYR_FORMALISM_PREDICATE_DATA_HPP_
 #define TYR_FORMALISM_PREDICATE_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Data<formalism::Predicate<T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::Predicate<T>>
 {
-    Index<formalism::Predicate<T>> index;
+    ygg::Index<::tyr::formalism::Predicate<T>> index;
     ::cista::offset::string name;
-    uint_t arity;
+    ygg::uint_t arity;
 
     Data() = default;
-    Data(::cista::offset::string name_, uint_t arity_) : index(), name(std::move(name_)), arity(arity_) {}
+    Data(::cista::offset::string name_, ygg::uint_t arity_) : index(), name(std::move(name_)), arity(arity_) {}
     // Python constructor
-    Data(const std::string& name_, uint_t arity_) : index(), name(name_), arity(arity_) {}
+    Data(const std::string& name_, ygg::uint_t arity_) : index(), name(name_), arity(arity_) {}
     Data(const Data& other) = delete;
     Data& operator=(const Data& other) = delete;
     Data(Data&& other) = default;
@@ -43,16 +45,16 @@ struct Data<formalism::Predicate<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(name);
-        tyr::clear(arity);
+        ygg::clear(index);
+        ygg::clear(name);
+        ygg::clear(arity);
     }
 
     auto cista_members() const noexcept { return std::tie(index, name, arity); }
     auto identifying_members() const noexcept { return std::tie(name, arity); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::Predicate<formalism::StaticTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::Predicate<::tyr::formalism::StaticTag>>);
 }
 
 #endif

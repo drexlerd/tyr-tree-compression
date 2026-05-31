@@ -27,8 +27,8 @@
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <tyr/common/python/bindings.hpp>
-#include <tyr/common/python/type_casters.hpp>
+#include "pytyr/bindings.hpp"
+#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
 
 namespace tyr::planning
@@ -42,29 +42,29 @@ void bind_state(nb::module_& m, const std::string& name)
     using T = StateView<Kind>;
 
     auto cls = nb::class_<T>(m, name.c_str())  //
-                   .def("__str__", [](const T& self) { return to_string(self); })
+                   .def("__str__", [](const T& self) { return ygg::to_string(self); })
                    .def("get_index", &T::get_index, nb::rv_policy::copy)
                    .def("get_repository", &T::get_repository, nb::rv_policy::copy)
                    .def("get_state_repository", &T::get_state_repository, nb::rv_policy::copy)
                    // AccessibleStateConcept
                    .def("test",
-                        nb::overload_cast<formalism::planning::GroundAtomView<formalism::StaticTag>>(&T::test, nb::const_),
+                        nb::overload_cast<::tyr::formalism::planning::GroundAtomView<::tyr::formalism::StaticTag>>(&T::test, nb::const_),
                         nb::rv_policy::copy,
                         "static_atom"_a)
                    .def("test",
-                        nb::overload_cast<formalism::planning::GroundAtomView<formalism::DerivedTag>>(&T::test, nb::const_),
+                        nb::overload_cast<::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag>>(&T::test, nb::const_),
                         nb::rv_policy::copy,
                         "derived_atom"_a)
                    .def("get",
-                        nb::overload_cast<formalism::planning::GroundFunctionTermView<formalism::StaticTag>>(&T::get, nb::const_),
+                        nb::overload_cast<::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::StaticTag>>(&T::get, nb::const_),
                         nb::rv_policy::copy,
                         "static_fterm"_a)
                    .def("get",
-                        nb::overload_cast<formalism::planning::FDRVariableView<formalism::FluentTag>>(&T::get, nb::const_),
+                        nb::overload_cast<::tyr::formalism::planning::FDRVariableView<::tyr::formalism::FluentTag>>(&T::get, nb::const_),
                         nb::rv_policy::copy,
                         "fluent_fact"_a)
                    .def("get",
-                        nb::overload_cast<formalism::planning::GroundFunctionTermView<formalism::FluentTag>>(&T::get, nb::const_),
+                        nb::overload_cast<::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag>>(&T::get, nb::const_),
                         nb::rv_policy::copy,
                         "fluent_fterm"_a)
                    // IterableStateConcept
@@ -117,8 +117,8 @@ void bind_node(nb::module_& m, const std::string& name)
     using T = Node<Kind>;
 
     nb::class_<T>(m, name.c_str())
-        .def(nb::init<StateView<Kind>, float_t>(), "state"_a, "metric_value"_a)
-        .def("__str__", [](const T& self) { return to_string(self); })
+        .def(nb::init<StateView<Kind>, ygg::float_t>(), "state"_a, "metric_value"_a)
+        .def("__str__", [](const T& self) { return ygg::to_string(self); })
         .def("get_state", &T::get_state, nb::rv_policy::reference_internal)
         .def("get_metric", &T::get_metric, nb::rv_policy::copy);
 }
@@ -141,7 +141,7 @@ void bind_plan(nb::module_& m, const std::string& name)
     nb::class_<T>(m, name.c_str())  //
         .def(nb::init<Node<Kind>>(), "start_node"_a)
         .def(nb::init<Node<Kind>, LabeledNodeList<Kind>>(), "start_node"_a, "labeled_succ_nodes"_a)
-        .def("__str__", [](const T& self) { return to_string(self); })
+        .def("__str__", [](const T& self) { return ygg::to_string(self); })
         .def("get_start_node", &T::get_start_node, nb::rv_policy::copy)
         .def("get_labeled_succ_nodes", &T::get_labeled_succ_nodes, nb::rv_policy::copy)
         .def("get_cost", &T::get_cost)
@@ -167,8 +167,8 @@ void bind_state_repository(nb::module_& m, const std::string& name)
         .def("get_initial_state", &T::get_initial_state, nb::rv_policy::move)
         .def("get_registered_state", &T::get_registered_state, nb::rv_policy::move, "state_index"_a)
         .def("create_state",
-             nb::overload_cast<const std::vector<formalism::planning::FDRFactView<formalism::FluentTag>>&,
-                               const std::vector<formalism::planning::GroundFunctionTermViewValuePair<formalism::FluentTag>>&>(&T::create_state),
+             nb::overload_cast<const std::vector<::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag>>&,
+                               const std::vector<::tyr::formalism::planning::GroundFunctionTermViewValuePair<::tyr::formalism::FluentTag>>&>(&T::create_state),
              nb::rv_policy::move,
              "fluent_fact"_a,
              "fterm_values"_a)
@@ -316,11 +316,11 @@ public:
 
     NB_TRAMPOLINE(Base, 3);
 
-    void set_goal(formalism::planning::GroundConjunctiveConditionView goal) override { NB_OVERRIDE_PURE(set_goal, goal); }
+    void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) override { NB_OVERRIDE_PURE(set_goal, goal); }
 
-    float_t evaluate(const StateView<Kind>& state) override { NB_OVERRIDE_PURE(evaluate, state); }
+    ygg::float_t evaluate(const StateView<Kind>& state) override { NB_OVERRIDE_PURE(evaluate, state); }
 
-    const UnorderedSet<formalism::planning::GroundActionView>& get_preferred_action_views() override { NB_OVERRIDE(get_preferred_action_views); }
+    const ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView>& get_preferred_action_views() override { NB_OVERRIDE(get_preferred_action_views); }
 };
 
 template<TaskKind Kind>
@@ -358,7 +358,7 @@ void bind_rpg_max_heuristic(nb::module_& m, const std::string& name)
     using T = MaxRPGHeuristic<Kind>;
 
     nb::class_<T, Heuristic<Kind>>(m, name.c_str())  //
-        .def(nb::new_([](TaskPtr<Kind> task, std::shared_ptr<ExecutionContext> execution_context)
+        .def(nb::new_([](TaskPtr<Kind> task, std::shared_ptr<ygg::ExecutionContext> execution_context)
                       { return T::create(std::move(task), std::move(execution_context)); }),
              "task"_a,
              "execution_context"_a);
@@ -370,7 +370,7 @@ void bind_rpg_add_heuristic(nb::module_& m, const std::string& name)
     using T = AddRPGHeuristic<Kind>;
 
     nb::class_<T, Heuristic<Kind>>(m, name.c_str())  //
-        .def(nb::new_([](TaskPtr<Kind> task, std::shared_ptr<ExecutionContext> execution_context)
+        .def(nb::new_([](TaskPtr<Kind> task, std::shared_ptr<ygg::ExecutionContext> execution_context)
                       { return T::create(std::move(task), std::move(execution_context)); }),
              "task"_a,
              "execution_context"_a);
@@ -382,7 +382,7 @@ void bind_rpg_ff_heuristic(nb::module_& m, const std::string& name)
     using T = FFRPGHeuristic<Kind>;
 
     nb::class_<T, Heuristic<Kind>>(m, name.c_str())  //
-        .def(nb::new_([](TaskPtr<Kind> task, std::shared_ptr<ExecutionContext> execution_context)
+        .def(nb::new_([](TaskPtr<Kind> task, std::shared_ptr<ygg::ExecutionContext> execution_context)
                       { return T::create(std::move(task), std::move(execution_context)); }),
              "task"_a,
              "execution_context"_a);

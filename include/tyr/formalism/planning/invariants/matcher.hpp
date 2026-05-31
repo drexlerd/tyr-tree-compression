@@ -32,7 +32,7 @@ namespace tyr::formalism::planning::invariant
 struct InvariantMatchData
 {
 public:
-    InvariantMatchData(Invariant inv, std::vector<unification::SubstitutionFunction<Index<Object>>> rigid_variable_bindings);
+    InvariantMatchData(Invariant inv, std::vector<unification::SubstitutionFunction<ygg::Index<Object>>> rigid_variable_bindings);
 
     const auto& invariant() const noexcept { return m_inv; }
     const auto& rigid_variable_bindings() const noexcept { return m_rigid_variable_bindings; }
@@ -43,10 +43,10 @@ private:
 
 private:
     Invariant m_inv;
-    std::vector<unification::SubstitutionFunction<Index<Object>>> m_rigid_variable_bindings;
+    std::vector<unification::SubstitutionFunction<ygg::Index<Object>>> m_rigid_variable_bindings;
 
     /// postings[p][o][b] is true iff the b-th binding binds object o to rigid parameter p.
-    std::vector<UnorderedMap<Index<Object>, boost::dynamic_bitset<>>> m_postings;
+    std::vector<ygg::UnorderedMap<ygg::Index<Object>, boost::dynamic_bitset<>>> m_postings;
 };
 
 using InvariantMatchDataList = std::vector<InvariantMatchData>;

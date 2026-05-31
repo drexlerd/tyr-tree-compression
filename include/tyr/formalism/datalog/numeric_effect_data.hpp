@@ -18,39 +18,41 @@
 #ifndef TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/function_expression_data.hpp"
 #include "tyr/formalism/datalog/function_term_index.hpp"
 #include "tyr/formalism/datalog/numeric_effect_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::NumericEffectOpKind Op, formalism::FactKind T>
-struct Data<formalism::datalog::NumericEffect<Op, T>>
-{
-    static_assert(std::same_as<T, formalism::FluentTag>, "Datalog numeric effects are currently only supported for fluent functions.");
+using namespace ::tyr;
 
-    Index<formalism::datalog::NumericEffect<Op, T>> index;
-    Index<formalism::datalog::FunctionTerm<T>> fterm;
-    Data<formalism::datalog::FunctionExpression> fexpr;
+template<::tyr::formalism::NumericEffectOpKind Op, ::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::datalog::NumericEffect<Op, T>>
+{
+    static_assert(std::same_as<T, ::tyr::formalism::FluentTag>, "Datalog numeric effects are currently only supported for fluent functions.");
+
+    ygg::Index<::tyr::formalism::datalog::NumericEffect<Op, T>> index;
+    ygg::Index<::tyr::formalism::datalog::FunctionTerm<T>> fterm;
+    ygg::Data<::tyr::formalism::datalog::FunctionExpression> fexpr;
 
     Data() = default;
-    Data(Index<formalism::datalog::FunctionTerm<T>> fterm_, Data<formalism::datalog::FunctionExpression> fexpr_) : index(), fterm(fterm_), fexpr(fexpr_) {}
+    Data(ygg::Index<::tyr::formalism::datalog::FunctionTerm<T>> fterm_, ygg::Data<::tyr::formalism::datalog::FunctionExpression> fexpr_) : index(), fterm(fterm_), fexpr(fexpr_) {}
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(fterm);
-        tyr::clear(fexpr);
+        ygg::clear(index);
+        ygg::clear(fterm);
+        ygg::clear(fexpr);
     }
 
     auto cista_members() const noexcept { return std::tie(index, fterm, fexpr); }
     auto identifying_members() const noexcept { return std::tie(Op::kind, fterm, fexpr); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::NumericEffect<formalism::Assign, formalism::FluentTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::NumericEffect<::tyr::formalism::Assign, ::tyr::formalism::FluentTag>>);
 
 }
 

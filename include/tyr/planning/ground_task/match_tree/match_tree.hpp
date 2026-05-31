@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_MATCH_TREE_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_MATCH_TREE_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/declarations.hpp"
@@ -35,19 +35,19 @@ template<typename Tag>
 class MatchTree
 {
 private:
-    IndexList<Tag> m_elements;
+    ygg::IndexList<Tag> m_elements;
 
     RepositoryPtr<Tag> m_context;
 
-    std::optional<Data<Node<Tag>>> m_root;
+    std::optional<ygg::Data<Node<Tag>>> m_root;
 
-    std::vector<Data<Node<Tag>>> m_evaluate_stack;  ///< temporary during evaluation.
+    std::vector<ygg::Data<Node<Tag>>> m_evaluate_stack;  ///< temporary during evaluation.
 
 public:
-    MatchTree(IndexList<Tag> elements, const formalism::planning::Repository& context);
+    MatchTree(ygg::IndexList<Tag> elements, const ::tyr::formalism::planning::Repository& context);
     ~MatchTree();
 
-    static MatchTreePtr<Tag> create(IndexList<Tag> elements, const formalism::planning::Repository& context);
+    static MatchTreePtr<Tag> create(ygg::IndexList<Tag> elements, const ::tyr::formalism::planning::Repository& context);
 
     // Uncopieable and unmoveable to prohibit invalidating spans on m_elements.
     MatchTree(const MatchTree& other) = delete;
@@ -55,7 +55,7 @@ public:
     MatchTree(MatchTree&& other) = delete;
     MatchTree& operator=(MatchTree&& other) = delete;
 
-    void generate(const StateContext<GroundTag>& state, IndexList<Tag>& out_applicable_elements);
+    void generate(const StateContext<GroundTag>& state, ygg::IndexList<Tag>& out_applicable_elements);
 };
 
 }

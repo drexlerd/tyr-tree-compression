@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_TREE_COMPRESSION_CONTEXT_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_TREE_COMPRESSION_CONTEXT_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
@@ -37,8 +37,8 @@ namespace tyr::planning
 template<>
 struct StateStorageContext<LiftedTag, TreeCompression>
 {
-    valla::IndexedHashSet<valla::Slot<uint_t>, uint_t> uint_nodes;
-    valla::IndexedHashSet<float_t, uint_t> float_nodes;
+    valla::IndexedHashSet<valla::Slot<ygg::uint_t>, ygg::uint_t> uint_nodes;
+    valla::IndexedHashSet<ygg::float_t, ygg::uint_t> float_nodes;
 
     size_t memory_usage() const noexcept
     {

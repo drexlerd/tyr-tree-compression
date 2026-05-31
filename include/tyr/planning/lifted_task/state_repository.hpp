@@ -18,10 +18,10 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_REPOSITORY_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_REPOSITORY_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/indexed_hash_set.hpp"
-#include "tyr/common/onetbb.hpp"
-#include "tyr/common/shared_object_pool.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/indexed_hash_set.hpp>
+#include <yggdrasil/execution/onetbb.hpp>
+#include <yggdrasil/containers/shared_object_pool.hpp>
 #include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/lifted_task/state_data.hpp"
 #include "tyr/planning/lifted_task/state_view.hpp"
@@ -51,23 +51,23 @@ class StateRepository<LiftedTag> : public std::enable_shared_from_this<StateRepo
     friend class StateRepositoryFactory<LiftedTag>;
 
 private:
-    StateRepository(uint_t index, TaskPtr<LiftedTag> task, AxiomEvaluatorPtr<LiftedTag> axiom_evaluator);
+    StateRepository(ygg::uint_t index, TaskPtr<LiftedTag> task, AxiomEvaluatorPtr<LiftedTag> axiom_evaluator);
 
 public:
     StateView<LiftedTag> get_initial_state();
 
-    StateView<LiftedTag> get_registered_state(Index<State<LiftedTag>> state_index);
+    StateView<LiftedTag> get_registered_state(ygg::Index<State<LiftedTag>> state_index);
 
     StateView<LiftedTag>
-    create_state(const std::vector<Data<formalism::planning::FDRFact<formalism::FluentTag>>>& fluent_facts,
-                 const std::vector<std::pair<Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>, float_t>>& fterm_values);
+    create_state(const std::vector<ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>>& fluent_facts,
+                 const std::vector<std::pair<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>>, ygg::float_t>>& fterm_values);
 
-    StateView<LiftedTag> create_state(const std::vector<formalism::planning::FDRFactView<formalism::FluentTag>>& fluent_facts,
-                                      const std::vector<formalism::planning::GroundFunctionTermViewValuePair<formalism::FluentTag>>& fterm_values);
+    StateView<LiftedTag> create_state(const std::vector<::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag>>& fluent_facts,
+                                      const std::vector<::tyr::formalism::planning::GroundFunctionTermViewValuePair<::tyr::formalism::FluentTag>>& fterm_values);
 
-    SharedObjectPoolPtr<UnpackedState<LiftedTag>> get_unregistered_state();
+    ygg::SharedObjectPoolPtr<UnpackedState<LiftedTag>> get_unregistered_state();
 
-    StateView<LiftedTag> register_state(SharedObjectPoolPtr<UnpackedState<LiftedTag>> state);
+    StateView<LiftedTag> register_state(ygg::SharedObjectPoolPtr<UnpackedState<LiftedTag>> state);
 
     size_t memory_usage() const noexcept;
 
@@ -79,17 +79,17 @@ public:
     size_t num_states() const noexcept { return m_packed_states.size(); }
 
 private:
-    uint_t m_index;
+    ygg::uint_t m_index;
     TaskPtr<LiftedTag> m_task;
-    ExecutionContextPtr m_execution_context;
+    ygg::ExecutionContextPtr m_execution_context;
 
     StateStorageContext<LiftedTag, StateStoragePolicyTag> m_context;
     FactStorageBackend<LiftedTag, StateStoragePolicyTag> m_fluent_backend;
     AtomStorageBackend<LiftedTag, StateStoragePolicyTag> m_derived_backend;
     NumericStorageBackend<LiftedTag, StateStoragePolicyTag> m_numeric_backend;
 
-    IndexedHashSet<State<LiftedTag>> m_packed_states;
-    SharedObjectPool<UnpackedState<LiftedTag>> m_unpacked_state_pool;
+    ygg::IndexedHashSet<State<LiftedTag>> m_packed_states;
+    ygg::SharedObjectPool<UnpackedState<LiftedTag>> m_unpacked_state_pool;
 
     AxiomEvaluatorPtr<LiftedTag> m_axiom_evaluator;
 };

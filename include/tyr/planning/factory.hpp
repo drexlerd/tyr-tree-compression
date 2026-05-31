@@ -44,7 +44,7 @@ public:
     }
 
 private:
-    uint_t m_next_index;
+    ygg::uint_t m_next_index;
 };
 
 template<TaskKind Kind>
@@ -53,13 +53,13 @@ class AxiomEvaluatorFactory
 public:
     AxiomEvaluatorFactory() : m_next_index(0) {}
 
-    AxiomEvaluatorPtr<Kind> create(TaskPtr<Kind> task, ExecutionContextPtr execution_context)
+    AxiomEvaluatorPtr<Kind> create(TaskPtr<Kind> task, ygg::ExecutionContextPtr execution_context)
     {
         return AxiomEvaluatorPtr<Kind>(new AxiomEvaluator<Kind>(m_next_index++, std::move(task), std::move(execution_context)));
     }
 
 private:
-    uint_t m_next_index;
+    ygg::uint_t m_next_index;
 };
 
 template<TaskKind Kind>
@@ -68,14 +68,14 @@ class SuccessorGeneratorFactory
 public:
     SuccessorGeneratorFactory() : m_next_index(0) {}
 
-    SuccessorGeneratorPtr<Kind> create(TaskPtr<Kind> task, ExecutionContextPtr execution_context, StateRepositoryPtr<Kind> state_repository)
+    SuccessorGeneratorPtr<Kind> create(TaskPtr<Kind> task, ygg::ExecutionContextPtr execution_context, StateRepositoryPtr<Kind> state_repository)
     {
         return SuccessorGeneratorPtr<Kind>(
             new SuccessorGenerator<Kind>(m_next_index++, std::move(task), std::move(execution_context), std::move(state_repository)));
     }
 
 private:
-    uint_t m_next_index;
+    ygg::uint_t m_next_index;
 };
 
 }

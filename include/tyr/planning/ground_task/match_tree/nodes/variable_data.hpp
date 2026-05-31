@@ -18,28 +18,30 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_VARIABLE_DATA_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_VARIABLE_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/fdr_variable_index.hpp"
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/node_data.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<typename Tag>
 struct Data<planning::match_tree::VariableSelectorNode<Tag>>
 {
-    Index<planning::match_tree::VariableSelectorNode<Tag>> index;
-    Index<formalism::planning::FDRVariable<formalism::FluentTag>> variable;
-    ::cista::offset::vector<::cista::optional<Data<planning::match_tree::Node<Tag>>>> domain_children;
-    ::cista::optional<Data<planning::match_tree::Node<Tag>>> dontcare_child;
+    ygg::Index<planning::match_tree::VariableSelectorNode<Tag>> index;
+    ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> variable;
+    ::cista::offset::vector<::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>>> domain_children;
+    ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> dontcare_child;
 
     Data() = default;
-    Data(Index<planning::match_tree::VariableSelectorNode<Tag>> index,
-         Index<formalism::planning::FDRVariable<formalism::FluentTag>> variable,
-         ::cista::offset::vector<::cista::optional<Data<planning::match_tree::Node<Tag>>>> domain_children,
-         ::cista::optional<Data<planning::match_tree::Node<Tag>>> dontcare_child) :
+    Data(ygg::Index<planning::match_tree::VariableSelectorNode<Tag>> index,
+         ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> variable,
+         ::cista::offset::vector<::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>>> domain_children,
+         ::cista::optional<ygg::Data<planning::match_tree::Node<Tag>>> dontcare_child) :
         index(index),
         variable(variable),
         domain_children(std::move(domain_children)),
@@ -53,10 +55,10 @@ struct Data<planning::match_tree::VariableSelectorNode<Tag>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(variable);
-        tyr::clear(domain_children);
-        tyr::clear(dontcare_child);
+        ygg::clear(index);
+        ygg::clear(variable);
+        ygg::clear(domain_children);
+        ygg::clear(dontcare_child);
     }
 
     auto cista_members() const noexcept { return std::tie(index, variable, domain_children, dontcare_child); }

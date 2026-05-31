@@ -18,24 +18,24 @@
 #ifndef TYR_FORMALISM_PLANNING_ACTION_INDEX_HPP_
 #define TYR_FORMALISM_PLANNING_ACTION_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
 template<>
-struct Index<formalism::planning::Action> : IndexMixin<Index<formalism::planning::Action>>
+struct Index<tyr::formalism::planning::Action> : IndexMixin<ygg::Index<tyr::formalism::planning::Action>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::planning::Action>>;
+    using Base = IndexMixin<ygg::Index<tyr::formalism::planning::Action>>;
     using Base::Base;
 };
-
-namespace formalism::planning
-{
-using ActionIndex = Index<Action>;
 }
+
+namespace tyr::formalism::planning
+{
+using ActionIndex = ygg::Index<Action>;
 }
 
 #endif

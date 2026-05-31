@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_DATALOG_EXPRESSION_ARITY_HPP_
 #define TYR_FORMALISM_DATALOG_EXPRESSION_ARITY_HPP_
 
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -34,33 +34,33 @@ namespace tyr::formalism::datalog
  * collect_parameters
  */
 
-void collect_parameters(float_t element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(ygg::float_t element, ygg::UnorderedSet<ParameterIndex>& result);
 
-void collect_parameters(TermView element, UnorderedSet<ParameterIndex>& result);
-
-template<FactKind T>
-void collect_parameters(AtomView<T> element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(TermView element, ygg::UnorderedSet<ParameterIndex>& result);
 
 template<FactKind T>
-void collect_parameters(LiteralView<T> element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(AtomView<T> element, ygg::UnorderedSet<ParameterIndex>& result);
 
 template<FactKind T>
-void collect_parameters(FunctionTermView<T> element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(LiteralView<T> element, ygg::UnorderedSet<ParameterIndex>& result);
 
-void collect_parameters(FunctionExpressionView element, UnorderedSet<ParameterIndex>& result);
+template<FactKind T>
+void collect_parameters(FunctionTermView<T> element, ygg::UnorderedSet<ParameterIndex>& result);
+
+void collect_parameters(FunctionExpressionView element, ygg::UnorderedSet<ParameterIndex>& result);
 
 template<ArithmeticOpKind O>
-void collect_parameters(LiftedUnaryOperatorView<O> element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(LiftedUnaryOperatorView<O> element, ygg::UnorderedSet<ParameterIndex>& result);
 
 template<OpKind O>
-void collect_parameters(LiftedBinaryOperatorView<O> element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(LiftedBinaryOperatorView<O> element, ygg::UnorderedSet<ParameterIndex>& result);
 
 template<ArithmeticOpKind O>
-void collect_parameters(LiftedMultiOperatorView<O> element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(LiftedMultiOperatorView<O> element, ygg::UnorderedSet<ParameterIndex>& result);
 
-void collect_parameters(LiftedArithmeticOperatorView element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(LiftedArithmeticOperatorView element, ygg::UnorderedSet<ParameterIndex>& result);
 
-void collect_parameters(LiftedBooleanOperatorView element, UnorderedSet<ParameterIndex>& result);
+void collect_parameters(LiftedBooleanOperatorView element, ygg::UnorderedSet<ParameterIndex>& result);
 
 auto collect_parameters(LiftedBooleanOperatorView element);
 
@@ -68,9 +68,9 @@ auto collect_parameters(LiftedBooleanOperatorView element);
  * Implementations
  */
 
-inline void collect_parameters(float_t element, UnorderedSet<ParameterIndex>& result) {}
+inline void collect_parameters(ygg::float_t element, ygg::UnorderedSet<ParameterIndex>& result) {}
 
-inline void collect_parameters(TermView element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(TermView element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     visit(
         [&](auto&& arg)
@@ -81,62 +81,62 @@ inline void collect_parameters(TermView element, UnorderedSet<ParameterIndex>& r
                 result.insert(arg);
             else if constexpr (std::is_same_v<Alternative, ObjectView>) {}
             else
-                static_assert(dependent_false<Alternative>::value, "Missing case");
+                static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
         },
         element.get_variant());
 }
 
 template<FactKind T>
-inline void collect_parameters(AtomView<T> element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(AtomView<T> element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     for (const auto term : element.get_terms())
         collect_parameters(term, result);
 }
 
 template<FactKind T>
-inline void collect_parameters(LiteralView<T> element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(LiteralView<T> element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     collect_parameters(element.get_atom(), result);
 }
 
 template<FactKind T>
-inline void collect_parameters(FunctionTermView<T> element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(FunctionTermView<T> element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     for (const auto term : element.get_terms())
         collect_parameters(term, result);
 }
 
-inline void collect_parameters(FunctionExpressionView element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(FunctionExpressionView element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     visit([&](auto&& arg) { collect_parameters(arg, result); }, element.get_variant());
 }
 
 template<ArithmeticOpKind O>
-inline void collect_parameters(LiftedUnaryOperatorView<O> element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(LiftedUnaryOperatorView<O> element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     collect_parameters(element.get_arg(), result);
 }
 
 template<OpKind O>
-inline void collect_parameters(LiftedBinaryOperatorView<O> element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(LiftedBinaryOperatorView<O> element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     collect_parameters(element.get_lhs(), result);
     collect_parameters(element.get_rhs(), result);
 }
 
 template<ArithmeticOpKind O>
-inline void collect_parameters(LiftedMultiOperatorView<O> element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(LiftedMultiOperatorView<O> element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     for (const auto arg : element.get_args())
         collect_parameters(arg, result);
 }
 
-inline void collect_parameters(LiftedArithmeticOperatorView element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(LiftedArithmeticOperatorView element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     visit([&](auto&& arg) { collect_parameters(arg, result); }, element.get_variant());
 }
 
-inline void collect_parameters(LiftedBooleanOperatorView element, UnorderedSet<ParameterIndex>& result)
+inline void collect_parameters(LiftedBooleanOperatorView element, ygg::UnorderedSet<ParameterIndex>& result)
 {
     visit([&](auto&& arg) { collect_parameters(arg, result); }, element.get_variant());
 }
@@ -144,7 +144,7 @@ inline void collect_parameters(LiftedBooleanOperatorView element, UnorderedSet<P
 template<FactKind T>
 inline auto collect_parameters(AtomView<T> element)
 {
-    auto result = UnorderedSet<ParameterIndex> {};
+    auto result = ygg::UnorderedSet<ParameterIndex> {};
     collect_parameters(element, result);
     return result;
 }
@@ -152,7 +152,7 @@ inline auto collect_parameters(AtomView<T> element)
 template<FactKind T>
 inline auto collect_parameters(LiteralView<T> element)
 {
-    auto result = UnorderedSet<ParameterIndex> {};
+    auto result = ygg::UnorderedSet<ParameterIndex> {};
     collect_parameters(element, result);
     return result;
 }
@@ -160,14 +160,14 @@ inline auto collect_parameters(LiteralView<T> element)
 template<FactKind T>
 inline auto collect_parameters(FunctionTermView<T> element)
 {
-    auto result = UnorderedSet<ParameterIndex> {};
+    auto result = ygg::UnorderedSet<ParameterIndex> {};
     collect_parameters(element, result);
     return result;
 }
 
 inline auto collect_parameters(LiftedBooleanOperatorView element)
 {
-    auto result = UnorderedSet<ParameterIndex> {};
+    auto result = ygg::UnorderedSet<ParameterIndex> {};
     visit([&](auto&& arg) { collect_parameters(arg, result); }, element.get_variant());
     return result;
 }
@@ -176,7 +176,7 @@ inline auto collect_parameters(LiftedBooleanOperatorView element)
  * max_fterm_arity
  */
 
-inline size_t max_fterm_arity(float_t element);
+inline size_t max_fterm_arity(ygg::float_t element);
 
 template<FactKind T>
 size_t max_fterm_arity(FunctionTermView<T> element);
@@ -200,7 +200,7 @@ size_t max_fterm_arity(LiftedBooleanOperatorView element);
  * Implementations
  */
 
-inline size_t max_fterm_arity(float_t element) { return 0; }
+inline size_t max_fterm_arity(ygg::float_t element) { return 0; }
 
 template<FactKind T>
 inline size_t max_fterm_arity(FunctionTermView<T> element)

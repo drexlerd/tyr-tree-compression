@@ -33,10 +33,10 @@ namespace
 
 using PositionMapping = std::vector<std::pair<size_t, std::optional<ParameterIndex>>>;
 
-Map<ParameterIndex, Data<Term>>
+ygg::Map<ParameterIndex, ygg::Data<Term>>
 get_parameters_from_part(const MutableAtom<FluentTag>& part, const MutableAtom<FluentTag>& literal, size_t num_rigid_variables)
 {
-    Map<ParameterIndex, Data<Term>> result;
+    ygg::Map<ParameterIndex, ygg::Data<Term>> result;
 
     for (size_t pos = 0; pos < part.terms.size(); ++pos)
     {
@@ -46,7 +46,7 @@ get_parameters_from_part(const MutableAtom<FluentTag>& part, const MutableAtom<F
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, ParameterIndex>)
                 {
-                    if (static_cast<uint_t>(arg) < num_rigid_variables)
+                    if (static_cast<ygg::uint_t>(arg) < num_rigid_variables)
                         result.emplace(arg, literal.terms[pos]);
                 }
             },
@@ -114,11 +114,11 @@ std::vector<PositionMapping> possible_mappings(const MutableAtom<FluentTag>& par
 
     const auto own_parameters = get_parameters_from_part(part, own_literal, num_rigid_variables);
 
-    Map<Data<Term>, std::vector<ParameterIndex>> ownarg_to_invariant_parameters;
+    ygg::Map<ygg::Data<Term>, std::vector<ParameterIndex>> ownarg_to_invariant_parameters;
     for (const auto& [inv_param, term] : own_parameters)
         ownarg_to_invariant_parameters[term].push_back(inv_param);
 
-    Map<Data<Term>, std::vector<size_t>> other_arg_to_positions;
+    ygg::Map<ygg::Data<Term>, std::vector<size_t>> other_arg_to_positions;
     for (size_t pos = 0; pos < other_literal.terms.size(); ++pos)
         other_arg_to_positions[other_literal.terms[pos]].push_back(pos);
 
@@ -159,10 +159,10 @@ MutableAtomList<FluentTag> possible_matches(const MutableAtom<FluentTag>& part,
 
     for (const auto& mapping : possible_mappings(part, own_literal, other_literal, num_rigid_variables))
     {
-        std::vector<Data<Term>> args(other_literal.terms.size(), Data<Term>(ParameterIndex(num_rigid_variables)));
+        std::vector<ygg::Data<Term>> args(other_literal.terms.size(), ygg::Data<Term>(ParameterIndex(num_rigid_variables)));
 
         for (const auto& [other_pos, inv_var] : mapping)
-            args[other_pos] = Data<Term>(inv_var.value_or(ParameterIndex(num_rigid_variables)));
+            args[other_pos] = ygg::Data<Term>(inv_var.value_or(ParameterIndex(num_rigid_variables)));
 
         result.push_back(MutableAtom<FluentTag>(other_literal.predicate, std::move(args)));
     }

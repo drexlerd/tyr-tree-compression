@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_STATE_BUILDER_HPP_
 #define TYR_PLANNING_STATE_BUILDER_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/planning/fdr_value.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -32,23 +32,23 @@ namespace tyr::planning
 template<typename T, typename Kind>
 concept UnpackedStateConcept = requires(T& s,
                                         const T& cs,
-                                        Index<State<Kind>> index,
-                                        Index<formalism::planning::FDRVariable<formalism::FluentTag>> variable,
-                                        Data<formalism::planning::FDRFact<formalism::FluentTag>> fact,
-                                        Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> fterm,
-                                        float_t value,
-                                        Index<formalism::planning::GroundAtom<formalism::DerivedTag>> atom) {
+                                        ygg::Index<State<Kind>> index,
+                                        ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> variable,
+                                        ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> fact,
+                                        ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> fterm,
+                                        ygg::float_t value,
+                                        ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> atom) {
     requires TaskKind<Kind>;
     typename T::TaskType;
     { s.clear() };
     { s.clear_unextended_part() };
     { s.clear_extended_part() };
     { s.assign_unextended_part(cs) };
-    { cs.get_index() } -> std::same_as<Index<State<Kind>>>;
+    { cs.get_index() } -> std::same_as<ygg::Index<State<Kind>>>;
     { s.set(index) };
-    { cs.get(variable) } -> std::same_as<formalism::planning::FDRValue>;
+    { cs.get(variable) } -> std::same_as<::tyr::formalism::planning::FDRValue>;
     { s.set(fact) };
-    { cs.get(fterm) } -> std::same_as<float_t>;
+    { cs.get(fterm) } -> std::same_as<ygg::float_t>;
     { s.set(fterm, value) };
     { cs.test(atom) } -> std::same_as<bool>;
     { s.set(atom) };

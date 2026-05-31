@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_HASH_SET_ATOM_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_HASH_SET_ATOM_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/lifted_task/state_storage.hpp"
 #include "tyr/planning/lifted_task/state_storage/hash_set/context.hpp"
@@ -31,7 +31,7 @@ namespace tyr::planning
 template<>
 struct AtomPackedStorage<LiftedTag, HashSet>
 {
-    uint_t index;
+    ygg::uint_t index;
 
     auto identifying_members() const noexcept { return std::tie(index); }
 };
@@ -50,9 +50,9 @@ public:
     void unpack(const Packed& packed, Unpacked& unpacked);
 
 private:
-    RawVectorSet<uint_t, uint_t>& m_uint_vec_set;
+    ygg::RawVectorSet<ygg::uint_t, ygg::uint_t>& m_uint_vec_set;
 
-    std::vector<uint_t> m_buffer;
+    std::vector<ygg::uint_t> m_buffer;
 };
 
 }

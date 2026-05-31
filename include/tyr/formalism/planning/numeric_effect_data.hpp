@@ -18,34 +18,36 @@
 #ifndef TYR_FORMALISM_PLANNING_NUMERIC_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_NUMERIC_EFFECT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/function_expression_data.hpp"
 #include "tyr/formalism/planning/function_term_index.hpp"
 #include "tyr/formalism/planning/numeric_effect_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::NumericEffectOpKind Op, formalism::FactKind T>
-struct Data<formalism::planning::NumericEffect<Op, T>>
+
+template<::tyr::formalism::NumericEffectOpKind Op, ::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::NumericEffect<Op, T>>
 {
-    static_assert(std::same_as<T, formalism::FluentTag> || (std::same_as<T, formalism::AuxiliaryTag> && std::same_as<Op, formalism::Increase>),
+    static_assert(std::same_as<T, ::tyr::formalism::FluentTag> || (std::same_as<T, ::tyr::formalism::AuxiliaryTag> && std::same_as<Op, ::tyr::formalism::Increase>),
                   "Unsupported NumericEffect<Op, T> combination.");
 
-    Index<formalism::planning::NumericEffect<Op, T>> index;
-    Index<formalism::planning::FunctionTerm<T>> fterm;
-    Data<formalism::planning::FunctionExpression> fexpr;
+    ygg::Index<::tyr::formalism::planning::NumericEffect<Op, T>> index;
+    ygg::Index<::tyr::formalism::planning::FunctionTerm<T>> fterm;
+    ygg::Data<::tyr::formalism::planning::FunctionExpression> fexpr;
 
     Data() = default;
-    Data(Index<formalism::planning::FunctionTerm<T>> fterm_, Data<formalism::planning::FunctionExpression> fexpr_) : index(), fterm(fterm_), fexpr(fexpr_) {}
+    Data(ygg::Index<::tyr::formalism::planning::FunctionTerm<T>> fterm_, ygg::Data<::tyr::formalism::planning::FunctionExpression> fexpr_) : index(), fterm(fterm_), fexpr(fexpr_) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::planning::FunctionTerm<T>>, C> fterm_, View<Data<formalism::planning::FunctionExpression>, C> fexpr_) : index(), fterm(), fexpr()
+    Data(::ygg::View<ygg::Index<::tyr::formalism::planning::FunctionTerm<T>>, C> fterm_, ::ygg::View<ygg::Data<::tyr::formalism::planning::FunctionExpression>, C> fexpr_) : index(), fterm(), fexpr()
     {
-        set(fterm_, fterm);
-        set(fexpr_, fexpr);
+        ygg::set(fterm_, fterm);
+        ygg::set(fexpr_, fexpr);
     }
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
@@ -54,16 +56,16 @@ struct Data<formalism::planning::NumericEffect<Op, T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(fterm);
-        tyr::clear(fexpr);
+        ygg::clear(index);
+        ygg::clear(fterm);
+        ygg::clear(fexpr);
     }
 
     auto cista_members() const noexcept { return std::tie(index, fterm, fexpr); }
     auto identifying_members() const noexcept { return std::tie(Op::kind, fterm, fexpr); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::NumericEffect<formalism::Assign, formalism::FluentTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Assign, ::tyr::formalism::FluentTag>>);
 
 }
 

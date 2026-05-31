@@ -32,9 +32,9 @@ public:
 
     static std::shared_ptr<BlindHeuristic> create() { return std::make_shared<BlindHeuristic>(); }
 
-    void set_goal(formalism::planning::GroundConjunctiveConditionView goal) override {}
+    void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) override {}
 
-    float_t evaluate(const StateView<Kind>& state) override { return float_t { 0 }; }
+    ygg::float_t evaluate(const StateView<Kind>& state) override { return ygg::float_t { 0 }; }
 };
 
 }

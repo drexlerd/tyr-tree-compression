@@ -18,24 +18,26 @@
 #ifndef TYR_FORMALISM_TERM_DATA_HPP_
 #define TYR_FORMALISM_TERM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/parameter_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::Term>
+struct Data<::tyr::formalism::Term>
 {
-    using Variant = ::cista::offset::variant<Index<formalism::Object>, formalism::ParameterIndex>;
+    using Variant = ::cista::offset::variant<ygg::Index<::tyr::formalism::Object>, ::tyr::formalism::ParameterIndex>;
 
     Variant value;
 
     template<typename C>
-    using ViewVariant = std::variant<View<Index<formalism::Object>, C>, formalism::ParameterIndex>;
+    using ViewVariant = std::variant<::ygg::View<ygg::Index<::tyr::formalism::Object>, C>, ::tyr::formalism::ParameterIndex>;
 
     Data() = default;
     Data(Variant value) : value(value) {}
@@ -47,24 +49,24 @@ struct Data<formalism::Term>
             {
                 using Alternative = std::decay_t<decltype(arg)>;
 
-                if constexpr (std::is_same_v<Alternative, formalism::ParameterIndex>)
+                if constexpr (std::is_same_v<Alternative, ::tyr::formalism::ParameterIndex>)
                     return Variant(arg);
-                else if constexpr (std::is_same_v<Alternative, View<Index<formalism::Object>, C>>)
+                else if constexpr (std::is_same_v<Alternative, ::ygg::View<ygg::Index<::tyr::formalism::Object>, C>>)
                     return Variant(arg.get_index());
                 else
-                    static_assert(dependent_false<Alternative>::value, "Missing case");
+                    static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             },
             value_))
     {
     }
 
-    void clear() noexcept { tyr::clear(value); }
+    void clear() noexcept { ygg::clear(value); }
 
     auto cista_members() const noexcept { return std::tie(value); }
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::Term>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::Term>);
 
 }
 

@@ -2,7 +2,6 @@ from pathlib import Path
 from importlib.metadata import PackageNotFoundError, version
 
 from . import (
-    common as common,
     formalism as formalism,
     planning as planning,
 )

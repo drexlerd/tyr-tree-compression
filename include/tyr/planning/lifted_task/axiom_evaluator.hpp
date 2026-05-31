@@ -20,7 +20,7 @@
 
 #include "tyr/planning/lifted_task/state_builder.hpp"
 //
-#include "tyr/common/onetbb.hpp"
+#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/datalog/policies/annotation.hpp"
 #include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
@@ -38,7 +38,7 @@ class AxiomEvaluator<LiftedTag>
     friend class AxiomEvaluatorFactory<LiftedTag>;
 
 private:
-    AxiomEvaluator(uint_t index, TaskPtr<LiftedTag> task, ExecutionContextPtr execution_context);
+    AxiomEvaluator(ygg::uint_t index, TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context);
 
 public:
     void compute_extended_state(UnpackedState<LiftedTag>& unpacked_state);
@@ -50,9 +50,9 @@ public:
     void print_summary(size_t verbosity) const;
 
 private:
-    uint_t m_index;
+    ygg::uint_t m_index;
     TaskPtr<LiftedTag> m_task;
-    ExecutionContextPtr m_execution_context;
+    ygg::ExecutionContextPtr m_execution_context;
 
     datalog::ProgramWorkspace<datalog::NoOrAnnotationPolicy, datalog::NoAndAnnotationPolicy, datalog::NoTerminationPolicy> m_workspace;
 };

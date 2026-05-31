@@ -18,7 +18,7 @@
 #ifndef TYR_FORMALISM_UNIFICATION_MATCH_TERM_HPP_
 #define TYR_FORMALISM_UNIFICATION_MATCH_TERM_HPP_
 
-#include "tyr/common/comparators.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
 #include "tyr/formalism/term_data.hpp"
 #include "tyr/formalism/unification/match_policy.hpp"
 #include "tyr/formalism/unification/match_state.hpp"
@@ -27,7 +27,7 @@ namespace tyr::formalism::unification
 {
 
 template<typename Policy = DefaultMatchPolicy>
-bool match_term(const Data<Term>& pattern, const Data<Term>& element, TermMatchState& state, const Policy& policy = {})
+bool match_term(const ygg::Data<Term>& pattern, const ygg::Data<Term>& element, TermMatchState& state, const Policy& policy = {})
 {
     return std::visit(
         [&](auto&& lhs) -> bool
@@ -45,33 +45,33 @@ bool match_term(const Data<Term>& pattern, const Data<Term>& element, TermMatchS
                         {
                             return policy.match_parameter_parameter(lhs, rhs, state);
                         }
-                        else if constexpr (std::is_same_v<Rhs, Index<Object>>)
+                        else if constexpr (std::is_same_v<Rhs, ygg::Index<Object>>)
                         {
-                            return policy.match_parameter_object(lhs, Data<Term>(rhs), state);
+                            return policy.match_parameter_object(lhs, ygg::Data<Term>(rhs), state);
                         }
                         else
                         {
-                            static_assert(dependent_false<Rhs>::value, "Missing case");
+                            static_assert(ygg::dependent_false<Rhs>::value, "Missing case");
                         }
                     }
-                    else if constexpr (std::is_same_v<Lhs, Index<Object>>)
+                    else if constexpr (std::is_same_v<Lhs, ygg::Index<Object>>)
                     {
                         if constexpr (std::is_same_v<Rhs, ParameterIndex>)
                         {
-                            return policy.match_object_parameter(Data<Term>(lhs), rhs, state);
+                            return policy.match_object_parameter(ygg::Data<Term>(lhs), rhs, state);
                         }
-                        else if constexpr (std::is_same_v<Rhs, Index<Object>>)
+                        else if constexpr (std::is_same_v<Rhs, ygg::Index<Object>>)
                         {
                             return lhs == rhs;
                         }
                         else
                         {
-                            static_assert(dependent_false<Rhs>::value, "Missing case");
+                            static_assert(ygg::dependent_false<Rhs>::value, "Missing case");
                         }
                     }
                     else
                     {
-                        static_assert(dependent_false<Lhs>::value, "Missing case");
+                        static_assert(ygg::dependent_false<Lhs>::value, "Missing case");
                     }
                 },
                 element.value);

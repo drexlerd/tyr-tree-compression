@@ -15,13 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_COMMON_PYTHON_BINDINGS_HPP_
-#define TYR_COMMON_PYTHON_BINDINGS_HPP_
+#ifndef PYTYR_BINDINGS_HPP_
+#define PYTYR_BINDINGS_HPP_
 
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/formatter.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/formatting/formatter.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
@@ -35,16 +34,16 @@ template<typename V>
 nb::class_<V>& add_print(nb::class_<V>& cls)
 {
     return cls  //
-        .def("__str__", [](const V& self) { return to_string(self); })
-        .def("__repr__", [](const V& self) { return to_string(self); });
+        .def("__str__", [](const V& self) { return ygg::to_string(self); })
+        .def("__repr__", [](const V& self) { return ygg::to_string(self); });
 }
 
 template<typename V>
 nb::class_<V>& add_hash(nb::class_<V>& cls)
 {
     return cls  //
-        .def("__eq__", [](const V& self, const V& other) { return EqualTo<V> {}(self, other); })
-        .def("__hash__", [](const V& self) { return Hash<V> {}(self); });
+        .def("__eq__", [](const V& self, const V& other) { return ygg::EqualTo<V> {}(self, other); })
+        .def("__hash__", [](const V& self) { return ygg::Hash<V> {}(self); });
 }
 
 template<typename T>
@@ -52,10 +51,10 @@ void bind_index(nb::module_& m, const std::string& name)
 {
     nb::class_<T>(m, name.c_str())  //
         .def(nb::init<>())          // default -> MAX sentinel
-        .def(nb::init<uint_t>(), nb::arg("index"))
-        .def("__int__", [](const T& i) { return static_cast<uint_t>(i); })
-        .def("__index__", [](const T& i) { return static_cast<uint_t>(i); })
-        .def("__hash__", [](const T& i) { return static_cast<uint_t>(i); })
+        .def(nb::init<ygg::uint_t>(), nb::arg("index"))
+        .def("__int__", [](const T& i) { return static_cast<ygg::uint_t>(i); })
+        .def("__index__", [](const T& i) { return static_cast<ygg::uint_t>(i); })
+        .def("__hash__", [](const T& i) { return static_cast<ygg::uint_t>(i); })
 
         .def("__eq__", [](const T& a, const T& b) { return a == b; })
         .def("__lt__", [](const T& a, const T& b) { return a < b; })
@@ -63,7 +62,7 @@ void bind_index(nb::module_& m, const std::string& name)
         .def("__gt__", [](const T& a, const T& b) { return a > b; })
         .def("__ge__", [](const T& a, const T& b) { return a >= b; })
 
-        .def("__repr__", [name](const T& i) { return name + "(" + std::to_string(static_cast<uint_t>(i)) + ")"; });
+        .def("__repr__", [name](const T& i) { return name + "(" + std::to_string(static_cast<ygg::uint_t>(i)) + ")"; });
 }
 
 template<typename T>

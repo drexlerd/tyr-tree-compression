@@ -17,8 +17,8 @@
 
 #include "tyr/planning/algorithms/astar_eager.hpp"
 
-#include "tyr/common/chrono.hpp"
-#include "tyr/common/segmented_vector.hpp"
+#include <yggdrasil/core/chrono.hpp>
+#include <yggdrasil/containers/segmented_vector.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/algorithms/astar_eager/event_handler.hpp"
@@ -58,8 +58,8 @@ namespace tyr::planning::astar_eager
 template<TaskKind Kind>
 struct SearchNode
 {
-    float_t g_value;
-    Index<State<Kind>> parent_state;
+    ygg::float_t g_value;
+    ygg::Index<State<Kind>> parent_state;
     SearchNodeStatus status;
 };
 
@@ -67,18 +67,18 @@ static_assert(sizeof(SearchNode<LiftedTag>) == 16);
 static_assert(sizeof(SearchNode<GroundTag>) == 16);
 
 template<TaskKind Kind>
-using SearchNodeVector = SegmentedVector<SearchNode<Kind>>;
+using SearchNodeVector = ygg::SegmentedVector<SearchNode<Kind>>;
 
 template<TaskKind Kind>
-static SearchNode<Kind>& get_or_create_search_node(Index<State<Kind>> state_index, SearchNodeVector<Kind>& search_nodes)
+static SearchNode<Kind>& get_or_create_search_node(ygg::Index<State<Kind>> state_index, SearchNodeVector<Kind>& search_nodes)
 {
-    static auto default_node = SearchNode { std::numeric_limits<float_t>::infinity(), Index<State<Kind>>::max(), SearchNodeStatus::NEW };
+    static auto default_node = SearchNode { std::numeric_limits<ygg::float_t>::infinity(), ygg::Index<State<Kind>>::max(), SearchNodeStatus::NEW };
 
-    while (uint_t(state_index) >= search_nodes.size())
+    while (ygg::uint_t(state_index) >= search_nodes.size())
     {
         search_nodes.push_back(default_node);
     }
-    return search_nodes[uint_t(state_index)];
+    return search_nodes[ygg::uint_t(state_index)];
 }
 
 /**
@@ -88,11 +88,11 @@ static SearchNode<Kind>& get_or_create_search_node(Index<State<Kind>> state_inde
 template<TaskKind Kind>
 struct QueueEntry
 {
-    using KeyType = std::tuple<float_t, SearchNodeStatus>;
-    using ItemType = std::tuple<float_t, Index<State<Kind>>>;
+    using KeyType = std::tuple<ygg::float_t, SearchNodeStatus>;
+    using ItemType = std::tuple<ygg::float_t, ygg::Index<State<Kind>>>;
 
-    float_t f_value;
-    Index<State<Kind>> state;
+    ygg::float_t f_value;
+    ygg::Index<State<Kind>> state;
     SearchNodeStatus status;
 
     KeyType get_key() const { return std::make_tuple(f_value, status); }
@@ -120,11 +120,11 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
     auto result = SearchResult<Kind>();
     auto search_nodes = SearchNodeVector<Kind>();
     auto openlist = Queue<Kind>();
-    const auto start_g_value = FloatTolerance<float_t>::canonicalize(start_node.get_metric());
-    const auto start_h_value = FloatTolerance<float_t>::canonicalize(heuristic.evaluate(start_state));
-    const auto start_f_value = FloatTolerance<float_t>::canonicalize(start_g_value + start_h_value);
+    const auto start_g_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(start_node.get_metric());
+    const auto start_h_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(heuristic.evaluate(start_state));
+    const auto start_f_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(start_g_value + start_h_value);
     auto& start_search_node = get_or_create_search_node(start_state_index, search_nodes);
-    start_search_node.status = (start_h_value == std::numeric_limits<float_t>::infinity()) ? SearchNodeStatus::DEAD_END : SearchNodeStatus::OPEN;
+    start_search_node.status = (start_h_value == std::numeric_limits<ygg::float_t>::infinity()) ? SearchNodeStatus::DEAD_END : SearchNodeStatus::OPEN;
     start_search_node.g_value = start_g_value;
 
     event_handler->on_start_search(start_node, start_f_value);
@@ -181,7 +181,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
     auto f_value = start_f_value;
     openlist.insert(QueueEntry { start_f_value, start_state_index, start_search_node.status });
 
-    auto stopwatch = options.max_time ? std::optional<CountdownWatch>(options.max_time.value()) : std::nullopt;
+    auto stopwatch = options.max_time ? std::optional<ygg::CountdownWatch>(options.max_time.value()) : std::nullopt;
 
     while (!openlist.empty())
     {
@@ -298,9 +298,9 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
                 successor_search_node.parent_state = state_index;
                 successor_search_node.g_value = successor_g_value;
 
-                const auto successor_h_value = FloatTolerance<float_t>::canonicalize(heuristic.evaluate(succ_state));
+                const auto successor_h_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(heuristic.evaluate(succ_state));
 
-                if (successor_h_value == std::numeric_limits<float_t>::infinity())
+                if (successor_h_value == std::numeric_limits<ygg::float_t>::infinity())
                 {
                     successor_search_node.status = SearchNodeStatus::DEAD_END;
                     continue;
@@ -311,7 +311,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
                 event_handler->on_generate_node_relaxed(node, normalized_labeled_succ_node);
 
-                const auto successor_f_value = FloatTolerance<float_t>::canonicalize(successor_g_value + successor_h_value);
+                const auto successor_f_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(successor_g_value + successor_h_value);
                 openlist.insert(QueueEntry { successor_f_value, succ_state_index, successor_search_node.status });
             }
             else

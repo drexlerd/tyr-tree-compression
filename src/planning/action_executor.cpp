@@ -19,7 +19,7 @@
 #include "tyr/formalism/planning/views.hpp"
 //
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/grounder.hpp"
@@ -48,8 +48,8 @@ template<TaskKind Kind>
 void process_effects(fp::GroundActionView action,
                      UnpackedState<Kind>& succ_unpacked_state,
                      StateContext<Kind>& state_context,
-                     DataList<fp::FDRFact<f::FluentTag>>& tmp_del_effects,
-                     DataList<fp::FDRFact<f::FluentTag>>& tmp_add_effects)
+                     ygg::DataList<fp::FDRFact<f::FluentTag>>& tmp_del_effects,
+                     ygg::DataList<fp::FDRFact<f::FluentTag>>& tmp_add_effects)
 {
     for (const auto cond_effect : action.get_effects())
     {
@@ -80,10 +80,10 @@ inline void process_effects(fp::ActionView action,
                             StateContext<LiftedTag>& state_context,
                             fp::GrounderContext& grounder_context,
                             fp::FDRContext& fdr_context,
-                            itertools::cartesian_set::Workspace<Index<f::Object>>& cartesian_workspace,
-                            formalism::planning::EffectFamilyList& effect_families,
-                            DataList<fp::FDRFact<f::FluentTag>>& tmp_del_effects,
-                            DataList<fp::FDRFact<f::FluentTag>>& tmp_add_effects)
+                            ygg::itertools::cartesian_set::Workspace<ygg::Index<f::Object>>& cartesian_workspace,
+                            ::tyr::formalism::planning::EffectFamilyList& effect_families,
+                            ygg::DataList<fp::FDRFact<f::FluentTag>>& tmp_del_effects,
+                            ygg::DataList<fp::FDRFact<f::FluentTag>>& tmp_add_effects)
 {
     auto applicability_context = ApplicabilityContext { state_context, grounder_context, fdr_context };
 
@@ -92,7 +92,7 @@ inline void process_effects(fp::ActionView action,
         const auto& parameter_domains = action_domain.payload.effect_domains.at(cond_effect.get_index()).payload.effect_domain.payload;
         const auto binding_size = grounder_context.binding.size();
 
-        itertools::cartesian_set::for_each_element(
+        ygg::itertools::cartesian_set::for_each_element(
             parameter_domains.begin() + action.get_arity(),
             parameter_domains.end(),
             cartesian_workspace,
@@ -132,8 +132,8 @@ inline void process_effects(fp::ActionView action,
 template<TaskKind Kind, typename ProcessEffects>
 Node<Kind> apply_action_impl(const StateContext<Kind>& state_context,
                              StateRepository<Kind>& state_repository,
-                             DataList<fp::FDRFact<f::FluentTag>>& del_effects,
-                             DataList<fp::FDRFact<f::FluentTag>>& add_effects,
+                             ygg::DataList<fp::FDRFact<f::FluentTag>>& del_effects,
+                             ygg::DataList<fp::FDRFact<f::FluentTag>>& add_effects,
                              ProcessEffects&& process_effects)
 {
     del_effects.clear();
@@ -150,7 +150,7 @@ Node<Kind> apply_action_impl(const StateContext<Kind>& state_context,
 
     for (const auto fact : del_effects)
         if (succ_unpacked_state.get(fact.variable) == fact.value)
-            succ_unpacked_state.set(Data<fp::FDRFact<f::FluentTag>> { fact.variable, fp::FDRValue::none() });
+            succ_unpacked_state.set(ygg::Data<fp::FDRFact<f::FluentTag>> { fact.variable, fp::FDRValue::none() });
 
     for (const auto fact : add_effects)
         succ_unpacked_state.set(fact);
@@ -163,7 +163,7 @@ Node<Kind> apply_action_impl(const StateContext<Kind>& state_context,
     else
         ++succ_state_context.auxiliary_value;  // Assume unit cost if no metric is given
 
-    return Node<Kind>(succ_state, FloatTolerance<float_t>::canonicalize(succ_state_context.auxiliary_value));
+    return Node<Kind>(succ_state, ygg::FloatTolerance<ygg::float_t>::canonicalize(succ_state_context.auxiliary_value));
 }
 
 // Ground action API

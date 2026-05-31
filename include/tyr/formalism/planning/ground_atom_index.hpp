@@ -18,18 +18,18 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_ATOM_INDEX_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_ATOM_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Index<formalism::planning::GroundAtom<T>> : IndexMixin<Index<formalism::planning::GroundAtom<T>>>
+template<tyr::formalism::FactKind T>
+struct Index<tyr::formalism::planning::GroundAtom<T>> : ygg::IndexMixin<ygg::Index<tyr::formalism::planning::GroundAtom<T>>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::planning::GroundAtom<T>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::planning::GroundAtom<T>>>;
     using Base::Base;
 };
 

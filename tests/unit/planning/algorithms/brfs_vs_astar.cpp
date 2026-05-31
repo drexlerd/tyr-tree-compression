@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json.hpp"
-#include "tyr/common/json_suite.hpp"
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <gtest/gtest.h>
 #include <filesystem>
@@ -45,24 +45,24 @@ struct BrfsCase
 
 BrfsCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
-    return BrfsCase { tyr::common::as_string(object, "name", "case"),
-                      tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
-                      tyr::common::suite_path(suite, tyr::common::as_string(object, "task_file", "case")) };
+    return BrfsCase { ygg::common::as_string(object, "name", "case"),
+                      ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                      ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
 }
 
 std::vector<BrfsCase> load_cases()
 {
-    const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/algorithms/brfs_vs_blind_astar.json");
-    const auto& suite_object = tyr::common::as_object(suite, "suite");
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/algorithms/brfs_vs_blind_astar.json");
+    const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<BrfsCase> {};
-    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
-        result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
+    for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))
+        result.push_back(parse_case(suite_object, ygg::common::as_object(case_value, "case")));
     return result;
 }
 
 GroundSearchContext create_ground_context(const std::filesystem::path& domain_file, const std::filesystem::path& task_file)
 {
-    auto execution_context = ExecutionContext::create(1);
+    auto execution_context = ygg::ExecutionContext::create(1);
     auto task = p::Task<p::LiftedTag>(fp::Parser(domain_file).parse_task(task_file)).instantiate_ground_task(*execution_context).task;
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::GroundTag>().create(task, axiom_evaluator);

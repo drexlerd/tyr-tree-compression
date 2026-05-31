@@ -66,7 +66,7 @@ public:
             self().on_start_search_impl();
     }
 
-    void on_start_subsearch(uint_t subsearch_index) override
+    void on_start_subsearch(ygg::uint_t subsearch_index) override
     {
         if (verbosity(1))
             self().on_start_subsearch_impl(subsearch_index);
@@ -79,7 +79,7 @@ public:
             m_statistics.add_effective_width(*arity);
     }
 
-    void on_end_subsearch(uint_t subsearch_index, tyr::planning::SearchStatus status) override
+    void on_end_subsearch(ygg::uint_t subsearch_index, tyr::planning::SearchStatus status) override
     {
         if (verbosity(1))
             self().on_end_subsearch_impl(subsearch_index, status);
@@ -107,8 +107,8 @@ private:
     friend class EventHandlerBase<DefaultEventHandler<Kind>, Kind>;
 
     void on_start_search_impl() const {}
-    void on_start_subsearch_impl(uint_t subsearch_index) const { static_cast<void>(subsearch_index); }
-    void on_end_subsearch_impl(uint_t subsearch_index, SearchStatus status) const
+    void on_start_subsearch_impl(ygg::uint_t subsearch_index) const { static_cast<void>(subsearch_index); }
+    void on_end_subsearch_impl(ygg::uint_t subsearch_index, SearchStatus status) const
     {
         static_cast<void>(subsearch_index);
         static_cast<void>(status);

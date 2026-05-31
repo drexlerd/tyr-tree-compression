@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_STATE_ITERATORS_HPP_
 #define TYR_PLANNING_STATE_ITERATORS_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/indices.hpp"
 
@@ -40,7 +40,7 @@ template<class Tag>
 class AtomIterator
 {
 public:
-    using value_type = Index<formalism::planning::GroundAtom<Tag>>;
+    using value_type = ygg::Index<::tyr::formalism::planning::GroundAtom<Tag>>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
@@ -53,7 +53,7 @@ public:
     value_type operator*() const noexcept
     {
         assert(m_data);
-        return Index<formalism::planning::GroundAtom<Tag>> { static_cast<uint_t>(m_i) };
+        return ygg::Index<::tyr::formalism::planning::GroundAtom<Tag>> { static_cast<ygg::uint_t>(m_i) };
     }
 
     AtomIterator& operator++() noexcept
@@ -109,7 +109,7 @@ template<class Tag>
 class FunctionTermValueIterator
 {
 public:
-    using value_type = std::pair<Index<formalism::planning::GroundFunctionTerm<Tag>>, float_t>;
+    using value_type = std::pair<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<Tag>>, ygg::float_t>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
@@ -124,7 +124,7 @@ public:
     }
 
     FunctionTermValueIterator() noexcept : m_data(nullptr), m_i(0) {}
-    FunctionTermValueIterator(const std::vector<float_t>& data, bool begin) noexcept : m_data(&data), m_i(begin ? 0 : m_data->size())
+    FunctionTermValueIterator(const std::vector<ygg::float_t>& data, bool begin) noexcept : m_data(&data), m_i(begin ? 0 : m_data->size())
     {
         if (begin)
             skip_nan();
@@ -133,7 +133,7 @@ public:
     value_type operator*() const noexcept
     {
         assert(m_data);
-        return { Index<formalism::planning::GroundFunctionTerm<Tag>> { static_cast<uint_t>(m_i) }, (*m_data)[m_i] };
+        return { ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<Tag>> { static_cast<ygg::uint_t>(m_i) }, (*m_data)[m_i] };
     }
 
     FunctionTermValueIterator& operator++() noexcept
@@ -156,7 +156,7 @@ public:
     friend bool operator!=(const FunctionTermValueIterator& lhs, const FunctionTermValueIterator& rhs) noexcept { return !(lhs == rhs); }
 
 private:
-    const std::vector<float_t>* m_data;
+    const std::vector<ygg::float_t>* m_data;
     std::size_t m_i = 0;
 };
 
@@ -165,13 +165,13 @@ class FunctionTermValueRange : public std::ranges::view_interface<FunctionTermVa
 {
 public:
     FunctionTermValueRange() = default;
-    explicit FunctionTermValueRange(const std::vector<float_t>& values) : m_data(&values) {}
+    explicit FunctionTermValueRange(const std::vector<ygg::float_t>& values) : m_data(&values) {}
 
     auto begin() const { return FunctionTermValueIterator<Tag>(*m_data, true); }
     auto end() const { return FunctionTermValueIterator<Tag>(*m_data, false); }
 
 private:
-    const std::vector<float_t>* m_data;
+    const std::vector<ygg::float_t>* m_data;
 };
 }
 

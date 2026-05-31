@@ -18,25 +18,27 @@
 #ifndef TYR_FORMALISM_PLANNING_FDR_VARIABLE_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_FDR_VARIABLE_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/fdr_variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::planning::FDRVariable<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::FDRVariable<T>>
 {
-    Index<formalism::planning::FDRVariable<T>> index;
-    IndexList<formalism::planning::GroundAtom<T>> atoms;
+    ygg::Index<::tyr::formalism::planning::FDRVariable<T>> index;
+    ygg::IndexList<::tyr::formalism::planning::GroundAtom<T>> atoms;
 
     Data() = default;
-    Data(IndexList<formalism::planning::GroundAtom<T>> atoms_) : index(), atoms(std::move(atoms_)) {}
+    Data(ygg::IndexList<::tyr::formalism::planning::GroundAtom<T>> atoms_) : index(), atoms(std::move(atoms_)) {}
     // Python constructor
     template<typename C>
-    Data(const std::vector<View<Index<formalism::planning::GroundAtom<T>>, C>>& atoms_) : index(), atoms()
+    Data(const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::GroundAtom<T>>, C>>& atoms_) : index(), atoms()
     {
         set(atoms_, atoms);
     }
@@ -47,15 +49,15 @@ struct Data<formalism::planning::FDRVariable<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(atoms);
+        ygg::clear(index);
+        ygg::clear(atoms);
     }
 
     auto cista_members() const noexcept { return std::tie(index, atoms); }
     auto identifying_members() const noexcept { return std::tie(atoms); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::FDRVariable<formalism::StaticTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::FDRVariable<::tyr::formalism::StaticTag>>);
 }
 
 #endif

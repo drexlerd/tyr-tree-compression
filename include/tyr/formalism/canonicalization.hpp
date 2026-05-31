@@ -20,8 +20,8 @@
 #ifndef TYR_FORMALISM_CANONICALIZATION_HPP_
 #define TYR_FORMALISM_CANONICALIZATION_HPP_
 
-#include "tyr/common/canonicalization.hpp"
-#include "tyr/common/comparators.hpp"
+#include <yggdrasil/semantics/canonicalization.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 #include "tyr/formalism/datas.hpp"
 
 #include <algorithm>
@@ -33,58 +33,58 @@ namespace tyr::formalism
  * Datalog
  */
 
-inline bool is_canonical(const Data<Variable>& data) { return true; }
+inline bool is_canonical(const ygg::Data<Variable>& data) { return true; }
 
-inline bool is_canonical(const Data<Object>& data) { return true; }
+inline bool is_canonical(const ygg::Data<Object>& data) { return true; }
 
 template<typename Tag>
-bool is_canonical(const Data<RelationBinding<Tag>>& data)
+bool is_canonical(const ygg::Data<RelationBinding<Tag>>& data)
 {
     return true;
 }
 
-inline bool is_canonical(const Data<Term>& data) { return true; }
+inline bool is_canonical(const ygg::Data<Term>& data) { return true; }
 
 template<FactKind T>
-bool is_canonical(const Data<Predicate<T>>& data)
+bool is_canonical(const ygg::Data<Predicate<T>>& data)
 {
     return true;
 }
 
 template<FactKind T>
-bool is_canonical(const Data<Function<T>>& data)
+bool is_canonical(const ygg::Data<Function<T>>& data)
 {
     return true;
 }
 
-inline void canonicalize(Data<Variable>& data)
+inline void canonicalize(ygg::Data<Variable>& data)
 {  // Trivially canonical
 }
 
-inline void canonicalize(Data<Object>& data)
+inline void canonicalize(ygg::Data<Object>& data)
 {
     // Trivially canonical
 }
 
 template<typename Tag>
-void canonicalize(Data<RelationBinding<Tag>>& data)
+void canonicalize(ygg::Data<RelationBinding<Tag>>& data)
 {
     // Trivially canonical
 }
 
-inline void canonicalize(Data<Term>& data)
-{
-    // Trivially canonical
-}
-
-template<FactKind T>
-void canonicalize(Data<Predicate<T>>& data)
+inline void canonicalize(ygg::Data<Term>& data)
 {
     // Trivially canonical
 }
 
 template<FactKind T>
-void canonicalize(Data<Function<T>>& data)
+void canonicalize(ygg::Data<Predicate<T>>& data)
+{
+    // Trivially canonical
+}
+
+template<FactKind T>
+void canonicalize(ygg::Data<Function<T>>& data)
 {
     // Trivially canonical
 }

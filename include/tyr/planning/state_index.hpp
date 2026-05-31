@@ -18,17 +18,17 @@
 #ifndef TYR_PLANNING_STATE_INDEX_HPP_
 #define TYR_PLANNING_STATE_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<planning::TaskKind Kind>
-struct Index<planning::State<Kind>> : IndexMixin<Index<planning::State<Kind>>>
+template<tyr::planning::TaskKind Kind>
+struct Index<tyr::planning::State<Kind>> : ygg::IndexMixin<ygg::Index<tyr::planning::State<Kind>>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<planning::State<Kind>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::planning::State<Kind>>>;
     using Base::Base;
 };
 }

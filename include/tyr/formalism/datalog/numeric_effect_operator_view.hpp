@@ -18,38 +18,39 @@
 #ifndef TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_OPERATOR_VIEW_HPP_
 #define TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_OPERATOR_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/numeric_effect_data.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T, formalism::datalog::Context C>
-class View<Data<formalism::datalog::NumericEffectOperator<T>>, C>
+using namespace ::tyr;
+template<::tyr::formalism::FactKind T, ::tyr::formalism::datalog::Context C>
+class View<ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T>>, C>
 {
 private:
     const C* m_context;
-    Data<formalism::datalog::NumericEffectOperator<T>> m_handle;
+    ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T>> m_handle;
 
 public:
-    View(Data<formalism::datalog::NumericEffectOperator<T>> data, const C& context) noexcept : m_context(&context), m_handle(data) {}
+    View(ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T>> data, const C& context) noexcept : m_context(&context), m_handle(data) {}
 
     const auto& get_data() const noexcept { return m_handle; }
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
 
-    auto get_variant() const noexcept { return make_view(m_handle.value, *m_context); }
+    auto get_variant() const noexcept { return ygg::make_view(m_handle.value, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
-template<formalism::FactKind T, typename C>
-auto make_view(const Data<formalism::datalog::NumericEffectOperator<T>>& element, const C& context) noexcept
+template<::tyr::formalism::FactKind T, typename C>
+auto make_view(const ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T>>& element, const C& context) noexcept
 {
-    return View<Data<formalism::datalog::NumericEffectOperator<T>>, C>(
+    return ygg::View<ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T>>, C>(
         element,
-        std::visit([&](const auto& arg) -> decltype(auto) { return make_view(arg, context).get_context(); }, element.value));
+        std::visit([&](const auto& arg) -> decltype(auto) { return ygg::make_view(arg, context).get_context(); }, element.value));
 }
 
 }

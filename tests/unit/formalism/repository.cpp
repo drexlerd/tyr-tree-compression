@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 
-namespace b = tyr::buffer;
+namespace b = ygg::buffer;
 namespace f = tyr::formalism;
 namespace fp = tyr::formalism::planning;
 
@@ -30,9 +30,9 @@ TEST(TyrTests, TyrFormalismRepository)
 {
     auto factory = fp::RepositoryFactory();
     auto repository = factory.create();
-    auto predicate_builder = Data<f::Predicate<f::FluentTag>>();
-    auto object_builder = Data<f::Object>();
-    auto atom_builder = Data<fp::Atom<f::FluentTag>>();
+    auto predicate_builder = ygg::Data<f::Predicate<f::FluentTag>>();
+    auto object_builder = ygg::Data<f::Object>();
+    auto atom_builder = ygg::Data<fp::Atom<f::FluentTag>>();
 
     // Create a unique predicate
     predicate_builder.name = "predicate_0";
@@ -92,8 +92,8 @@ TEST(TyrTests, TyrFormalismRepository)
     // Create atom
     atom_builder.terms.clear();
     atom_builder.predicate = predicate_0.get_index();
-    atom_builder.terms.push_back(Data<f::Term>(object_0.get_index()));
-    atom_builder.terms.push_back(Data<f::Term>(object_1.get_index()));
+    atom_builder.terms.push_back(ygg::Data<f::Term>(object_0.get_index()));
+    atom_builder.terms.push_back(ygg::Data<f::Term>(object_1.get_index()));
     canonicalize(atom_builder);
     auto [atom_0, atom_success_0] = repository.get_or_create(atom_builder);
 
@@ -110,9 +110,9 @@ TEST(TyrTests, TyrFormalismView)
 {
     auto factory = fp::RepositoryFactory();
     auto repository = factory.create();
-    auto predicate_builder = Data<f::Predicate<f::FluentTag>>();
-    auto object_builder = Data<f::Object>();
-    auto atom_builder = Data<fp::Atom<f::FluentTag>>();
+    auto predicate_builder = ygg::Data<f::Predicate<f::FluentTag>>();
+    auto object_builder = ygg::Data<f::Object>();
+    auto atom_builder = ygg::Data<fp::Atom<f::FluentTag>>();
 
     // Create a unique predicate
     predicate_builder.name = "predicate_0";
@@ -131,8 +131,8 @@ TEST(TyrTests, TyrFormalismView)
     // Create atom
     atom_builder.terms.clear();
     atom_builder.predicate = predicate_0.get_index();
-    atom_builder.terms.push_back(Data<f::Term>(object_0.get_index()));
-    atom_builder.terms.push_back(Data<f::Term>(object_1.get_index()));
+    atom_builder.terms.push_back(ygg::Data<f::Term>(object_0.get_index()));
+    atom_builder.terms.push_back(ygg::Data<f::Term>(object_1.get_index()));
     canonicalize(atom_builder);
     [[maybe_unused]] auto [atom_0, atom_success_0] = repository.get_or_create(atom_builder);
 }

@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_AXIOM_STRATIFICATION_HPP_
 #define TYR_PLANNING_GROUND_TASK_AXIOM_STRATIFICATION_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 
 #include <vector>
@@ -26,7 +26,7 @@
 namespace tyr::planning
 {
 
-using GroundAxiomStratum = IndexList<formalism::planning::GroundAxiom>;
+using GroundAxiomStratum = ygg::IndexList<::tyr::formalism::planning::GroundAxiom>;
 
 struct GroundAxiomStrata
 {
@@ -38,7 +38,7 @@ struct GroundAxiomStrata
 /// Source: https://users.cecs.anu.edu.au/~thiebaux/papers/ijcai03.pdf
 /// @param task is the task
 /// @return is the GroundAxiomStrata
-extern GroundAxiomStrata compute_ground_axiom_stratification(formalism::planning::FDRTaskView task);
+extern GroundAxiomStrata compute_ground_axiom_stratification(::tyr::formalism::planning::FDRTaskView task);
 }
 
 #endif

@@ -18,26 +18,28 @@
 #ifndef TYR_FORMALISM_FDR_FACT_DATA_HPP_
 #define TYR_FORMALISM_FDR_FACT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/fdr_value.hpp"
 #include "tyr/formalism/planning/fdr_variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Data<formalism::planning::FDRFact<T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::FDRFact<T>>
 {
-    Index<formalism::planning::FDRVariable<T>> variable;
-    formalism::planning::FDRValue value;
+    ygg::Index<::tyr::formalism::planning::FDRVariable<T>> variable;
+    ::tyr::formalism::planning::FDRValue value;
 
     Data() = default;
-    Data(Index<formalism::planning::FDRVariable<T>> variable_, formalism::planning::FDRValue value_) : variable(variable_), value(value_) {}
+    Data(ygg::Index<::tyr::formalism::planning::FDRVariable<T>> variable_, ::tyr::formalism::planning::FDRValue value_) : variable(variable_), value(value_) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::planning::FDRVariable<T>>, C> variable_, formalism::planning::FDRValue value_) : variable(), value(value_)
+    Data(::ygg::View<ygg::Index<::tyr::formalism::planning::FDRVariable<T>>, C> variable_, ::tyr::formalism::planning::FDRValue value_) : variable(), value(value_)
     {
         set(variable_, variable);
     }
@@ -48,15 +50,15 @@ struct Data<formalism::planning::FDRFact<T>>
 
     void clear() noexcept
     {
-        tyr::clear(variable);
-        tyr::clear(value);
+        ygg::clear(variable);
+        ygg::clear(value);
     }
 
     auto cista_members() const noexcept { return std::tie(variable, value); }
     auto identifying_members() const noexcept { return std::tie(variable, value); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::planning::FDRFact<formalism::FluentTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>);
 
 }
 

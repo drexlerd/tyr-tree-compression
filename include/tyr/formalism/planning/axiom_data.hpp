@@ -18,29 +18,31 @@
 #ifndef TYR_FORMALISM_PLANNING_AXIOM_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_AXIOM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/atom_index.hpp"
 #include "tyr/formalism/planning/axiom_index.hpp"
 #include "tyr/formalism/planning/conjunctive_condition_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::Axiom>
+struct Data<::tyr::formalism::planning::Axiom>
 {
-    Index<formalism::planning::Axiom> index;
-    IndexList<formalism::Variable> variables;
-    Index<formalism::planning::ConjunctiveCondition> body;
-    Index<formalism::planning::Atom<formalism::DerivedTag>> head;
+    ygg::Index<::tyr::formalism::planning::Axiom> index;
+    ygg::IndexList<::tyr::formalism::Variable> variables;
+    ygg::Index<::tyr::formalism::planning::ConjunctiveCondition> body;
+    ygg::Index<::tyr::formalism::planning::Atom<::tyr::formalism::DerivedTag>> head;
 
     Data() = default;
-    Data(IndexList<formalism::Variable> variables_,
-         Index<formalism::planning::ConjunctiveCondition> body_,
-         Index<formalism::planning::Atom<formalism::DerivedTag>> head_) :
+    Data(ygg::IndexList<::tyr::formalism::Variable> variables_,
+         ygg::Index<::tyr::formalism::planning::ConjunctiveCondition> body_,
+         ygg::Index<::tyr::formalism::planning::Atom<::tyr::formalism::DerivedTag>> head_) :
         index(),
         variables(std::move(variables_)),
         body(body_),
@@ -49,9 +51,9 @@ struct Data<formalism::planning::Axiom>
     }
     // Python constructor
     template<typename C>
-    Data(const std::vector<View<Index<formalism::Variable>, C>>& variables_,
-         View<Index<formalism::planning::ConjunctiveCondition>, C> body_,
-         View<Index<formalism::planning::Atom<formalism::DerivedTag>>, C> head_) :
+    Data(const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Variable>, C>>& variables_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::ConjunctiveCondition>, C> body_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::Atom<::tyr::formalism::DerivedTag>>, C> head_) :
         index(),
         variables(),
         body(),
@@ -68,17 +70,17 @@ struct Data<formalism::planning::Axiom>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(variables);
-        tyr::clear(body);
-        tyr::clear(head);
+        ygg::clear(index);
+        ygg::clear(variables);
+        ygg::clear(body);
+        ygg::clear(head);
     }
 
     auto cista_members() const noexcept { return std::tie(index, variables, body, head); }
     auto identifying_members() const noexcept { return std::tie(variables, body, head); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::Axiom>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::Axiom>);
 }
 
 #endif

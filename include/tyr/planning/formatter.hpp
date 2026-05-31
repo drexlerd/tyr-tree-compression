@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_FORMATTER_HPP_
 #define TYR_PLANNING_FORMATTER_HPP_
 
-#include "tyr/common/chrono.hpp"
-#include "tyr/common/cista_formatters.hpp"
+#include <yggdrasil/core/chrono.hpp>
+#include <yggdrasil/formatting/cista_formatters.hpp>
 #include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/planning/algorithms/statistics.hpp"
 #include "tyr/planning/declarations.hpp"
@@ -60,11 +60,11 @@ struct formatter<tyr::planning::Task<tyr::planning::GroundTag>, char>
 };
 
 template<>
-struct formatter<tyr::Data<tyr::planning::State<tyr::planning::LiftedTag>>, char>
+struct formatter<ygg::Data<tyr::planning::State<tyr::planning::LiftedTag>>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::planning::State<tyr::planning::LiftedTag>>&, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::planning::State<tyr::planning::LiftedTag>>&, FormatContext& ctx) const
     {
         return ctx.out();
     }
@@ -82,11 +82,11 @@ struct formatter<tyr::planning::UnpackedState<tyr::planning::LiftedTag>, char>
 };
 
 template<>
-struct formatter<tyr::Data<tyr::planning::State<tyr::planning::GroundTag>>, char>
+struct formatter<ygg::Data<tyr::planning::State<tyr::planning::GroundTag>>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
     template<typename FormatContext>
-    auto format(const tyr::Data<tyr::planning::State<tyr::planning::GroundTag>>&, FormatContext& ctx) const
+    auto format(const ygg::Data<tyr::planning::State<tyr::planning::GroundTag>>&, FormatContext& ctx) const
     {
         return ctx.out();
     }
@@ -115,8 +115,8 @@ struct formatter<tyr::planning::Statistics, char>
                               "[Search] Number of expanded states: {}\n"
                               "[Search] Number of generated states: {}\n"
                               "[Search] Number of pruned states: {}",
-                              tyr::to_ms(value.get_search_time()),
-                              tyr::to_ns(value.get_search_time()),
+                              ygg::to_ms(value.get_search_time()),
+                              ygg::to_ns(value.get_search_time()),
                               value.get_num_expanded(),
                               value.get_num_generated(),
                               value.get_num_pruned());
@@ -189,22 +189,22 @@ struct formatter<tyr::planning::StateView<Kind>, char>
         auto os = std::stringstream {};
         os << "State(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "index = ", value.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static atoms = ", static_atoms);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent atoms = ", fluent_facts);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "derived atoms = ", derived_atoms);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static numeric variables = ", static_fterm_values);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent numeric variables = ", fluent_fterm_values);
         }
 
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -219,13 +219,13 @@ struct formatter<tyr::planning::Node<Kind>, char>
         auto os = std::stringstream {};
         os << "Node(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "metric value = ", value.get_metric());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "state = ", value.get_state());
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };

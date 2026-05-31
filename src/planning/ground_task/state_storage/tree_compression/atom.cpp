@@ -17,7 +17,7 @@
 
 #include "tyr/planning/ground_task/state_storage/tree_compression/atom.hpp"
 
-#include "tyr/common/bit.hpp"
+#include <yggdrasil/core/bit.hpp>
 #include "tyr/planning/ground_task.hpp"
 #include "tyr/planning/ground_task/state_storage/tree_compression/context.hpp"
 
@@ -36,9 +36,9 @@ AtomStorageBackend<GroundTag, TreeCompression>::insert(const typename AtomStorag
 {
     auto data = m_buffer.data();
 
-    std::fill(m_buffer.begin(), m_buffer.end(), uint_t(0));
-    for (uint_t i = 0; i < m_num_bits; ++i)
-        bit::bit_reference(data, i) = unpacked.indices.test(i);
+    std::fill(m_buffer.begin(), m_buffer.end(), ygg::uint_t(0));
+    for (ygg::uint_t i = 0; i < m_num_bits; ++i)
+        ygg::bit::bit_reference(data, i) = unpacked.indices.test(i);
     return typename AtomStorageBackend<GroundTag, TreeCompression>::Packed { m_array_set.insert(m_buffer) };
 }
 
@@ -51,8 +51,8 @@ void AtomStorageBackend<GroundTag, TreeCompression>::unpack(const typename AtomS
     if (indices.size() != m_num_bits)
         indices.resize(m_num_bits);
 
-    for (uint_t i = 0; i < m_num_bits; ++i)
-        indices[i] = bool(bit::bit_reference(data, i));
+    for (ygg::uint_t i = 0; i < m_num_bits; ++i)
+        indices[i] = bool(ygg::bit::bit_reference(data, i));
 }
 
 }

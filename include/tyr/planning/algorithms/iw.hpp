@@ -40,7 +40,7 @@ struct Options
     std::optional<Node<Kind>> start_node = std::nullopt;
     EventHandlerPtr<Kind> event_handler = nullptr;
     GoalStrategyPtr<Kind> goal_strategy = nullptr;
-    uint_t max_num_states = std::numeric_limits<uint_t>::max();
+    ygg::uint_t max_num_states = std::numeric_limits<ygg::uint_t>::max();
     std::optional<std::chrono::steady_clock::duration> max_time = std::nullopt;
     uint64_t random_seed = 0;
     bool shuffle_labeled_succ_nodes = false;
@@ -49,7 +49,7 @@ struct Options
 };
 
 template<TaskKind Kind>
-SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, uint_t max_arity, const Options<Kind>& options = Options<Kind>());
+SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, ygg::uint_t max_arity, const Options<Kind>& options = Options<Kind>());
 
 /// @brief Adapter that exposes IW search through the generic solver interface.
 template<TaskKind Kind>
@@ -58,7 +58,7 @@ struct Solver
     using EventHandlerType = EventHandler<Kind>;
 
     brfs::Solver<Kind> brfs_solver;
-    uint_t max_arity;
+    ygg::uint_t max_arity;
     Options<Kind> options;
 
     SearchResult<Kind> solve() { return find_solution(brfs_solver, max_arity, options); }

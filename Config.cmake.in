@@ -17,6 +17,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/tyr_native_dependencies.cmake")
 
 configure_yggdrasil()
 configure_pypddl()
+tyr_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
 tyr_register_native_dependency_prefix("${PYPDDL_NATIVE_PREFIX}")
 
 # -----------

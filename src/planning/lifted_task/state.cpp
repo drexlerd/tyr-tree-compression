@@ -27,55 +27,55 @@ namespace tyr
 {
 using namespace planning;
 
-Index<State<LiftedTag>> UnpackedState<LiftedTag>::get_index() const { return m_index; }
+ygg::Index<State<LiftedTag>> UnpackedState<LiftedTag>::get_index() const { return m_index; }
 
-void UnpackedState<LiftedTag>::set(Index<State<LiftedTag>> index) { m_index = index; }
+void UnpackedState<LiftedTag>::set(ygg::Index<State<LiftedTag>> index) { m_index = index; }
 
-formalism::planning::FDRValue UnpackedState<LiftedTag>::get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const
+::tyr::formalism::planning::FDRValue UnpackedState<LiftedTag>::get(ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> index) const
 {
-    return formalism::planning::FDRValue(tyr::test(uint_t(index), m_fact_storage.indices));
+    return ::tyr::formalism::planning::FDRValue(ygg::test(ygg::uint_t(index), m_fact_storage.indices));
 }
 
-void UnpackedState<LiftedTag>::set(Data<formalism::planning::FDRFact<formalism::FluentTag>> fact)
+void UnpackedState<LiftedTag>::set(ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> fact)
 {
-    assert(uint_t(fact.value) < 2);  // can only handle binary using bitsets
-    tyr::set(uint_t(fact.variable), bool(uint_t(fact.value)), m_fact_storage.indices);
+    assert(ygg::uint_t(fact.value) < 2);  // can only handle binary using bitsets
+    ygg::set(ygg::uint_t(fact.variable), bool(ygg::uint_t(fact.value)), m_fact_storage.indices);
 }
 
-float_t UnpackedState<LiftedTag>::get(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index) const
+ygg::float_t UnpackedState<LiftedTag>::get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index) const
 {
-    return tyr::get(uint_t(index), m_numeric_storage.values, std::numeric_limits<float_t>::quiet_NaN());
+    return ygg::get(ygg::uint_t(index), m_numeric_storage.values, std::numeric_limits<ygg::float_t>::quiet_NaN());
 }
 
-void UnpackedState<LiftedTag>::set(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index, float_t value)
+void UnpackedState<LiftedTag>::set(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index, ygg::float_t value)
 {
-    tyr::set(uint_t(index), value, m_numeric_storage.values, std::numeric_limits<float_t>::quiet_NaN());
+    ygg::set(ygg::uint_t(index), value, m_numeric_storage.values, std::numeric_limits<ygg::float_t>::quiet_NaN());
 }
 
-bool UnpackedState<LiftedTag>::test(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index) const
+bool UnpackedState<LiftedTag>::test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index) const
 {
-    return tyr::test(uint_t(index), m_atom_storage.indices);
+    return ygg::test(ygg::uint_t(index), m_atom_storage.indices);
 }
 
-void UnpackedState<LiftedTag>::set(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index)
+void UnpackedState<LiftedTag>::set(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index)
 {
-    tyr::set(uint_t(index), true, m_atom_storage.indices);
+    ygg::set(ygg::uint_t(index), true, m_atom_storage.indices);
 }
 
-formalism::planning::FDRValue UnpackedState<LiftedTag>::get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const
+::tyr::formalism::planning::FDRValue UnpackedState<LiftedTag>::get(::tyr::formalism::planning::FDRVariableView<::tyr::formalism::FluentTag> view) const
 {
     return get(view.get_index());
 }
 
-void UnpackedState<LiftedTag>::set(formalism::planning::FDRFactView<formalism::FluentTag> view) { set(view.get_data()); }
+void UnpackedState<LiftedTag>::set(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> view) { set(view.get_data()); }
 
-float_t UnpackedState<LiftedTag>::get(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view) const { return get(view.get_index()); }
+ygg::float_t UnpackedState<LiftedTag>::get(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> view) const { return get(view.get_index()); }
 
-void UnpackedState<LiftedTag>::set(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view, float_t value) { set(view.get_index(), value); }
+void UnpackedState<LiftedTag>::set(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> view, ygg::float_t value) { set(view.get_index(), value); }
 
-bool UnpackedState<LiftedTag>::test(formalism::planning::GroundAtomView<formalism::DerivedTag> view) const { return test(view.get_index()); }
+bool UnpackedState<LiftedTag>::test(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag> view) const { return test(view.get_index()); }
 
-void UnpackedState<LiftedTag>::set(formalism::planning::GroundAtomView<formalism::DerivedTag> view) { set(view.get_index()); }
+void UnpackedState<LiftedTag>::set(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag> view) { set(view.get_index()); }
 
 void UnpackedState<LiftedTag>::clear()
 {
@@ -97,55 +97,57 @@ void UnpackedState<LiftedTag>::assign_unextended_part(const UnpackedState<Lifted
     m_numeric_storage = other.m_numeric_storage;
 }
 
-FDRFactRange<LiftedTag, formalism::FluentTag> UnpackedState<LiftedTag>::get_fluent_facts() const noexcept
+FDRFactRange<LiftedTag, ::tyr::formalism::FluentTag> UnpackedState<LiftedTag>::get_fluent_facts() const noexcept
 {
-    return FDRFactRange<LiftedTag, formalism::FluentTag>(m_fact_storage.indices);
+    return FDRFactRange<LiftedTag, ::tyr::formalism::FluentTag>(m_fact_storage.indices);
 }
 
-AtomRange<formalism::DerivedTag> UnpackedState<LiftedTag>::get_derived_atoms() const noexcept
+AtomRange<::tyr::formalism::DerivedTag> UnpackedState<LiftedTag>::get_derived_atoms() const noexcept
 {
-    return AtomRange<formalism::DerivedTag>(m_atom_storage.indices);
+    return AtomRange<::tyr::formalism::DerivedTag>(m_atom_storage.indices);
 }
 
-FunctionTermValueRange<formalism::FluentTag> UnpackedState<LiftedTag>::get_fluent_fterm_values() const noexcept
+FunctionTermValueRange<::tyr::formalism::FluentTag> UnpackedState<LiftedTag>::get_fluent_fterm_values() const noexcept
 {
-    return FunctionTermValueRange<formalism::FluentTag>(m_numeric_storage.values);
+    return FunctionTermValueRange<::tyr::formalism::FluentTag>(m_numeric_storage.values);
 }
 
 NumericUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_numeric_variables() noexcept { return m_numeric_storage; }
 
 const NumericUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_numeric_variables() const noexcept { return m_numeric_storage; }
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 LiftedUnpackedAtomStorage<T>& UnpackedState<LiftedTag>::get_atoms() noexcept
 {
-    if constexpr (std::same_as<T, formalism::FluentTag>)
+    if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
         return m_fact_storage;
-    else if constexpr (std::same_as<T, formalism::DerivedTag>)
+    else if constexpr (std::same_as<T, ::tyr::formalism::DerivedTag>)
         return m_atom_storage;
 }
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 const LiftedUnpackedAtomStorage<T>& UnpackedState<LiftedTag>::get_atoms() const noexcept
 {
-    if constexpr (std::same_as<T, formalism::FluentTag>)
+    if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
         return m_fact_storage;
-    else if constexpr (std::same_as<T, formalism::DerivedTag>)
+    else if constexpr (std::same_as<T, ::tyr::formalism::DerivedTag>)
         return m_atom_storage;
 }
 
-template FactUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<formalism::FluentTag>() noexcept;
-template AtomUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<formalism::DerivedTag>() noexcept;
-template const FactUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<formalism::FluentTag>() const noexcept;
-template const AtomUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<formalism::DerivedTag>() const noexcept;
+template FactUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<::tyr::formalism::FluentTag>() noexcept;
+template AtomUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<::tyr::formalism::DerivedTag>() noexcept;
+template const FactUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<::tyr::formalism::FluentTag>() const noexcept;
+template const AtomUnpackedStorage<LiftedTag>& UnpackedState<LiftedTag>::get_atoms<::tyr::formalism::DerivedTag>() const noexcept;
 
 }
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+namespace planning = ::tyr::planning;
 
 LiftedStateView::View(std::shared_ptr<planning::StateRepository<planning::LiftedTag>> owner,
-                      SharedObjectPoolPtr<planning::UnpackedState<planning::LiftedTag>> unpacked) noexcept :
+                      ygg::SharedObjectPoolPtr<planning::UnpackedState<planning::LiftedTag>> unpacked) noexcept :
     m_state_repository(std::move(owner)),
     m_unpacked(std::move(unpacked))
 {
@@ -161,95 +163,95 @@ LiftedStateView& LiftedStateView::operator=(const View&) = default;
 
 LiftedStateView& LiftedStateView::operator=(View&&) noexcept = default;
 
-Index<planning::State<planning::LiftedTag>> LiftedStateView::get_index() const { return m_unpacked->get_index(); }
+ygg::Index<planning::State<planning::LiftedTag>> LiftedStateView::get_index() const { return m_unpacked->get_index(); }
 
-std::tuple<Index<planning::State<planning::LiftedTag>>, uint_t> LiftedStateView::identifying_members() const noexcept
+std::tuple<ygg::Index<planning::State<planning::LiftedTag>>, ygg::uint_t> LiftedStateView::identifying_members() const noexcept
 {
     return std::make_tuple(get_index(), m_state_repository->get_index());
 }
 
-formalism::planning::FDRValue LiftedStateView::get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const { return m_unpacked->get(index); }
+::tyr::formalism::planning::FDRValue LiftedStateView::get(ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> index) const { return m_unpacked->get(index); }
 
-float_t LiftedStateView::get(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index) const { return m_unpacked->get(index); }
+ygg::float_t LiftedStateView::get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index) const { return m_unpacked->get(index); }
 
-bool LiftedStateView::test(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index) const { return m_unpacked->test(index); }
+bool LiftedStateView::test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index) const { return m_unpacked->test(index); }
 
 const std::shared_ptr<planning::StateRepository<planning::LiftedTag>>& LiftedStateView::get_state_repository() const noexcept { return m_state_repository; }
 
 const planning::UnpackedState<planning::LiftedTag>& LiftedStateView::get_unpacked_state() const noexcept { return *m_unpacked; }
 
-bool LiftedStateView::test(formalism::planning::GroundAtomView<formalism::StaticTag> view) const { return test(view.get_index()); }
+bool LiftedStateView::test(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::StaticTag> view) const { return test(view.get_index()); }
 
-float_t LiftedStateView::get(formalism::planning::GroundFunctionTermView<formalism::StaticTag> view) const { return get(view.get_index()); }
+ygg::float_t LiftedStateView::get(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::StaticTag> view) const { return get(view.get_index()); }
 
-formalism::planning::FDRValue LiftedStateView::get(formalism::planning::FDRVariableView<formalism::FluentTag> view) const { return get(view.get_index()); }
+::tyr::formalism::planning::FDRValue LiftedStateView::get(::tyr::formalism::planning::FDRVariableView<::tyr::formalism::FluentTag> view) const { return get(view.get_index()); }
 
-float_t LiftedStateView::get(formalism::planning::GroundFunctionTermView<formalism::FluentTag> view) const { return get(view.get_index()); }
+ygg::float_t LiftedStateView::get(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> view) const { return get(view.get_index()); }
 
-bool LiftedStateView::test(formalism::planning::GroundAtomView<formalism::DerivedTag> view) const { return test(view.get_index()); }
+bool LiftedStateView::test(::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag> view) const { return test(view.get_index()); }
 
-bool LiftedStateView::test(Index<formalism::planning::GroundAtom<formalism::StaticTag>> index) const { return m_state_repository->get_task()->test(index); }
+bool LiftedStateView::test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const { return m_state_repository->get_task()->test(index); }
 
-float_t LiftedStateView::get(Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>> index) const
+ygg::float_t LiftedStateView::get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>> index) const
 {
     return m_state_repository->get_task()->get(index);
 }
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 const boost::dynamic_bitset<>& LiftedStateView::get_atoms() const noexcept
 {
-    if constexpr (std::is_same_v<T, formalism::StaticTag>)
+    if constexpr (std::is_same_v<T, ::tyr::formalism::StaticTag>)
         return m_state_repository->get_task()->get_static_atoms_bitset();
-    else if constexpr (std::is_same_v<T, formalism::FluentTag> || std::is_same_v<T, formalism::DerivedTag>)
+    else if constexpr (std::is_same_v<T, ::tyr::formalism::FluentTag> || std::is_same_v<T, ::tyr::formalism::DerivedTag>)
         return m_unpacked->template get_atoms<T>().indices;
     else
-        static_assert(dependent_false<T>::value, "Missing case");
+        static_assert(ygg::dependent_false<T>::value, "Missing case");
 }
 
-template const boost::dynamic_bitset<>& LiftedStateView::get_atoms<formalism::StaticTag>() const noexcept;
-template const boost::dynamic_bitset<>& LiftedStateView::get_atoms<formalism::FluentTag>() const noexcept;
-template const boost::dynamic_bitset<>& LiftedStateView::get_atoms<formalism::DerivedTag>() const noexcept;
+template const boost::dynamic_bitset<>& LiftedStateView::get_atoms<::tyr::formalism::StaticTag>() const noexcept;
+template const boost::dynamic_bitset<>& LiftedStateView::get_atoms<::tyr::formalism::FluentTag>() const noexcept;
+template const boost::dynamic_bitset<>& LiftedStateView::get_atoms<::tyr::formalism::DerivedTag>() const noexcept;
 
-template<formalism::FactKind T>
-const std::vector<float_t>& LiftedStateView::get_numeric_variables() const noexcept
+template<::tyr::formalism::FactKind T>
+const std::vector<ygg::float_t>& LiftedStateView::get_numeric_variables() const noexcept
 {
-    if constexpr (std::is_same_v<T, formalism::StaticTag>)
+    if constexpr (std::is_same_v<T, ::tyr::formalism::StaticTag>)
         return m_state_repository->get_task()->get_static_numeric_variables();
-    else if constexpr (std::is_same_v<T, formalism::FluentTag>)
+    else if constexpr (std::is_same_v<T, ::tyr::formalism::FluentTag>)
         return m_unpacked->get_numeric_variables().values;
     else
-        static_assert(dependent_false<T>::value, "Missing case");
+        static_assert(ygg::dependent_false<T>::value, "Missing case");
 }
 
-template const std::vector<float_t>& LiftedStateView::get_numeric_variables<formalism::StaticTag>() const noexcept;
-template const std::vector<float_t>& LiftedStateView::get_numeric_variables<formalism::FluentTag>() const noexcept;
+template const std::vector<ygg::float_t>& LiftedStateView::get_numeric_variables<::tyr::formalism::StaticTag>() const noexcept;
+template const std::vector<ygg::float_t>& LiftedStateView::get_numeric_variables<::tyr::formalism::FluentTag>() const noexcept;
 
-planning::AtomRange<formalism::StaticTag> LiftedStateView::get_static_atoms() const noexcept
+planning::AtomRange<::tyr::formalism::StaticTag> LiftedStateView::get_static_atoms() const noexcept
 {
-    return planning::AtomRange<formalism::StaticTag>(m_state_repository->get_task()->get_static_atoms_bitset());
+    return planning::AtomRange<::tyr::formalism::StaticTag>(m_state_repository->get_task()->get_static_atoms_bitset());
 }
 
-planning::FDRFactRange<planning::LiftedTag, formalism::FluentTag> LiftedStateView::get_fluent_facts() const noexcept
+planning::FDRFactRange<planning::LiftedTag, ::tyr::formalism::FluentTag> LiftedStateView::get_fluent_facts() const noexcept
 {
-    return planning::FDRFactRange<planning::LiftedTag, formalism::FluentTag>(get_atoms<formalism::FluentTag>());
+    return planning::FDRFactRange<planning::LiftedTag, ::tyr::formalism::FluentTag>(get_atoms<::tyr::formalism::FluentTag>());
 }
 
-planning::AtomRange<formalism::DerivedTag> LiftedStateView::get_derived_atoms() const noexcept
+planning::AtomRange<::tyr::formalism::DerivedTag> LiftedStateView::get_derived_atoms() const noexcept
 {
-    return planning::AtomRange<formalism::DerivedTag>(get_atoms<formalism::DerivedTag>());
+    return planning::AtomRange<::tyr::formalism::DerivedTag>(get_atoms<::tyr::formalism::DerivedTag>());
 }
 
-planning::FunctionTermValueRange<formalism::StaticTag> LiftedStateView::get_static_fterm_values() const noexcept
+planning::FunctionTermValueRange<::tyr::formalism::StaticTag> LiftedStateView::get_static_fterm_values() const noexcept
 {
-    return planning::FunctionTermValueRange<formalism::StaticTag>(m_state_repository->get_task()->get_static_numeric_variables());
+    return planning::FunctionTermValueRange<::tyr::formalism::StaticTag>(m_state_repository->get_task()->get_static_numeric_variables());
 }
 
-planning::FunctionTermValueRange<formalism::FluentTag> LiftedStateView::get_fluent_fterm_values() const noexcept
+planning::FunctionTermValueRange<::tyr::formalism::FluentTag> LiftedStateView::get_fluent_fterm_values() const noexcept
 {
-    return planning::FunctionTermValueRange<formalism::FluentTag>(get_numeric_variables<formalism::FluentTag>());
+    return planning::FunctionTermValueRange<::tyr::formalism::FluentTag>(get_numeric_variables<::tyr::formalism::FluentTag>());
 }
 
-const std::shared_ptr<formalism::planning::Repository>& LiftedStateView::get_repository() const noexcept
+const std::shared_ptr<::tyr::formalism::planning::Repository>& LiftedStateView::get_repository() const noexcept
 {
     return m_state_repository->get_task()->get_repository();
 }

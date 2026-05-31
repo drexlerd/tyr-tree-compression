@@ -27,18 +27,18 @@ namespace tyr::tests
 
 TEST(TyrTests, TyrPlanningIwRankTupleUsesStableCombinadicRanks)
 {
-    EXPECT_EQ(planning::iw::rank_tuple<3>(std::span<const uint_t> {}), 0);
+    EXPECT_EQ(planning::iw::rank_tuple<3>(std::span<const ygg::uint_t> {}), 0);
 
-    const auto atom_0 = std::array<uint_t, 1> { 0 };
-    const auto atom_3 = std::array<uint_t, 1> { 3 };
-    const auto tuple_0_1 = std::array<uint_t, 2> { 0, 1 };
-    const auto tuple_0_2 = std::array<uint_t, 2> { 0, 2 };
-    const auto tuple_1_2 = std::array<uint_t, 2> { 1, 2 };
-    const auto tuple_0_3 = std::array<uint_t, 2> { 0, 3 };
-    const auto tuple_1_3 = std::array<uint_t, 2> { 1, 3 };
-    const auto tuple_2_3 = std::array<uint_t, 2> { 2, 3 };
-    const auto tuple_0_1_2 = std::array<uint_t, 3> { 0, 1, 2 };
-    const auto tuple_0_1_4 = std::array<uint_t, 3> { 0, 1, 4 };
+    const auto atom_0 = std::array<ygg::uint_t, 1> { 0 };
+    const auto atom_3 = std::array<ygg::uint_t, 1> { 3 };
+    const auto tuple_0_1 = std::array<ygg::uint_t, 2> { 0, 1 };
+    const auto tuple_0_2 = std::array<ygg::uint_t, 2> { 0, 2 };
+    const auto tuple_1_2 = std::array<ygg::uint_t, 2> { 1, 2 };
+    const auto tuple_0_3 = std::array<ygg::uint_t, 2> { 0, 3 };
+    const auto tuple_1_3 = std::array<ygg::uint_t, 2> { 1, 3 };
+    const auto tuple_2_3 = std::array<ygg::uint_t, 2> { 2, 3 };
+    const auto tuple_0_1_2 = std::array<ygg::uint_t, 3> { 0, 1, 2 };
+    const auto tuple_0_1_4 = std::array<ygg::uint_t, 3> { 0, 1, 4 };
 
     EXPECT_EQ(planning::iw::rank_tuple<3>(atom_0), 0);
     EXPECT_EQ(planning::iw::rank_tuple<3>(atom_3), 3);
@@ -58,12 +58,12 @@ TEST(TyrTests, TyrPlanningIwDynamicNoveltyTableGrowsWithoutRemapping)
 {
     auto table = planning::iw::DynamicNoveltyTable<3>();
 
-    const auto atom_0 = std::array<uint_t, 1> { 0 };
-    const auto atom_100 = std::array<uint_t, 1> { 100 };
-    const auto tuple_0_1 = std::array<uint_t, 2> { 0, 1 };
-    const auto tuple_1_2 = std::array<uint_t, 2> { 1, 2 };
-    const auto tuple_0_1_2 = std::array<uint_t, 3> { 0, 1, 2 };
-    const auto tuple_10_20_30 = std::array<uint_t, 3> { 10, 20, 30 };
+    const auto atom_0 = std::array<ygg::uint_t, 1> { 0 };
+    const auto atom_100 = std::array<ygg::uint_t, 1> { 100 };
+    const auto tuple_0_1 = std::array<ygg::uint_t, 2> { 0, 1 };
+    const auto tuple_1_2 = std::array<ygg::uint_t, 2> { 1, 2 };
+    const auto tuple_0_1_2 = std::array<ygg::uint_t, 3> { 0, 1, 2 };
+    const auto tuple_10_20_30 = std::array<ygg::uint_t, 3> { 10, 20, 30 };
 
     EXPECT_EQ(table.get_num_bits(1), 0);
     EXPECT_EQ(table.get_num_bits(2), 0);
@@ -103,8 +103,8 @@ TEST(TyrTests, TyrPlanningIwDynamicNoveltyTableSeparatesArityBuckets)
 {
     auto table = planning::iw::DynamicNoveltyTable<2>();
 
-    const auto atom_1 = std::array<uint_t, 1> { 1 };
-    const auto tuple_0_2 = std::array<uint_t, 2> { 0, 2 };
+    const auto atom_1 = std::array<ygg::uint_t, 1> { 1 };
+    const auto tuple_0_2 = std::array<ygg::uint_t, 2> { 0, 2 };
 
     ASSERT_EQ(planning::iw::rank_tuple<2>(atom_1), planning::iw::rank_tuple<2>(tuple_0_2));
 
@@ -123,10 +123,10 @@ TEST(TyrTests, TyrPlanningIwDynamicNoveltyTableReportsArity)
 TEST(TyrTests, TyrPlanningIwForEachTupleGeneratesCanonicalTuplesUpToArity)
 {
     const auto atoms = planning::iw::AtomIndexList { 1, 3, 5 };
-    auto tuple = std::array<uint_t, 2> {};
+    auto tuple = std::array<ygg::uint_t, 2> {};
     auto generated = std::vector<planning::iw::AtomIndexList> {};
 
-    planning::iw::for_each_tuple<2>(atoms, tuple, [&](std::span<const uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
+    planning::iw::for_each_tuple<2>(atoms, tuple, [&](std::span<const ygg::uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
 
     const auto expected = std::vector<planning::iw::AtomIndexList> {
         { 1 }, { 3 }, { 5 }, { 1, 3 }, { 1, 5 }, { 3, 5 },
@@ -138,10 +138,10 @@ TEST(TyrTests, TyrPlanningIwForEachTupleGeneratesCanonicalTuplesUpToArity)
 TEST(TyrTests, TyrPlanningIwForEachTupleRespectsRuntimeArity)
 {
     const auto atoms = planning::iw::AtomIndexList { 1, 3, 5 };
-    auto tuple = std::array<uint_t, 3> {};
+    auto tuple = std::array<ygg::uint_t, 3> {};
     auto generated = std::vector<planning::iw::AtomIndexList> {};
 
-    planning::iw::for_each_tuple<3>(atoms, 2, tuple, [&](std::span<const uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
+    planning::iw::for_each_tuple<3>(atoms, 2, tuple, [&](std::span<const ygg::uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
 
     const auto expected = std::vector<planning::iw::AtomIndexList> {
         { 1 }, { 3 }, { 5 }, { 1, 3 }, { 1, 5 }, { 3, 5 },
@@ -154,9 +154,9 @@ TEST(TyrTests, TyrPlanningIwForEachTupleWithAddedAtomsGeneratesOnlyTuplesContain
 {
     const auto added = planning::iw::AtomIndexList { 2, 5 };
     const auto kept = planning::iw::AtomIndexList { 1, 4 };
-    auto added_tuple = std::array<uint_t, 2> {};
-    auto kept_tuple = std::array<uint_t, 2> {};
-    auto tuple = std::array<uint_t, 2> {};
+    auto added_tuple = std::array<ygg::uint_t, 2> {};
+    auto kept_tuple = std::array<ygg::uint_t, 2> {};
+    auto tuple = std::array<ygg::uint_t, 2> {};
     auto generated = std::vector<planning::iw::AtomIndexList> {};
 
     planning::iw::for_each_tuple_with_added_atoms<2>(added,
@@ -164,7 +164,7 @@ TEST(TyrTests, TyrPlanningIwForEachTupleWithAddedAtomsGeneratesOnlyTuplesContain
                                                      added_tuple,
                                                      kept_tuple,
                                                      tuple,
-                                                     [&](std::span<const uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
+                                                     [&](std::span<const ygg::uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
 
     const auto expected = std::vector<planning::iw::AtomIndexList> {
         { 2 }, { 5 }, { 1, 2 }, { 2, 4 }, { 1, 5 }, { 4, 5 }, { 2, 5 },
@@ -177,9 +177,9 @@ TEST(TyrTests, TyrPlanningIwForEachTupleWithAddedAtomsRespectsRuntimeArity)
 {
     const auto added = planning::iw::AtomIndexList { 2, 5 };
     const auto kept = planning::iw::AtomIndexList { 1, 4 };
-    auto added_tuple = std::array<uint_t, 3> {};
-    auto kept_tuple = std::array<uint_t, 3> {};
-    auto tuple = std::array<uint_t, 3> {};
+    auto added_tuple = std::array<ygg::uint_t, 3> {};
+    auto kept_tuple = std::array<ygg::uint_t, 3> {};
+    auto tuple = std::array<ygg::uint_t, 3> {};
     auto generated = std::vector<planning::iw::AtomIndexList> {};
 
     planning::iw::for_each_tuple_with_added_atoms<3>(added,
@@ -188,7 +188,7 @@ TEST(TyrTests, TyrPlanningIwForEachTupleWithAddedAtomsRespectsRuntimeArity)
                                                      added_tuple,
                                                      kept_tuple,
                                                      tuple,
-                                                     [&](std::span<const uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
+                                                     [&](std::span<const ygg::uint_t> item) { generated.emplace_back(item.begin(), item.end()); });
 
     const auto expected = std::vector<planning::iw::AtomIndexList> {
         { 2 }, { 5 }, { 1, 2 }, { 2, 4 }, { 1, 5 }, { 4, 5 }, { 2, 5 },

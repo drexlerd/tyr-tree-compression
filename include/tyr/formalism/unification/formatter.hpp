@@ -39,17 +39,17 @@ struct formatter<tyr::formalism::unification::SubstitutionFunction<T>, char>
         os << "SubstitutionFunction(\n";
 
         {
-            tyr::IndentScope scope(os);
+            ygg::IndentScope scope(os);
 
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "parameters = ", value.parameters());
 
-            os << tyr::print_indent << "bindings = [\n";
+            os << ygg::print_indent << "bindings = [\n";
             {
-                tyr::IndentScope scope(os);
+                ygg::IndentScope scope(os);
                 for (const auto& parameter : value.parameters())
                 {
-                    os << tyr::print_indent;
+                    os << ygg::print_indent;
                     if (value.is_bound(parameter))
                         fmt::print(os, "{} -> {}\n", parameter, *value[parameter]);
                     else
@@ -57,7 +57,7 @@ struct formatter<tyr::formalism::unification::SubstitutionFunction<T>, char>
                 }
             }
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
 
         return fmt::format_to(ctx.out(), "{}", os.str());
     }

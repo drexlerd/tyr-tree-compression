@@ -18,27 +18,29 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_LITERAL_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_LITERAL_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_atom_index.hpp"
 #include "tyr/formalism/planning/ground_literal_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::planning::GroundLiteral<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::GroundLiteral<T>>
 {
-    Index<formalism::planning::GroundLiteral<T>> index;
-    Index<formalism::planning::GroundAtom<T>> atom;
+    ygg::Index<::tyr::formalism::planning::GroundLiteral<T>> index;
+    ygg::Index<::tyr::formalism::planning::GroundAtom<T>> atom;
     bool polarity;
 
     Data() = default;
-    Data(Index<formalism::planning::GroundAtom<T>> atom_, bool polarity_) : index(), atom(atom_), polarity(polarity_) {}
+    Data(ygg::Index<::tyr::formalism::planning::GroundAtom<T>> atom_, bool polarity_) : index(), atom(atom_), polarity(polarity_) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::planning::GroundAtom<T>>, C> atom_, bool polarity_) : index(), atom(), polarity(polarity_)
+    Data(::ygg::View<ygg::Index<::tyr::formalism::planning::GroundAtom<T>>, C> atom_, bool polarity_) : index(), atom(), polarity(polarity_)
     {
         set(atom_, atom);
     }
@@ -49,16 +51,16 @@ struct Data<formalism::planning::GroundLiteral<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(atom);
-        tyr::clear(polarity);
+        ygg::clear(index);
+        ygg::clear(atom);
+        ygg::clear(polarity);
     }
 
     auto cista_members() const noexcept { return std::tie(index, atom, polarity); }
     auto identifying_members() const noexcept { return std::tie(atom, polarity); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::planning::GroundLiteral<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundLiteral<::tyr::formalism::StaticTag>>);
 }
 
 #endif

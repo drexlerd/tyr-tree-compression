@@ -20,8 +20,8 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_CANONICALIZATION_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_CANONICALIZATION_HPP_
 
-#include "tyr/common/canonicalization.hpp"
-#include "tyr/common/comparators.hpp"
+#include <yggdrasil/semantics/canonicalization.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 #include "tyr/planning/ground_task/match_tree/nodes/atom_data.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/constraint_data.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/generator_data.hpp"
@@ -34,58 +34,58 @@ namespace tyr::planning::match_tree
 {
 
 template<typename Tag>
-bool is_canonical(const Data<AtomSelectorNode<Tag>>& element)
+bool is_canonical(const ygg::Data<AtomSelectorNode<Tag>>& element)
 {
     return true;
 };
 
 template<typename Tag>
-bool is_canonical(const Data<VariableSelectorNode<Tag>>& element)
+bool is_canonical(const ygg::Data<VariableSelectorNode<Tag>>& element)
 {
     return true;
 };
 
 template<typename Tag>
-bool is_canonical(const Data<NegativeFactSelectorNode<Tag>>& element)
+bool is_canonical(const ygg::Data<NegativeFactSelectorNode<Tag>>& element)
 {
     return true;
 };
 
 template<typename Tag>
-bool is_canonical(const Data<NumericConstraintSelectorNode<Tag>>& element)
+bool is_canonical(const ygg::Data<NumericConstraintSelectorNode<Tag>>& element)
 {
     return true;
 };
 
 template<typename Tag>
-bool is_canonical(const Data<ElementGeneratorNode<Tag>>& element)
+bool is_canonical(const ygg::Data<ElementGeneratorNode<Tag>>& element)
 {
     return true;
 };
 
 template<typename Tag>
-bool is_canonical(const Data<Node<Tag>>& element)
+bool is_canonical(const ygg::Data<Node<Tag>>& element)
 {
     return true;
 };
 
 template<typename Tag>
-void canonicalize(Data<AtomSelectorNode<Tag>>& element) {};
+void canonicalize(ygg::Data<AtomSelectorNode<Tag>>& element) {};
 
 template<typename Tag>
-void canonicalize(Data<VariableSelectorNode<Tag>>& element) {};
+void canonicalize(ygg::Data<VariableSelectorNode<Tag>>& element) {};
 
 template<typename Tag>
-void canonicalize(Data<NegativeFactSelectorNode<Tag>>& element) {};
+void canonicalize(ygg::Data<NegativeFactSelectorNode<Tag>>& element) {};
 
 template<typename Tag>
-void canonicalize(Data<NumericConstraintSelectorNode<Tag>>& element) {};
+void canonicalize(ygg::Data<NumericConstraintSelectorNode<Tag>>& element) {};
 
 template<typename Tag>
-void canonicalize(Data<ElementGeneratorNode<Tag>>& element) {};
+void canonicalize(ygg::Data<ElementGeneratorNode<Tag>>& element) {};
 
 template<typename Tag>
-void canonicalize(Data<Node<Tag>>& element) {};
+void canonicalize(ygg::Data<Node<Tag>>& element) {};
 
 }
 

@@ -20,8 +20,8 @@
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/vector.h>
-#include <tyr/common/python/bindings.hpp>
-#include <tyr/common/python/type_casters.hpp>
+#include "pytyr/bindings.hpp"
+#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
 
 namespace tyr::formalism::planning::invariant
@@ -123,7 +123,7 @@ void bind_invariant(nb::module_& m, const std::string& name)
 void bind_invariant_match_data(nb::module_& m, const std::string& name)
 {
     using V = InvariantMatchData;
-    using ObjectSubstitution = unification::SubstitutionFunction<Index<Object>>;
+    using ObjectSubstitution = unification::SubstitutionFunction<ygg::Index<Object>>;
 
     nb::class_<V>(m, name.c_str())
         .def(nb::init<Invariant, std::vector<ObjectSubstitution>>(), "invariant"_a, "rigid_variable_bindings"_a)
@@ -182,8 +182,8 @@ void bind_matcher(nb::module_& m, const std::string& name)
 void bind_invariants(nb::module_& m)
 {
     bind_invariant(m, "Invariant");
-    bind_substitution_function<Index<Object>>(m, "ObjectSubstitution");
-    bind_substitution_function<Data<Term>>(m, "TermSubstitution");
+    bind_substitution_function<ygg::Index<Object>>(m, "ObjectSubstitution");
+    bind_substitution_function<ygg::Data<Term>>(m, "TermSubstitution");
     bind_invariant_match_data(m, "InvariantMatchData");
     bind_query_workspace(m, "InvariantQueryWorkspace");
     bind_query_result_match(m, "InvariantQueryResultMatch");

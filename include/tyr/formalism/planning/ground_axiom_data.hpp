@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_AXIOM_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_AXIOM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/planning/axiom_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
@@ -27,21 +27,23 @@
 #include "tyr/formalism/planning/ground_axiom_index.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_condition_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::GroundAxiom>
+struct Data<::tyr::formalism::planning::GroundAxiom>
 {
-    Index<formalism::planning::GroundAxiom> index;
-    Index<formalism::RelationBinding<formalism::planning::Axiom>> binding;
-    Index<formalism::planning::GroundConjunctiveCondition> body;
-    Index<formalism::planning::GroundAtom<formalism::DerivedTag>> head;
+    ygg::Index<::tyr::formalism::planning::GroundAxiom> index;
+    ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Axiom>> binding;
+    ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition> body;
+    ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> head;
 
     Data() = default;
-    Data(Index<formalism::RelationBinding<formalism::planning::Axiom>> binding_,
-         Index<formalism::planning::GroundConjunctiveCondition> body_,
-         Index<formalism::planning::GroundAtom<formalism::DerivedTag>> head_) :
+    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Axiom>> binding_,
+         ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition> body_,
+         ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> head_) :
         index(),
         binding(binding_),
         body(body_),
@@ -50,9 +52,9 @@ struct Data<formalism::planning::GroundAxiom>
     }
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::RelationBinding<formalism::planning::Axiom>>, C> binding_,
-         View<Index<formalism::planning::GroundConjunctiveCondition>, C> body_,
-         View<Index<formalism::planning::GroundAtom<formalism::DerivedTag>>, C> head_) :
+    Data(::ygg::View<ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Axiom>>, C> binding_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition>, C> body_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>>, C> head_) :
         index(),
         binding(),
         body(),
@@ -69,17 +71,17 @@ struct Data<formalism::planning::GroundAxiom>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(binding);
-        tyr::clear(body);
-        tyr::clear(head);
+        ygg::clear(index);
+        ygg::clear(binding);
+        ygg::clear(body);
+        ygg::clear(head);
     }
 
     auto cista_members() const noexcept { return std::tie(index, binding, body, head); }
     auto identifying_members() const noexcept { return std::tie(binding); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::planning::GroundAxiom>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundAxiom>);
 }
 
 #endif

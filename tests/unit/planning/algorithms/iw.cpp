@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/common/json.hpp"
-#include "tyr/common/json_suite.hpp"
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <filesystem>
 #include <fmt/core.h>
@@ -43,10 +43,10 @@ struct IwCase
     std::string name;
     std::filesystem::path domain_file;
     std::filesystem::path task_file;
-    uint_t max_arity;
+    ygg::uint_t max_arity;
     std::optional<p::SearchStatus> expected_status;
-    std::optional<uint_t> expected_plan_length;
-    std::optional<uint_t> expected_solution_arity;
+    std::optional<ygg::uint_t> expected_plan_length;
+    std::optional<ygg::uint_t> expected_solution_arity;
 };
 
 p::SearchStatus parse_status(const std::string& status)
@@ -102,21 +102,21 @@ std::string to_string(p::SearchStatus status)
 
 IwCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
-    const auto max_arity = tyr::common::as_uint_t(suite, "max_arity", "suite");
+    const auto max_arity = ygg::common::as_uint_t(suite, "max_arity", "suite");
     auto expected_status = std::optional<p::SearchStatus> {};
-    auto expected_plan_length = std::optional<uint_t> {};
-    auto expected_solution_arity = std::optional<uint_t> {};
+    auto expected_plan_length = std::optional<ygg::uint_t> {};
+    auto expected_solution_arity = std::optional<ygg::uint_t> {};
 
-    if (const auto value = tyr::common::find_string(object, "expected_status", "case"))
+    if (const auto value = ygg::common::find_string(object, "expected_status", "case"))
         expected_status = parse_status(*value);
-    if (const auto value = tyr::common::find_uint_t(object, "expected_plan_length", "case"))
+    if (const auto value = ygg::common::find_uint_t(object, "expected_plan_length", "case"))
         expected_plan_length = *value;
-    if (const auto value = tyr::common::find_uint_t(object, "expected_solution_arity", "case"))
+    if (const auto value = ygg::common::find_uint_t(object, "expected_solution_arity", "case"))
         expected_solution_arity = *value;
 
-    return IwCase { tyr::common::as_string(object, "name", "case"),
-                    tyr::common::suite_path(suite, tyr::common::as_string(object, "domain_file", "case")),
-                    tyr::common::suite_path(suite, tyr::common::as_string(object, "task_file", "case")),
+    return IwCase { ygg::common::as_string(object, "name", "case"),
+                    ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                    ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")),
                     max_arity,
                     expected_status,
                     expected_plan_length,
@@ -125,17 +125,17 @@ IwCase parse_case(const boost::json::object& suite, const boost::json::object& o
 
 std::vector<IwCase> load_cases()
 {
-    const auto suite = tyr::common::load_json_file(tyr::common::root_path() / "tests/unit/planning/algorithms/iw.json");
-    const auto& suite_object = tyr::common::as_object(suite, "suite");
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/algorithms/iw.json");
+    const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<IwCase> {};
-    for (const auto& case_value : tyr::common::as_array(suite_object, "cases", "suite"))
-        result.push_back(parse_case(suite_object, tyr::common::as_object(case_value, "case")));
+    for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))
+        result.push_back(parse_case(suite_object, ygg::common::as_object(case_value, "case")));
     return result;
 }
 
 GroundSearchContext create_ground_context(const std::filesystem::path& domain_file, const std::filesystem::path& task_file)
 {
-    auto execution_context = ExecutionContext::create(1);
+    auto execution_context = ygg::ExecutionContext::create(1);
     auto task = p::Task<p::LiftedTag>(fp::Parser(domain_file).parse_task(task_file)).instantiate_ground_task(*execution_context).task;
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::GroundTag>().create(task, axiom_evaluator);
@@ -162,7 +162,7 @@ TEST_P(IwTest, MatchesExpectedOutcome)
 
     const auto result = p::iw::find_solution(brfs_solver, param.max_arity, options);
 
-    const auto plan_length = result.plan ? std::optional<uint_t>(result.plan->get_length()) : std::nullopt;
+    const auto plan_length = result.plan ? std::optional<ygg::uint_t>(result.plan->get_length()) : std::nullopt;
     const auto solution_arity = iw_event_handler->get_statistics().get_solution_arity();
     fmt::println("IW_OBSERVED {} {} {} {}",
                  param.name,

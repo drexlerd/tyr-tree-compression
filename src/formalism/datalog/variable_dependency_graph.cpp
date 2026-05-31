@@ -32,17 +32,17 @@ static void insert_literal_dependencies(const std::vector<ParameterIndex>& param
 
     for (const auto parameter : parameters)
     {
-        const auto pi = uint_t(parameter);
+        const auto pi = ygg::uint_t(parameter);
         unary_dep.set(pi);
     }
 
-    for (uint_t i = 0; i < parameters.size(); ++i)
+    for (ygg::uint_t i = 0; i < parameters.size(); ++i)
     {
-        const auto pi = uint_t(parameters[i]);
+        const auto pi = ygg::uint_t(parameters[i]);
 
-        for (uint_t j = i + 1; j < parameters.size(); ++j)
+        for (ygg::uint_t j = i + 1; j < parameters.size(); ++j)
         {
-            const auto pj = uint_t(parameters[j]);
+            const auto pj = ygg::uint_t(parameters[j]);
 
             binary_dep.set(binary.get_index(pi, pj));
             binary_dep.set(binary.get_index(pj, pi));
@@ -74,17 +74,17 @@ static void insert_numeric_constraint(LiftedBooleanOperatorView numeric_constrai
 
     for (const auto parameter : parameters)
     {
-        const auto pi = uint_t(parameter);
+        const auto pi = ygg::uint_t(parameter);
         unary_dep.set(pi);
     }
 
-    for (uint_t i = 0; i < parameters.size(); ++i)
+    for (ygg::uint_t i = 0; i < parameters.size(); ++i)
     {
-        const auto pi = uint_t(parameters[i]);
+        const auto pi = ygg::uint_t(parameters[i]);
 
-        for (uint_t j = i + 1; j < parameters.size(); ++j)
+        for (ygg::uint_t j = i + 1; j < parameters.size(); ++j)
         {
-            const auto pj = uint_t(parameters[j]);
+            const auto pj = ygg::uint_t(parameters[j]);
 
             binary_dep.set(binary.get_index(pi, pj));
             binary_dep.set(binary.get_index(pj, pi));

@@ -51,7 +51,7 @@ namespace
 template<typename Callback>
 void for_each_action_binding(const d::ProgramWorkspace<d::NoOrAnnotationPolicy, d::NoAndAnnotationPolicy, d::NoTerminationPolicy>& workspace,
                              const ApplicableActionProgram& program,
-                             IndexList<f::Object>& binding_scratch,
+                             ygg::IndexList<f::Object>& binding_scratch,
                              Callback&& callback)
 {
     const auto& mapping = program.get_predicate_to_action_mapping();
@@ -74,9 +74,9 @@ void for_each_action_binding(const d::ProgramWorkspace<d::NoOrAnnotationPolicy, 
 }
 }
 
-SuccessorGenerator<LiftedTag>::SuccessorGenerator(uint_t index,
+SuccessorGenerator<LiftedTag>::SuccessorGenerator(ygg::uint_t index,
                                                   TaskPtr<LiftedTag> task,
-                                                  ExecutionContextPtr execution_context,
+                                                  ygg::ExecutionContextPtr execution_context,
                                                   StateRepositoryPtr<LiftedTag> state_repository) :
     m_index(index),
     m_task(std::move(task)),
@@ -160,7 +160,7 @@ fp::GroundActionView SuccessorGenerator<LiftedTag>::get_ground_action(fp::Action
 }
 
 // Action binding API (interning)
-Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_successor_node(const Node<LiftedTag>& node, formalism::planning::ActionBindingView binding)
+Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_successor_node(const Node<LiftedTag>& node, ::tyr::formalism::planning::ActionBindingView binding)
 {
     m_scratch_action_binding.relation = binding.get_relation().get_index();
     m_scratch_action_binding.objects.clear();
@@ -170,15 +170,15 @@ Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_successor_node(const Node<Lif
     return get_successor_node(node, m_scratch_action_binding);
 }
 
-std::vector<formalism::planning::ActionBindingView> SuccessorGenerator<LiftedTag>::get_applicable_action_bindings(const Node<LiftedTag>& node)
+std::vector<::tyr::formalism::planning::ActionBindingView> SuccessorGenerator<LiftedTag>::get_applicable_action_bindings(const Node<LiftedTag>& node)
 {
-    auto result = std::vector<formalism::planning::ActionBindingView> {};
+    auto result = std::vector<::tyr::formalism::planning::ActionBindingView> {};
     get_applicable_action_bindings(node, result);
     return result;
 }
 
 void SuccessorGenerator<LiftedTag>::get_applicable_action_bindings(const Node<LiftedTag>& node,
-                                                                   std::vector<formalism::planning::ActionBindingView>& out_bindings)
+                                                                   std::vector<::tyr::formalism::planning::ActionBindingView>& out_bindings)
 {
     out_bindings.clear();
 
@@ -202,7 +202,7 @@ void SuccessorGenerator<LiftedTag>::get_applicable_action_bindings(const Node<Li
 
 // Action binding API (no interning)
 Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_successor_node(const Node<LiftedTag>& node,
-                                                                  const Data<formalism::RelationBinding<formalism::planning::Action>>& binding)
+                                                                  const ygg::Data<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>>& binding)
 {
     m_workspace.binding.clear();
     for (const auto object : binding.objects)
@@ -210,13 +210,13 @@ Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_successor_node(const Node<Lif
 
     auto grounder_context = fp::GrounderContext { m_workspace.planning_builder, *m_task->get_repository(), m_workspace.binding };
     const auto state_context = StateContext<LiftedTag>(*m_task, node.get_state().get_unpacked_state(), node.get_metric());
-    const auto action = make_view(binding.relation, *m_task->get_repository());
+    const auto action = ygg::make_view(binding.relation, *m_task->get_repository());
 
     return m_executor.apply_action(state_context, action, grounder_context, *m_task->get_fdr_context(), *m_state_repository);
 }
 
 void SuccessorGenerator<LiftedTag>::for_each_applicable_action_binding_impl(const Node<LiftedTag>& node,
-                                                                            Data<formalism::RelationBinding<formalism::planning::Action>>& scratch_binding,
+                                                                            ygg::Data<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>>& scratch_binding,
                                                                             ActionBindingCallback callback,
                                                                             void* callback_data)
 {
@@ -246,7 +246,7 @@ void SuccessorGenerator<LiftedTag>::for_each_applicable_action_binding_impl(cons
 }
 
 // Lookup
-Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_node(Index<State<LiftedTag>> state_index)
+Node<LiftedTag> SuccessorGenerator<LiftedTag>::get_node(ygg::Index<State<LiftedTag>> state_index)
 {
     auto state = m_state_repository->get_registered_state(state_index);
     const auto state_context = StateContext<LiftedTag>(*m_task, state.get_unpacked_state(), 0);

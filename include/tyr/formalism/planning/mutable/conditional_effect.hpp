@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_CONDITIONAL_EFFECT_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_CONDITIONAL_EFFECT_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/mutable/conjunctive_condition.hpp"
 #include "tyr/formalism/planning/mutable/conjunctive_effect.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -61,12 +61,12 @@ struct MutableConditionalEffect
 
     friend bool operator==(const MutableConditionalEffect& lhs, const MutableConditionalEffect& rhs)
     {
-        return EqualTo<MutableConditionalEffect> {}(lhs, rhs);
+        return ygg::EqualTo<MutableConditionalEffect> {}(lhs, rhs);
     }
 
     friend bool operator<(const MutableConditionalEffect& lhs, const MutableConditionalEffect& rhs)
     {
-        return Less<MutableConditionalEffect> {}(lhs, rhs);
+        return ygg::Less<MutableConditionalEffect> {}(lhs, rhs);
     }
 };
 

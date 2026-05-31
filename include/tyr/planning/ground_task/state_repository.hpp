@@ -18,10 +18,10 @@
 #ifndef TYR_PLANNING_GROUND_TASK_STATE_REPOSITORY_HPP_
 #define TYR_PLANNING_GROUND_TASK_STATE_REPOSITORY_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/indexed_hash_set.hpp"
-#include "tyr/common/raw_array_set.hpp"
-#include "tyr/common/shared_object_pool.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/indexed_hash_set.hpp>
+#include <yggdrasil/containers/raw_array_set.hpp>
+#include <yggdrasil/containers/shared_object_pool.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task/state_builder.hpp"
 #include "tyr/planning/ground_task/state_data.hpp"
@@ -53,23 +53,23 @@ class StateRepository<GroundTag> : public std::enable_shared_from_this<StateRepo
     friend class StateRepositoryFactory<GroundTag>;
 
 private:
-    StateRepository(uint_t index, TaskPtr<GroundTag> task, AxiomEvaluatorPtr<GroundTag> axiom_evaluator);
+    StateRepository(ygg::uint_t index, TaskPtr<GroundTag> task, AxiomEvaluatorPtr<GroundTag> axiom_evaluator);
 
 public:
     StateView<GroundTag> get_initial_state();
 
-    StateView<GroundTag> get_registered_state(Index<State<GroundTag>> state_index);
+    StateView<GroundTag> get_registered_state(ygg::Index<State<GroundTag>> state_index);
 
     StateView<GroundTag>
-    create_state(const std::vector<Data<formalism::planning::FDRFact<formalism::FluentTag>>>& fluent_facts,
-                 const std::vector<std::pair<Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>, float_t>>& fterm_values);
+    create_state(const std::vector<ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>>& fluent_facts,
+                 const std::vector<std::pair<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>>, ygg::float_t>>& fterm_values);
 
-    StateView<GroundTag> create_state(const std::vector<formalism::planning::FDRFactView<formalism::FluentTag>>& fluent_facts,
-                                      const std::vector<formalism::planning::GroundFunctionTermViewValuePair<formalism::FluentTag>>& fterm_values);
+    StateView<GroundTag> create_state(const std::vector<::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag>>& fluent_facts,
+                                      const std::vector<::tyr::formalism::planning::GroundFunctionTermViewValuePair<::tyr::formalism::FluentTag>>& fterm_values);
 
-    SharedObjectPoolPtr<UnpackedState<GroundTag>> get_unregistered_state();
+    ygg::SharedObjectPoolPtr<UnpackedState<GroundTag>> get_unregistered_state();
 
-    StateView<GroundTag> register_state(SharedObjectPoolPtr<UnpackedState<GroundTag>> state);
+    StateView<GroundTag> register_state(ygg::SharedObjectPoolPtr<UnpackedState<GroundTag>> state);
 
     size_t memory_usage() const noexcept;
 
@@ -80,7 +80,7 @@ public:
     size_t num_states() const noexcept { return m_packed_states.size(); }
 
 private:
-    uint_t m_index;
+    ygg::uint_t m_index;
     TaskPtr<GroundTag> m_task;
 
     StateStorageContext<GroundTag, StateStoragePolicyTag> m_context;
@@ -88,8 +88,8 @@ private:
     AtomStorageBackend<GroundTag, StateStoragePolicyTag> m_derived_backend;
     NumericStorageBackend<GroundTag, StateStoragePolicyTag> m_numeric_backend;
 
-    IndexedHashSet<State<GroundTag>> m_packed_states;
-    SharedObjectPool<UnpackedState<GroundTag>> m_unpacked_state_pool;
+    ygg::IndexedHashSet<State<GroundTag>> m_packed_states;
+    ygg::SharedObjectPool<UnpackedState<GroundTag>> m_unpacked_state_pool;
 
     AxiomEvaluatorPtr<GroundTag> m_axiom_evaluator;
 };

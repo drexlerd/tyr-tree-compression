@@ -18,24 +18,25 @@
 #ifndef TYR_FORMALISM_DATALOG_BINARY_OPERATOR_VIEW_HPP_
 #define TYR_FORMALISM_DATALOG_BINARY_OPERATOR_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/datalog/binary_operator_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T, formalism::datalog::Context C>
-class View<Index<formalism::datalog::BinaryOperator<Op, T>>, C>
+using namespace ::tyr;
+template<::tyr::formalism::OpKind Op, typename T, ::tyr::formalism::datalog::Context C>
+class View<ygg::Index<::tyr::formalism::datalog::BinaryOperator<Op, T>>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::datalog::BinaryOperator<Op, T>> m_handle;
+    ygg::Index<::tyr::formalism::datalog::BinaryOperator<Op, T>> m_handle;
 
 public:
     using OpType = Op;
 
-    View(Index<formalism::datalog::BinaryOperator<Op, T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::datalog::BinaryOperator<Op, T>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
@@ -44,15 +45,15 @@ public:
     auto get_index() const noexcept { return m_handle; }
     auto get_lhs() const noexcept
     {
-        if constexpr (ViewConcept<T, C>)
-            return make_view(get_data().lhs, *m_context);
+        if constexpr (ygg::ViewConcept<T, C>)
+            return ygg::make_view(get_data().lhs, *m_context);
         else
             return get_data().lhs;
     }
     auto get_rhs() const noexcept
     {
-        if constexpr (ViewConcept<T, C>)
-            return make_view(get_data().rhs, *m_context);
+        if constexpr (ygg::ViewConcept<T, C>)
+            return ygg::make_view(get_data().rhs, *m_context);
         else
             return get_data().rhs;
     }

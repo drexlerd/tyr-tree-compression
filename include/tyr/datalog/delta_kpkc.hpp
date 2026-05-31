@@ -18,9 +18,9 @@
 #ifndef TYR_DATALOG_DELTA_KPKC_HPP_
 #define TYR_DATALOG_DELTA_KPKC_HPP_
 
-#include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/cista_formatters.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/containers/dynamic_bitset.hpp>
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/delta_kpkc_graph.hpp"
 #include "tyr/datalog/statistics/rule.hpp"
@@ -37,13 +37,13 @@ namespace tyr::datalog::kpkc
 struct Workspace
 {
     std::vector<uint64_t> compatible_vertices_data;
-    MDSpan<uint64_t, 2> compatible_vertices_span;  ///< Dimensions K x K x O(V)
+    ygg::MDSpan<uint64_t, 2> compatible_vertices_span;  ///< Dimensions K x K x O(V)
 
     boost::dynamic_bitset<> partition_bits;  ///< Dimensions K
     std::vector<Vertex> partial_solution;    ///< Dimensions K
-    uint_t partial_solution_size;
-    uint_t anchor_pi;
-    uint_t anchor_pj;
+    ygg::uint_t partial_solution_size;
+    ygg::uint_t anchor_pi;
+    ygg::uint_t anchor_pj;
 
     /// @brief Allocate workspace memory layout for a given graph layout.
     /// @param graph
@@ -125,7 +125,7 @@ private:
     /// i.e., the partition with the smallest number of candidate vertices.
     /// @param depth is the recursion depth.
     /// @return
-    uint_t choose_best_partition(size_t depth, const Workspace& workspace) const;
+    ygg::uint_t choose_best_partition(size_t depth, const Workspace& workspace) const;
 
     /// @brief Update the P part of BronKerbosch given the last selected vertex `src` at depth `depth`.
     /// @tparam AnchorType is the type of the anchor.
@@ -281,7 +281,7 @@ void DeltaKPKC::for_each_new_k_clique(Callback&& callback, Workspace& workspace)
 template<typename AnchorType>
 bool DeltaKPKC::update_compatible_adjacent_vertices_at_next_depth(Vertex src, size_t depth, Workspace& workspace) const
 {
-    const uint_t k = m_layout.k;
+    const ygg::uint_t k = m_layout.k;
 
     const auto& partition_bits = workspace.partition_bits;
 
@@ -292,14 +292,14 @@ bool DeltaKPKC::update_compatible_adjacent_vertices_at_next_depth(Vertex src, si
     const auto cv_curr = workspace.compatible_vertices_span(depth);
     auto cv_next = workspace.compatible_vertices_span(depth + 1);
 
-    for (uint_t p = 0; p < k; ++p)
+    for (ygg::uint_t p = 0; p < k; ++p)
     {
         if (partition_bits.test(p))
             continue;
 
         const auto& info = m_layout.info.infos[p];
-        auto src_cur = BitsetSpan<const uint64_t>(cv_curr.data() + info.block_offset, info.num_bits);
-        auto dst_next = BitsetSpan<uint64_t>(cv_next.data() + info.block_offset, info.num_bits);
+        auto src_cur = ygg::BitsetSpan<const uint64_t>(cv_curr.data() + info.block_offset, info.num_bits);
+        auto dst_next = ygg::BitsetSpan<uint64_t>(cv_next.data() + info.block_offset, info.num_bits);
         auto src_full = m_full_graph.matrix.get_bitset(src.index, p);
 
         dst_next.copy_from(src_cur);
@@ -331,20 +331,20 @@ void DeltaKPKC::complete_from_seed(Callback&& callback, size_t depth, Workspace&
 {
     assert(depth < m_layout.k);
 
-    const uint_t p = choose_best_partition(depth, workspace);
-    if (p == std::numeric_limits<uint_t>::max())
+    const ygg::uint_t p = choose_best_partition(depth, workspace);
+    if (p == std::numeric_limits<ygg::uint_t>::max())
         return;  // dead branch: no unused partition has candidates
 
-    const uint_t k = m_layout.k;
+    const ygg::uint_t k = m_layout.k;
 
     auto& partition_bits = workspace.partition_bits;
     auto& partial_solution = workspace.partial_solution;
     auto& partial_solution_size = workspace.partial_solution_size;
     const auto& info = m_layout.info.infos[p];
-    const auto cv_d_p = BitsetSpan<const uint64_t>(workspace.compatible_vertices_span(depth).data() + info.block_offset, info.num_bits);
+    const auto cv_d_p = ygg::BitsetSpan<const uint64_t>(workspace.compatible_vertices_span(depth).data() + info.block_offset, info.num_bits);
 
     // Iterate through compatible vertices in the best partition
-    for (auto bit = cv_d_p.find_first(); bit != BitsetSpan<const uint64_t>::npos; bit = cv_d_p.find_next(bit))
+    for (auto bit = cv_d_p.find_first(); bit != ygg::BitsetSpan<const uint64_t>::npos; bit = cv_d_p.find_next(bit))
     {
         const auto vertex = Vertex(info.bit_offset + bit);
 

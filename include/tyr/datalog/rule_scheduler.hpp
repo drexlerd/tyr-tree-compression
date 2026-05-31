@@ -20,15 +20,15 @@
 
 #include "tyr/analysis/listeners.hpp"              // for ListenerStratum
 #include "tyr/analysis/stratification.hpp"         // for RuleStratum, Rule...
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"                 // for EqualTo
-#include "tyr/common/cista_formatters.hpp"
-#include "tyr/common/hash.hpp"                     // for Hash
-#include "tyr/common/types.hpp"                    // for IndexList
-#include "tyr/common/vector.hpp"                   // for View
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>                 // for EqualTo
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/semantics/hash.hpp>                     // for Hash
+#include <yggdrasil/core/types.hpp>                    // for ygg::IndexList
+#include <yggdrasil/containers/vector.hpp>                   // for ygg::View
 #include "tyr/formalism/datalog/declarations.hpp"  // for FluentTag (ptr only)
 #include "tyr/formalism/datalog/repository.hpp"    // for Repository
-#include "tyr/formalism/datalog/rule_index.hpp"    // for Index
+#include "tyr/formalism/datalog/rule_index.hpp"    // for ygg::Index
 
 #include <boost/dynamic_bitset/dynamic_bitset.hpp>  // for dynamic_bitset
 #include <vector>                                   // for vector
@@ -41,7 +41,7 @@ class RuleSchedulerStratum
 public:
     RuleSchedulerStratum(const analysis::RuleStratum& rules,
                          const analysis::ListenerStratum& listeners,
-                         const formalism::datalog::Repository& context,
+                         const ::tyr::formalism::datalog::Repository& context,
                          size_t num_fluent_predicates,
                          size_t num_fluent_functions);
 
@@ -49,23 +49,23 @@ public:
 
     void on_start_iteration() noexcept;
 
-    void on_generate(Index<formalism::Predicate<formalism::FluentTag>> predicate);
-    void on_generate(Index<formalism::Function<formalism::FluentTag>> function);
+    void on_generate(ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> predicate);
+    void on_generate(ygg::Index<::tyr::formalism::Function<::tyr::formalism::FluentTag>> function);
 
     void on_finish_iteration();
 
-    const formalism::datalog::Repository& get_context() const noexcept { return m_context; }
-    const IndexList<formalism::datalog::Rule>& get_rules() const noexcept { return m_rules; }
-    const UnorderedSet<Index<formalism::datalog::Rule>>& get_active_rules() const noexcept { return m_active_rules; }
+    const ::tyr::formalism::datalog::Repository& get_context() const noexcept { return m_context; }
+    const ygg::IndexList<::tyr::formalism::datalog::Rule>& get_rules() const noexcept { return m_rules; }
+    const ygg::UnorderedSet<ygg::Index<::tyr::formalism::datalog::Rule>>& get_active_rules() const noexcept { return m_active_rules; }
 
 private:
     const analysis::RuleStratum& m_rules;
     const analysis::ListenerStratum& m_listeners;
-    const formalism::datalog::Repository& m_context;
+    const ::tyr::formalism::datalog::Repository& m_context;
 
     boost::dynamic_bitset<> m_active_predicates;
     boost::dynamic_bitset<> m_active_functions;
-    UnorderedSet<Index<formalism::datalog::Rule>> m_active_rules;
+    ygg::UnorderedSet<ygg::Index<::tyr::formalism::datalog::Rule>> m_active_rules;
 };
 
 struct RuleSchedulerStrata
@@ -76,7 +76,7 @@ struct RuleSchedulerStrata
 extern RuleSchedulerStrata
 create_schedulers(const analysis::RuleStrata& rules,
                   const analysis::ListenerStrata& listeners,
-                  const formalism::datalog::Repository& context,
+                  const ::tyr::formalism::datalog::Repository& context,
                   size_t num_fluent_predicates,
                   size_t num_fluent_functions);
 

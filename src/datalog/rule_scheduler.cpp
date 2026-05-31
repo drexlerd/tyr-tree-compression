@@ -17,9 +17,9 @@
 
 #include "tyr/datalog/rule_scheduler.hpp"
 
-#include "tyr/common/config.hpp"  // for uint_t
+#include <yggdrasil/core/config.hpp>  // for ygg::uint_t
 #include "tyr/formalism/datalog/formatter.hpp"
-#include "tyr/formalism/datalog/views.hpp"  // for View
+#include "tyr/formalism/datalog/views.hpp"  // for ygg::View
 
 #include <assert.h>       // for assert
 #include <gtl/phmap.hpp>  // for operator!=, flat_hash_set
@@ -34,19 +34,19 @@ namespace tyr::datalog
 namespace
 {
 template<typename Relation>
-void activate_relation(boost::dynamic_bitset<>& bitset, Index<Relation> relation)
+void activate_relation(boost::dynamic_bitset<>& bitset, ygg::Index<Relation> relation)
 {
-    assert(uint_t(relation) < bitset.size());
-    bitset.set(uint_t(relation));
+    assert(ygg::uint_t(relation) < bitset.size());
+    bitset.set(ygg::uint_t(relation));
 }
 
 template<typename Relation>
 void collect_active_rules(const boost::dynamic_bitset<>& bitset,
-                          const UnorderedMap<Index<Relation>, UnorderedSet<Index<fd::Rule>>>& listeners,
-                          UnorderedSet<Index<fd::Rule>>& active_rules)
+                          const ygg::UnorderedMap<ygg::Index<Relation>, ygg::UnorderedSet<ygg::Index<fd::Rule>>>& listeners,
+                          ygg::UnorderedSet<ygg::Index<fd::Rule>>& active_rules)
 {
     for (auto i = bitset.find_first(); i != boost::dynamic_bitset<>::npos; i = bitset.find_next(i))
-        if (const auto it = listeners.find(Index<Relation>(i)); it != listeners.end())
+        if (const auto it = listeners.find(ygg::Index<Relation>(i)); it != listeners.end())
             for (const auto rule : it->second)
                 active_rules.insert(rule);
 }
@@ -79,9 +79,9 @@ void RuleSchedulerStratum::on_start_iteration() noexcept
     m_active_functions.reset();
 }
 
-void RuleSchedulerStratum::on_generate(Index<f::Predicate<f::FluentTag>> predicate) { activate_relation(m_active_predicates, predicate); }
+void RuleSchedulerStratum::on_generate(ygg::Index<f::Predicate<f::FluentTag>> predicate) { activate_relation(m_active_predicates, predicate); }
 
-void RuleSchedulerStratum::on_generate(Index<f::Function<f::FluentTag>> function) { activate_relation(m_active_functions, function); }
+void RuleSchedulerStratum::on_generate(ygg::Index<f::Function<f::FluentTag>> function) { activate_relation(m_active_functions, function); }
 
 void RuleSchedulerStratum::on_finish_iteration()
 {
@@ -99,7 +99,7 @@ RuleSchedulerStrata create_schedulers(const analysis::RuleStrata& rules,
     assert(rules.data.size() == listeners.data.size());
 
     auto result = RuleSchedulerStrata {};
-    for (uint_t i = 0; i < rules.data.size(); ++i)
+    for (ygg::uint_t i = 0; i < rules.data.size(); ++i)
         result.data.emplace_back(rules.data[i], listeners.data[i], context, num_fluent_predicates, num_fluent_functions);
 
     return result;

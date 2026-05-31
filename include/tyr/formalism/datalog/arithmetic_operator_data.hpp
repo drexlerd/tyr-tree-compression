@@ -18,38 +18,40 @@
 #ifndef TYR_FORMALISM_DATALOG_ARITHMETIC_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_ARITHMETIC_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/binary_operator_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/multi_operator_index.hpp"
 #include "tyr/formalism/datalog/unary_operator_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<typename T>
-struct Data<formalism::datalog::ArithmeticOperator<T>>
+struct Data<::tyr::formalism::datalog::ArithmeticOperator<T>>
 {
-    using Variant = ::cista::offset::variant<Index<formalism::datalog::UnaryOperator<formalism::Sub, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Add, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Sub, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Mul, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Div, T>>,
-                                             Index<formalism::datalog::MultiOperator<formalism::Add, T>>,
-                                             Index<formalism::datalog::MultiOperator<formalism::Mul, T>>>;
+    using Variant = ::cista::offset::variant<ygg::Index<::tyr::formalism::datalog::UnaryOperator<::tyr::formalism::Sub, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Add, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Sub, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Mul, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Div, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::MultiOperator<::tyr::formalism::Add, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::MultiOperator<::tyr::formalism::Mul, T>>>;
 
     Variant value;
 
     Data() = default;
     Data(Variant value) : value(value) {}
 
-    void clear() noexcept { tyr::clear(value); }
+    void clear() noexcept { ygg::clear(value); }
 
     auto cista_members() const noexcept { return std::tie(value); }
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::ArithmeticOperator<Data<formalism::datalog::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::ArithmeticOperator<ygg::Data<::tyr::formalism::datalog::FunctionExpression>>>);
 
 }
 

@@ -49,7 +49,7 @@ public:
 
     void on_start_search(const Node<Kind>& node) override { NB_OVERRIDE_PURE(on_start_search, node); }
 
-    void on_finish_layer(uint_t layer) override { NB_OVERRIDE_PURE(on_finish_layer, layer); }
+    void on_finish_layer(ygg::uint_t layer) override { NB_OVERRIDE_PURE(on_finish_layer, layer); }
 
     void on_end_search(tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_search, status); }
 

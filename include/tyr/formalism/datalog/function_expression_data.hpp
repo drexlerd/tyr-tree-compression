@@ -18,21 +18,23 @@
 #ifndef TYR_FORMALISM_DATALOG_FUNCTION_EXPRESSION_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_FUNCTION_EXPRESSION_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/arithmetic_operator_data.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/function_term_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::datalog::FunctionExpression>
+struct Data<::tyr::formalism::datalog::FunctionExpression>
 {
-    using Variant = ::cista::offset::variant<float_t,
-                                             Data<formalism::datalog::ArithmeticOperator<Data<formalism::datalog::FunctionExpression>>>,
-                                             Index<formalism::datalog::FunctionTerm<formalism::StaticTag>>,
-                                             Index<formalism::datalog::FunctionTerm<formalism::FluentTag>>>;
+    using Variant = ::cista::offset::variant<ygg::float_t,
+                                             ygg::Data<::tyr::formalism::datalog::ArithmeticOperator<ygg::Data<::tyr::formalism::datalog::FunctionExpression>>>,
+                                             ygg::Index<::tyr::formalism::datalog::FunctionTerm<::tyr::formalism::StaticTag>>,
+                                             ygg::Index<::tyr::formalism::datalog::FunctionTerm<::tyr::formalism::FluentTag>>>;
 
     Variant value;
 
@@ -43,13 +45,13 @@ struct Data<formalism::datalog::FunctionExpression>
     Data(Data&& other) = default;
     Data& operator=(Data&& other) = default;
 
-    void clear() noexcept { tyr::clear(value); }
+    void clear() noexcept { ygg::clear(value); }
 
     auto cista_members() const noexcept { return std::tie(value); }
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::FunctionExpression>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::FunctionExpression>);
 
 }
 

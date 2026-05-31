@@ -18,21 +18,23 @@
 #ifndef TYR_PLANNING_STATE_DATA_HPP_
 #define TYR_PLANNING_STATE_DATA_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/concepts.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/concepts.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_index.hpp"
 
 #include <concepts>
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<planning::TaskKind Kind>
 struct Data<planning::State<Kind>>
 {
-    static_assert(dependent_false<Kind>::value, "Data<State<Kind>> is not defined for type T.");
+    static_assert(ygg::dependent_false<Kind>::value, "ygg::Data<State<Kind>> is not defined for type T.");
 };
 }
 

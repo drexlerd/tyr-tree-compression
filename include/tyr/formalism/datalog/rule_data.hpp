@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_DATALOG_RULE_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_RULE_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/datalog/atom_index.hpp"
 #include "tyr/formalism/datalog/conjunctive_condition_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -28,26 +28,28 @@
 #include "tyr/formalism/datalog/rule_index.hpp"
 #include "tyr/formalism/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<>
-struct Data<formalism::datalog::Rule>
-{
-    using Head = ::cista::offset::variant<Index<formalism::datalog::Atom<formalism::FluentTag>>,
-                                         Data<formalism::datalog::NumericEffectOperator<formalism::FluentTag>>>;
+using namespace ::tyr;
 
-    Index<formalism::datalog::Rule> index;
-    IndexList<formalism::Variable> variables;
-    Index<formalism::datalog::ConjunctiveCondition> body;
+template<>
+struct Data<::tyr::formalism::datalog::Rule>
+{
+    using Head = ::cista::offset::variant<ygg::Index<::tyr::formalism::datalog::Atom<::tyr::formalism::FluentTag>>,
+                                         ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<::tyr::formalism::FluentTag>>>;
+
+    ygg::Index<::tyr::formalism::datalog::Rule> index;
+    ygg::IndexList<::tyr::formalism::Variable> variables;
+    ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> body;
     Head head;
-    uint_t cost;
+    ygg::uint_t cost;
 
     Data() = default;
-    Data(Index<formalism::datalog::Rule> index,
-         IndexList<formalism::Variable> variables,
-         Index<formalism::datalog::ConjunctiveCondition> body,
+    Data(ygg::Index<::tyr::formalism::datalog::Rule> index,
+         ygg::IndexList<::tyr::formalism::Variable> variables,
+         ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> body,
          Head head,
-         uint_t cost) :
+         ygg::uint_t cost) :
         index(index),
         variables(std::move(variables)),
         body(body),
@@ -62,18 +64,18 @@ struct Data<formalism::datalog::Rule>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(variables);
-        tyr::clear(body);
-        tyr::clear(head);
-        tyr::clear(cost);
+        ygg::clear(index);
+        ygg::clear(variables);
+        ygg::clear(body);
+        ygg::clear(head);
+        ygg::clear(cost);
     }
 
     auto cista_members() const noexcept { return std::tie(index, variables, body, head, cost); }
     auto identifying_members() const noexcept { return std::tie(variables, body, head, cost); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::Rule>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::Rule>);
 }
 
 #endif

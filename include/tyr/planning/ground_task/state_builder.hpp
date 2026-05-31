@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_GROUND_TASK_STATE_BUILDER_HPP_
 #define TYR_PLANNING_GROUND_TASK_STATE_BUILDER_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/dynamic_bitset.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/planning/fdr_fact_data.hpp"
 #include "tyr/formalism/planning/fdr_variable_index.hpp"
 #include "tyr/formalism/planning/ground_atom_index.hpp"
@@ -37,22 +37,22 @@
 
 namespace tyr::planning
 {
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 struct GroundUnpackedAtomStorageType;
 
 template<>
-struct GroundUnpackedAtomStorageType<formalism::FluentTag>
+struct GroundUnpackedAtomStorageType<::tyr::formalism::FluentTag>
 {
     using type = planning::FactUnpackedStorage<GroundTag>;
 };
 
 template<>
-struct GroundUnpackedAtomStorageType<formalism::DerivedTag>
+struct GroundUnpackedAtomStorageType<::tyr::formalism::DerivedTag>
 {
     using type = planning::AtomUnpackedStorage<GroundTag>;
 };
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 using GroundUnpackedAtomStorage = typename GroundUnpackedAtomStorageType<T>::type;
 
 }
@@ -72,17 +72,17 @@ public:
      * UnpackedStateConcept
      */
 
-    Index<planning::State<planning::GroundTag>> get_index() const;
-    void set(Index<planning::State<planning::GroundTag>> index);
+    ygg::Index<planning::State<planning::GroundTag>> get_index() const;
+    void set(ygg::Index<planning::State<planning::GroundTag>> index);
 
-    formalism::planning::FDRValue get(Index<formalism::planning::FDRVariable<formalism::FluentTag>> index) const;
-    void set(Data<formalism::planning::FDRFact<formalism::FluentTag>> fact);
+    ::tyr::formalism::planning::FDRValue get(ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>> index) const;
+    void set(ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> fact);
 
-    float_t get(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index) const;
-    void set(Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>> index, float_t value);
+    ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index) const;
+    void set(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>> index, ygg::float_t value);
 
-    bool test(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index) const;
-    void set(Index<formalism::planning::GroundAtom<formalism::DerivedTag>> index);
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index) const;
+    void set(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> index);
 
     void clear();
     void clear_unextended_part();
@@ -96,16 +96,16 @@ public:
     void resize_fluent_facts(size_t num_fluent_facts);
     void resize_derived_atoms(size_t num_derived_atoms);
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     planning::GroundUnpackedAtomStorage<T>& get_atoms() noexcept;
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const planning::GroundUnpackedAtomStorage<T>& get_atoms() const noexcept;
 
     planning::NumericUnpackedStorage<planning::GroundTag>& get_numeric_variables() noexcept;
     const planning::NumericUnpackedStorage<planning::GroundTag>& get_numeric_variables() const noexcept;
 
 private:
-    Index<planning::State<planning::GroundTag>> m_index;
+    ygg::Index<planning::State<planning::GroundTag>> m_index;
 
     planning::FactUnpackedStorage<planning::GroundTag> m_fact_storage;
     planning::AtomUnpackedStorage<planning::GroundTag> m_atom_storage;

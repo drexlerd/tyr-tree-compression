@@ -35,9 +35,9 @@ public:
     virtual ~EventHandler() = default;
 
     virtual void on_start_search() = 0;
-    virtual void on_start_subsearch(uint_t subsearch_index) = 0;
+    virtual void on_start_subsearch(ygg::uint_t subsearch_index) = 0;
     virtual void add_subsearch_statistics(const tyr::planning::Statistics& search_statistics, const typename Subsolver::EventHandlerType::StatisticsType& solver_statistics) = 0;
-    virtual void on_end_subsearch(uint_t subsearch_index, tyr::planning::SearchStatus status) = 0;
+    virtual void on_end_subsearch(ygg::uint_t subsearch_index, tyr::planning::SearchStatus status) = 0;
     virtual void on_end_search(tyr::planning::SearchStatus status) = 0;
     virtual void on_solved(const Plan<Kind>& plan) = 0;
 };
@@ -69,7 +69,7 @@ public:
             self().on_start_search_impl();
     }
 
-    void on_start_subsearch(uint_t subsearch_index) override
+    void on_start_subsearch(ygg::uint_t subsearch_index) override
     {
         if (verbosity(1))
             self().on_start_subsearch_impl(subsearch_index);
@@ -81,7 +81,7 @@ public:
         m_statistics.add_solver_statistics(solver_statistics);
     }
 
-    void on_end_subsearch(uint_t subsearch_index, tyr::planning::SearchStatus status) override
+    void on_end_subsearch(ygg::uint_t subsearch_index, tyr::planning::SearchStatus status) override
     {
         if (verbosity(1))
             self().on_end_subsearch_impl(subsearch_index, status);
@@ -109,8 +109,8 @@ private:
     friend class EventHandlerBase<DefaultEventHandler<Kind, Subsolver>, Kind, Subsolver>;
 
     void on_start_search_impl() const {}
-    void on_start_subsearch_impl(uint_t subsearch_index) const { static_cast<void>(subsearch_index); }
-    void on_end_subsearch_impl(uint_t subsearch_index, SearchStatus status) const
+    void on_start_subsearch_impl(ygg::uint_t subsearch_index) const { static_cast<void>(subsearch_index); }
+    void on_end_subsearch_impl(ygg::uint_t subsearch_index, SearchStatus status) const
     {
         static_cast<void>(subsearch_index);
         static_cast<void>(status);

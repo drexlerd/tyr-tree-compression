@@ -42,8 +42,8 @@ void FactStorageBackend<LiftedTag, HashSet>::unpack(const typename FactStorageBa
     const auto view = m_uint_vec_set[packed.index];
 
     unpacked.indices.clear();
-    for (uint_t i = 0; i < view.size(); ++i)
-        tyr::set(view[i], true, unpacked.indices);
+    for (ygg::uint_t i = 0; i < view.size(); ++i)
+        ygg::set(view[i], true, unpacked.indices);
 }
 
 }

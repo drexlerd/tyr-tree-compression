@@ -18,7 +18,7 @@
 #ifndef TYR_SOLVER_POLICIES_TERMINATION_CONCEPT_HPP_
 #define TYR_SOLVER_POLICIES_TERMINATION_CONCEPT_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/annotation_types.hpp"
@@ -36,7 +36,7 @@ class NumericSupportSelector;
 template<typename T>
 concept TerminationPolicyConcept = requires(T& p,
                                             const T& cp,
-                                            formalism::datalog::GroundConjunctiveConditionView goals,
+                                            ::tyr::formalism::datalog::GroundConjunctiveConditionView goals,
                                             const FactSets& fact_sets,
                                             const SelectedPredicateAnnotations& and_annot,
                                             const SelectedFunctionAnnotations& numeric_and_annot,

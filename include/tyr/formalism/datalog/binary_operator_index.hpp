@@ -18,19 +18,19 @@
 #ifndef TYR_FORMALISM_DATALOG_BINARY_OPERATOR_INDEX_HPP_
 #define TYR_FORMALISM_DATALOG_BINARY_OPERATOR_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T>
-struct Index<formalism::datalog::BinaryOperator<Op, T>> : IndexMixin<Index<formalism::datalog::BinaryOperator<Op, T>>>
+template<tyr::formalism::OpKind Op, typename T>
+struct Index<tyr::formalism::datalog::BinaryOperator<Op, T>> : ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::BinaryOperator<Op, T>>>
 {
     using OpType = Op;
 
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::datalog::BinaryOperator<Op, T>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::BinaryOperator<Op, T>>>;
     using Base::Base;
 };
 }

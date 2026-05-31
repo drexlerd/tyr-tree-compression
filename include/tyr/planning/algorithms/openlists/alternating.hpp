@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_ALGORITHMS_OPENLISTS_ALTERNATING_HPP_
 #define TYR_PLANNING_ALGORITHMS_OPENLISTS_ALTERNATING_HPP_
 
-#include "tyr/common/tuple.hpp"
+#include <yggdrasil/containers/tuple.hpp>
 #include "tyr/planning/algorithms/openlists/interface.hpp"
 #include "tyr/planning/algorithms/openlists/priority_queue.hpp"
 
@@ -46,7 +46,7 @@ private:
         assert(m_pos < N);
 
         auto result = bool();
-        visit_at(m_queues, m_pos, [&result](auto&& queue) { result = queue.get().empty(); });
+        ygg::visit_at(m_queues, m_pos, [&result](auto&& queue) { result = queue.get().empty(); });
 
         return result;
     }
@@ -56,7 +56,7 @@ private:
         assert(m_pos < N);
 
         auto result = size();
-        visit_at(m_queues, m_pos, [&result](auto&& queue) { result = queue.get().size(); });
+        ygg::visit_at(m_queues, m_pos, [&result](auto&& queue) { result = queue.get().size(); });
 
         return result;
     }
@@ -100,7 +100,7 @@ public:
         }
 
         ItemType result;
-        visit_at(m_queues, m_pos, [&result](auto&& queue) { result = queue.get().top(); });
+        ygg::visit_at(m_queues, m_pos, [&result](auto&& queue) { result = queue.get().top(); });
         return result;
     }
 
@@ -108,7 +108,7 @@ public:
     {
         assert(!cur_empty());
 
-        visit_at(m_queues, m_pos, [](auto&& queue) { queue.get().pop(); });
+        ygg::visit_at(m_queues, m_pos, [](auto&& queue) { queue.get().pop(); });
 
         ++m_count;
     }

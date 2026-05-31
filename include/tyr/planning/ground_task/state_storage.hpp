@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_STATE_STORAGE_HPP_
 #define TYR_PLANNING_GROUND_TASK_STATE_STORAGE_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
@@ -37,7 +37,7 @@ struct AtomUnpackedStorage<GroundTag>
 template<>
 struct FactUnpackedStorage<GroundTag>
 {
-    std::vector<uint_t> values;
+    std::vector<ygg::uint_t> values;
 };
 
 }

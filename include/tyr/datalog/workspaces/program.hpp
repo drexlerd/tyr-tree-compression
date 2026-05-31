@@ -18,9 +18,9 @@
 #ifndef TYR_DATALOG_WORKSPACES_PROGRAM_HPP_
 #define TYR_DATALOG_WORKSPACES_PROGRAM_HPP_
 
-#include "tyr/common/closed_interval.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/policies/numeric_support.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
@@ -44,11 +44,11 @@ namespace tyr::datalog
 class CostBuckets
 {
 public:
-    using PredicateViewType = formalism::datalog::PredicateBindingView<formalism::FluentTag>;
-    using FunctionViewType = formalism::datalog::FunctionBindingView<formalism::FluentTag>;
-    using PredicateBucket = UnorderedSet<PredicateViewType>;
-    using FunctionBucket = UnorderedMap<FunctionViewType, ClosedInterval<float_t>>;
-    using Cost = uint_t;
+    using PredicateViewType = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
+    using FunctionViewType = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
+    using PredicateBucket = ygg::UnorderedSet<PredicateViewType>;
+    using FunctionBucket = ygg::UnorderedMap<FunctionViewType, ygg::ClosedInterval<ygg::float_t>>;
+    using Cost = ygg::uint_t;
 
     struct Bucket
     {
@@ -94,7 +94,7 @@ public:
         return inserted;
     }
 
-    bool insert(Cost c, FunctionViewType f, ClosedInterval<float_t> interval)
+    bool insert(Cost c, FunctionViewType f, ygg::ClosedInterval<ygg::float_t> interval)
     {
         resize_to_fit(c);
 
@@ -163,15 +163,15 @@ public:
 
 private:
     std::vector<Bucket> m_buckets;
-    uint_t m_current = 0;
+    ygg::uint_t m_current = 0;
     size_t m_total_size = 0;
 };
 
 template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
 struct ProgramWorkspace
 {
-    const formalism::datalog::Repository& program_repository;
-    formalism::datalog::Repository& workspace_repository;
+    const ::tyr::formalism::datalog::Repository& program_repository;
+    ::tyr::formalism::datalog::Repository& workspace_repository;
 
     FactsWorkspace facts;
 
@@ -184,10 +184,10 @@ struct ProgramWorkspace
 
     std::vector<std::unique_ptr<RuleWorkspace<AndAP>>> rules;
 
-    formalism::planning::Builder planning_builder;
-    formalism::datalog::Builder datalog_builder;
+    ::tyr::formalism::planning::Builder planning_builder;
+    ::tyr::formalism::datalog::Builder datalog_builder;
 
-    IndexList<formalism::Object> binding;
+    ygg::IndexList<::tyr::formalism::Object> binding;
 
     RuleSchedulerStrata schedulers;
 

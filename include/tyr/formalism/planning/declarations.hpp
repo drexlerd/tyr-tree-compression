@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_DECLARATIONS_HPP_
 #define TYR_FORMALISM_PLANNING_DECLARATIONS_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 
 namespace tyr::formalism::planning
@@ -211,76 +211,76 @@ struct FDRTask
 {
 };
 
-using CoreTypes = TypeList<Variable, Object>;
-using PredicateTypes = MapTypeListT<Predicate, StaticFluentDerivedTags>;
-using AtomTypes = MapTypeListT<Atom, StaticFluentDerivedTags>;
-using GroundAtomTypes = MapTypeListT<GroundAtom, StaticFluentDerivedTags>;
-using LiteralTypes = MapTypeListT<Literal, StaticFluentDerivedTags>;
-using GroundLiteralTypes = MapTypeListT<GroundLiteral, StaticFluentDerivedTags>;
-using FunctionTypes = MapTypeListT<Function, StaticFluentAuxiliaryTags>;
-using FunctionTermTypes = MapTypeListT<FunctionTerm, StaticFluentAuxiliaryTags>;
-using GroundFunctionTermTypes = MapTypeListT<GroundFunctionTerm, StaticFluentAuxiliaryTags>;
-using GroundFunctionTermValueTypes = MapTypeListT<GroundFunctionTermValue, StaticFluentAuxiliaryTags>;
-using FDRVariableTypes = MapTypeListT<FDRVariable, TypeList<FluentTag>>;
-using FDRFactTypes = MapTypeListT<FDRFact, TypeList<FluentTag>>;
+using CoreTypes = ygg::TypeList<Variable, Object>;
+using PredicateTypes = ygg::MapTypeListT<Predicate, StaticFluentDerivedTags>;
+using AtomTypes = ygg::MapTypeListT<Atom, StaticFluentDerivedTags>;
+using GroundAtomTypes = ygg::MapTypeListT<GroundAtom, StaticFluentDerivedTags>;
+using LiteralTypes = ygg::MapTypeListT<Literal, StaticFluentDerivedTags>;
+using GroundLiteralTypes = ygg::MapTypeListT<GroundLiteral, StaticFluentDerivedTags>;
+using FunctionTypes = ygg::MapTypeListT<Function, StaticFluentAuxiliaryTags>;
+using FunctionTermTypes = ygg::MapTypeListT<FunctionTerm, StaticFluentAuxiliaryTags>;
+using GroundFunctionTermTypes = ygg::MapTypeListT<GroundFunctionTerm, StaticFluentAuxiliaryTags>;
+using GroundFunctionTermValueTypes = ygg::MapTypeListT<GroundFunctionTermValue, StaticFluentAuxiliaryTags>;
+using FDRVariableTypes = ygg::MapTypeListT<FDRVariable, ygg::TypeList<FluentTag>>;
+using FDRFactTypes = ygg::MapTypeListT<FDRFact, ygg::TypeList<FluentTag>>;
 
 template<typename Op>
-using LiftedUnaryOperatorType = UnaryOperator<Op, Data<FunctionExpression>>;
+using LiftedUnaryOperatorType = UnaryOperator<Op, ygg::Data<FunctionExpression>>;
 
 template<typename Op>
-using LiftedBinaryOperatorType = BinaryOperator<Op, Data<FunctionExpression>>;
+using LiftedBinaryOperatorType = BinaryOperator<Op, ygg::Data<FunctionExpression>>;
 
 template<typename Op>
-using LiftedMultiOperatorType = MultiOperator<Op, Data<FunctionExpression>>;
+using LiftedMultiOperatorType = MultiOperator<Op, ygg::Data<FunctionExpression>>;
 
 template<typename Op>
-using GroundUnaryOperatorType = UnaryOperator<Op, Data<GroundFunctionExpression>>;
+using GroundUnaryOperatorType = UnaryOperator<Op, ygg::Data<GroundFunctionExpression>>;
 
 template<typename Op>
-using GroundBinaryOperatorType = BinaryOperator<Op, Data<GroundFunctionExpression>>;
+using GroundBinaryOperatorType = BinaryOperator<Op, ygg::Data<GroundFunctionExpression>>;
 
 template<typename Op>
-using GroundMultiOperatorType = MultiOperator<Op, Data<GroundFunctionExpression>>;
+using GroundMultiOperatorType = MultiOperator<Op, ygg::Data<GroundFunctionExpression>>;
 
-using LiftedArithmeticExpressionTypes = ConcatTypeListsT<MapTypeListT<LiftedUnaryOperatorType, UnaryArithmeticOpKinds>,
-                                                         MapTypeListT<LiftedBinaryOperatorType, BinaryArithmeticOpKinds>,
-                                                         MapTypeListT<LiftedMultiOperatorType, MultiArithmeticOpKinds>>;
+using LiftedArithmeticExpressionTypes = ygg::ConcatTypeListsT<ygg::MapTypeListT<LiftedUnaryOperatorType, UnaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<LiftedBinaryOperatorType, BinaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<LiftedMultiOperatorType, MultiArithmeticOpKinds>>;
 
-using LiftedBooleanExpressionTypes = MapTypeListT<LiftedBinaryOperatorType, BooleanOpKinds>;
+using LiftedBooleanExpressionTypes = ygg::MapTypeListT<LiftedBinaryOperatorType, BooleanOpKinds>;
 
-using GroundArithmeticExpressionTypes = ConcatTypeListsT<MapTypeListT<GroundUnaryOperatorType, UnaryArithmeticOpKinds>,
-                                                         MapTypeListT<GroundBinaryOperatorType, BinaryArithmeticOpKinds>,
-                                                         MapTypeListT<GroundMultiOperatorType, MultiArithmeticOpKinds>>;
+using GroundArithmeticExpressionTypes = ygg::ConcatTypeListsT<ygg::MapTypeListT<GroundUnaryOperatorType, UnaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<GroundBinaryOperatorType, BinaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<GroundMultiOperatorType, MultiArithmeticOpKinds>>;
 
-using GroundBooleanExpressionTypes = MapTypeListT<GroundBinaryOperatorType, BooleanOpKinds>;
+using GroundBooleanExpressionTypes = ygg::MapTypeListT<GroundBinaryOperatorType, BooleanOpKinds>;
 
 using ExpressionTypes =
-    ConcatTypeListsT<LiftedArithmeticExpressionTypes, LiftedBooleanExpressionTypes, GroundArithmeticExpressionTypes, GroundBooleanExpressionTypes>;
+    ygg::ConcatTypeListsT<LiftedArithmeticExpressionTypes, LiftedBooleanExpressionTypes, GroundArithmeticExpressionTypes, GroundBooleanExpressionTypes>;
 
-using NumericEffectTypes = TypeList<NumericEffect<Assign, FluentTag>,
+using NumericEffectTypes = ygg::TypeList<NumericEffect<Assign, FluentTag>,
                                     NumericEffect<Increase, FluentTag>,
                                     NumericEffect<Decrease, FluentTag>,
                                     NumericEffect<ScaleUp, FluentTag>,
                                     NumericEffect<ScaleDown, FluentTag>,
                                     NumericEffect<Increase, AuxiliaryTag>>;
 
-using GroundNumericEffectTypes = TypeList<GroundNumericEffect<Assign, FluentTag>,
+using GroundNumericEffectTypes = ygg::TypeList<GroundNumericEffect<Assign, FluentTag>,
                                           GroundNumericEffect<Increase, FluentTag>,
                                           GroundNumericEffect<Decrease, FluentTag>,
                                           GroundNumericEffect<ScaleUp, FluentTag>,
                                           GroundNumericEffect<ScaleDown, FluentTag>,
                                           GroundNumericEffect<Increase, AuxiliaryTag>>;
 
-using NumericEffectOperatorTypes = TypeList<NumericEffectOperator<FluentTag>, NumericEffectOperator<AuxiliaryTag>>;
-using GroundNumericEffectOperatorTypes = TypeList<GroundNumericEffectOperator<FluentTag>, GroundNumericEffectOperator<AuxiliaryTag>>;
-using EffectTypes = ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes, NumericEffectOperatorTypes, GroundNumericEffectOperatorTypes>;
-using OperatorEffectTypes = ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes>;
-using ControlTypes = TypeList<ConditionalEffect, GroundConditionalEffect, ConjunctiveEffect, GroundConjunctiveEffect, Action, GroundAction, Axiom, GroundAxiom>;
-using StructureTypes = TypeList<Action, Axiom>;
-using ProblemTypes = TypeList<Metric, Domain, Task, FDRTask>;
-using ConditionTypes = TypeList<ConjunctiveCondition, GroundConjunctiveCondition>;
+using NumericEffectOperatorTypes = ygg::TypeList<NumericEffectOperator<FluentTag>, NumericEffectOperator<AuxiliaryTag>>;
+using GroundNumericEffectOperatorTypes = ygg::TypeList<GroundNumericEffectOperator<FluentTag>, GroundNumericEffectOperator<AuxiliaryTag>>;
+using EffectTypes = ygg::ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes, NumericEffectOperatorTypes, GroundNumericEffectOperatorTypes>;
+using OperatorEffectTypes = ygg::ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes>;
+using ControlTypes = ygg::TypeList<ConditionalEffect, GroundConditionalEffect, ConjunctiveEffect, GroundConjunctiveEffect, Action, GroundAction, Axiom, GroundAxiom>;
+using StructureTypes = ygg::TypeList<Action, Axiom>;
+using ProblemTypes = ygg::TypeList<Metric, Domain, Task, FDRTask>;
+using ConditionTypes = ygg::TypeList<ConjunctiveCondition, GroundConjunctiveCondition>;
 
-using SymbolRepositoryTypes = ConcatTypeListsT<CoreTypes,
+using SymbolRepositoryTypes = ygg::ConcatTypeListsT<CoreTypes,
                                                PredicateTypes,
                                                AtomTypes,
                                                GroundAtomTypes,
@@ -297,21 +297,21 @@ using SymbolRepositoryTypes = ConcatTypeListsT<CoreTypes,
                                                FDRVariableTypes,
                                                ConditionTypes>;
 
-using RelationRepositoryTypes = ConcatTypeListsT<PredicateTypes, FunctionTypes, StructureTypes>;
-using BuilderTypes = ConcatTypeListsT<SymbolRepositoryTypes, MapTypeListT<RelationBinding, RelationRepositoryTypes>>;
+using RelationRepositoryTypes = ygg::ConcatTypeListsT<PredicateTypes, FunctionTypes, StructureTypes>;
+using BuilderTypes = ygg::ConcatTypeListsT<SymbolRepositoryTypes, ygg::MapTypeListT<RelationBinding, RelationRepositoryTypes>>;
 
 /**
  * Context
  */
 
 template<typename Repo, typename Tag>
-concept RepositoryAccess = requires(const Repo& r, Index<Tag> idx) {
-    requires CanonicalizableContext<Index<Tag>, Repo>;
-    { r[idx] } -> std::same_as<const Data<Tag>&>;
+concept RepositoryAccess = requires(const Repo& r, ygg::Index<Tag> idx) {
+    requires ygg::CanonicalizableContext<ygg::Index<Tag>, Repo>;
+    { r[idx] } -> std::same_as<const ygg::Data<Tag>&>;
 };
 
 template<typename Repo, typename... Tags>
-constexpr bool repository_access_for_types(TypeList<Tags...>) noexcept
+constexpr bool repository_access_for_types(ygg::TypeList<Tags...>) noexcept
 {
     return (RepositoryAccess<Repo, Tags> && ...);
 }

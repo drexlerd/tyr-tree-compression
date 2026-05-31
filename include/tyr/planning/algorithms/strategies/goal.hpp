@@ -42,12 +42,12 @@ class ConjunctiveGoalStrategy : public GoalStrategy<Kind>
 {
 public:
     ConjunctiveGoalStrategy(const Task<Kind>& task) : m_goal(task.get_task().get_goal()) {}
-    ConjunctiveGoalStrategy(formalism::planning::GroundConjunctiveConditionView goal) : m_goal(goal) {}
+    ConjunctiveGoalStrategy(::tyr::formalism::planning::GroundConjunctiveConditionView goal) : m_goal(goal) {}
 
-    void set_goal(formalism::planning::GroundConjunctiveConditionView goal) { m_goal = goal; }
+    void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) { m_goal = goal; }
 
     static std::shared_ptr<ConjunctiveGoalStrategy<Kind>> create(const Task<Kind>& task) { return std::make_shared<ConjunctiveGoalStrategy<Kind>>(task); }
-    static std::shared_ptr<ConjunctiveGoalStrategy<Kind>> create(formalism::planning::GroundConjunctiveConditionView goal)
+    static std::shared_ptr<ConjunctiveGoalStrategy<Kind>> create(::tyr::formalism::planning::GroundConjunctiveConditionView goal)
     {
         return std::make_shared<ConjunctiveGoalStrategy<Kind>>(goal);
     }
@@ -56,12 +56,12 @@ public:
     bool is_dynamic_goal_satisfied(const StateView<Kind>& seed_state, const StateView<Kind>& state) override
     {
         static_cast<void>(seed_state);
-        const auto state_context = StateContext { *state.get_state_repository()->get_task(), state.get_unpacked_state(), float_t { 0 } };
+        const auto state_context = StateContext { *state.get_state_repository()->get_task(), state.get_unpacked_state(), ygg::float_t { 0 } };
         return is_dynamically_applicable(m_goal, state_context);
     }
 
 private:
-    formalism::planning::GroundConjunctiveConditionView m_goal;
+    ::tyr::formalism::planning::GroundConjunctiveConditionView m_goal;
 };
 
 template<TaskKind Kind>
@@ -69,12 +69,12 @@ class SerializedGoalStrategy : public GoalStrategy<Kind>
 {
 public:
     SerializedGoalStrategy(const Task<Kind>& task) : m_goal(task.get_task().get_goal()) {}
-    SerializedGoalStrategy(formalism::planning::GroundConjunctiveConditionView goal) : m_goal(goal) {}
+    SerializedGoalStrategy(::tyr::formalism::planning::GroundConjunctiveConditionView goal) : m_goal(goal) {}
 
     void clear() noexcept {}
 
     static std::shared_ptr<SerializedGoalStrategy<Kind>> create(const Task<Kind>& task) { return std::make_shared<SerializedGoalStrategy<Kind>>(task); }
-    static std::shared_ptr<SerializedGoalStrategy<Kind>> create(formalism::planning::GroundConjunctiveConditionView goal)
+    static std::shared_ptr<SerializedGoalStrategy<Kind>> create(::tyr::formalism::planning::GroundConjunctiveConditionView goal)
     {
         return std::make_shared<SerializedGoalStrategy<Kind>>(goal);
     }
@@ -87,26 +87,26 @@ public:
     }
 
 private:
-    uint_t count_satisfied_goals(const StateView<Kind>& state) const
+    ygg::uint_t count_satisfied_goals(const StateView<Kind>& state) const
     {
-        const auto state_context = StateContext { *state.get_state_repository()->get_task(), state.get_unpacked_state(), float_t { 0 } };
-        auto result = uint_t { 0 };
+        const auto state_context = StateContext { *state.get_state_repository()->get_task(), state.get_unpacked_state(), ygg::float_t { 0 } };
+        auto result = ygg::uint_t { 0 };
 
-        for (auto literal : m_goal.template get_literals<formalism::StaticTag>())
+        for (auto literal : m_goal.template get_literals<::tyr::formalism::StaticTag>())
             result += is_applicable(literal, state_context) ? 1 : 0;
-        for (auto literal : m_goal.template get_literals<formalism::DerivedTag>())
+        for (auto literal : m_goal.template get_literals<::tyr::formalism::DerivedTag>())
             result += is_applicable(literal, state_context) ? 1 : 0;
-        for (auto fact : m_goal.template get_facts<formalism::PositiveTag>())
-            result += is_applicable<formalism::PositiveTag>(fact, state_context) ? 1 : 0;
-        for (auto fact : m_goal.template get_facts<formalism::NegativeTag>())
-            result += is_applicable<formalism::NegativeTag>(fact, state_context) ? 1 : 0;
+        for (auto fact : m_goal.template get_facts<::tyr::formalism::PositiveTag>())
+            result += is_applicable<::tyr::formalism::PositiveTag>(fact, state_context) ? 1 : 0;
+        for (auto fact : m_goal.template get_facts<::tyr::formalism::NegativeTag>())
+            result += is_applicable<::tyr::formalism::NegativeTag>(fact, state_context) ? 1 : 0;
         for (auto numeric_constraint : m_goal.get_numeric_constraints())
             result += is_applicable(numeric_constraint, state_context) ? 1 : 0;
 
         return result;
     }
 
-    formalism::planning::GroundConjunctiveConditionView m_goal;
+    ::tyr::formalism::planning::GroundConjunctiveConditionView m_goal;
 };
 
 template<TaskKind Kind>

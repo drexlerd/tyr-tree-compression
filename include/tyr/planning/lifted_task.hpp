@@ -18,15 +18,15 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_HPP_
 #define TYR_PLANNING_LIFTED_TASK_HPP_
 
-#include "tyr/common/config.hpp"          // for float_t, uint_t
-#include "tyr/common/dynamic_bitset.hpp"  // for test
-#include "tyr/common/onetbb.hpp"
-#include "tyr/common/vector.hpp"                    // for get
+#include <yggdrasil/core/config.hpp>          // for ygg::float_t, ygg::uint_t
+#include <yggdrasil/containers/dynamic_bitset.hpp>  // for test
+#include <yggdrasil/execution/onetbb.hpp>
+#include <yggdrasil/containers/vector.hpp>                    // for get
 #include "tyr/formalism/planning/declarations.hpp"  // for OverlayRepos...
 #include "tyr/formalism/planning/fdr_context.hpp"
 #include "tyr/formalism/planning/grounder_decl.hpp"
 #include "tyr/formalism/planning/planning_task.hpp"
-#include "tyr/formalism/planning/views.hpp"  // for View
+#include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/lifted_task/task_grounder_decl.hpp"
 #include "tyr/planning/programs/action.hpp"
@@ -46,11 +46,11 @@ template<>
 class Task<LiftedTag>
 {
 public:
-    explicit Task(formalism::planning::PlanningTask task);
+    explicit Task(::tyr::formalism::planning::PlanningTask task);
 
-    static TaskPtr<LiftedTag> create(formalism::planning::PlanningTask task);
+    static TaskPtr<LiftedTag> create(::tyr::formalism::planning::PlanningTask task);
 
-    GroundTaskInstantiationResult instantiate_ground_task(ExecutionContext& execution_context,
+    GroundTaskInstantiationResult instantiate_ground_task(ygg::ExecutionContext& execution_context,
                                                           const GroundTaskInstantiationOptions& options = GroundTaskInstantiationOptions());
 
     /**
@@ -77,17 +77,17 @@ public:
 
     const auto& get_static_atoms_bitset() const noexcept { return m_static_atoms_bitset; }
     const auto& get_static_numeric_variables() const noexcept { return m_static_numeric_variables; }
-    bool test(Index<formalism::planning::GroundAtom<formalism::StaticTag>> index) const { return tyr::test(uint_t(index), m_static_atoms_bitset); }
-    float_t get(Index<formalism::planning::GroundFunctionTerm<formalism::StaticTag>> index) const
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const { return ygg::test(ygg::uint_t(index), m_static_atoms_bitset); }
+    ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>> index) const
     {
-        return tyr::get(uint_t(index), m_static_numeric_variables, std::numeric_limits<float_t>::quiet_NaN());
+        return ygg::get(ygg::uint_t(index), m_static_numeric_variables, std::numeric_limits<ygg::float_t>::quiet_NaN());
     }
 
 private:
-    formalism::planning::PlanningTask m_task;
+    ::tyr::formalism::planning::PlanningTask m_task;
 
     boost::dynamic_bitset<> m_static_atoms_bitset;
-    std::vector<float_t> m_static_numeric_variables;
+    std::vector<ygg::float_t> m_static_numeric_variables;
 
     AxiomEvaluatorProgram m_axiom_program;
 
@@ -95,7 +95,7 @@ private:
 
     RPGProgram m_rpg_program;
 
-    formalism::planning::GrounderCache m_grounder_cache;
+    ::tyr::formalism::planning::GrounderCache m_grounder_cache;
 };
 
 }

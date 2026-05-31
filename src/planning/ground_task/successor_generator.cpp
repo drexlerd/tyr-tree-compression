@@ -19,7 +19,7 @@
 
 #include "../metric.hpp"
 #include "tyr/formalism/planning/repository.hpp"
-#include "tyr/formalism/planning/views.hpp"  // for View
+#include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/applicability.hpp"    // for StateC...
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task.hpp"
@@ -36,9 +36,9 @@ namespace fp = tyr::formalism::planning;
 namespace tyr::planning
 {
 
-SuccessorGenerator<GroundTag>::SuccessorGenerator(uint_t index,
+SuccessorGenerator<GroundTag>::SuccessorGenerator(ygg::uint_t index,
                                                   TaskPtr<GroundTag> task,
-                                                  ExecutionContextPtr execution_context,
+                                                  ygg::ExecutionContextPtr execution_context,
                                                   StateRepositoryPtr<GroundTag> state_repository) :
     m_index(index),
     m_task(std::move(task)),
@@ -79,7 +79,7 @@ void SuccessorGenerator<GroundTag>::get_labeled_successor_nodes(const Node<Groun
 
     m_task->get_action_match_tree()->generate(state_context, m_applicable_actions);
 
-    for (const auto ground_action : make_view(m_applicable_actions, *m_task->get_repository()))
+    for (const auto ground_action : ygg::make_view(m_applicable_actions, *m_task->get_repository()))
     {
         if (m_executor.is_applicable(ground_action, state_context))
             out_nodes.emplace_back(ground_action, m_executor.apply_action(state_context, ground_action, *m_state_repository));
@@ -99,7 +99,7 @@ fp::GroundActionView SuccessorGenerator<GroundTag>::get_ground_action(fp::Action
     return m_task->get_ground_action(binding);
 }
 
-Node<GroundTag> SuccessorGenerator<GroundTag>::get_node(Index<State<GroundTag>> state_index)
+Node<GroundTag> SuccessorGenerator<GroundTag>::get_node(ygg::Index<State<GroundTag>> state_index)
 {
     auto state = m_state_repository->get_registered_state(state_index);
     const auto state_context = StateContext<GroundTag>(*m_task, state.get_unpacked_state(), 0);

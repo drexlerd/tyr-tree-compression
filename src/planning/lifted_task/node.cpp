@@ -19,7 +19,7 @@
 
 #include "tyr/planning/lifted_task/state_view.hpp"
 //
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/state_index.hpp"
 

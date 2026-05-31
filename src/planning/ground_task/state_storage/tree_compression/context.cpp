@@ -30,16 +30,16 @@ auto compute_layout_data(const Task<GroundTag>& task) -> StateStorageContext<Gro
     using VariableInfo = Context::VariableInfo;
     using LayoutData = Context::LayoutData;
 
-    constexpr uint_t bits_per_block = static_cast<uint_t>(bit::bits_per_block_v<Block>);
+    constexpr ygg::uint_t bits_per_block = static_cast<ygg::uint_t>(ygg::bit::bits_per_block_v<Block>);
 
     auto layout = LayoutData {};
 
-    uint_t current_bit = 0;
+    ygg::uint_t current_bit = 0;
 
     for (const auto variable : task.get_formalism_task().get_task().get_fluent_variables())
     {
-        const auto domain_size = static_cast<uint_t>(variable.get_atoms().size() + 1);
-        const auto length = static_cast<uint_t>(bit::bits_needed(domain_size));
+        const auto domain_size = static_cast<ygg::uint_t>(variable.get_atoms().size() + 1);
+        const auto length = static_cast<ygg::uint_t>(ygg::bit::bits_needed(domain_size));
 
         layout.fluent_infos.push_back(VariableInfo {
             .begin = current_bit / bits_per_block,
@@ -50,16 +50,16 @@ auto compute_layout_data(const Task<GroundTag>& task) -> StateStorageContext<Gro
         current_bit += length;
     }
 
-    layout.fluent_array_size = bit::ceil_div(current_bit, bits_per_block);
-    layout.derived_num_bits = static_cast<uint_t>(task.get_formalism_task().get_task().get_atoms<formalism::DerivedTag>().size());
-    layout.derived_array_size = bit::ceil_div(layout.derived_num_bits, bits_per_block);
+    layout.fluent_array_size = ygg::bit::ceil_div(current_bit, bits_per_block);
+    layout.derived_num_bits = static_cast<ygg::uint_t>(task.get_formalism_task().get_task().get_atoms<::tyr::formalism::DerivedTag>().size());
+    layout.derived_array_size = ygg::bit::ceil_div(layout.derived_num_bits, bits_per_block);
 
     return layout;
 }
 
 }
 
-StateStorageContext<GroundTag, TreeCompression>::StateStorageContext(const Task<GroundTag>& task) : StateStorageContext(compute_layout_data<uint_t>(task)) {}
+StateStorageContext<GroundTag, TreeCompression>::StateStorageContext(const Task<GroundTag>& task) : StateStorageContext(compute_layout_data<ygg::uint_t>(task)) {}
 
 StateStorageContext<GroundTag, TreeCompression>::StateStorageContext(LayoutData&& layout_data) :
     fluent_infos(layout_data.fluent_infos),

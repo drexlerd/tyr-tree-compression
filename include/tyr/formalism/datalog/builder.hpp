@@ -24,7 +24,7 @@
 
 namespace tyr::formalism::datalog
 {
-using Builder = tyr::ApplyTypeListT<tyr::formalism::Builder, BuilderTypes>;
+using Builder = ygg::ApplyTypeListT<tyr::formalism::Builder, BuilderTypes>;
 }
 
 #endif

@@ -11,8 +11,8 @@
 #define TYR_ANALYSIS_FORMATTER_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/cista_formatters.hpp"
-#include "tyr/common/iostream.hpp"
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/io/iostream.hpp>
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/planning/formatter.hpp"
 
@@ -54,13 +54,13 @@ struct formatter<tyr::analysis::Scoped<Element, Payload>, char>
         auto os = std::stringstream {};
         os << "ElementDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -75,13 +75,13 @@ struct formatter<tyr::analysis::Scoped<tyr::formalism::planning::Axiom, Payload>
         auto os = std::stringstream {};
         os << "AxiomDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -96,13 +96,13 @@ struct formatter<tyr::analysis::Scoped<tyr::formalism::datalog::Rule, Payload>, 
         auto os = std::stringstream {};
         os << "RuleDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -117,15 +117,15 @@ struct formatter<tyr::analysis::ConditionalEffectDomain, char>
         auto os = std::stringstream {};
         os << "ConditionalEffectDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "condition domain = ", value.payload.condition_domain);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "effect domain = ", value.payload.effect_domain);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -140,15 +140,15 @@ struct formatter<tyr::analysis::ActionDomain, char>
         auto os = std::stringstream {};
         os << "ActionDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "precondition domain = ", value.payload.precondition_domain);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "effect domains = ", value.payload.effect_domains);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -163,13 +163,13 @@ struct formatter<tyr::analysis::ConditionalEffectDomainData, char>
         auto os = std::stringstream {};
         os << "ConditionalEffectDomainData(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "condition domain = ", value.condition_domain);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "effect domain = ", value.effect_domain);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -184,13 +184,13 @@ struct formatter<tyr::analysis::ActionDomainData, char>
         auto os = std::stringstream {};
         os << "ActionDomainData(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "precondition domain = ", value.precondition_domain);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "effect domains = ", value.effect_domains);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -205,23 +205,23 @@ struct formatter<tyr::analysis::ProgramVariableDomains, char>
         auto os = std::stringstream {};
         os << "ProgramVariableDomains(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static predicate domains = ", value.static_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent predicate domains = ", value.fluent_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static function domains = ", value.static_function_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent function domains = ", value.fluent_function_domains);
 
             for (const auto& [rule, domain] : value.rule_domains)
             {
-                os << tyr::print_indent;
+                os << ygg::print_indent;
                 fmt::print(os, "rule {} domain = {}\n", rule, domain);
             }
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -236,31 +236,31 @@ struct formatter<tyr::analysis::TaskVariableDomains, char>
         auto os = std::stringstream {};
         os << "TaskVariableDomains(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static predicate domains = ", value.static_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent predicate domains = ", value.fluent_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "derived predicate domains = ", value.derived_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static function domains = ", value.static_function_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent function domains = ", value.fluent_function_domains);
 
             for (const auto& [action, domain] : value.action_domains)
             {
-                os << tyr::print_indent;
+                os << ygg::print_indent;
                 fmt::print(os, "action {} domain = {}\n", action, domain);
             }
 
             for (const auto& [axiom, domain] : value.axiom_domains)
             {
-                os << tyr::print_indent;
+                os << ygg::print_indent;
                 fmt::print(os, "axiom {} domain = {}\n", axiom, domain);
             }
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -276,15 +276,15 @@ struct formatter<tyr::analysis::ScopedView<tyr::formalism::planning::Conditional
         auto os = std::stringstream {};
         os << "ConditionalEffectDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}\n", value.payload.condition_domain);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}\n", value.payload.effect_domain);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -299,19 +299,19 @@ struct formatter<tyr::analysis::ScopedView<tyr::formalism::planning::Action, tyr
         auto os = std::stringstream {};
         os << "ActionDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}\n", value.payload.precondition_domain);
 
             for (const auto& [conditional_effect, domain] : value.payload.effect_domains)
             {
-                os << tyr::print_indent;
+                os << ygg::print_indent;
                 fmt::print(os, "{}\n", domain);
             }
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -326,13 +326,13 @@ struct formatter<tyr::analysis::ScopedView<Element, Payload, C>, char>
         auto os = std::stringstream {};
         os << "ElementDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -347,13 +347,13 @@ struct formatter<tyr::analysis::ScopedView<tyr::formalism::planning::Conjunctive
         auto os = std::stringstream {};
         os << "ConjunctiveConditionDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -368,13 +368,13 @@ struct formatter<tyr::analysis::ScopedView<tyr::formalism::planning::Conjunctive
         auto os = std::stringstream {};
         os << "ConjunctiveEffectDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -389,13 +389,13 @@ struct formatter<tyr::analysis::ScopedView<tyr::formalism::planning::Axiom, Payl
         auto os = std::stringstream {};
         os << "AxiomDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -410,13 +410,13 @@ struct formatter<tyr::analysis::ScopedView<tyr::formalism::datalog::Rule, Payloa
         auto os = std::stringstream {};
         os << "RuleDomain(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "element = ", value.element.get_index());
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "payload = ", value.payload);
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -442,23 +442,23 @@ struct formatter<tyr::analysis::ProgramVariableDomainsView, char>
         auto os = std::stringstream {};
         os << "ProgramVariableDomains(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static predicate domains = ", value.static_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent predicate domains = ", value.fluent_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static function domains = ", value.static_function_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent function domains = ", value.fluent_function_domains);
 
             for (const auto& [rule, domain] : value.rule_domains)
             {
-                os << tyr::print_indent;
+                os << ygg::print_indent;
                 fmt::print(os, "{}\n", domain);
             }
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };
@@ -473,31 +473,31 @@ struct formatter<tyr::analysis::TaskVariableDomainsView, char>
         auto os = std::stringstream {};
         os << "TaskVariableDomains(\n";
         {
-            tyr::IndentScope scope(os);
-            os << tyr::print_indent;
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static predicate domains = ", value.static_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent predicate domains = ", value.fluent_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "derived predicate domains = ", value.derived_predicate_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "static function domains = ", value.static_function_domains);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "fluent function domains = ", value.fluent_function_domains);
 
             for (const auto& [action, domain] : value.action_domains)
             {
-                os << tyr::print_indent;
+                os << ygg::print_indent;
                 fmt::print(os, "{}\n", domain);
             }
 
             for (const auto& [axiom, domain] : value.axiom_domains)
             {
-                os << tyr::print_indent;
+                os << ygg::print_indent;
                 fmt::print(os, "{}\n", domain);
             }
         }
-        os << tyr::print_indent << ")";
+        os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
     }
 };

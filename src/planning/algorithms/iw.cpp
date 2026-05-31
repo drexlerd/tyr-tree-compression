@@ -53,7 +53,7 @@ private:
 };
 
 template<TaskKind Kind>
-PruningStrategyPtr<Kind> make_pruning_strategy(uint_t arity, PruningStrategyPtr<Kind> base_pruning_strategy)
+PruningStrategyPtr<Kind> make_pruning_strategy(ygg::uint_t arity, PruningStrategyPtr<Kind> base_pruning_strategy)
 {
     auto novelty_pruning_strategy = NoveltyPruningStrategy<Kind>::create(arity);
     if (!base_pruning_strategy)
@@ -63,7 +63,7 @@ PruningStrategyPtr<Kind> make_pruning_strategy(uint_t arity, PruningStrategyPtr<
 }
 
 template<TaskKind Kind>
-SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, uint_t max_arity, const Options<Kind>& options)
+SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, ygg::uint_t max_arity, const Options<Kind>& options)
 {
     if (max_arity > MaxArity)
         throw std::invalid_argument("iw::find_solution(...): max_arity exceeds iw::MaxArity.");
@@ -75,7 +75,7 @@ SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, uint_t max_ari
 
     event_handler->on_start_search(max_arity);
 
-    for (auto arity = uint_t { 0 }; arity <= max_arity; ++arity)
+    for (auto arity = ygg::uint_t { 0 }; arity <= max_arity; ++arity)
     {
         event_handler->on_start_arity(arity);
 
@@ -111,7 +111,7 @@ SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, uint_t max_ari
 static_assert(SolverConcept<Solver<LiftedTag>, LiftedTag>);
 static_assert(SolverConcept<Solver<GroundTag>, GroundTag>);
 
-template SearchResult<LiftedTag> find_solution(brfs::Solver<LiftedTag>&, uint_t, const Options<LiftedTag>&);
-template SearchResult<GroundTag> find_solution(brfs::Solver<GroundTag>&, uint_t, const Options<GroundTag>&);
+template SearchResult<LiftedTag> find_solution(brfs::Solver<LiftedTag>&, ygg::uint_t, const Options<LiftedTag>&);
+template SearchResult<GroundTag> find_solution(brfs::Solver<GroundTag>&, ygg::uint_t, const Options<GroundTag>&);
 
 }

@@ -18,26 +18,27 @@
 #ifndef TYR_FORMALISM_PLANNING_ACTION_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_ACTION_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/planning/action_index.hpp"
 #include "tyr/formalism/planning/conditional_effect_view.hpp"
 #include "tyr/formalism/planning/conjunctive_condition_view.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/variable_view.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::planning::Context C>
-class View<Index<formalism::planning::Action>, C>
+template<::tyr::formalism::planning::Context C>
+class View<ygg::Index<::tyr::formalism::planning::Action>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::planning::Action> m_handle;
+    ygg::Index<::tyr::formalism::planning::Action> m_handle;
 
 public:
-    View(Index<formalism::planning::Action> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::planning::Action> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
@@ -47,9 +48,9 @@ public:
     const auto& get_name() const noexcept { return get_data().name; }
     auto get_original_arity() const noexcept { return get_data().original_arity; }
     auto get_arity() const noexcept { return get_variables().size(); }
-    auto get_variables() const noexcept { return make_view(get_data().variables, *m_context); }
-    auto get_condition() const noexcept { return make_view(get_data().condition, *m_context); }
-    auto get_effects() const noexcept { return make_view(get_data().effects, *m_context); }
+    auto get_variables() const noexcept { return ygg::make_view(get_data().variables, *m_context); }
+    auto get_condition() const noexcept { return ygg::make_view(get_data().condition, *m_context); }
+    auto get_effects() const noexcept { return ygg::make_view(get_data().effects, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

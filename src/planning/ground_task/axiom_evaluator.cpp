@@ -17,8 +17,8 @@
 
 #include "tyr/planning/ground_task/axiom_evaluator.hpp"
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/config.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/applicability.hpp"
@@ -29,11 +29,11 @@
 namespace tyr::planning
 {
 
-AxiomEvaluator<GroundTag>::AxiomEvaluator(uint_t index, TaskPtr<GroundTag> task, ExecutionContextPtr) : m_index(index), m_task(task), m_applicable_axioms() {}
+AxiomEvaluator<GroundTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<GroundTag> task, ygg::ExecutionContextPtr) : m_index(index), m_task(task), m_applicable_axioms() {}
 
 void AxiomEvaluator<GroundTag>::compute_extended_state(UnpackedState<GroundTag>& unpacked_state)
 {
-    auto state_context = StateContext<GroundTag> { *m_task, unpacked_state, float_t(0) };
+    auto state_context = StateContext<GroundTag> { *m_task, unpacked_state, ygg::float_t(0) };
 
     for (const auto& match_tree : m_task->get_axiom_match_tree_strata())
     {
@@ -46,7 +46,7 @@ void AxiomEvaluator<GroundTag>::compute_extended_state(UnpackedState<GroundTag>&
 
             for (const auto axiom : m_applicable_axioms)
             {
-                const auto atom = make_view(axiom, *m_task->get_repository()).get_head().get_index();
+                const auto atom = ygg::make_view(axiom, *m_task->get_repository()).get_head().get_index();
 
                 if (!unpacked_state.test(atom))
                     discovered_new_atom = true;

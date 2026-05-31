@@ -1,6 +1,6 @@
 #include <nanobind/nanobind.h>
 
-#include <tyr/common/config.hpp>
+#include <yggdrasil/core/config.hpp>
 #include <tyr/formalism/planning/repository.hpp>
 
 namespace nb = nanobind;
@@ -17,6 +17,6 @@ namespace
 
 NB_MODULE(_downstream_tyr, m)
 {
-    m.def("float_t_size", [] { return sizeof(tyr::float_t); });
+    m.def("float_t_size", [] { return sizeof(ygg::float_t); });
     m.def("multiply", [](int lhs, int rhs) { return lhs * rhs; });
 }

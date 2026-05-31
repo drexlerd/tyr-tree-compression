@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_TREE_COMPRESSION_FACT_HPP_
 #define TYR_PLANNING_LIFTED_TASK_STATE_STORAGE_TREE_COMPRESSION_FACT_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/lifted_task/state_storage.hpp"
 #include "tyr/planning/lifted_task/state_storage/tree_compression/context.hpp"
@@ -31,7 +31,7 @@ namespace tyr::planning
 template<>
 struct FactPackedStorage<LiftedTag, TreeCompression>
 {
-    valla::Slot<uint_t> slot;
+    valla::Slot<ygg::uint_t> slot;
 
     auto identifying_members() const noexcept { return std::tie(slot.i1, slot.i2); }
 };
@@ -50,9 +50,9 @@ public:
     void unpack(const Packed& packed, Unpacked& unpacked);
 
 private:
-    valla::IndexedHashSet<valla::Slot<uint_t>, uint_t>& m_uint_nodes;
+    valla::IndexedHashSet<valla::Slot<ygg::uint_t>, ygg::uint_t>& m_uint_nodes;
 
-    std::vector<uint_t> m_uint_node_buffer;
+    std::vector<ygg::uint_t> m_uint_node_buffer;
 };
 
 }

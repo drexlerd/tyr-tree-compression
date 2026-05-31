@@ -18,11 +18,11 @@
 #ifndef TYR_SOLVER_POLICIES_ANNOTATION_TYPES_HPP_
 #define TYR_SOLVER_POLICIES_ANNOTATION_TYPES_HPP_
 
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/closed_interval.hpp"
-#include "tyr/common/config.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -49,7 +49,7 @@ namespace tyr::datalog
 struct WitnessAnnotation
 {
 public:
-    WitnessAnnotation(formalism::datalog::RuleBindingView rule_row, Cost cost) : m_rule_row(rule_row), m_cost(cost) {}
+    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Cost cost) : m_rule_row(rule_row), m_cost(cost) {}
 
     auto get_rule_row() const noexcept { return m_rule_row; }
     auto get_cost() const noexcept { return m_cost; }
@@ -57,7 +57,7 @@ public:
     auto identifying_members() const noexcept { return std::tie(m_rule_row); }
 
 private:
-    formalism::datalog::RuleBindingView m_rule_row;
+    ::tyr::formalism::datalog::RuleBindingView m_rule_row;
     Cost m_cost;
 };
 
@@ -82,11 +82,11 @@ inline Cost get_cost(const Annotation& annotation) noexcept
 class AnnotationMap
 {
 public:
-    using Binding = formalism::datalog::PredicateBindingView<formalism::FluentTag>;
-    using Relation = formalism::datalog::PredicateView<formalism::FluentTag>;
-    using Row = Index<formalism::Row>;
-    using Inner = UnorderedMap<Row, Annotation>;
-    using Outer = UnorderedMap<Relation, Inner>;
+    using Binding = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
+    using Relation = ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>;
+    using Row = ygg::Index<::tyr::formalism::Row>;
+    using Inner = ygg::UnorderedMap<Row, Annotation>;
+    using Outer = ygg::UnorderedMap<Relation, Inner>;
 
     void clear() noexcept
     {
@@ -127,20 +127,20 @@ using SelectedPredicateAnnotations = AnnotationMap;
 
 struct NumericIntervalAnnotation
 {
-    ClosedInterval<float_t> interval;
+    ygg::ClosedInterval<ygg::float_t> interval;
     Annotation annotation;
 };
 
 class NumericIntervalAnnotations
 {
 public:
-    using Binding = formalism::datalog::FunctionBindingView<formalism::FluentTag>;
-    using Relation = formalism::datalog::FunctionView<formalism::FluentTag>;
-    using Row = Index<formalism::Row>;
+    using Binding = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
+    using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
+    using Row = ygg::Index<::tyr::formalism::Row>;
     using Entry = NumericIntervalAnnotation;
     using Entries = std::vector<Entry>;
-    using RowPartitions = UnorderedMap<Row, Entries>;
-    using Partitions = UnorderedMap<Relation, RowPartitions>;
+    using RowPartitions = ygg::UnorderedMap<Row, Entries>;
+    using Partitions = ygg::UnorderedMap<Relation, RowPartitions>;
 
     void clear() noexcept
     {
@@ -166,7 +166,7 @@ public:
         return (!entries || entries->empty()) ? nullptr : &entries->back().annotation;
     }
 
-    const Annotation* find(Binding binding, ClosedInterval<float_t> interval) const noexcept
+    const Annotation* find(Binding binding, ygg::ClosedInterval<ygg::float_t> interval) const noexcept
     {
         const auto* entries = find_entries(binding);
         if (!entries)
@@ -179,7 +179,7 @@ public:
         return nullptr;
     }
 
-    void insert(Binding binding, ClosedInterval<float_t> interval, Annotation annotation)
+    void insert(Binding binding, ygg::ClosedInterval<ygg::float_t> interval, Annotation annotation)
     {
         if (empty(interval))
             return;

@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_AXIOM_EVALUATOR_HPP_
 #define TYR_PLANNING_AXIOM_EVALUATOR_HPP_
 
-#include "tyr/common/concepts.hpp"
-#include "tyr/common/config.hpp"
-#include "tyr/common/onetbb.hpp"
+#include <yggdrasil/core/concepts.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_builder.hpp"
 
@@ -36,7 +36,7 @@ template<typename T, typename Kind>
 concept AxiomEvaluatorConcept = requires(T& r, UnpackedState<Kind>& unpacked_state) {
     requires TaskKind<Kind>;
     { r.compute_extended_state(unpacked_state) } -> std::same_as<void>;
-    { r.get_index() } -> std::same_as<uint_t>;
+    { r.get_index() } -> std::same_as<ygg::uint_t>;
 };
 
 }

@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_NODE_HPP_
 #define TYR_PLANNING_NODE_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -41,7 +41,7 @@ using NodeList = std::vector<Node<Kind>>;
 template<TaskKind Kind>
 struct LabeledNode
 {
-    formalism::planning::GroundActionView label;
+    ::tyr::formalism::planning::GroundActionView label;
     Node<Kind> node;
 };
 
@@ -52,7 +52,7 @@ template<typename T, typename Kind>
 concept NodeConcept = requires(const T& cn) {
     requires TaskKind<Kind>;
     { cn.get_state() } -> std::same_as<const StateView<Kind>&>;
-    { cn.get_metric() } -> std::same_as<float_t>;
+    { cn.get_metric() } -> std::same_as<ygg::float_t>;
 };
 }
 

@@ -42,7 +42,7 @@ struct Options
     EventHandlerPtr<Kind, Subsolver> event_handler = nullptr;
     GoalStrategyPtr<Kind> subgoal_strategy = nullptr;
     GoalStrategyPtr<Kind> goal_strategy = nullptr;
-    uint_t max_num_subsearches = std::numeric_limits<uint_t>::max();
+    ygg::uint_t max_num_subsearches = std::numeric_limits<ygg::uint_t>::max();
 
     Options() = default;
 };
@@ -79,7 +79,7 @@ void append_plan(const Plan<Kind>& subplan, Node<Kind>& current_node, LabeledNod
     for (const auto& labeled_succ_node : subplan.get_labeled_succ_nodes())
     {
         const auto step_cost = labeled_succ_node.node.get_metric() - previous_metric;
-        cumulative_metric = FloatTolerance<float_t>::canonicalize(cumulative_metric + step_cost);
+        cumulative_metric = ygg::FloatTolerance<ygg::float_t>::canonicalize(cumulative_metric + step_cost);
         current_node = Node<Kind>(labeled_succ_node.node.get_state(), cumulative_metric);
         labeled_succ_nodes.emplace_back(labeled_succ_node.label, current_node);
         previous_metric = labeled_succ_node.node.get_metric();
@@ -149,7 +149,7 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
     if (auto serialized_subgoal_strategy = std::dynamic_pointer_cast<SerializedGoalStrategy<Kind>>(options.subgoal_strategy))
         serialized_subgoal_strategy->clear();
 
-    for (auto subsearch_index = uint_t { 0 }; subsearch_index < options.max_num_subsearches; ++subsearch_index)
+    for (auto subsearch_index = ygg::uint_t { 0 }; subsearch_index < options.max_num_subsearches; ++subsearch_index)
     {
         auto local_solver = solver;
         local_solver.options.start_node = current_start_node;

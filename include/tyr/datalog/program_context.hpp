@@ -30,9 +30,9 @@ namespace tyr::datalog
 class ProgramContext
 {
 public:
-    ProgramContext(formalism::datalog::ProgramView program,
-                   formalism::datalog::RepositoryPtr program_repository,
-                   formalism::datalog::RepositoryFactoryPtr repository_factory,
+    ProgramContext(::tyr::formalism::datalog::ProgramView program,
+                   ::tyr::formalism::datalog::RepositoryPtr program_repository,
+                   ::tyr::formalism::datalog::RepositoryFactoryPtr repository_factory,
                    analysis::ProgramVariableDomains domains,
                    analysis::RuleStrata strata,
                    analysis::ListenerStrata listeners) :
@@ -55,10 +55,10 @@ public:
     const auto& get_listeners() const noexcept { return m_listeners; }
 
 private:
-    formalism::datalog::ProgramView m_program;
-    formalism::datalog::RepositoryPtr m_program_repository;
-    formalism::datalog::RepositoryFactoryPtr m_repository_factory;
-    formalism::datalog::RepositoryPtr m_workspace_repository;
+    ::tyr::formalism::datalog::ProgramView m_program;
+    ::tyr::formalism::datalog::RepositoryPtr m_program_repository;
+    ::tyr::formalism::datalog::RepositoryFactoryPtr m_repository_factory;
+    ::tyr::formalism::datalog::RepositoryPtr m_workspace_repository;
     analysis::ProgramVariableDomains m_domains;
     analysis::RuleStrata m_strata;
     analysis::ListenerStrata m_listeners;

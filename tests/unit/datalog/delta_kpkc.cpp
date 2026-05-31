@@ -17,7 +17,7 @@
 
 #include "tyr/datalog/delta_kpkc.hpp"
 
-#include "tyr/common/formatter.hpp"
+#include <yggdrasil/formatting/formatter.hpp>
 #include "tyr/formalism/formalism.hpp"
 #include "tyr/planning/planning.hpp"
 
@@ -29,7 +29,7 @@ namespace p = tyr::planning;
 namespace tyr::tests
 {
 
-inline std::vector<d::kpkc::Vertex> V(std::initializer_list<uint_t> xs)
+inline std::vector<d::kpkc::Vertex> V(std::initializer_list<ygg::uint_t> xs)
 {
     auto out = std::vector<d::kpkc::Vertex> {};
     out.reserve(xs.size());
@@ -58,13 +58,13 @@ inline boost::dynamic_bitset<> B(size_t n, std::initializer_list<size_t> bits)
 
 TEST(TyrTests, TyrDatalogDeltaKPKCStandard3)
 {
-    const auto nv = uint_t(6);
-    const auto k = uint_t(3);
+    const auto nv = ygg::uint_t(6);
+    const auto k = ygg::uint_t(3);
 
     auto layout = d::kpkc::GraphLayout(nv,
                                        k,
                                        std::vector<std::vector<d::kpkc::Vertex>> { V({ 0, 1 }), V({ 2, 3 }), V({ 4, 5 }) },
-                                       std::vector<uint_t> { 0, 0, 1, 1, 2, 2 });
+                                       std::vector<ygg::uint_t> { 0, 0, 1, 1, 2, 2 });
 
     auto delta_graph = d::kpkc::Graph {};
     delta_graph.adjacency_matrix.resize(nv);
@@ -113,13 +113,13 @@ TEST(TyrTests, TyrDatalogDeltaKPKCStandard3)
 
 TEST(TyrTests, TyrDatalogDeltaKPKCDelta3)
 {
-    const auto nv = uint_t(6);
-    const auto k = uint_t(3);
+    const auto nv = ygg::uint_t(6);
+    const auto k = ygg::uint_t(3);
 
     auto layout = d::kpkc::GraphLayout(nv,
                                        k,
                                        std::vector<std::vector<d::kpkc::Vertex>> { V({ 0, 1 }), V({ 2, 3 }), V({ 4, 5 }) },
-                                       std::vector<uint_t> { 0, 0, 1, 1, 2, 2 });
+                                       std::vector<ygg::uint_t> { 0, 0, 1, 1, 2, 2 });
 
     auto delta_graph = d::kpkc::Graph {};
     delta_graph.adjacency_matrix.resize(nv);
@@ -172,13 +172,13 @@ TEST(TyrTests, TyrDatalogDeltaKPKCDelta3)
 
 TEST(TyrTests, TyrDatalogDeltaKPKCStandard4)
 {
-    const auto nv = uint_t(8);
-    const auto k = uint_t(4);
+    const auto nv = ygg::uint_t(8);
+    const auto k = ygg::uint_t(4);
 
     auto layout = d::kpkc::GraphLayout(nv,
                                        k,
                                        std::vector<std::vector<d::kpkc::Vertex>> { V({ 0, 1 }), V({ 2, 3 }), V({ 4, 5 }), V({ 6, 7 }) },
-                                       std::vector<uint_t> { 0, 0, 1, 1, 2, 2, 3, 3 });
+                                       std::vector<ygg::uint_t> { 0, 0, 1, 1, 2, 2, 3, 3 });
 
     auto delta_graph = d::kpkc::Graph {};
     delta_graph.adjacency_matrix.resize(nv);
@@ -245,13 +245,13 @@ TEST(TyrTests, TyrDatalogDeltaKPKCStandard4)
 
 TEST(TyrTests, TyrDatalogDeltaKPKCDelta4)
 {
-    const auto nv = uint_t(8);
-    const auto k = uint_t(4);
+    const auto nv = ygg::uint_t(8);
+    const auto k = ygg::uint_t(4);
 
     auto layout = d::kpkc::GraphLayout(nv,
                                        k,
                                        std::vector<std::vector<d::kpkc::Vertex>> { V({ 0, 1 }), V({ 2, 3 }), V({ 4, 5 }), V({ 6, 7 }) },
-                                       std::vector<uint_t> { 0, 0, 1, 1, 2, 2, 3, 3 });
+                                       std::vector<ygg::uint_t> { 0, 0, 1, 1, 2, 2, 3, 3 });
 
     auto delta_graph = d::kpkc::Graph {};
     delta_graph.adjacency_matrix.resize(nv);

@@ -19,30 +19,30 @@
 
 #include <gtest/gtest.h>
 
-namespace b = tyr::buffer;
+namespace b = ygg::buffer;
 namespace f = tyr::formalism;
 namespace fp = tyr::formalism::planning;
 
 namespace tyr::tests
 {
 
-inline IndexList<f::Object> O(std::initializer_list<size_t> xs)
+inline ygg::IndexList<f::Object> O(std::initializer_list<size_t> xs)
 {
-    auto out = IndexList<f::Object> {};
+    auto out = ygg::IndexList<f::Object> {};
     out.reserve(xs.size());
     for (auto x : xs)
-        out.emplace_back(Index<f::Object>(x));
+        out.emplace_back(ygg::Index<f::Object>(x));
     return out;
 }
 
 TEST(TyrTests, TyrFormalismIndex)
 {
-    auto set = UnorderedSet<IndexList<f::Object>> {};
+    auto set = ygg::UnorderedSet<ygg::IndexList<f::Object>> {};
     auto l1 = O({ 0, 2, 3 });
     auto l2 = O({ 0, 2, 3 });
 
-    auto hash = Hash<IndexList<f::Object>> {};
-    auto equal_to = EqualTo<IndexList<f::Object>> {};
+    auto hash = ygg::Hash<ygg::IndexList<f::Object>> {};
+    auto equal_to = ygg::EqualTo<ygg::IndexList<f::Object>> {};
     EXPECT_EQ(hash(l1), hash(l2));
     EXPECT_TRUE(equal_to(l1, l2));
 

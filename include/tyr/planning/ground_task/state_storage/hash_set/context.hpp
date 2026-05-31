@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_GROUND_TASK_STATE_STORAGE_HASH_SET_CONTEXT_HPP_
 #define TYR_PLANNING_GROUND_TASK_STATE_STORAGE_HASH_SET_CONTEXT_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/raw_array_set.hpp"
-#include "tyr/common/raw_vector_set.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/raw_array_set.hpp>
+#include <yggdrasil/containers/raw_vector_set.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
@@ -42,7 +42,7 @@ struct StateStorageContext<GroundTag, HashSet>
 
     struct VariableInfo
     {
-        uint_t begin;
+        ygg::uint_t begin;
         uint8_t offset;
         uint8_t length;
     };
@@ -50,18 +50,18 @@ struct StateStorageContext<GroundTag, HashSet>
     struct LayoutData
     {
         std::vector<VariableInfo> fluent_infos;
-        uint_t fluent_array_size;
-        uint_t derived_num_bits;
-        uint_t derived_array_size;
+        ygg::uint_t fluent_array_size;
+        ygg::uint_t derived_num_bits;
+        ygg::uint_t derived_array_size;
     };
 
     std::vector<VariableInfo> fluent_infos;
-    RawArraySet<uint_t> fluent_array_set;
+    ygg::RawArraySet<ygg::uint_t> fluent_array_set;
 
-    uint_t derived_num_bits;
-    RawArraySet<uint_t> derived_array_set;
+    ygg::uint_t derived_num_bits;
+    ygg::RawArraySet<ygg::uint_t> derived_array_set;
 
-    RawVectorSet<uint_t, float_t> float_vec_set;
+    ygg::RawVectorSet<ygg::uint_t, ygg::float_t> float_vec_set;
 
     size_t memory_usage() const noexcept
     {

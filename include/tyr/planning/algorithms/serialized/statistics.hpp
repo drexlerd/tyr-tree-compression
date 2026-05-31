@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_ALGORITHMS_SERIALIZED_STATISTICS_HPP_
 #define TYR_PLANNING_ALGORITHMS_SERIALIZED_STATISTICS_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/algorithms/concepts.hpp"
 #include "tyr/planning/algorithms/utils.hpp"
 
@@ -48,7 +48,7 @@ public:
     void add_search_statistics(const SearchStatistics& statistics) { m_search_statistics.push_back(statistics); }
     void add_solver_statistics(const SolverStatistics& statistics) { m_solver_statistics.push_back(statistics); }
 
-    uint_t get_num_subsearches() const { return static_cast<uint_t>(m_search_statistics.size()); }
+    ygg::uint_t get_num_subsearches() const { return static_cast<ygg::uint_t>(m_search_statistics.size()); }
     const std::vector<SearchStatistics>& get_search_statistics() const { return m_search_statistics; }
     const std::vector<SolverStatistics>& get_solver_statistics() const { return m_solver_statistics; }
 };

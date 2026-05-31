@@ -18,8 +18,8 @@
 #ifndef TYR_SOLVER_POLICIES_ANNOTATION_CONCEPT_HPP_
 #define TYR_SOLVER_POLICIES_ANNOTATION_CONCEPT_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -42,10 +42,10 @@ class NumericSupportSelectorWorkspace;
 // circle "or"-node
 template<typename T>
 concept OrAnnotationPolicyConcept = requires(const T& p,
-                                             formalism::datalog::PredicateBindingView<formalism::FluentTag> program_head,
-                                             formalism::datalog::FunctionBindingView<formalism::FluentTag> program_function_head,
-                                             ClosedInterval<float_t> interval,
-                                             formalism::datalog::PredicateBindingView<formalism::FluentTag> delta_head,
+                                             ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
+                                             ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> program_function_head,
+                                             ygg::ClosedInterval<ygg::float_t> interval,
+                                             ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
                                              const SelectedPredicateAnnotations& delta_and_annot,
                                              SelectedPredicateAnnotations& program_and_annot,
                                              SelectedFunctionAnnotations& program_numeric_and_annot) {
@@ -61,18 +61,18 @@ concept OrAnnotationPolicyConcept = requires(const T& p,
 // rectangular "and"-node
 template<typename T>
 concept AndAnnotationPolicyConcept = requires(const T& p,
-                                              formalism::datalog::PredicateBindingView<formalism::FluentTag> program_head,
-                                              formalism::datalog::PredicateBindingView<formalism::FluentTag> delta_head,
-                                              uint_t current_cost,
-                                              formalism::datalog::RuleView rule,
-                                              formalism::datalog::ConjunctiveConditionView witness_condition,
+                                              ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
+                                              ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+                                              ygg::uint_t current_cost,
+                                              ::tyr::formalism::datalog::RuleView rule,
+                                              ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition,
                                               const NumericSupportSelector& numeric_support_selector,
                                               NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
                                               const SelectedPredicateAnnotations& program_and_annot,
                                               const SelectedFunctionAnnotations& program_numeric_and_annot,
                                               SelectedPredicateAnnotations& delta_and_annot,
-                                              formalism::datalog::GrounderContext& delta_context,
-                                              formalism::datalog::GrounderContext& iteration_context) {
+                                              ::tyr::formalism::datalog::GrounderContext& delta_context,
+                                              ::tyr::formalism::datalog::GrounderContext& iteration_context) {
     /// Ground the witness and annotate the cost of it from the given annotations.
     {
         p.update_annotation(program_head,

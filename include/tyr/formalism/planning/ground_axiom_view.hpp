@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_AXIOM_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_AXIOM_VIEW_HPP_
 
-#include "tyr/common/array.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/containers/array.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/binding_view.hpp"
 #include "tyr/formalism/planning/axiom_view.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
@@ -27,18 +27,19 @@
 #include "tyr/formalism/planning/ground_axiom_index.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_condition_view.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::planning::Context C>
-class View<Index<formalism::planning::GroundAxiom>, C>
+template<::tyr::formalism::planning::Context C>
+class View<ygg::Index<::tyr::formalism::planning::GroundAxiom>, C>
 {
 private:
     const C* m_context;
-    Index<formalism::planning::GroundAxiom> m_handle;
+    ygg::Index<::tyr::formalism::planning::GroundAxiom> m_handle;
 
 public:
-    View(Index<formalism::planning::GroundAxiom> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<::tyr::formalism::planning::GroundAxiom> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
@@ -46,10 +47,10 @@ public:
 
     auto get_index() const noexcept { return m_handle; }
     auto get_axiom() const noexcept { return get_row().get_relation(); }
-    auto get_row() const noexcept { return make_view(get_data().binding, *m_context); }
+    auto get_row() const noexcept { return ygg::make_view(get_data().binding, *m_context); }
     auto get_key() const noexcept { return get_row().get_key(); }
-    auto get_body() const noexcept { return make_view(get_data().body, *m_context); }
-    auto get_head() const noexcept { return make_view(get_data().head, *m_context); }
+    auto get_body() const noexcept { return ygg::make_view(get_data().body, *m_context); }
+    auto get_head() const noexcept { return ygg::make_view(get_data().head, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

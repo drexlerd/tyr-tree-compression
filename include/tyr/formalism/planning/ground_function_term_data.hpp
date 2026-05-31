@@ -18,27 +18,29 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_FUNCTION_TERM_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_FUNCTION_TERM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/function_index.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_function_term_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::planning::GroundFunctionTerm<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::GroundFunctionTerm<T>>
 {
-    Index<formalism::planning::GroundFunctionTerm<T>> index;
-    Index<formalism::RelationBinding<formalism::Function<T>>> binding;
+    ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<T>> index;
+    ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>> binding;
 
     Data() = default;
-    Data(Index<formalism::RelationBinding<formalism::Function<T>>> binding_) : index(), binding(binding_) {}
+    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>> binding_) : index(), binding(binding_) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::RelationBinding<formalism::Function<T>>>, C> binding_) : index(), binding()
+    Data(::ygg::View<ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>>, C> binding_) : index(), binding()
     {
         set(binding_, binding);
     }
@@ -49,15 +51,15 @@ struct Data<formalism::planning::GroundFunctionTerm<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(binding);
+        ygg::clear(index);
+        ygg::clear(binding);
     }
 
     auto cista_members() const noexcept { return std::tie(index, binding); }
     auto identifying_members() const noexcept { return std::tie(binding); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::planning::GroundFunctionTerm<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>>);
 }
 
 #endif

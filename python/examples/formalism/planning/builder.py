@@ -10,9 +10,7 @@ Example usage (run from the repository root):
 Author: Dominik Drexler (dominik.drexler@liu.se)
 """
 
-from pytyr.common import (
-    ExecutionContext
-)
+from pyyggdrasil import ExecutionContext
 
 from pytyr.formalism.planning import (
     ParameterIndex,

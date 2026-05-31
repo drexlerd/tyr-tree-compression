@@ -18,27 +18,29 @@
 #ifndef TYR_FORMALISM_PLANNING_ATOM_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_ATOM_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/atom_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/predicate_index.hpp"
 #include "tyr/formalism/term_data.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Data<formalism::planning::Atom<T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::planning::Atom<T>>
 {
-    Index<formalism::planning::Atom<T>> index;
-    Index<formalism::Predicate<T>> predicate;
-    DataList<formalism::Term> terms;
+    ygg::Index<::tyr::formalism::planning::Atom<T>> index;
+    ygg::Index<::tyr::formalism::Predicate<T>> predicate;
+    ygg::DataList<::tyr::formalism::Term> terms;
 
     Data() = default;
-    Data(Index<formalism::Predicate<T>> predicate_, DataList<formalism::Term> terms_) : index(), predicate(predicate), terms(std::move(terms)) {}
+    Data(ygg::Index<::tyr::formalism::Predicate<T>> predicate_, ygg::DataList<::tyr::formalism::Term> terms_) : index(), predicate(predicate), terms(std::move(terms)) {}
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::Predicate<T>>, C> predicate_, const std::vector<View<Data<formalism::Term>, C>>& terms_) : index(), predicate(), terms()
+    Data(::ygg::View<ygg::Index<::tyr::formalism::Predicate<T>>, C> predicate_, const std::vector<::ygg::View<ygg::Data<::tyr::formalism::Term>, C>>& terms_) : index(), predicate(), terms()
     {
         set(predicate_, predicate);
         set(terms_, terms);
@@ -50,16 +52,16 @@ struct Data<formalism::planning::Atom<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(predicate);
-        tyr::clear(terms);
+        ygg::clear(index);
+        ygg::clear(predicate);
+        ygg::clear(terms);
     }
 
     auto cista_members() const noexcept { return std::tie(index, predicate, terms); }
     auto identifying_members() const noexcept { return std::tie(predicate, terms); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::Atom<formalism::StaticTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::Atom<::tyr::formalism::StaticTag>>);
 }
 
 #endif

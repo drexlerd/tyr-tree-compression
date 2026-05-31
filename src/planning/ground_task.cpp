@@ -17,12 +17,12 @@
 
 #include "tyr/planning/ground_task.hpp"
 
-#include "tyr/common/comparators.hpp"                         // for operat...
-#include "tyr/common/dynamic_bitset.hpp"                      // for set
-#include "tyr/common/vector.hpp"                              // for View, set
+#include <yggdrasil/semantics/comparators.hpp>                         // for operat...
+#include <yggdrasil/containers/dynamic_bitset.hpp>                      // for set
+#include <yggdrasil/containers/vector.hpp>                              // for ygg::View, set
 #include "tyr/formalism/planning/fdr_context.hpp"             // for Genera...
 #include "tyr/formalism/planning/repository.hpp"              // for Reposi...
-#include "tyr/formalism/planning/views.hpp"                   // for Index
+#include "tyr/formalism/planning/views.hpp"                   // for ygg::Index
 #include "tyr/planning/ground_task/axiom_stratification.hpp"  // for compute...
 
 #include <cassert>  // for assert
@@ -35,7 +35,7 @@ namespace fp = tyr::formalism::planning;
 namespace tyr::planning
 {
 
-Task<GroundTag>::Task(formalism::planning::PlanningFDRTask task) :
+Task<GroundTag>::Task(::tyr::formalism::planning::PlanningFDRTask task) :
     m_task(std::move(task)),
     m_static_atoms_bitset(),
     m_static_numeric_variables(),
@@ -47,10 +47,10 @@ Task<GroundTag>::Task(formalism::planning::PlanningFDRTask task) :
         m_action_binding_to_ground_action.emplace(action.get_row(), action);
 
     for (const auto atom : get_task().template get_atoms<f::StaticTag>())
-        set(uint_t(atom.get_index()), true, m_static_atoms_bitset);
+        ygg::set(ygg::uint_t(atom.get_index()), true, m_static_atoms_bitset);
 
     for (const auto fterm_value : get_task().template get_fterm_values<f::StaticTag>())
-        set(uint_t(fterm_value.get_fterm().get_index()), fterm_value.get_value(), m_static_numeric_variables, std::numeric_limits<float_t>::quiet_NaN());
+        ygg::set(ygg::uint_t(fterm_value.get_fterm().get_index()), fterm_value.get_value(), m_static_numeric_variables, std::numeric_limits<ygg::float_t>::quiet_NaN());
 
     auto axiom_strata = compute_ground_axiom_stratification(get_task());
 

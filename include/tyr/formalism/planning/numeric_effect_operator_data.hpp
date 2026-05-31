@@ -18,34 +18,36 @@
 #ifndef TYR_FORMALISM_PLANNING_NUMERIC_EFFECT_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_NUMERIC_EFFECT_OPERATOR_DATA_HPP_
 
-#include "tyr/common/cista_comparators.hpp"
-#include "tyr/common/cista_equal_to.hpp"
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/serialization/cista_comparators.hpp>
+#include <yggdrasil/serialization/cista_equal_to.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/numeric_effect_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::NumericEffectOperator<formalism::FluentTag>>
+struct Data<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::FluentTag>>
 {
-    using Variant = ::cista::offset::variant<Index<formalism::planning::NumericEffect<formalism::Assign, formalism::FluentTag>>,
-                                             Index<formalism::planning::NumericEffect<formalism::Increase, formalism::FluentTag>>,
-                                             Index<formalism::planning::NumericEffect<formalism::Decrease, formalism::FluentTag>>,
-                                             Index<formalism::planning::NumericEffect<formalism::ScaleUp, formalism::FluentTag>>,
-                                             Index<formalism::planning::NumericEffect<formalism::ScaleDown, formalism::FluentTag>>>;
+    using Variant = ::cista::offset::variant<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Assign, ::tyr::formalism::FluentTag>>,
+                                             ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Increase, ::tyr::formalism::FluentTag>>,
+                                             ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag>>,
+                                             ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag>>,
+                                             ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag>>>;
 
     Variant value;
 
     template<typename C>
-    using ViewVariant = std::variant<View<Index<formalism::planning::NumericEffect<formalism::Assign, formalism::FluentTag>>, C>,
-                                     View<Index<formalism::planning::NumericEffect<formalism::Increase, formalism::FluentTag>>, C>,
-                                     View<Index<formalism::planning::NumericEffect<formalism::Decrease, formalism::FluentTag>>, C>,
-                                     View<Index<formalism::planning::NumericEffect<formalism::ScaleUp, formalism::FluentTag>>, C>,
-                                     View<Index<formalism::planning::NumericEffect<formalism::ScaleDown, formalism::FluentTag>>, C>>;
+    using ViewVariant = std::variant<::ygg::View<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Assign, ::tyr::formalism::FluentTag>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Increase, ::tyr::formalism::FluentTag>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag>>, C>,
+                                     ::ygg::View<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag>>, C>>;
 
     Data() = default;
     Data(Variant value_) : value(value_) {}
@@ -55,21 +57,21 @@ struct Data<formalism::planning::NumericEffectOperator<formalism::FluentTag>>
     {
     }
 
-    void clear() noexcept { tyr::clear(value); }
+    void clear() noexcept { ygg::clear(value); }
 
     auto cista_members() const noexcept { return std::tie(value); }
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
 template<>
-struct Data<formalism::planning::NumericEffectOperator<formalism::AuxiliaryTag>>
+struct Data<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::AuxiliaryTag>>
 {
-    using Variant = ::cista::offset::variant<Index<formalism::planning::NumericEffect<formalism::Increase, formalism::AuxiliaryTag>>>;
+    using Variant = ::cista::offset::variant<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Increase, ::tyr::formalism::AuxiliaryTag>>>;
 
     Variant value;
 
     template<typename C>
-    using ViewVariant = std::variant<View<Index<formalism::planning::NumericEffect<formalism::Increase, formalism::AuxiliaryTag>>, C>>;
+    using ViewVariant = std::variant<::ygg::View<ygg::Index<::tyr::formalism::planning::NumericEffect<::tyr::formalism::Increase, ::tyr::formalism::AuxiliaryTag>>, C>>;
 
     Data() = default;
     Data(Variant value_) : value(value_) {}
@@ -85,7 +87,7 @@ struct Data<formalism::planning::NumericEffectOperator<formalism::AuxiliaryTag>>
         new (&value) Variant {};
     }
 
-    friend bool operator==(const Data& lhs, const Data& rhs) { return EqualTo<Variant> {}(lhs.value, rhs.value); }
+    friend bool operator==(const Data& lhs, const Data& rhs) { return ygg::EqualTo<Variant> {}(lhs.value, rhs.value); }
     friend bool operator!=(const Data& lhs, const Data& rhs) { return lhs.value != rhs.value; }
     friend bool operator<=(const Data& lhs, const Data& rhs) { return lhs.value <= rhs.value; }
     friend bool operator<(const Data& lhs, const Data& rhs) { return lhs.value < rhs.value; }
@@ -96,8 +98,8 @@ struct Data<formalism::planning::NumericEffectOperator<formalism::AuxiliaryTag>>
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::NumericEffectOperator<formalism::FluentTag>>);
-static_assert(!uses_trivial_storage_v<formalism::planning::NumericEffectOperator<formalism::AuxiliaryTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::FluentTag>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::AuxiliaryTag>>);
 
 }
 

@@ -18,11 +18,11 @@
 #ifndef TYR_FORMALISM_PLANNING_INVARIANTS_INVARIANT_HPP_
 #define TYR_FORMALISM_PLANNING_INVARIANTS_INVARIANT_HPP_
 
-#include "tyr/common/block_array_comparators.hpp"
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/containers/block_array_comparators.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/grounder.hpp"
 #include "tyr/formalism/planning/mutable/atom.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -41,7 +41,7 @@ struct Invariant
     size_t num_rigid_variables = 0;
     size_t num_counted_variables = 0;
     MutableAtomList<FluentTag> atoms;
-    UnorderedSet<PredicateView<FluentTag>> predicates;
+    ygg::UnorderedSet<PredicateView<FluentTag>> predicates;
 
     Invariant() = default;
 
@@ -56,7 +56,7 @@ struct Invariant
     Invariant(size_t num_rigid_variables_,
               size_t num_counted_variables_,
               MutableAtomList<FluentTag> atoms_,
-              UnorderedSet<PredicateView<FluentTag>> predicates_) :
+              ygg::UnorderedSet<PredicateView<FluentTag>> predicates_) :
         num_rigid_variables(num_rigid_variables_),
         num_counted_variables(num_counted_variables_),
         atoms(std::move(atoms_)),
@@ -66,8 +66,8 @@ struct Invariant
 
     void canonicalize()
     {
-        std::sort(atoms.begin(), atoms.end(), tyr::Less<MutableAtom<FluentTag>> {});
-        atoms.erase(std::unique(atoms.begin(), atoms.end(), tyr::EqualTo<MutableAtom<FluentTag>> {}), atoms.end());
+        std::sort(atoms.begin(), atoms.end(), ygg::Less<MutableAtom<FluentTag>> {});
+        atoms.erase(std::unique(atoms.begin(), atoms.end(), ygg::EqualTo<MutableAtom<FluentTag>> {}), atoms.end());
 
         predicates.clear();
         for (const auto& atom : atoms)
@@ -76,9 +76,9 @@ struct Invariant
 
     auto identifying_members() const noexcept { return std::tie(num_rigid_variables, num_counted_variables, atoms); }
 
-    friend bool operator==(const Invariant& lhs, const Invariant& rhs) { return tyr::EqualTo<Invariant> {}(lhs, rhs); }
+    friend bool operator==(const Invariant& lhs, const Invariant& rhs) { return ygg::EqualTo<Invariant> {}(lhs, rhs); }
 
-    friend bool operator<(const Invariant& lhs, const Invariant& rhs) { return tyr::Less<Invariant> {}(lhs, rhs); }
+    friend bool operator<(const Invariant& lhs, const Invariant& rhs) { return ygg::Less<Invariant> {}(lhs, rhs); }
 };
 
 using InvariantList = std::vector<Invariant>;

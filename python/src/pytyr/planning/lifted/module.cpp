@@ -63,7 +63,7 @@ void bind_lifted_module_definitions(nb::module_& m)
         .def_rw("disable_invariant_synthesis", &GroundTaskInstantiationOptions::disable_invariant_synthesis);
 
     nb::class_<Task<LiftedTag>>(m, "Task")  //
-        .def(nb::new_([](formalism::planning::PlanningTask&& task) { return Task<LiftedTag>::create(std::move(task)); }),
+        .def(nb::new_([](::tyr::formalism::planning::PlanningTask&& task) { return Task<LiftedTag>::create(std::move(task)); }),
              "formalism_task"_a,
              R"doc(
 Create a planning task from a formalism task.
@@ -85,7 +85,7 @@ should not be used further.
         .def("get_fdr_context", nb::overload_cast<>(&Task<LiftedTag>::get_fdr_context, nb::const_))
         .def("instantiate_ground_task", &Task<LiftedTag>::instantiate_ground_task, "execution_context"_a, "options"_a);
 
-    bind_index<Index<State<LiftedTag>>>(m, "StateIndex");
+    bind_index<ygg::Index<State<LiftedTag>>>(m, "StateIndex");
     bind_state<LiftedTag>(m, "State");
     bind_node<LiftedTag>(m, "Node");
     bind_labeled_node<LiftedTag>(m, "LabeledNode");

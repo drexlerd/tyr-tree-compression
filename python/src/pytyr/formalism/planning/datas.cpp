@@ -20,8 +20,8 @@
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <tyr/common/python/bindings.hpp>
-#include <tyr/common/python/type_casters.hpp>
+#include "pytyr/bindings.hpp"
+#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
 
 namespace tyr::formalism::planning
@@ -30,12 +30,12 @@ namespace
 {
 
 /**
- * Data
+ * ygg::Data
  */
 
 void bind_object_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Object>;
+    using V = ygg::Data<Object>;
 
     nb::class_<V>(m, name.c_str())  //
         .def(nb::init<const std::string&>(), "name"_a)
@@ -44,7 +44,7 @@ void bind_object_builder(nb::module_& m, const std::string& name)
 
 void bind_variable_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Variable>;
+    using V = ygg::Data<Variable>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const std::string&>(), "name"_a)
@@ -55,7 +55,7 @@ void bind_variable_builder(nb::module_& m, const std::string& name)
 
 void bind_term_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Term>;
+    using V = ygg::Data<Term>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a)
@@ -67,10 +67,10 @@ void bind_term_builder(nb::module_& m, const std::string& name)
 template<typename Tag>
 void bind_relation_binding_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<RelationBinding<Tag>>;
+    using V = ygg::Data<RelationBinding<Tag>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<View<Index<Tag>, Repository>, const ObjectViewList&>(), "relation"_a, "objects"_a);
+                   .def(nb::init<ygg::View<ygg::Index<Tag>, Repository>, const ObjectViewList&>(), "relation"_a, "objects"_a);
     add_print(cls);
     add_hash(cls);
 }
@@ -78,10 +78,10 @@ void bind_relation_binding_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_predicate_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Predicate<T>>;
+    using V = ygg::Data<Predicate<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<const std::string&, uint_t>(), "name"_a, "arity"_a);
+                   .def(nb::init<const std::string&, ygg::uint_t>(), "name"_a, "arity"_a);
     add_print(cls);
     add_hash(cls);
 }
@@ -89,7 +89,7 @@ void bind_predicate_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_atom_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Atom<T>>;
+    using V = ygg::Data<Atom<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<PredicateView<T>, const TermViewList&>(), "predicate"_a, "terms"_a);
@@ -100,7 +100,7 @@ void bind_atom_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_ground_atom_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundAtom<T>>;
+    using V = ygg::Data<GroundAtom<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<PredicateBindingView<T>>(), "binding"_a);
@@ -111,7 +111,7 @@ void bind_ground_atom_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_literal_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Literal<T>>;
+    using V = ygg::Data<Literal<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<AtomView<T>, bool>(), "atom"_a, "polarity"_a);
@@ -122,7 +122,7 @@ void bind_literal_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_ground_literal_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundLiteral<T>>;
+    using V = ygg::Data<GroundLiteral<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<GroundAtomView<T>, bool>(), "atom"_a, "polarity"_a);
@@ -133,7 +133,7 @@ void bind_ground_literal_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_fdr_variable_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<FDRVariable<T>>;
+    using V = ygg::Data<FDRVariable<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const GroundAtomViewList<T>>(), "atoms"_a);
@@ -144,7 +144,7 @@ void bind_fdr_variable_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_fdr_fact_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<FDRFact<T>>;
+    using V = ygg::Data<FDRFact<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FDRVariableView<T>, FDRValue>(), "variable"_a, "value"_a);
@@ -155,10 +155,10 @@ void bind_fdr_fact_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_function_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Function<T>>;
+    using V = ygg::Data<Function<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<const std::string&, uint_t>(), "name"_a, "arity"_a);
+                   .def(nb::init<const std::string&, ygg::uint_t>(), "name"_a, "arity"_a);
     add_print(cls);
     add_hash(cls);
 }
@@ -166,7 +166,7 @@ void bind_function_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_function_term_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<FunctionTerm<T>>;
+    using V = ygg::Data<FunctionTerm<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FunctionView<T>, const TermViewList&>(), "function"_a, "terms"_a);
@@ -177,7 +177,7 @@ void bind_function_term_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_ground_function_term_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundFunctionTerm<T>>;
+    using V = ygg::Data<GroundFunctionTerm<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FunctionBindingView<T>>(), "binding"_a);
@@ -188,10 +188,10 @@ void bind_ground_function_term_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_ground_function_term_value_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundFunctionTermValue<T>>;
+    using V = ygg::Data<GroundFunctionTermValue<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<GroundFunctionTermView<T>, float_t>(), "fterm"_a, "value"_a);
+                   .def(nb::init<GroundFunctionTermView<T>, ygg::float_t>(), "fterm"_a, "value"_a);
     add_print(cls);
     add_hash(cls);
 }
@@ -199,7 +199,7 @@ void bind_ground_function_term_value_builder(nb::module_& m, const std::string& 
 template<NumericEffectOpKind Op, FactKind T>
 void bind_numeric_effect_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<NumericEffect<Op, T>>;
+    using V = ygg::Data<NumericEffect<Op, T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FunctionTermView<T>, FunctionExpressionView>(), "fterm"_a, "fexpr"_a);
@@ -210,7 +210,7 @@ void bind_numeric_effect_builder(nb::module_& m, const std::string& name)
 template<NumericEffectOpKind Op, FactKind T>
 void bind_ground_numeric_effect_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundNumericEffect<Op, T>>;
+    using V = ygg::Data<GroundNumericEffect<Op, T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<GroundFunctionTermView<T>, GroundFunctionExpressionView>(), "fterm"_a, "fexpr"_a);
@@ -221,7 +221,7 @@ void bind_ground_numeric_effect_builder(nb::module_& m, const std::string& name)
 template<FactKind T>
 void bind_numeric_effect_operator_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<NumericEffectOperator<T>>;
+    using V = ygg::Data<NumericEffectOperator<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
@@ -232,7 +232,7 @@ void bind_numeric_effect_operator_builder(nb::module_& m, const std::string& nam
 template<FactKind T>
 void bind_ground_numeric_effect_operator_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundNumericEffectOperator<T>>;
+    using V = ygg::Data<GroundNumericEffectOperator<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
@@ -242,7 +242,7 @@ void bind_ground_numeric_effect_operator_builder(nb::module_& m, const std::stri
 
 void bind_function_expression_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<FunctionExpression>;
+    using V = ygg::Data<FunctionExpression>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
@@ -252,7 +252,7 @@ void bind_function_expression_builder(nb::module_& m, const std::string& name)
 
 void bind_conjunctive_condition_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<ConjunctiveCondition>;
+    using V = ygg::Data<ConjunctiveCondition>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const VariableViewList&,
@@ -271,7 +271,7 @@ void bind_conjunctive_condition_builder(nb::module_& m, const std::string& name)
 
 void bind_conjunctive_effect_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<ConjunctiveEffect>;
+    using V = ygg::Data<ConjunctiveEffect>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const LiteralViewList<FluentTag>&,
@@ -286,7 +286,7 @@ void bind_conjunctive_effect_builder(nb::module_& m, const std::string& name)
 
 void bind_conditional_effect_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<ConditionalEffect>;
+    using V = ygg::Data<ConditionalEffect>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const VariableViewList&, ConjunctiveConditionView, ConjunctiveEffectView>(), "variables"_a, "condition"_a, "effect"_a);
@@ -296,10 +296,10 @@ void bind_conditional_effect_builder(nb::module_& m, const std::string& name)
 
 void bind_action_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Action>;
+    using V = ygg::Data<Action>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<const std::string&, uint_t, const VariableViewList&, ConjunctiveConditionView, const ConditionalEffectViewList&>(),
+                   .def(nb::init<const std::string&, ygg::uint_t, const VariableViewList&, ConjunctiveConditionView, const ConditionalEffectViewList&>(),
                         "name"_a,
                         "original_arity"_a,
                         "variables"_a,
@@ -311,7 +311,7 @@ void bind_action_builder(nb::module_& m, const std::string& name)
 
 void bind_axiom_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Axiom>;
+    using V = ygg::Data<Axiom>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const VariableViewList&, ConjunctiveConditionView, AtomView<DerivedTag>>(), "variables"_a, "body"_a, "head"_a);
@@ -321,7 +321,7 @@ void bind_axiom_builder(nb::module_& m, const std::string& name)
 
 void bind_ground_function_expression_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundFunctionExpression>;
+    using V = ygg::Data<GroundFunctionExpression>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
@@ -331,7 +331,7 @@ void bind_ground_function_expression_builder(nb::module_& m, const std::string& 
 
 void bind_ground_conjunctive_condition_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundConjunctiveCondition>;
+    using V = ygg::Data<GroundConjunctiveCondition>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const GroundLiteralViewList<StaticTag>&,
@@ -350,7 +350,7 @@ void bind_ground_conjunctive_condition_builder(nb::module_& m, const std::string
 
 void bind_ground_conjunctive_effect_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundConjunctiveEffect>;
+    using V = ygg::Data<GroundConjunctiveEffect>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const FDRFactViewList<FluentTag>&,
@@ -367,7 +367,7 @@ void bind_ground_conjunctive_effect_builder(nb::module_& m, const std::string& n
 
 void bind_ground_conditional_effect_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundConditionalEffect>;
+    using V = ygg::Data<GroundConditionalEffect>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<GroundConjunctiveConditionView, GroundConjunctiveEffectView>(), "condition"_a, "effect"_a);
@@ -377,7 +377,7 @@ void bind_ground_conditional_effect_builder(nb::module_& m, const std::string& n
 
 void bind_ground_action_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundAction>;
+    using V = ygg::Data<GroundAction>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<ActionBindingView, GroundConjunctiveConditionView, const GroundConditionalEffectViewList&>(),
@@ -390,7 +390,7 @@ void bind_ground_action_builder(nb::module_& m, const std::string& name)
 
 void bind_ground_axiom_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<GroundAxiom>;
+    using V = ygg::Data<GroundAxiom>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<AxiomBindingView, GroundConjunctiveConditionView, GroundAtomView<DerivedTag>>(), "binding"_a, "body"_a, "head"_a);
@@ -400,7 +400,7 @@ void bind_ground_axiom_builder(nb::module_& m, const std::string& name)
 
 void bind_metric_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Metric>;
+    using V = ygg::Data<Metric>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::ObjectiveVariant, GroundFunctionExpressionView>(), "objective_kind"_a, "fexpr"_a);
@@ -410,7 +410,7 @@ void bind_metric_builder(nb::module_& m, const std::string& name)
 
 void bind_domain_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Domain>;
+    using V = ygg::Data<Domain>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const std::string&,
@@ -439,7 +439,7 @@ void bind_domain_builder(nb::module_& m, const std::string& name)
 
 void bind_lifted_task_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<Task>;
+    using V = ygg::Data<Task>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const std::string&,
@@ -472,7 +472,7 @@ void bind_lifted_task_builder(nb::module_& m, const std::string& name)
 
 void bind_ground_task_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<FDRTask>;
+    using V = ygg::Data<FDRTask>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
 
@@ -517,10 +517,10 @@ void bind_ground_task_builder(nb::module_& m, const std::string& name)
 template<OpKind Op, typename T>
 void bind_unary_operator_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<UnaryOperator<Op, T>>;
+    using V = ygg::Data<UnaryOperator<Op, T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<View<T, Repository>>(), "arg"_a);
+                   .def(nb::init<ygg::View<T, Repository>>(), "arg"_a);
     add_print(cls);
     add_hash(cls);
 }
@@ -528,10 +528,10 @@ void bind_unary_operator_builder(nb::module_& m, const std::string& name)
 template<OpKind Op, typename T>
 void bind_binary_operator_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<BinaryOperator<Op, T>>;
+    using V = ygg::Data<BinaryOperator<Op, T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<View<T, Repository>, View<T, Repository>>(), "lhs"_a, "rhs"_a);
+                   .def(nb::init<ygg::View<T, Repository>, ygg::View<T, Repository>>(), "lhs"_a, "rhs"_a);
     add_print(cls);
     add_hash(cls);
 }
@@ -539,10 +539,10 @@ void bind_binary_operator_builder(nb::module_& m, const std::string& name)
 template<OpKind Op, typename T>
 void bind_multi_operator_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<MultiOperator<Op, T>>;
+    using V = ygg::Data<MultiOperator<Op, T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def(nb::init<const std::vector<View<T, Repository>>&>(), "args"_a);
+                   .def(nb::init<const std::vector<ygg::View<T, Repository>>&>(), "args"_a);
     add_print(cls);
     add_hash(cls);
 }
@@ -550,7 +550,7 @@ void bind_multi_operator_builder(nb::module_& m, const std::string& name)
 template<typename T>
 void bind_arithmethic_operator_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<ArithmeticOperator<T>>;
+    using V = ygg::Data<ArithmeticOperator<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
@@ -561,7 +561,7 @@ void bind_arithmethic_operator_builder(nb::module_& m, const std::string& name)
 template<typename T>
 void bind_boolean_operator_builder(nb::module_& m, const std::string& name)
 {
-    using V = Data<BooleanOperator<T>>;
+    using V = ygg::Data<BooleanOperator<T>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
@@ -627,23 +627,23 @@ void bind_datas(nb::module_& m)
     bind_ground_function_term_value_builder<FluentTag>(m, "FluentGroundFunctionTermValueBuilder");
     bind_ground_function_term_value_builder<AuxiliaryTag>(m, "AuxiliaryGroundFunctionTermValueBuilder");
 
-    bind_unary_operator_builder<Sub, Data<FunctionExpression>>(m, "UnaryOperatorSubBuilder");
-    bind_binary_operator_builder<Add, Data<FunctionExpression>>(m, "BinaryOperatorAddBuilder");
-    bind_binary_operator_builder<Sub, Data<FunctionExpression>>(m, "BinaryOperatorSubBuilder");
-    bind_binary_operator_builder<Mul, Data<FunctionExpression>>(m, "BinaryOperatorMulBuilder");
-    bind_binary_operator_builder<Div, Data<FunctionExpression>>(m, "BinaryOperatorDivBuilder");
-    bind_binary_operator_builder<Eq, Data<FunctionExpression>>(m, "BinaryOperatorEqBuilder");
-    bind_binary_operator_builder<Ne, Data<FunctionExpression>>(m, "BinaryOperatorNeBuilder");
-    bind_binary_operator_builder<Le, Data<FunctionExpression>>(m, "BinaryOperatorLeBuilder");
-    bind_binary_operator_builder<Lt, Data<FunctionExpression>>(m, "BinaryOperatorLtBuilder");
-    bind_binary_operator_builder<Ge, Data<FunctionExpression>>(m, "BinaryOperatorGeBuilder");
-    bind_binary_operator_builder<Gt, Data<FunctionExpression>>(m, "BinaryOperatorGtBuilder");
+    bind_unary_operator_builder<Sub, ygg::Data<FunctionExpression>>(m, "UnaryOperatorSubBuilder");
+    bind_binary_operator_builder<Add, ygg::Data<FunctionExpression>>(m, "BinaryOperatorAddBuilder");
+    bind_binary_operator_builder<Sub, ygg::Data<FunctionExpression>>(m, "BinaryOperatorSubBuilder");
+    bind_binary_operator_builder<Mul, ygg::Data<FunctionExpression>>(m, "BinaryOperatorMulBuilder");
+    bind_binary_operator_builder<Div, ygg::Data<FunctionExpression>>(m, "BinaryOperatorDivBuilder");
+    bind_binary_operator_builder<Eq, ygg::Data<FunctionExpression>>(m, "BinaryOperatorEqBuilder");
+    bind_binary_operator_builder<Ne, ygg::Data<FunctionExpression>>(m, "BinaryOperatorNeBuilder");
+    bind_binary_operator_builder<Le, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLeBuilder");
+    bind_binary_operator_builder<Lt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLtBuilder");
+    bind_binary_operator_builder<Ge, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGeBuilder");
+    bind_binary_operator_builder<Gt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGtBuilder");
 
-    bind_multi_operator_builder<Add, Data<FunctionExpression>>(m, "MultiOperatorAddBuilder");
-    bind_multi_operator_builder<Mul, Data<FunctionExpression>>(m, "MultiOperatorMulBuilder");
+    bind_multi_operator_builder<Add, ygg::Data<FunctionExpression>>(m, "MultiOperatorAddBuilder");
+    bind_multi_operator_builder<Mul, ygg::Data<FunctionExpression>>(m, "MultiOperatorMulBuilder");
 
-    bind_arithmethic_operator_builder<Data<FunctionExpression>>(m, "ArithmeticOperatorBuilder");
-    bind_boolean_operator_builder<Data<FunctionExpression>>(m, "BooleanOperatorBuilder");
+    bind_arithmethic_operator_builder<ygg::Data<FunctionExpression>>(m, "ArithmeticOperatorBuilder");
+    bind_boolean_operator_builder<ygg::Data<FunctionExpression>>(m, "BooleanOperatorBuilder");
 
     bind_function_expression_builder(m, "FunctionExpressionBuilder");
     bind_conjunctive_condition_builder(m, "ConjunctiveConditionBuilder");
@@ -663,23 +663,23 @@ void bind_datas(nb::module_& m)
     bind_action_builder(m, "ActionBuilder");
     bind_axiom_builder(m, "AxiomBuilder");
 
-    bind_unary_operator_builder<Sub, Data<GroundFunctionExpression>>(m, "GroundUnaryOperatorSubBuilder");
-    bind_binary_operator_builder<Add, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorAddBuilder");
-    bind_binary_operator_builder<Sub, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorSubBuilder");
-    bind_binary_operator_builder<Mul, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorMulBuilder");
-    bind_binary_operator_builder<Div, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorDivBuilder");
-    bind_binary_operator_builder<Eq, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorEqBuilder");
-    bind_binary_operator_builder<Ne, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorNeBuilder");
-    bind_binary_operator_builder<Le, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLeBuilder");
-    bind_binary_operator_builder<Lt, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLtBuilder");
-    bind_binary_operator_builder<Ge, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGeBuilder");
-    bind_binary_operator_builder<Gt, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGtBuilder");
+    bind_unary_operator_builder<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundUnaryOperatorSubBuilder");
+    bind_binary_operator_builder<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorAddBuilder");
+    bind_binary_operator_builder<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorSubBuilder");
+    bind_binary_operator_builder<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorMulBuilder");
+    bind_binary_operator_builder<Div, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorDivBuilder");
+    bind_binary_operator_builder<Eq, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorEqBuilder");
+    bind_binary_operator_builder<Ne, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorNeBuilder");
+    bind_binary_operator_builder<Le, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLeBuilder");
+    bind_binary_operator_builder<Lt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLtBuilder");
+    bind_binary_operator_builder<Ge, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGeBuilder");
+    bind_binary_operator_builder<Gt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGtBuilder");
 
-    bind_multi_operator_builder<Add, Data<GroundFunctionExpression>>(m, "GroundMultiOperatorAddBuilder");
-    bind_multi_operator_builder<Mul, Data<GroundFunctionExpression>>(m, "GroundMultiOperatorMulBuilder");
+    bind_multi_operator_builder<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorAddBuilder");
+    bind_multi_operator_builder<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorMulBuilder");
 
-    bind_arithmethic_operator_builder<Data<GroundFunctionExpression>>(m, "GroundArithmeticOperatorBuilder");
-    bind_boolean_operator_builder<Data<GroundFunctionExpression>>(m, "GroundBooleanOperatorBuilder");
+    bind_arithmethic_operator_builder<ygg::Data<GroundFunctionExpression>>(m, "GroundArithmeticOperatorBuilder");
+    bind_boolean_operator_builder<ygg::Data<GroundFunctionExpression>>(m, "GroundBooleanOperatorBuilder");
 
     bind_ground_function_expression_builder(m, "GroundFunctionExpressionBuilder");
 

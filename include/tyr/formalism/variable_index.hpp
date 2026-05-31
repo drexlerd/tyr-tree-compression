@@ -18,17 +18,17 @@
 #ifndef TYR_FORMALISM_VARIABLE_INDEX_HPP_
 #define TYR_FORMALISM_VARIABLE_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
 template<>
-struct Index<formalism::Variable> : IndexMixin<Index<formalism::Variable>>
+struct Index<tyr::formalism::Variable> : ygg::IndexMixin<ygg::Index<tyr::formalism::Variable>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::Variable>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::Variable>>;
     using Base::Base;
 };
 }

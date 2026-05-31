@@ -18,31 +18,33 @@
 #ifndef TYR_FORMALISM_PLANNING_METRIC_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_METRIC_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_function_expression_data.hpp"
 #include "tyr/formalism/planning/metric_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::Metric>
+struct Data<::tyr::formalism::planning::Metric>
 {
-    using ObjectiveVariant = ::cista::offset::variant<formalism::planning::Minimize, formalism::planning::Maximize>;
+    using ObjectiveVariant = ::cista::offset::variant<::tyr::formalism::planning::Minimize, ::tyr::formalism::planning::Maximize>;
 
-    Index<formalism::planning::Metric> index;
+    ygg::Index<::tyr::formalism::planning::Metric> index;
     ObjectiveVariant objective;
-    Data<formalism::planning::GroundFunctionExpression> fexpr;
+    ygg::Data<::tyr::formalism::planning::GroundFunctionExpression> fexpr;
 
     Data() = default;
-    Data(ObjectiveVariant objective_, Data<formalism::planning::GroundFunctionExpression> fexpr_) : index(), objective(objective_), fexpr(fexpr_) {}
+    Data(ObjectiveVariant objective_, ygg::Data<::tyr::formalism::planning::GroundFunctionExpression> fexpr_) : index(), objective(objective_), fexpr(fexpr_) {}
     // Python constructor
     template<typename C>
-    Data(ObjectiveVariant objective_, View<Data<formalism::planning::GroundFunctionExpression>, C> fexpr_) : index(), objective(objective_), fexpr()
+    Data(ObjectiveVariant objective_, ::ygg::View<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>, C> fexpr_) : index(), objective(objective_), fexpr()
     {
-        set(fexpr_, fexpr);
+        ygg::set(fexpr_, fexpr);
     }
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
@@ -51,16 +53,16 @@ struct Data<formalism::planning::Metric>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(objective);
-        tyr::clear(fexpr);
+        ygg::clear(index);
+        ygg::clear(objective);
+        ygg::clear(fexpr);
     }
 
     auto cista_members() const noexcept { return std::tie(index, objective, fexpr); }
     auto identifying_members() const noexcept { return std::tie(objective, fexpr); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::Metric>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::Metric>);
 }
 
 #endif

@@ -18,8 +18,8 @@
 #ifndef TYR_SRC_FORMALISM_PLANNING_LOKI_TO_TYR_HPP_
 #define TYR_SRC_FORMALISM_PLANNING_LOKI_TO_TYR_HPP_
 
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/canonicalization.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
@@ -128,13 +128,13 @@ private:
     {
         ParameterIndexMapping() = default;
 
-        UnorderedMap<Index<Variable>, ParameterIndex> map;
+        ygg::UnorderedMap<ygg::Index<Variable>, ParameterIndex> map;
 
-        void push_parameters(const IndexList<Variable>& parameters);
+        void push_parameters(const ygg::IndexList<Variable>& parameters);
 
-        void pop_parameters(const IndexList<Variable>& parameters);
+        void pop_parameters(const ygg::IndexList<Variable>& parameters);
 
-        ParameterIndex lookup_parameter_index(Index<Variable> variable);
+        ParameterIndex lookup_parameter_index(ygg::Index<Variable> variable);
     };
 
     ParameterIndexMapping m_param_map;
@@ -154,13 +154,13 @@ private:
 
     FunctionViewVariant translate_common(loki::FunctionSkeleton element, Builder& builder, Repository& context);
 
-    Index<Object> translate_common(loki::Object element, Builder& builder, Repository& context);
+    ygg::Index<Object> translate_common(loki::Object element, Builder& builder, Repository& context);
 
-    Index<Variable> translate_common(loki::Parameter element, Builder& builder, Repository& context);
+    ygg::Index<Variable> translate_common(loki::Parameter element, Builder& builder, Repository& context);
 
     PredicateViewVariant translate_common(loki::Predicate element, Builder& builder, Repository& context);
 
-    Index<Variable> translate_common(loki::Variable element, Builder& builder, Repository& context);
+    ygg::Index<Variable> translate_common(loki::Variable element, Builder& builder, Repository& context);
 
     /**
      * Lifted translation.
@@ -179,37 +179,37 @@ private:
         return output;
     }
 
-    Data<Term> translate_lifted(loki::Term element, Builder& builder, Repository& context);
+    ygg::Data<Term> translate_lifted(loki::Term element, Builder& builder, Repository& context);
 
     AtomViewVariant translate_lifted(loki::Atom element, Builder& builder, Repository& context);
 
     LiteralViewVariant translate_lifted(loki::Literal element, Builder& builder, Repository& context);
 
-    Data<FunctionExpression> translate_lifted(loki::FunctionExpressionNumber element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionNumber element, Builder& builder, Repository& context);
 
-    Data<FunctionExpression> translate_lifted(loki::FunctionExpressionBinaryOperator element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionBinaryOperator element, Builder& builder, Repository& context);
 
-    Data<FunctionExpression> translate_lifted(loki::FunctionExpressionMultiOperator element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionMultiOperator element, Builder& builder, Repository& context);
 
-    Data<FunctionExpression> translate_lifted(loki::FunctionExpressionMinus element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionMinus element, Builder& builder, Repository& context);
 
-    Data<FunctionExpression> translate_lifted(loki::FunctionExpressionFunction element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionFunction element, Builder& builder, Repository& context);
 
-    Data<FunctionExpression> translate_lifted(loki::FunctionExpression element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpression element, Builder& builder, Repository& context);
 
     FunctionTermViewVariant translate_lifted(loki::Function element, Builder& builder, Repository& context);
 
-    Data<BooleanOperator<Data<FunctionExpression>>> translate_lifted(loki::ConditionNumericConstraint element, Builder& builder, Repository& context);
+    ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>> translate_lifted(loki::ConditionNumericConstraint element, Builder& builder, Repository& context);
 
-    Index<ConjunctiveCondition> translate_lifted(loki::Condition element, const IndexList<Variable>& parameters, Builder& builder, Repository& context);
+    ygg::Index<ConjunctiveCondition> translate_lifted(loki::Condition element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
 
     NumericEffectViewVariant translate_lifted(loki::EffectNumeric element, Builder& builder, Repository& context);
 
-    IndexList<ConditionalEffect> translate_lifted(loki::Effect element, const IndexList<Variable>& parameters, Builder& builder, Repository& context);
+    ygg::IndexList<ConditionalEffect> translate_lifted(loki::Effect element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
 
-    Index<Action> translate_lifted(loki::Action element, Builder& builder, Repository& context);
+    ygg::Index<Action> translate_lifted(loki::Action element, Builder& builder, Repository& context);
 
-    Index<Axiom> translate_lifted(loki::Axiom element, Builder& builder, Repository& context);
+    ygg::Index<Axiom> translate_lifted(loki::Axiom element, Builder& builder, Repository& context);
 
     /**
      * Grounded translation
@@ -228,7 +228,7 @@ private:
         return output;
     }
 
-    Index<Object> translate_grounded(loki::Term element, Builder& builder, Repository& context);
+    ygg::Index<Object> translate_grounded(loki::Term element, Builder& builder, Repository& context);
 
     GroundAtomViewVariant translate_grounded(loki::Atom element, Builder& builder, Repository& context);
 
@@ -238,27 +238,27 @@ private:
 
     GroundLiteralOrFactViewVariant translate_grounded(loki::Literal element, Builder& builder, Repository& context, FDRContext& fdr_context);
 
-    Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionNumber element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionNumber element, Builder& builder, Repository& context);
 
-    Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionBinaryOperator element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionBinaryOperator element, Builder& builder, Repository& context);
 
-    Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionMultiOperator element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionMultiOperator element, Builder& builder, Repository& context);
 
-    Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionMinus element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionMinus element, Builder& builder, Repository& context);
 
-    Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionFunction element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionFunction element, Builder& builder, Repository& context);
 
-    Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpression element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpression element, Builder& builder, Repository& context);
 
     GroundFunctionTermViewVariant translate_grounded(loki::Function element, Builder& builder, Repository& context);
 
     GroundFunctionTermValueViewVariant translate_grounded(loki::FunctionValue element, Builder& builder, Repository& context);
 
-    Data<BooleanOperator<Data<GroundFunctionExpression>>> translate_grounded(loki::ConditionNumericConstraint element, Builder& builder, Repository& context);
+    ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>> translate_grounded(loki::ConditionNumericConstraint element, Builder& builder, Repository& context);
 
-    Index<GroundConjunctiveCondition> translate_grounded(loki::Condition element, Builder& builder, Repository& context, FDRContext& fdr_context);
+    ygg::Index<GroundConjunctiveCondition> translate_grounded(loki::Condition element, Builder& builder, Repository& context, FDRContext& fdr_context);
 
-    Index<Metric> translate_grounded(loki::OptimizationMetric element, Builder& builder, Repository& context);
+    ygg::Index<Metric> translate_grounded(loki::OptimizationMetric element, Builder& builder, Repository& context);
 
 public:
     LokiToTyrTranslator() = default;

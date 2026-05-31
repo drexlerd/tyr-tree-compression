@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_ALGORITHMS_IW_NOVELTY_TABLE_HPP_
 #define TYR_PLANNING_ALGORITHMS_IW_NOVELTY_TABLE_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/fdr_fact_view.hpp"
 #include "tyr/planning/algorithms/iw/utils.hpp"
 #include "tyr/planning/ground_task/state_view.hpp"
@@ -37,11 +37,11 @@
 namespace tyr::planning::iw
 {
 
-using AtomIndexList = std::vector<uint_t>;
+using AtomIndexList = std::vector<ygg::uint_t>;
 using TupleIndex = uint64_t;
 
 template<size_t Arity>
-inline bool validate_tuple(std::span<const uint_t> tuple)
+inline bool validate_tuple(std::span<const ygg::uint_t> tuple)
 {
     if (tuple.size() > Arity)
         return false;
@@ -54,7 +54,7 @@ inline bool validate_tuple(std::span<const uint_t> tuple)
 }
 
 template<size_t K>
-inline TupleIndex choose(uint_t n)
+inline TupleIndex choose(ygg::uint_t n)
 {
     static_assert(K > 0);
 
@@ -78,7 +78,7 @@ inline TupleIndex choose(uint_t n)
 }
 
 template<size_t Arity, size_t K = 1>
-inline TupleIndex rank_tuple_impl(std::span<const uint_t> tuple)
+inline TupleIndex rank_tuple_impl(std::span<const ygg::uint_t> tuple)
 {
     if constexpr (K > Arity)
     {
@@ -104,19 +104,19 @@ inline TupleIndex rank_tuple_impl(std::span<const uint_t> tuple)
 /// currently known number of atoms, hence old ranks remain stable when new atoms
 /// are encountered.
 template<size_t Arity>
-inline TupleIndex rank_tuple(std::span<const uint_t> tuple)
+inline TupleIndex rank_tuple(std::span<const ygg::uint_t> tuple)
 {
     assert(validate_tuple<Arity>(tuple));
     return rank_tuple_impl<Arity>(tuple);
 }
 
 template<size_t Arity, typename Callback>
-void for_each_tuple(const AtomIndexList& atoms, size_t tuple_size, size_t atom_pos, size_t tuple_pos, std::array<uint_t, Arity>& tuple, Callback&& callback)
+void for_each_tuple(const AtomIndexList& atoms, size_t tuple_size, size_t atom_pos, size_t tuple_pos, std::array<ygg::uint_t, Arity>& tuple, Callback&& callback)
     requires(Arity > 0)
 {
     if (tuple_pos == tuple_size)
     {
-        callback(std::span<const uint_t>(tuple.data(), tuple_size));
+        callback(std::span<const ygg::uint_t>(tuple.data(), tuple_size));
         return;
     }
 
@@ -129,7 +129,7 @@ void for_each_tuple(const AtomIndexList& atoms, size_t tuple_size, size_t atom_p
 }
 
 template<size_t Arity, typename Callback>
-void for_each_tuple(const AtomIndexList& atoms, size_t max_arity, std::array<uint_t, Arity>& tuple, Callback&& callback)
+void for_each_tuple(const AtomIndexList& atoms, size_t max_arity, std::array<ygg::uint_t, Arity>& tuple, Callback&& callback)
     requires(Arity > 0)
 {
     assert(max_arity <= Arity);
@@ -138,7 +138,7 @@ void for_each_tuple(const AtomIndexList& atoms, size_t max_arity, std::array<uin
 }
 
 template<size_t Arity, typename Callback>
-void for_each_tuple(const AtomIndexList& atoms, std::array<uint_t, Arity>& tuple, Callback&& callback)
+void for_each_tuple(const AtomIndexList& atoms, std::array<ygg::uint_t, Arity>& tuple, Callback&& callback)
     requires(Arity > 0)
 {
     for_each_tuple<Arity>(atoms, Arity, tuple, callback);
@@ -151,9 +151,9 @@ void for_each_tuple_with_added_atoms(const AtomIndexList& added_atoms,
                                      size_t num_kept,
                                      size_t added_pos,
                                      size_t added_tuple_pos,
-                                     std::array<uint_t, Arity>& added_tuple,
-                                     std::array<uint_t, Arity>& kept_tuple,
-                                     std::array<uint_t, Arity>& tuple,
+                                     std::array<ygg::uint_t, Arity>& added_tuple,
+                                     std::array<ygg::uint_t, Arity>& kept_tuple,
+                                     std::array<ygg::uint_t, Arity>& tuple,
                                      Callback&& callback)
     requires(Arity > 0)
 {
@@ -164,10 +164,10 @@ void for_each_tuple_with_added_atoms(const AtomIndexList& added_atoms,
                               0,
                               0,
                               kept_tuple,
-                              [&](std::span<const uint_t> kept)
+                              [&](std::span<const ygg::uint_t> kept)
                               {
                                   std::ranges::merge(added_tuple.begin(), added_tuple.begin() + num_added, kept.begin(), kept.end(), tuple.begin());
-                                  callback(std::span<const uint_t>(tuple.data(), num_added + num_kept));
+                                  callback(std::span<const ygg::uint_t>(tuple.data(), num_added + num_kept));
                               });
         return;
     }
@@ -185,9 +185,9 @@ template<size_t Arity, typename Callback>
 void for_each_tuple_with_added_atoms(const AtomIndexList& added_atoms,
                                      const AtomIndexList& kept_atoms,
                                      size_t max_arity,
-                                     std::array<uint_t, Arity>& added_tuple,
-                                     std::array<uint_t, Arity>& kept_tuple,
-                                     std::array<uint_t, Arity>& tuple,
+                                     std::array<ygg::uint_t, Arity>& added_tuple,
+                                     std::array<ygg::uint_t, Arity>& kept_tuple,
+                                     std::array<ygg::uint_t, Arity>& tuple,
                                      Callback&& callback)
     requires(Arity > 0)
 {
@@ -206,9 +206,9 @@ void for_each_tuple_with_added_atoms(const AtomIndexList& added_atoms,
 template<size_t Arity, typename Callback>
 void for_each_tuple_with_added_atoms(const AtomIndexList& added_atoms,
                                      const AtomIndexList& kept_atoms,
-                                     std::array<uint_t, Arity>& added_tuple,
-                                     std::array<uint_t, Arity>& kept_tuple,
-                                     std::array<uint_t, Arity>& tuple,
+                                     std::array<ygg::uint_t, Arity>& added_tuple,
+                                     std::array<ygg::uint_t, Arity>& kept_tuple,
+                                     std::array<ygg::uint_t, Arity>& tuple,
                                      Callback&& callback)
     requires(Arity > 0)
 {
@@ -221,9 +221,9 @@ class DynamicNoveltyTable
 public:
     DynamicNoveltyTable() = default;
 
-    uint_t get_arity() const noexcept { return Arity; }
+    ygg::uint_t get_arity() const noexcept { return Arity; }
 
-    size_t get_num_bits(uint_t arity) const
+    size_t get_num_bits(ygg::uint_t arity) const
     {
         assert(arity <= Arity);
         return m_seen_by_arity[arity].size();
@@ -235,13 +235,13 @@ public:
             seen.clear();
     }
 
-    void validate_max_arity(uint_t max_arity) const
+    void validate_max_arity(ygg::uint_t max_arity) const
     {
         if (max_arity > Arity)
             throw std::invalid_argument("DynamicNoveltyTable::validate_max_arity(...): max_arity exceeds table arity.");
     }
 
-    bool test(std::span<const uint_t> tuple) const
+    bool test(std::span<const ygg::uint_t> tuple) const
     {
         assert(validate_tuple<Arity>(tuple));
 
@@ -250,7 +250,7 @@ public:
         return rank < seen.size() && seen.test(rank);
     }
 
-    bool insert(std::span<const uint_t> tuple)
+    bool insert(std::span<const ygg::uint_t> tuple)
     {
         assert(validate_tuple<Arity>(tuple));
 
@@ -265,7 +265,7 @@ public:
     }
 
     template<TaskKind Kind>
-    bool insert(StateView<Kind> state, uint_t max_arity)
+    bool insert(StateView<Kind> state, ygg::uint_t max_arity)
     {
         validate_max_arity(max_arity);
 
@@ -273,15 +273,15 @@ public:
 
         if constexpr (Arity == 0)
         {
-            return insert(std::span<const uint_t> {});
+            return insert(std::span<const ygg::uint_t> {});
         }
         else
         {
             if (max_arity == 0)
-                return insert(std::span<const uint_t> {});
+                return insert(std::span<const ygg::uint_t> {});
 
             auto novel = false;
-            for_each_tuple<Arity>(m_atoms, max_arity, m_tuple, [&](std::span<const uint_t> tuple) { novel = insert(tuple) || novel; });
+            for_each_tuple<Arity>(m_atoms, max_arity, m_tuple, [&](std::span<const ygg::uint_t> tuple) { novel = insert(tuple) || novel; });
 
             return novel;
         }
@@ -294,7 +294,7 @@ public:
     }
 
     template<TaskKind Kind>
-    bool insert(StateView<Kind> src, StateView<Kind> dst, uint_t max_arity)
+    bool insert(StateView<Kind> src, StateView<Kind> dst, ygg::uint_t max_arity)
     {
         validate_max_arity(max_arity);
 
@@ -331,7 +331,7 @@ public:
                                                    m_added_tuple,
                                                    m_kept_tuple,
                                                    m_tuple,
-                                                   [&](std::span<const uint_t> tuple) { novel = insert(tuple) || novel; });
+                                                   [&](std::span<const ygg::uint_t> tuple) { novel = insert(tuple) || novel; });
 
             return novel;
         }
@@ -351,7 +351,7 @@ private:
         for (const auto fact : state.get_fluent_facts_view())
         {
             if (const auto atom = fact.get_atom())
-                out.push_back(uint_t(atom->get_index()));
+                out.push_back(ygg::uint_t(atom->get_index()));
         }
 
         std::ranges::sort(out);
@@ -363,9 +363,9 @@ private:
     AtomIndexList m_src_atoms;
     AtomIndexList m_added_atoms;
     AtomIndexList m_kept_atoms;
-    std::array<uint_t, Arity> m_added_tuple;
-    std::array<uint_t, Arity> m_kept_tuple;
-    std::array<uint_t, Arity> m_tuple;
+    std::array<ygg::uint_t, Arity> m_added_tuple;
+    std::array<ygg::uint_t, Arity> m_kept_tuple;
+    std::array<ygg::uint_t, Arity> m_tuple;
 };
 
 }

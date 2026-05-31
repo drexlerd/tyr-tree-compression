@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_SUCCESSOR_GENERATOR_HPP_
 #define TYR_PLANNING_SUCCESSOR_GENERATOR_HPP_
 
-#include "tyr/common/concepts.hpp"
-#include "tyr/common/config.hpp"
-#include "tyr/common/onetbb.hpp"
+#include <yggdrasil/core/concepts.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/node.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -36,17 +36,17 @@ class SuccessorGenerator;
 
 template<typename T, typename Kind>
 concept SuccessorGeneratorConcept = requires(T& r,
-                                             Index<State<Kind>> state_index,
+                                             ygg::Index<State<Kind>> state_index,
                                              const Node<Kind>& node,
                                              std::vector<LabeledNode<Kind>>& labeled_successor_nodes,
-                                             formalism::planning::GroundActionView action) {
+                                             ::tyr::formalism::planning::GroundActionView action) {
     requires TaskKind<Kind>;
     { r.get_initial_node() } -> std::same_as<Node<Kind>>;
     { r.get_labeled_successor_nodes(node) } -> std::same_as<std::vector<LabeledNode<Kind>>>;
     { r.get_labeled_successor_nodes(node, labeled_successor_nodes) } -> std::same_as<void>;
     { r.get_successor_node(node, action) } -> std::same_as<Node<Kind>>;
     { r.get_node(state_index) } -> std::same_as<Node<Kind>>;
-    { r.get_index() } -> std::same_as<uint_t>;
+    { r.get_index() } -> std::same_as<ygg::uint_t>;
 };
 
 }

@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_ALGORITHMS_IW_STATISTICS_HPP_
 #define TYR_PLANNING_ALGORITHMS_IW_STATISTICS_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/declarations.hpp"
 
 #include <optional>
@@ -30,12 +30,12 @@ template<TaskKind Kind>
 class Statistics
 {
 private:
-    std::optional<uint_t> m_solution_arity;
+    std::optional<ygg::uint_t> m_solution_arity;
 
 public:
     void clear() noexcept { m_solution_arity = std::nullopt; }
-    void set_solution_arity(uint_t arity) { m_solution_arity = arity; }
-    std::optional<uint_t> get_solution_arity() const { return m_solution_arity; }
+    void set_solution_arity(ygg::uint_t arity) { m_solution_arity = arity; }
+    std::optional<ygg::uint_t> get_solution_arity() const { return m_solution_arity; }
 };
 
 }

@@ -17,10 +17,10 @@
 
 #include "tyr/formalism/planning/fdr_context.hpp"
 
-#include "tyr/buffer/declarations.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/buffer/declarations.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/canonicalization.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
@@ -54,9 +54,9 @@ std::pair<FDRVariableView<FluentTag>, bool> merge_p2p(FDRVariableView<FluentTag>
     return context.destination.get_or_create(variable);
 }
 
-Data<FDRFact<FluentTag>> merge_p2p(FDRFactView<FluentTag> element, MergeContext& context)
+ygg::Data<FDRFact<FluentTag>> merge_p2p(FDRFactView<FluentTag> element, MergeContext& context)
 {
-    return Data<FDRFact<FluentTag>>(merge_p2p(element.get_variable(), context).first.get_index(), element.get_value());
+    return ygg::Data<FDRFact<FluentTag>>(merge_p2p(element.get_variable(), context).first.get_index(), element.get_value());
 }
 }
 
@@ -68,7 +68,7 @@ FDRContext::FDRContext(const std::vector<GroundAtomViewList<FluentTag>>& mutexes
     m_variables(),
     m_mapping()
 {
-    auto variable = Data<FDRVariable<FluentTag>>();
+    auto variable = ygg::Data<FDRVariable<FluentTag>>();
 
     for (const auto& group : mutexes)
     {
@@ -78,9 +78,9 @@ FDRContext::FDRContext(const std::vector<GroundAtomViewList<FluentTag>>& mutexes
         canonicalize(variable);
         const auto var_index = m_context->get_or_create(variable).first.get_index();
         m_variables.push_back(var_index);
-        for (uint_t i = 0; i < group.size(); ++i)
+        for (ygg::uint_t i = 0; i < group.size(); ++i)
         {
-            [[maybe_unused]] const auto [it, inserted] = m_mapping.emplace(group[i].get_index(), Data<FDRFact<FluentTag>>(var_index, FDRValue { i + 1 }));
+            [[maybe_unused]] const auto [it, inserted] = m_mapping.emplace(group[i].get_index(), ygg::Data<FDRFact<FluentTag>>(var_index, FDRValue { i + 1 }));
             assert(inserted && "Assumes non overlapping mutex groups");
         }
     }
@@ -92,7 +92,7 @@ FDRContext::FDRContext(const GroundAtomViewList<FluentTag>& all_atoms, Repositor
     m_variables(),
     m_mapping()
 {
-    auto variable = Data<FDRVariable<FluentTag>>();
+    auto variable = ygg::Data<FDRVariable<FluentTag>>();
 
     for (const auto& atom : all_atoms)
     {
@@ -101,7 +101,7 @@ FDRContext::FDRContext(const GroundAtomViewList<FluentTag>& all_atoms, Repositor
         canonicalize(variable);
         const auto var_index = m_context->get_or_create(variable).first.get_index();
         m_variables.push_back(var_index);
-        m_mapping.emplace(atom.get_index(), Data<FDRFact<FluentTag>>(var_index, FDRValue { 1 }));
+        m_mapping.emplace(atom.get_index(), ygg::Data<FDRFact<FluentTag>>(var_index, FDRValue { 1 }));
     }
 }
 
@@ -113,15 +113,15 @@ FDRContext::FDRContext(const FDRContext& other, Builder& builder, RepositoryPtr 
 {
     auto merge_context = MergeContext { builder, *m_context };
 
-    for (const auto variable : make_view(other.m_variables, *other.m_context))
+    for (const auto variable : ygg::make_view(other.m_variables, *other.m_context))
         m_variables.push_back(merge_p2p(variable, merge_context).first.get_index());
 
     for (const auto [atom_index, fact_data] : other.m_mapping)
-        m_mapping.emplace(merge_p2p(make_view(atom_index, *other.m_context), merge_context).first.get_index(),
-                          merge_p2p(make_view(fact_data, *other.m_context), merge_context));
+        m_mapping.emplace(merge_p2p(ygg::make_view(atom_index, *other.m_context), merge_context).first.get_index(),
+                          merge_p2p(ygg::make_view(fact_data, *other.m_context), merge_context));
 }
 
-Data<FDRFact<FluentTag>> FDRContext::get_fact(Index<GroundAtom<FluentTag>> atom)
+ygg::Data<FDRFact<FluentTag>> FDRContext::get_fact(ygg::Index<GroundAtom<FluentTag>> atom)
 {
     // Find explicit ground mutex group assignment
     if (auto it = m_mapping.find(atom); it != m_mapping.end())
@@ -134,17 +134,17 @@ Data<FDRFact<FluentTag>> FDRContext::get_fact(Index<GroundAtom<FluentTag>> atom)
     const auto var_index = m_context->get_or_create(m_builder).first.get_index();
 
     m_variables.push_back(var_index);
-    const auto fact = Data<FDRFact<FluentTag>>(var_index, FDRValue { 1 });
+    const auto fact = ygg::Data<FDRFact<FluentTag>>(var_index, FDRValue { 1 });
     m_mapping.emplace(atom, fact);
 
     return fact;
 }
 
-Data<FDRFact<FluentTag>> FDRContext::get_fact(GroundAtomView<FluentTag> atom) { return get_fact(atom.get_index()); }
+ygg::Data<FDRFact<FluentTag>> FDRContext::get_fact(GroundAtomView<FluentTag> atom) { return get_fact(atom.get_index()); }
 
-FDRFactView<FluentTag> FDRContext::get_fact_view(GroundAtomView<FluentTag> atom) { return make_view(get_fact(atom), *m_context); }
+FDRFactView<FluentTag> FDRContext::get_fact_view(GroundAtomView<FluentTag> atom) { return ygg::make_view(get_fact(atom), *m_context); }
 
-std::optional<Data<FDRFact<FluentTag>>> FDRContext::get_fact(Index<GroundAtom<FluentTag>> atom) const
+std::optional<ygg::Data<FDRFact<FluentTag>>> FDRContext::get_fact(ygg::Index<GroundAtom<FluentTag>> atom) const
 {
     if (auto it = m_mapping.find(atom); it != m_mapping.end())
         return it->second;
@@ -152,15 +152,15 @@ std::optional<Data<FDRFact<FluentTag>>> FDRContext::get_fact(Index<GroundAtom<Fl
     return std::nullopt;
 }
 
-std::optional<Data<FDRFact<FluentTag>>> FDRContext::get_fact(GroundAtomView<FluentTag> atom) const { return get_fact(atom.get_index()); }
+std::optional<ygg::Data<FDRFact<FluentTag>>> FDRContext::get_fact(GroundAtomView<FluentTag> atom) const { return get_fact(atom.get_index()); }
 
 std::optional<FDRFactView<FluentTag>> FDRContext::get_fact_view(GroundAtomView<FluentTag> atom) const
 {
     if (auto fact = get_fact(atom); fact)
-        return make_view(*fact, *m_context);
+        return ygg::make_view(*fact, *m_context);
 
     return std::nullopt;
 }
 
-FDRVariableListView<FluentTag> FDRContext::get_variables() const { return make_view(m_variables, *m_context); }
+FDRVariableListView<FluentTag> FDRContext::get_variables() const { return ygg::make_view(m_variables, *m_context); }
 }

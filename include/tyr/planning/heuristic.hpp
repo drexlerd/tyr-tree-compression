@@ -18,10 +18,10 @@
 #ifndef TYR_PLANNING_HEURISTIC_HPP_
 #define TYR_PLANNING_HEURISTIC_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/planning/declarations.hpp"
@@ -37,19 +37,19 @@ class Heuristic
 public:
     virtual ~Heuristic() = default;
 
-    virtual void set_goal(formalism::planning::GroundConjunctiveConditionView goal) = 0;
+    virtual void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) = 0;
 
-    virtual float_t evaluate(const StateView<Kind>& state) = 0;
+    virtual ygg::float_t evaluate(const StateView<Kind>& state) = 0;
 
-    virtual const UnorderedSet<Index<formalism::planning::GroundAction>>& get_preferred_actions()
+    virtual const ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>>& get_preferred_actions()
     {
-        static const auto actions = UnorderedSet<Index<formalism::planning::GroundAction>> {};
+        static const auto actions = ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> {};
         return actions;
     }
 
-    virtual const UnorderedSet<formalism::planning::GroundActionView>& get_preferred_action_views()
+    virtual const ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView>& get_preferred_action_views()
     {
-        static const auto actions = UnorderedSet<formalism::planning::GroundActionView> {};
+        static const auto actions = ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView> {};
         return actions;
     }
 

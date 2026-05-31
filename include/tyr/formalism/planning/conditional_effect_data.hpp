@@ -18,29 +18,31 @@
 #ifndef TYR_FORMALISM_PLANNING_CONDITIONAL_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_CONDITIONAL_EFFECT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/conditional_effect_index.hpp"
 #include "tyr/formalism/planning/conjunctive_condition_index.hpp"
 #include "tyr/formalism/planning/conjunctive_effect_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::ConditionalEffect>
+struct Data<::tyr::formalism::planning::ConditionalEffect>
 {
-    Index<formalism::planning::ConditionalEffect> index;
-    IndexList<formalism::Variable> variables;
-    Index<formalism::planning::ConjunctiveCondition> condition;
-    Index<formalism::planning::ConjunctiveEffect> effect;
+    ygg::Index<::tyr::formalism::planning::ConditionalEffect> index;
+    ygg::IndexList<::tyr::formalism::Variable> variables;
+    ygg::Index<::tyr::formalism::planning::ConjunctiveCondition> condition;
+    ygg::Index<::tyr::formalism::planning::ConjunctiveEffect> effect;
 
     Data() = default;
-    Data(IndexList<formalism::Variable> variables_,
-         Index<formalism::planning::ConjunctiveCondition> condition_,
-         Index<formalism::planning::ConjunctiveEffect> effect_) :
+    Data(ygg::IndexList<::tyr::formalism::Variable> variables_,
+         ygg::Index<::tyr::formalism::planning::ConjunctiveCondition> condition_,
+         ygg::Index<::tyr::formalism::planning::ConjunctiveEffect> effect_) :
         index(),
         variables(std::move(variables_)),
         condition(condition_),
@@ -49,9 +51,9 @@ struct Data<formalism::planning::ConditionalEffect>
     }
     // Python constructor
     template<typename C>
-    Data(const std::vector<View<Index<formalism::Variable>, C>>& variables_,
-         View<Index<formalism::planning::ConjunctiveCondition>, C> condition_,
-         View<Index<formalism::planning::ConjunctiveEffect>, C> effect_) :
+    Data(const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Variable>, C>>& variables_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::ConjunctiveCondition>, C> condition_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::ConjunctiveEffect>, C> effect_) :
         index(),
         variables(),
         condition(),
@@ -68,17 +70,17 @@ struct Data<formalism::planning::ConditionalEffect>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(variables);
-        tyr::clear(condition);
-        tyr::clear(effect);
+        ygg::clear(index);
+        ygg::clear(variables);
+        ygg::clear(condition);
+        ygg::clear(effect);
     }
 
     auto cista_members() const noexcept { return std::tie(index, variables, condition, effect); }
     auto identifying_members() const noexcept { return std::tie(variables, condition, effect); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::ConditionalEffect>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::ConditionalEffect>);
 
 }
 

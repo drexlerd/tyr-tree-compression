@@ -17,7 +17,7 @@
 
 #include "tyr/planning/plan.hpp"
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/planning/ground_task/node.hpp"
 #include "tyr/planning/lifted_task/node.hpp"
@@ -51,7 +51,7 @@ const LabeledNodeList<Kind>& Plan<Kind>::get_labeled_succ_nodes() const noexcept
 }
 
 template<TaskKind Kind>
-float_t Plan<Kind>::get_cost() const noexcept
+ygg::float_t Plan<Kind>::get_cost() const noexcept
 {
     return get_length() > 0 ? m_labeled_succ_nodes.back().node.get_metric() : 0.;
 }

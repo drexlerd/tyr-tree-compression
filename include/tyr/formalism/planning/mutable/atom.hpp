@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_ATOM_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_ATOM_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/unification/structure_traits.hpp"
 #include "tyr/formalism/unification/structure_traits_impl.hpp"
@@ -40,10 +40,10 @@ template<FactKind T>
 struct MutableAtom
 {
     PredicateView<T> predicate;
-    std::vector<Data<Term>> terms;
+    std::vector<ygg::Data<Term>> terms;
 
     MutableAtom() = default;
-    MutableAtom(PredicateView<T> predicate_, std::vector<Data<Term>> terms_) : predicate(predicate_), terms(std::move(terms_)) {}
+    MutableAtom(PredicateView<T> predicate_, std::vector<ygg::Data<Term>> terms_) : predicate(predicate_), terms(std::move(terms_)) {}
     MutableAtom(PredicateView<T> predicate_, const TermViewList& terms_) : predicate(predicate_), terms()
     {
         for (const auto& term : terms_)
@@ -57,13 +57,13 @@ struct MutableAtom
     MutableAtom(GroundAtomView<T> element) : predicate(element.get_predicate()), terms()
     {
         for (const auto& object : element.get_row().get_objects())
-            terms.push_back(Data<Term>(object.get_index()));
+            terms.push_back(ygg::Data<Term>(object.get_index()));
     }
 
     auto identifying_members() const noexcept { return std::tie(predicate, terms); }
 
-    friend bool operator==(const MutableAtom& lhs, const MutableAtom& rhs) { return EqualTo<MutableAtom> {}(lhs, rhs); }
-    friend bool operator<(const MutableAtom& lhs, const MutableAtom& rhs) { return Less<MutableAtom> {}(lhs, rhs); }
+    friend bool operator==(const MutableAtom& lhs, const MutableAtom& rhs) { return ygg::EqualTo<MutableAtom> {}(lhs, rhs); }
+    friend bool operator<(const MutableAtom& lhs, const MutableAtom& rhs) { return ygg::Less<MutableAtom> {}(lhs, rhs); }
 };
 
 template<FactKind T>
@@ -80,7 +80,7 @@ struct structure_traits<tyr::formalism::planning::MutableAtom<T>>
     template<typename F>
     static bool zip_terms(const Type& lhs, const Type& rhs, F&& f)
     {
-        if (!EqualTo<tyr::formalism::planning::PredicateView<T>> {}(lhs.predicate, rhs.predicate))
+        if (!ygg::EqualTo<tyr::formalism::planning::PredicateView<T>> {}(lhs.predicate, rhs.predicate))
             return false;
 
         if (lhs.terms.size() != rhs.terms.size())

@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_DATALOG_DECLARATIONS_HPP_
 #define TYR_FORMALISM_DATALOG_DECLARATIONS_HPP_
 
-#include "tyr/common/config.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 
 namespace tyr::formalism::datalog
@@ -134,61 +134,61 @@ struct Program
 {
 };
 
-using CoreTypes = TypeList<Variable, Object>;
-using PredicateTypes = MapTypeListT<Predicate, StaticFluentTags>;
-using AtomTypes = MapTypeListT<Atom, StaticFluentTags>;
-using GroundAtomTypes = MapTypeListT<GroundAtom, StaticFluentTags>;
-using LiteralTypes = MapTypeListT<Literal, StaticFluentTags>;
-using GroundLiteralTypes = MapTypeListT<GroundLiteral, StaticFluentTags>;
-using FunctionTypes = MapTypeListT<Function, StaticFluentTags>;
-using FunctionTermTypes = MapTypeListT<FunctionTerm, StaticFluentTags>;
-using GroundFunctionTermTypes = MapTypeListT<GroundFunctionTerm, StaticFluentTags>;
-using GroundFunctionTermValueTypes = MapTypeListT<GroundFunctionTermValue, StaticFluentTags>;
+using CoreTypes = ygg::TypeList<Variable, Object>;
+using PredicateTypes = ygg::MapTypeListT<Predicate, StaticFluentTags>;
+using AtomTypes = ygg::MapTypeListT<Atom, StaticFluentTags>;
+using GroundAtomTypes = ygg::MapTypeListT<GroundAtom, StaticFluentTags>;
+using LiteralTypes = ygg::MapTypeListT<Literal, StaticFluentTags>;
+using GroundLiteralTypes = ygg::MapTypeListT<GroundLiteral, StaticFluentTags>;
+using FunctionTypes = ygg::MapTypeListT<Function, StaticFluentTags>;
+using FunctionTermTypes = ygg::MapTypeListT<FunctionTerm, StaticFluentTags>;
+using GroundFunctionTermTypes = ygg::MapTypeListT<GroundFunctionTerm, StaticFluentTags>;
+using GroundFunctionTermValueTypes = ygg::MapTypeListT<GroundFunctionTermValue, StaticFluentTags>;
 template<typename Op>
 using FluentNumericEffectType = NumericEffect<Op, FluentTag>;
 template<typename Op>
 using GroundFluentNumericEffectType = GroundNumericEffect<Op, FluentTag>;
-using NumericEffectTypes = MapTypeListT<FluentNumericEffectType, NumericEffectOpKinds>;
-using GroundNumericEffectTypes = MapTypeListT<GroundFluentNumericEffectType, NumericEffectOpKinds>;
-using NumericEffectOperatorTypes = TypeList<NumericEffectOperator<FluentTag>>;
-using GroundNumericEffectOperatorTypes = TypeList<GroundNumericEffectOperator<FluentTag>>;
+using NumericEffectTypes = ygg::MapTypeListT<FluentNumericEffectType, NumericEffectOpKinds>;
+using GroundNumericEffectTypes = ygg::MapTypeListT<GroundFluentNumericEffectType, NumericEffectOpKinds>;
+using NumericEffectOperatorTypes = ygg::TypeList<NumericEffectOperator<FluentTag>>;
+using GroundNumericEffectOperatorTypes = ygg::TypeList<GroundNumericEffectOperator<FluentTag>>;
 
 template<typename Op>
-using LiftedUnaryOperatorType = UnaryOperator<Op, Data<FunctionExpression>>;
+using LiftedUnaryOperatorType = UnaryOperator<Op, ygg::Data<FunctionExpression>>;
 
 template<typename Op>
-using LiftedBinaryOperatorType = BinaryOperator<Op, Data<FunctionExpression>>;
+using LiftedBinaryOperatorType = BinaryOperator<Op, ygg::Data<FunctionExpression>>;
 
 template<typename Op>
-using LiftedMultiOperatorType = MultiOperator<Op, Data<FunctionExpression>>;
+using LiftedMultiOperatorType = MultiOperator<Op, ygg::Data<FunctionExpression>>;
 
 template<typename Op>
-using GroundUnaryOperatorType = UnaryOperator<Op, Data<GroundFunctionExpression>>;
+using GroundUnaryOperatorType = UnaryOperator<Op, ygg::Data<GroundFunctionExpression>>;
 
 template<typename Op>
-using GroundBinaryOperatorType = BinaryOperator<Op, Data<GroundFunctionExpression>>;
+using GroundBinaryOperatorType = BinaryOperator<Op, ygg::Data<GroundFunctionExpression>>;
 
 template<typename Op>
-using GroundMultiOperatorType = MultiOperator<Op, Data<GroundFunctionExpression>>;
+using GroundMultiOperatorType = MultiOperator<Op, ygg::Data<GroundFunctionExpression>>;
 
-using LiftedArithmeticExpressionTypes = ConcatTypeListsT<MapTypeListT<LiftedUnaryOperatorType, UnaryArithmeticOpKinds>,
-                                                         MapTypeListT<LiftedBinaryOperatorType, BinaryArithmeticOpKinds>,
-                                                         MapTypeListT<LiftedMultiOperatorType, MultiArithmeticOpKinds>>;
+using LiftedArithmeticExpressionTypes = ygg::ConcatTypeListsT<ygg::MapTypeListT<LiftedUnaryOperatorType, UnaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<LiftedBinaryOperatorType, BinaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<LiftedMultiOperatorType, MultiArithmeticOpKinds>>;
 
-using LiftedBooleanExpressionTypes = MapTypeListT<LiftedBinaryOperatorType, BooleanOpKinds>;
+using LiftedBooleanExpressionTypes = ygg::MapTypeListT<LiftedBinaryOperatorType, BooleanOpKinds>;
 
-using GroundArithmeticExpressionTypes = ConcatTypeListsT<MapTypeListT<GroundUnaryOperatorType, UnaryArithmeticOpKinds>,
-                                                         MapTypeListT<GroundBinaryOperatorType, BinaryArithmeticOpKinds>,
-                                                         MapTypeListT<GroundMultiOperatorType, MultiArithmeticOpKinds>>;
+using GroundArithmeticExpressionTypes = ygg::ConcatTypeListsT<ygg::MapTypeListT<GroundUnaryOperatorType, UnaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<GroundBinaryOperatorType, BinaryArithmeticOpKinds>,
+                                                         ygg::MapTypeListT<GroundMultiOperatorType, MultiArithmeticOpKinds>>;
 
-using GroundBooleanExpressionTypes = MapTypeListT<GroundBinaryOperatorType, BooleanOpKinds>;
+using GroundBooleanExpressionTypes = ygg::MapTypeListT<GroundBinaryOperatorType, BooleanOpKinds>;
 
 using ExpressionTypes =
-    ConcatTypeListsT<LiftedArithmeticExpressionTypes, LiftedBooleanExpressionTypes, GroundArithmeticExpressionTypes, GroundBooleanExpressionTypes>;
-using EffectTypes = ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes>;
-using CompoundTypes = TypeList<ConjunctiveCondition, Rule, GroundConjunctiveCondition, GroundRule, Program>;
+    ygg::ConcatTypeListsT<LiftedArithmeticExpressionTypes, LiftedBooleanExpressionTypes, GroundArithmeticExpressionTypes, GroundBooleanExpressionTypes>;
+using EffectTypes = ygg::ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes>;
+using CompoundTypes = ygg::TypeList<ConjunctiveCondition, Rule, GroundConjunctiveCondition, GroundRule, Program>;
 
-using SymbolRepositoryTypes = ConcatTypeListsT<CoreTypes,
+using SymbolRepositoryTypes = ygg::ConcatTypeListsT<CoreTypes,
                                                PredicateTypes,
                                                AtomTypes,
                                                GroundAtomTypes,
@@ -202,21 +202,21 @@ using SymbolRepositoryTypes = ConcatTypeListsT<CoreTypes,
                                                EffectTypes,
                                                CompoundTypes>;
 
-using RelationRepositoryTypes = ConcatTypeListsT<PredicateTypes, FunctionTypes, TypeList<Rule>>;
-using BuilderTypes = ConcatTypeListsT<SymbolRepositoryTypes, MapTypeListT<RelationBinding, RelationRepositoryTypes>>;
+using RelationRepositoryTypes = ygg::ConcatTypeListsT<PredicateTypes, FunctionTypes, ygg::TypeList<Rule>>;
+using BuilderTypes = ygg::ConcatTypeListsT<SymbolRepositoryTypes, ygg::MapTypeListT<RelationBinding, RelationRepositoryTypes>>;
 
 /**
  * Context
  */
 
 template<typename Repo, typename Tag>
-concept RepositoryAccess = requires(const Repo& r, Index<Tag> idx) {
-    requires CanonicalizableContext<Index<Tag>, Repo>;
-    { r[idx] } -> std::same_as<const Data<Tag>&>;
+concept RepositoryAccess = requires(const Repo& r, ygg::Index<Tag> idx) {
+    requires ygg::CanonicalizableContext<ygg::Index<Tag>, Repo>;
+    { r[idx] } -> std::same_as<const ygg::Data<Tag>&>;
 };
 
 template<typename Repo, typename... Tags>
-constexpr bool repository_access_for_types(TypeList<Tags...>) noexcept
+constexpr bool repository_access_for_types(ygg::TypeList<Tags...>) noexcept
 {
     return (RepositoryAccess<Repo, Tags> && ...);
 }

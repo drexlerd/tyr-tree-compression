@@ -17,7 +17,7 @@
 
 #include "indices.hpp"
 
-#include <tyr/common/python/bindings.hpp>
+#include "pytyr/bindings.hpp"
 #include <tyr/tyr.hpp>
 
 namespace tyr::formalism::planning
@@ -27,7 +27,7 @@ namespace
 template<typename Tag>
 void bind_relation_binding_index(nb::module_& m, const std::string& name)
 {
-    using V = Index<RelationBinding<Tag>>;
+    using V = ygg::Index<RelationBinding<Tag>>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def_ro("relation_index", &V::relation)
@@ -44,9 +44,9 @@ void bind_relation_binding_index(nb::module_& m, const std::string& name)
 
 void bind_indices(nb::module_& m)
 {
-    bind_index<Index<Row>>(m, "RowIndex");
-    bind_index<Index<Object>>(m, "ObjectIndex");
-    bind_index<Index<Variable>>(m, "VariableIndex");
+    bind_index<ygg::Index<Row>>(m, "RowIndex");
+    bind_index<ygg::Index<Object>>(m, "ObjectIndex");
+    bind_index<ygg::Index<Variable>>(m, "VariableIndex");
 
     bind_relation_binding_index<Predicate<StaticTag>>(m, "StaticPredicateBindingIndex");
     bind_relation_binding_index<Predicate<FluentTag>>(m, "FluentPredicateBindingIndex");
@@ -57,107 +57,107 @@ void bind_indices(nb::module_& m)
     bind_relation_binding_index<Action>(m, "ActionBindingIndex");
     bind_relation_binding_index<Axiom>(m, "AxiomBindingIndex");
 
-    bind_index<Index<Predicate<StaticTag>>>(m, "StaticPredicateIndex");
-    bind_index<Index<Predicate<FluentTag>>>(m, "FluentPredicateIndex");
-    bind_index<Index<Predicate<DerivedTag>>>(m, "DerivedPredicateIndex");
+    bind_index<ygg::Index<Predicate<StaticTag>>>(m, "StaticPredicateIndex");
+    bind_index<ygg::Index<Predicate<FluentTag>>>(m, "FluentPredicateIndex");
+    bind_index<ygg::Index<Predicate<DerivedTag>>>(m, "DerivedPredicateIndex");
 
-    bind_index<Index<Atom<StaticTag>>>(m, "StaticAtomIndex");
-    bind_index<Index<Atom<FluentTag>>>(m, "FluentAtomIndex");
-    bind_index<Index<Atom<DerivedTag>>>(m, "DerivedAtomIndex");
+    bind_index<ygg::Index<Atom<StaticTag>>>(m, "StaticAtomIndex");
+    bind_index<ygg::Index<Atom<FluentTag>>>(m, "FluentAtomIndex");
+    bind_index<ygg::Index<Atom<DerivedTag>>>(m, "DerivedAtomIndex");
 
-    bind_index<Index<GroundAtom<StaticTag>>>(m, "StaticGroundAtomIndex");
-    bind_index<Index<GroundAtom<FluentTag>>>(m, "FluentGroundAtomIndex");
-    bind_index<Index<GroundAtom<DerivedTag>>>(m, "DerivedGroundAtomIndex");
+    bind_index<ygg::Index<GroundAtom<StaticTag>>>(m, "StaticGroundAtomIndex");
+    bind_index<ygg::Index<GroundAtom<FluentTag>>>(m, "FluentGroundAtomIndex");
+    bind_index<ygg::Index<GroundAtom<DerivedTag>>>(m, "DerivedGroundAtomIndex");
 
-    bind_index<Index<Literal<StaticTag>>>(m, "StaticLiteralIndex");
-    bind_index<Index<Literal<FluentTag>>>(m, "FluentLiteralIndex");
-    bind_index<Index<Literal<DerivedTag>>>(m, "DerivedLiteralIndex");
+    bind_index<ygg::Index<Literal<StaticTag>>>(m, "StaticLiteralIndex");
+    bind_index<ygg::Index<Literal<FluentTag>>>(m, "FluentLiteralIndex");
+    bind_index<ygg::Index<Literal<DerivedTag>>>(m, "DerivedLiteralIndex");
 
-    bind_index<Index<GroundLiteral<StaticTag>>>(m, "StaticGroundLiteralIndex");
-    bind_index<Index<GroundLiteral<FluentTag>>>(m, "FluentGroundLiteralIndex");
-    bind_index<Index<GroundLiteral<DerivedTag>>>(m, "DerivedGroundLiteralIndex");
+    bind_index<ygg::Index<GroundLiteral<StaticTag>>>(m, "StaticGroundLiteralIndex");
+    bind_index<ygg::Index<GroundLiteral<FluentTag>>>(m, "FluentGroundLiteralIndex");
+    bind_index<ygg::Index<GroundLiteral<DerivedTag>>>(m, "DerivedGroundLiteralIndex");
 
-    bind_index<Index<FDRVariable<FluentTag>>>(m, "FluentFDRVariableIndex");
+    bind_index<ygg::Index<FDRVariable<FluentTag>>>(m, "FluentFDRVariableIndex");
 
-    bind_index<Index<Function<StaticTag>>>(m, "StaticFunctionIndex");
-    bind_index<Index<Function<FluentTag>>>(m, "FluentFunctionIndex");
-    bind_index<Index<Function<AuxiliaryTag>>>(m, "AuxiliaryFunctionIndex");
+    bind_index<ygg::Index<Function<StaticTag>>>(m, "StaticFunctionIndex");
+    bind_index<ygg::Index<Function<FluentTag>>>(m, "FluentFunctionIndex");
+    bind_index<ygg::Index<Function<AuxiliaryTag>>>(m, "AuxiliaryFunctionIndex");
 
-    bind_index<Index<FunctionTerm<StaticTag>>>(m, "StaticFunctionTermIndex");
-    bind_index<Index<FunctionTerm<FluentTag>>>(m, "FluentFunctionTermIndex");
-    bind_index<Index<FunctionTerm<AuxiliaryTag>>>(m, "AuxiliaryFunctionTermIndex");
+    bind_index<ygg::Index<FunctionTerm<StaticTag>>>(m, "StaticFunctionTermIndex");
+    bind_index<ygg::Index<FunctionTerm<FluentTag>>>(m, "FluentFunctionTermIndex");
+    bind_index<ygg::Index<FunctionTerm<AuxiliaryTag>>>(m, "AuxiliaryFunctionTermIndex");
 
-    bind_index<Index<GroundFunctionTerm<StaticTag>>>(m, "StaticGroundFunctionTermIndex");
-    bind_index<Index<GroundFunctionTerm<FluentTag>>>(m, "FluentGroundFunctionTermIndex");
-    bind_index<Index<GroundFunctionTerm<AuxiliaryTag>>>(m, "AuxiliaryGroundFunctionTermIndex");
+    bind_index<ygg::Index<GroundFunctionTerm<StaticTag>>>(m, "StaticGroundFunctionTermIndex");
+    bind_index<ygg::Index<GroundFunctionTerm<FluentTag>>>(m, "FluentGroundFunctionTermIndex");
+    bind_index<ygg::Index<GroundFunctionTerm<AuxiliaryTag>>>(m, "AuxiliaryGroundFunctionTermIndex");
 
-    bind_index<Index<GroundFunctionTermValue<StaticTag>>>(m, "StaticGroundFunctionTermValueIndex");
-    bind_index<Index<GroundFunctionTermValue<FluentTag>>>(m, "FluentGroundFunctionTermValueIndex");
-    bind_index<Index<GroundFunctionTermValue<AuxiliaryTag>>>(m, "AuxiliaryGroundFunctionTermValueIndex");
+    bind_index<ygg::Index<GroundFunctionTermValue<StaticTag>>>(m, "StaticGroundFunctionTermValueIndex");
+    bind_index<ygg::Index<GroundFunctionTermValue<FluentTag>>>(m, "FluentGroundFunctionTermValueIndex");
+    bind_index<ygg::Index<GroundFunctionTermValue<AuxiliaryTag>>>(m, "AuxiliaryGroundFunctionTermValueIndex");
 
-    bind_index<Index<UnaryOperator<Sub, Data<FunctionExpression>>>>(m, "UnaryOperatorSubIndex");
+    bind_index<ygg::Index<UnaryOperator<Sub, ygg::Data<FunctionExpression>>>>(m, "UnaryOperatorSubIndex");
 
-    bind_index<Index<BinaryOperator<Add, Data<FunctionExpression>>>>(m, "BinaryOperatorAddIndex");
-    bind_index<Index<BinaryOperator<Sub, Data<FunctionExpression>>>>(m, "BinaryOperatorSubIndex");
-    bind_index<Index<BinaryOperator<Mul, Data<FunctionExpression>>>>(m, "BinaryOperatorMulIndex");
-    bind_index<Index<BinaryOperator<Div, Data<FunctionExpression>>>>(m, "BinaryOperatorDivIndex");
-    bind_index<Index<BinaryOperator<Eq, Data<FunctionExpression>>>>(m, "BinaryOperatorEqIndex");
-    bind_index<Index<BinaryOperator<Ne, Data<FunctionExpression>>>>(m, "BinaryOperatorNeIndex");
-    bind_index<Index<BinaryOperator<Le, Data<FunctionExpression>>>>(m, "BinaryOperatorLeIndex");
-    bind_index<Index<BinaryOperator<Lt, Data<FunctionExpression>>>>(m, "BinaryOperatorLtIndex");
-    bind_index<Index<BinaryOperator<Ge, Data<FunctionExpression>>>>(m, "BinaryOperatorGeIndex");
-    bind_index<Index<BinaryOperator<Gt, Data<FunctionExpression>>>>(m, "BinaryOperatorGtIndex");
+    bind_index<ygg::Index<BinaryOperator<Add, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorAddIndex");
+    bind_index<ygg::Index<BinaryOperator<Sub, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorSubIndex");
+    bind_index<ygg::Index<BinaryOperator<Mul, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorMulIndex");
+    bind_index<ygg::Index<BinaryOperator<Div, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorDivIndex");
+    bind_index<ygg::Index<BinaryOperator<Eq, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorEqIndex");
+    bind_index<ygg::Index<BinaryOperator<Ne, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorNeIndex");
+    bind_index<ygg::Index<BinaryOperator<Le, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorLeIndex");
+    bind_index<ygg::Index<BinaryOperator<Lt, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorLtIndex");
+    bind_index<ygg::Index<BinaryOperator<Ge, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorGeIndex");
+    bind_index<ygg::Index<BinaryOperator<Gt, ygg::Data<FunctionExpression>>>>(m, "BinaryOperatorGtIndex");
 
-    bind_index<Index<MultiOperator<Add, Data<FunctionExpression>>>>(m, "MultiOperatorAddIndex");
-    bind_index<Index<MultiOperator<Mul, Data<FunctionExpression>>>>(m, "MultiOperatorMulIndex");
+    bind_index<ygg::Index<MultiOperator<Add, ygg::Data<FunctionExpression>>>>(m, "MultiOperatorAddIndex");
+    bind_index<ygg::Index<MultiOperator<Mul, ygg::Data<FunctionExpression>>>>(m, "MultiOperatorMulIndex");
 
-    bind_index<Index<ConjunctiveCondition>>(m, "ConjunctiveConditionIndex");
+    bind_index<ygg::Index<ConjunctiveCondition>>(m, "ConjunctiveConditionIndex");
 
-    bind_index<Index<NumericEffect<Assign, FluentTag>>>(m, "FluentNumericEffectAssignIndex");
-    bind_index<Index<NumericEffect<Increase, FluentTag>>>(m, "FluentNumericEffectIncreaseIndex");
-    bind_index<Index<NumericEffect<Decrease, FluentTag>>>(m, "FluentNumericEffectDecreaseIndex");
-    bind_index<Index<NumericEffect<ScaleUp, FluentTag>>>(m, "FluentNumericEffectScaleUpIndex");
-    bind_index<Index<NumericEffect<ScaleDown, FluentTag>>>(m, "FluentNumericEffectScaleDownIndex");
-    bind_index<Index<NumericEffect<Increase, AuxiliaryTag>>>(m, "AuxiliaryNumericEffectIncreaseIndex");
+    bind_index<ygg::Index<NumericEffect<Assign, FluentTag>>>(m, "FluentNumericEffectAssignIndex");
+    bind_index<ygg::Index<NumericEffect<Increase, FluentTag>>>(m, "FluentNumericEffectIncreaseIndex");
+    bind_index<ygg::Index<NumericEffect<Decrease, FluentTag>>>(m, "FluentNumericEffectDecreaseIndex");
+    bind_index<ygg::Index<NumericEffect<ScaleUp, FluentTag>>>(m, "FluentNumericEffectScaleUpIndex");
+    bind_index<ygg::Index<NumericEffect<ScaleDown, FluentTag>>>(m, "FluentNumericEffectScaleDownIndex");
+    bind_index<ygg::Index<NumericEffect<Increase, AuxiliaryTag>>>(m, "AuxiliaryNumericEffectIncreaseIndex");
 
-    bind_index<Index<ConjunctiveEffect>>(m, "ConjunctiveEffectIndex");
-    bind_index<Index<ConditionalEffect>>(m, "ConditionalEffectIndex");
-    bind_index<Index<Action>>(m, "ActionIndex");
-    bind_index<Index<Axiom>>(m, "AxiomIndex");
+    bind_index<ygg::Index<ConjunctiveEffect>>(m, "ConjunctiveEffectIndex");
+    bind_index<ygg::Index<ConditionalEffect>>(m, "ConditionalEffectIndex");
+    bind_index<ygg::Index<Action>>(m, "ActionIndex");
+    bind_index<ygg::Index<Axiom>>(m, "AxiomIndex");
 
-    bind_index<Index<UnaryOperator<Sub, Data<GroundFunctionExpression>>>>(m, "GroundUnaryOperatorSubIndex");
+    bind_index<ygg::Index<UnaryOperator<Sub, ygg::Data<GroundFunctionExpression>>>>(m, "GroundUnaryOperatorSubIndex");
 
-    bind_index<Index<BinaryOperator<Add, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorAddIndex");
-    bind_index<Index<BinaryOperator<Sub, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorSubIndex");
-    bind_index<Index<BinaryOperator<Mul, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorMulIndex");
-    bind_index<Index<BinaryOperator<Div, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorDivIndex");
-    bind_index<Index<BinaryOperator<Eq, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorEqIndex");
-    bind_index<Index<BinaryOperator<Ne, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorNeIndex");
-    bind_index<Index<BinaryOperator<Le, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorLeIndex");
-    bind_index<Index<BinaryOperator<Lt, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorLtIndex");
-    bind_index<Index<BinaryOperator<Ge, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorGeIndex");
-    bind_index<Index<BinaryOperator<Gt, Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorGtIndex");
+    bind_index<ygg::Index<BinaryOperator<Add, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorAddIndex");
+    bind_index<ygg::Index<BinaryOperator<Sub, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorSubIndex");
+    bind_index<ygg::Index<BinaryOperator<Mul, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorMulIndex");
+    bind_index<ygg::Index<BinaryOperator<Div, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorDivIndex");
+    bind_index<ygg::Index<BinaryOperator<Eq, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorEqIndex");
+    bind_index<ygg::Index<BinaryOperator<Ne, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorNeIndex");
+    bind_index<ygg::Index<BinaryOperator<Le, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorLeIndex");
+    bind_index<ygg::Index<BinaryOperator<Lt, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorLtIndex");
+    bind_index<ygg::Index<BinaryOperator<Ge, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorGeIndex");
+    bind_index<ygg::Index<BinaryOperator<Gt, ygg::Data<GroundFunctionExpression>>>>(m, "GroundBinaryOperatorGtIndex");
 
-    bind_index<Index<MultiOperator<Add, Data<GroundFunctionExpression>>>>(m, "GroundMultiOperatorAddIndex");
-    bind_index<Index<MultiOperator<Mul, Data<GroundFunctionExpression>>>>(m, "GroundMultiOperatorMulIndex");
+    bind_index<ygg::Index<MultiOperator<Add, ygg::Data<GroundFunctionExpression>>>>(m, "GroundMultiOperatorAddIndex");
+    bind_index<ygg::Index<MultiOperator<Mul, ygg::Data<GroundFunctionExpression>>>>(m, "GroundMultiOperatorMulIndex");
 
-    bind_index<Index<GroundConjunctiveCondition>>(m, "GroundConjunctiveConditionIndex");
+    bind_index<ygg::Index<GroundConjunctiveCondition>>(m, "GroundConjunctiveConditionIndex");
 
-    bind_index<Index<GroundNumericEffect<Assign, FluentTag>>>(m, "FluentGroundNumericEffectAssignIndex");
-    bind_index<Index<GroundNumericEffect<Increase, FluentTag>>>(m, "FluentGroundNumericEffectIncreaseIndex");
-    bind_index<Index<GroundNumericEffect<Decrease, FluentTag>>>(m, "FluentGroundNumericEffectDecreaseIndex");
-    bind_index<Index<GroundNumericEffect<ScaleUp, FluentTag>>>(m, "FluentGroundNumericEffectScaleUpIndex");
-    bind_index<Index<GroundNumericEffect<ScaleDown, FluentTag>>>(m, "FluentGroundNumericEffectScaleDownIndex");
-    bind_index<Index<GroundNumericEffect<Increase, AuxiliaryTag>>>(m, "AuxiliaryGroundNumericEffectIncreaseIndex");
+    bind_index<ygg::Index<GroundNumericEffect<Assign, FluentTag>>>(m, "FluentGroundNumericEffectAssignIndex");
+    bind_index<ygg::Index<GroundNumericEffect<Increase, FluentTag>>>(m, "FluentGroundNumericEffectIncreaseIndex");
+    bind_index<ygg::Index<GroundNumericEffect<Decrease, FluentTag>>>(m, "FluentGroundNumericEffectDecreaseIndex");
+    bind_index<ygg::Index<GroundNumericEffect<ScaleUp, FluentTag>>>(m, "FluentGroundNumericEffectScaleUpIndex");
+    bind_index<ygg::Index<GroundNumericEffect<ScaleDown, FluentTag>>>(m, "FluentGroundNumericEffectScaleDownIndex");
+    bind_index<ygg::Index<GroundNumericEffect<Increase, AuxiliaryTag>>>(m, "AuxiliaryGroundNumericEffectIncreaseIndex");
 
-    bind_index<Index<GroundConjunctiveEffect>>(m, "GroundConjunctiveEffectIndex");
-    bind_index<Index<GroundConditionalEffect>>(m, "GroundConditionalEffectIndex");
-    bind_index<Index<GroundAction>>(m, "GroundActionIndex");
-    bind_index<Index<GroundAxiom>>(m, "GroundAxiomIndex");
-    bind_index<Index<Metric>>(m, "MetricIndex");
-    bind_index<Index<Domain>>(m, "DomainIndex");
-    bind_index<Index<Task>>(m, "LiftedTaskIndex");
-    bind_index<Index<FDRTask>>(m, "GroundTaskIndex");
+    bind_index<ygg::Index<GroundConjunctiveEffect>>(m, "GroundConjunctiveEffectIndex");
+    bind_index<ygg::Index<GroundConditionalEffect>>(m, "GroundConditionalEffectIndex");
+    bind_index<ygg::Index<GroundAction>>(m, "GroundActionIndex");
+    bind_index<ygg::Index<GroundAxiom>>(m, "GroundAxiomIndex");
+    bind_index<ygg::Index<Metric>>(m, "MetricIndex");
+    bind_index<ygg::Index<Domain>>(m, "DomainIndex");
+    bind_index<ygg::Index<Task>>(m, "LiftedTaskIndex");
+    bind_index<ygg::Index<FDRTask>>(m, "GroundTaskIndex");
 }
 
 }

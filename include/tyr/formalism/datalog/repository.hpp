@@ -18,12 +18,16 @@
 #ifndef TYR_FORMALISM_DATALOG_REPOSITORY_HPP_
 #define TYR_FORMALISM_DATALOG_REPOSITORY_HPP_
 
-#include "tyr/buffer/declarations.hpp"
-#include "tyr/buffer/indexed_hash_set.hpp"
-#include "tyr/buffer/segmented_buffer.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/tuple.hpp"
+#include <yggdrasil/buffer/declarations.hpp>
+#include <yggdrasil/buffer/indexed_hash_set.hpp>
+#include <yggdrasil/buffer/segmented_buffer.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/containers/tuple.hpp>
+#include <yggdrasil/formalism/relation_repository.hpp>
+#include <yggdrasil/formalism/repository.hpp>
+#include <yggdrasil/formalism/repository_factory.hpp>
+#include <yggdrasil/formalism/symbol_repository.hpp>
 #include "tyr/formalism/datalog/canonicalization.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -31,10 +35,6 @@
 #include "tyr/formalism/datalog/views.hpp"
 #include "tyr/formalism/function_view.hpp"
 #include "tyr/formalism/predicate_view.hpp"
-#include "tyr/formalism/relation_repository.hpp"
-#include "tyr/formalism/repository.hpp"
-#include "tyr/formalism/repository_factory.hpp"
-#include "tyr/formalism/symbol_repository.hpp"
 
 #include <cassert>
 #include <optional>
@@ -44,411 +44,201 @@
 
 namespace tyr::formalism::datalog
 {
-using SymbolRepository = tyr::ApplyTypeListT<tyr::formalism::SymbolRepository, SymbolRepositoryTypes>;
+using SymbolRepository = ygg::ApplyTypeListT<::ygg::formalism::SymbolRepository, SymbolRepositoryTypes>;
 
-using RelationRepository = tyr::ApplyTypeListT<tyr::formalism::RelationRepository, RelationRepositoryTypes>;
+template<typename... Ts>
+using TaggedRelationRepository = ::ygg::formalism::RelationRepository<ObjectTag, Ts...>;
 
-using Repository = tyr::formalism::Repository<SymbolRepository, RelationRepository>;
+using RelationRepository = ygg::ApplyTypeListT<TaggedRelationRepository, RelationRepositoryTypes>;
+
+using Repository = ::ygg::formalism::Repository<SymbolRepository, RelationRepository>;
 
 using RepositoryPtr = std::shared_ptr<Repository>;
 
-using RepositoryFactory = tyr::formalism::RepositoryFactory<SymbolRepository, RelationRepository>;
+using RepositoryFactory = ::ygg::formalism::RepositoryFactory<SymbolRepository, RelationRepository>;
 
 using RepositoryFactoryPtr = std::shared_ptr<RepositoryFactory>;
 
 template<typename T>
-using ArithmeticOperatorView = View<Data<ArithmeticOperator<T>>, Repository>;
-using LiftedArithmeticOperatorView = View<Data<ArithmeticOperator<Data<FunctionExpression>>>, Repository>;
-using GroundArithmeticOperatorView = View<Data<ArithmeticOperator<Data<GroundFunctionExpression>>>, Repository>;
+using ArithmeticOperatorView = ygg::View<ygg::Data<ArithmeticOperator<T>>, Repository>;
+using LiftedArithmeticOperatorView = ygg::View<ygg::Data<ArithmeticOperator<ygg::Data<FunctionExpression>>>, Repository>;
+using GroundArithmeticOperatorView = ygg::View<ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>, Repository>;
 
 template<typename T>
-using ArithmeticOperatorListView = View<DataList<ArithmeticOperator<T>>, Repository>;
-using LiftedArithmeticOperatorListView = View<DataList<ArithmeticOperator<Data<FunctionExpression>>>, Repository>;
-using GroundArithmeticOperatorListView = View<DataList<ArithmeticOperator<Data<GroundFunctionExpression>>>, Repository>;
+using ArithmeticOperatorListView = ygg::View<ygg::DataList<ArithmeticOperator<T>>, Repository>;
+using LiftedArithmeticOperatorListView = ygg::View<ygg::DataList<ArithmeticOperator<ygg::Data<FunctionExpression>>>, Repository>;
+using GroundArithmeticOperatorListView = ygg::View<ygg::DataList<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>, Repository>;
 
-template<formalism::FactKind T>
-using AtomView = View<Index<Atom<T>>, Repository>;
+template<::tyr::formalism::FactKind T>
+using AtomView = ygg::View<ygg::Index<Atom<T>>, Repository>;
 
-template<formalism::FactKind T>
-using AtomListView = View<IndexList<Atom<T>>, Repository>;
+template<::tyr::formalism::FactKind T>
+using AtomListView = ygg::View<ygg::IndexList<Atom<T>>, Repository>;
 
-template<formalism::OpKind Op, typename T>
-using BinaryOperatorView = View<Index<BinaryOperator<Op, T>>, Repository>;
-template<formalism::OpKind Op>
-using LiftedBinaryOperatorView = View<Index<BinaryOperator<Op, Data<FunctionExpression>>>, Repository>;
-template<formalism::OpKind Op>
-using GroundBinaryOperatorView = View<Index<BinaryOperator<Op, Data<GroundFunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op, typename T>
+using BinaryOperatorView = ygg::View<ygg::Index<BinaryOperator<Op, T>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using LiftedBinaryOperatorView = ygg::View<ygg::Index<BinaryOperator<Op, ygg::Data<FunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using GroundBinaryOperatorView = ygg::View<ygg::Index<BinaryOperator<Op, ygg::Data<GroundFunctionExpression>>>, Repository>;
 
-template<formalism::OpKind Op, typename T>
-using BinaryOperatorListView = View<IndexList<BinaryOperator<Op, T>>, Repository>;
-template<formalism::OpKind Op>
-using LiftedBinaryOperatorListView = View<IndexList<BinaryOperator<Op, Data<FunctionExpression>>>, Repository>;
-template<formalism::OpKind Op>
-using GroundBinaryOperatorListView = View<IndexList<BinaryOperator<Op, Data<GroundFunctionExpression>>>, Repository>;
-
-template<FactKind T>
-using PredicateBindingView = View<Index<RelationBinding<Predicate<T>>>, Repository>;
-template<FactKind T>
-using FunctionBindingView = View<Index<RelationBinding<Function<T>>>, Repository>;
-using RuleBindingView = View<Index<RelationBinding<Rule>>, Repository>;
+template<::tyr::formalism::OpKind Op, typename T>
+using BinaryOperatorListView = ygg::View<ygg::IndexList<BinaryOperator<Op, T>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using LiftedBinaryOperatorListView = ygg::View<ygg::IndexList<BinaryOperator<Op, ygg::Data<FunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using GroundBinaryOperatorListView = ygg::View<ygg::IndexList<BinaryOperator<Op, ygg::Data<GroundFunctionExpression>>>, Repository>;
 
 template<FactKind T>
-using PredicateBindingForwardRangeView = View<RelationBindingsForwardRange<Predicate<T>, std::vector<Index<Row>>>, Repository>;
+using PredicateBindingView = ygg::View<ygg::Index<RelationBinding<Predicate<T>>>, Repository>;
 template<FactKind T>
-using FunctionBindingRandomAccessRangeView = View<RelationBindingsRandomAccessRange<Function<T>, std::vector<Index<Row>>>, Repository>;
+using FunctionBindingView = ygg::View<ygg::Index<RelationBinding<Function<T>>>, Repository>;
+using RuleBindingView = ygg::View<ygg::Index<RelationBinding<Rule>>, Repository>;
+
+template<FactKind T>
+using PredicateBindingForwardRangeView = ygg::View<RelationBindingsForwardRange<Predicate<T>, std::vector<ygg::Index<Row>>>, Repository>;
+template<FactKind T>
+using FunctionBindingRandomAccessRangeView = ygg::View<RelationBindingsRandomAccessRange<Function<T>, std::vector<ygg::Index<Row>>>, Repository>;
 
 template<typename T>
-using BooleanOperatorView = View<Data<BooleanOperator<T>>, Repository>;
-using LiftedBooleanOperatorView = View<Data<BooleanOperator<Data<FunctionExpression>>>, Repository>;
-using GroundBooleanOperatorView = View<Data<BooleanOperator<Data<GroundFunctionExpression>>>, Repository>;
+using BooleanOperatorView = ygg::View<ygg::Data<BooleanOperator<T>>, Repository>;
+using LiftedBooleanOperatorView = ygg::View<ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>>, Repository>;
+using GroundBooleanOperatorView = ygg::View<ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>>, Repository>;
 
 template<typename T>
-using BooleanOperatorListView = View<DataList<BooleanOperator<T>>, Repository>;
-using LiftedBooleanOperatorListView = View<DataList<BooleanOperator<Data<FunctionExpression>>>, Repository>;
-using GroundBooleanOperatorListView = View<DataList<BooleanOperator<Data<GroundFunctionExpression>>>, Repository>;
+using BooleanOperatorListView = ygg::View<ygg::DataList<BooleanOperator<T>>, Repository>;
+using LiftedBooleanOperatorListView = ygg::View<ygg::DataList<BooleanOperator<ygg::Data<FunctionExpression>>>, Repository>;
+using GroundBooleanOperatorListView = ygg::View<ygg::DataList<BooleanOperator<ygg::Data<GroundFunctionExpression>>>, Repository>;
 
-using ConjunctiveConditionView = View<Index<ConjunctiveCondition>, Repository>;
+using ConjunctiveConditionView = ygg::View<ygg::Index<ConjunctiveCondition>, Repository>;
 
-using ConjunctiveConditionListView = View<IndexList<ConjunctiveCondition>, Repository>;
+using ConjunctiveConditionListView = ygg::View<ygg::IndexList<ConjunctiveCondition>, Repository>;
 
-using FunctionExpressionView = View<Data<FunctionExpression>, Repository>;
+using FunctionExpressionView = ygg::View<ygg::Data<FunctionExpression>, Repository>;
 
-using FunctionExpressionListView = View<DataList<FunctionExpression>, Repository>;
+using FunctionExpressionListView = ygg::View<ygg::DataList<FunctionExpression>, Repository>;
 
-template<formalism::FactKind T>
-using FunctionTermView = View<Index<FunctionTerm<T>>, Repository>;
+template<::tyr::formalism::FactKind T>
+using FunctionTermView = ygg::View<ygg::Index<FunctionTerm<T>>, Repository>;
 
-template<formalism::FactKind T>
-using FunctionTermListView = View<IndexList<FunctionTerm<T>>, Repository>;
-
-template<FactKind T>
-using FunctionView = View<Index<Function<T>>, Repository>;
+template<::tyr::formalism::FactKind T>
+using FunctionTermListView = ygg::View<ygg::IndexList<FunctionTerm<T>>, Repository>;
 
 template<FactKind T>
-using FunctionListView = View<IndexList<Function<T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundAtomView = View<Index<GroundAtom<T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundAtomListView = View<IndexList<GroundAtom<T>>, Repository>;
-
-using GroundConjunctiveConditionView = View<Index<GroundConjunctiveCondition>, Repository>;
-
-using GroundConjunctiveConditionListView = View<IndexList<GroundConjunctiveCondition>, Repository>;
-
-using GroundFunctionExpressionView = View<Data<GroundFunctionExpression>, Repository>;
-
-using GroundFunctionExpressionListView = View<DataList<GroundFunctionExpression>, Repository>;
-
-template<formalism::FactKind T>
-using GroundFunctionTermValueView = View<Index<GroundFunctionTermValue<T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundFunctionTermValueListView = View<IndexList<GroundFunctionTermValue<T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundFunctionTermView = View<Index<GroundFunctionTerm<T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundFunctionTermListView = View<IndexList<GroundFunctionTerm<T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundLiteralView = View<Index<GroundLiteral<T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundLiteralListView = View<IndexList<GroundLiteral<T>>, Repository>;
-
-template<NumericEffectOpKind Op, formalism::FactKind T>
-using GroundNumericEffectView = View<Index<GroundNumericEffect<Op, T>>, Repository>;
-
-template<formalism::FactKind T>
-using GroundNumericEffectOperatorView = View<Data<GroundNumericEffectOperator<T>>, Repository>;
-
-using GroundRuleView = View<Index<GroundRule>, Repository>;
-
-using GroundRuleListView = View<IndexList<GroundRule>, Repository>;
-
-template<formalism::FactKind T>
-using LiteralView = View<Index<Literal<T>>, Repository>;
-
-template<formalism::FactKind T>
-using LiteralListView = View<IndexList<Literal<T>>, Repository>;
-
-template<formalism::OpKind Op, typename T>
-using MultiOperatorView = View<Index<MultiOperator<Op, T>>, Repository>;
-template<formalism::OpKind Op>
-using LiftedMultiOperatorView = View<Index<MultiOperator<Op, Data<FunctionExpression>>>, Repository>;
-template<formalism::OpKind Op>
-using GroundMultiOperatorView = View<Index<MultiOperator<Op, Data<GroundFunctionExpression>>>, Repository>;
-
-template<formalism::OpKind Op, typename T>
-using MultiOperatorListView = View<IndexList<MultiOperator<Op, T>>, Repository>;
-template<formalism::OpKind Op>
-using LiftedMultiOperatorListView = View<IndexList<MultiOperator<Op, Data<FunctionExpression>>>, Repository>;
-template<formalism::OpKind Op>
-using GroundMultiOperatorListView = View<IndexList<MultiOperator<Op, Data<GroundFunctionExpression>>>, Repository>;
-
-using ObjectView = View<Index<Object>, Repository>;
-
-using ObjectListView = View<IndexList<Object>, Repository>;
-
-template<NumericEffectOpKind Op, formalism::FactKind T>
-using NumericEffectView = View<Index<NumericEffect<Op, T>>, Repository>;
-
-template<formalism::FactKind T>
-using NumericEffectOperatorView = View<Data<NumericEffectOperator<T>>, Repository>;
+using FunctionView = ygg::View<ygg::Index<Function<T>>, Repository>;
 
 template<FactKind T>
-using PredicateView = View<Index<Predicate<T>>, Repository>;
+using FunctionListView = ygg::View<ygg::IndexList<Function<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundAtomView = ygg::View<ygg::Index<GroundAtom<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundAtomListView = ygg::View<ygg::IndexList<GroundAtom<T>>, Repository>;
+
+using GroundConjunctiveConditionView = ygg::View<ygg::Index<GroundConjunctiveCondition>, Repository>;
+
+using GroundConjunctiveConditionListView = ygg::View<ygg::IndexList<GroundConjunctiveCondition>, Repository>;
+
+using GroundFunctionExpressionView = ygg::View<ygg::Data<GroundFunctionExpression>, Repository>;
+
+using GroundFunctionExpressionListView = ygg::View<ygg::DataList<GroundFunctionExpression>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundFunctionTermValueView = ygg::View<ygg::Index<GroundFunctionTermValue<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundFunctionTermValueListView = ygg::View<ygg::IndexList<GroundFunctionTermValue<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundFunctionTermView = ygg::View<ygg::Index<GroundFunctionTerm<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundFunctionTermListView = ygg::View<ygg::IndexList<GroundFunctionTerm<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundLiteralView = ygg::View<ygg::Index<GroundLiteral<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundLiteralListView = ygg::View<ygg::IndexList<GroundLiteral<T>>, Repository>;
+
+template<NumericEffectOpKind Op, ::tyr::formalism::FactKind T>
+using GroundNumericEffectView = ygg::View<ygg::Index<GroundNumericEffect<Op, T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using GroundNumericEffectOperatorView = ygg::View<ygg::Data<GroundNumericEffectOperator<T>>, Repository>;
+
+using GroundRuleView = ygg::View<ygg::Index<GroundRule>, Repository>;
+
+using GroundRuleListView = ygg::View<ygg::IndexList<GroundRule>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using LiteralView = ygg::View<ygg::Index<Literal<T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using LiteralListView = ygg::View<ygg::IndexList<Literal<T>>, Repository>;
+
+template<::tyr::formalism::OpKind Op, typename T>
+using MultiOperatorView = ygg::View<ygg::Index<MultiOperator<Op, T>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using LiftedMultiOperatorView = ygg::View<ygg::Index<MultiOperator<Op, ygg::Data<FunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using GroundMultiOperatorView = ygg::View<ygg::Index<MultiOperator<Op, ygg::Data<GroundFunctionExpression>>>, Repository>;
+
+template<::tyr::formalism::OpKind Op, typename T>
+using MultiOperatorListView = ygg::View<ygg::IndexList<MultiOperator<Op, T>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using LiftedMultiOperatorListView = ygg::View<ygg::IndexList<MultiOperator<Op, ygg::Data<FunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using GroundMultiOperatorListView = ygg::View<ygg::IndexList<MultiOperator<Op, ygg::Data<GroundFunctionExpression>>>, Repository>;
+
+using ObjectView = ygg::View<ygg::Index<Object>, Repository>;
+
+using ObjectListView = ygg::View<ygg::IndexList<Object>, Repository>;
+
+template<NumericEffectOpKind Op, ::tyr::formalism::FactKind T>
+using NumericEffectView = ygg::View<ygg::Index<NumericEffect<Op, T>>, Repository>;
+
+template<::tyr::formalism::FactKind T>
+using NumericEffectOperatorView = ygg::View<ygg::Data<NumericEffectOperator<T>>, Repository>;
 
 template<FactKind T>
-using PredicateListView = View<IndexList<Predicate<T>>, Repository>;
+using PredicateView = ygg::View<ygg::Index<Predicate<T>>, Repository>;
 
-using ProgramView = View<Index<Program>, Repository>;
+template<FactKind T>
+using PredicateListView = ygg::View<ygg::IndexList<Predicate<T>>, Repository>;
 
-using ProgramListView = View<IndexList<Program>, Repository>;
+using ProgramView = ygg::View<ygg::Index<Program>, Repository>;
 
-using RuleView = View<Index<Rule>, Repository>;
+using ProgramListView = ygg::View<ygg::IndexList<Program>, Repository>;
 
-using RuleListView = View<IndexList<Rule>, Repository>;
+using RuleView = ygg::View<ygg::Index<Rule>, Repository>;
 
-using TermView = View<Data<Term>, Repository>;
+using RuleListView = ygg::View<ygg::IndexList<Rule>, Repository>;
 
-using TermListView = View<DataList<Term>, Repository>;
+using TermView = ygg::View<ygg::Data<Term>, Repository>;
 
-template<formalism::OpKind Op, typename T>
-using UnaryOperatorView = View<Index<UnaryOperator<Op, T>>, Repository>;
-template<formalism::OpKind Op>
-using LiftedUnaryOperatorView = View<Index<UnaryOperator<Op, Data<FunctionExpression>>>, Repository>;
-template<formalism::OpKind Op>
-using GroundUnaryOperatorView = View<Index<UnaryOperator<Op, Data<GroundFunctionExpression>>>, Repository>;
+using TermListView = ygg::View<ygg::DataList<Term>, Repository>;
 
-template<formalism::OpKind Op, typename T>
-using UnaryOperatorListView = View<IndexList<UnaryOperator<Op, T>>, Repository>;
-template<formalism::OpKind Op>
-using LiftedUnaryOperatorListView = View<IndexList<UnaryOperator<Op, Data<FunctionExpression>>>, Repository>;
-template<formalism::OpKind Op>
-using GroundUnaryOperatorListView = View<IndexList<UnaryOperator<Op, Data<GroundFunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op, typename T>
+using UnaryOperatorView = ygg::View<ygg::Index<UnaryOperator<Op, T>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using LiftedUnaryOperatorView = ygg::View<ygg::Index<UnaryOperator<Op, ygg::Data<FunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using GroundUnaryOperatorView = ygg::View<ygg::Index<UnaryOperator<Op, ygg::Data<GroundFunctionExpression>>>, Repository>;
 
-using VariableView = View<Index<Variable>, Repository>;
+template<::tyr::formalism::OpKind Op, typename T>
+using UnaryOperatorListView = ygg::View<ygg::IndexList<UnaryOperator<Op, T>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using LiftedUnaryOperatorListView = ygg::View<ygg::IndexList<UnaryOperator<Op, ygg::Data<FunctionExpression>>>, Repository>;
+template<::tyr::formalism::OpKind Op>
+using GroundUnaryOperatorListView = ygg::View<ygg::IndexList<UnaryOperator<Op, ygg::Data<GroundFunctionExpression>>>, Repository>;
 
-using VariableListView = View<IndexList<Variable>, Repository>;
+using VariableView = ygg::View<ygg::Index<Variable>, Repository>;
+
+using VariableListView = ygg::View<ygg::IndexList<Variable>, Repository>;
 
 }
 
-#ifndef TYR_HEADER_INSTANTIATION
-
-namespace tyr::formalism
-{
-// BasicRelationRepository
-extern template class BasicRelationRepository<Predicate<StaticTag>>;
-extern template class BasicRelationRepository<Predicate<FluentTag>>;
-extern template class BasicRelationRepository<Function<StaticTag>>;
-extern template class BasicRelationRepository<Function<FluentTag>>;
-extern template class BasicRelationRepository<datalog::Rule>;
-
-// BasicSymbolRepository
-extern template class BasicSymbolRepository<Variable>;
-extern template class BasicSymbolRepository<Object>;
-extern template class BasicSymbolRepository<Predicate<StaticTag>>;
-extern template class BasicSymbolRepository<Predicate<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::Atom<StaticTag>>;
-extern template class BasicSymbolRepository<datalog::Atom<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundAtom<StaticTag>>;
-extern template class BasicSymbolRepository<datalog::GroundAtom<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::Literal<StaticTag>>;
-extern template class BasicSymbolRepository<datalog::Literal<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundLiteral<StaticTag>>;
-extern template class BasicSymbolRepository<datalog::GroundLiteral<FluentTag>>;
-extern template class BasicSymbolRepository<Function<StaticTag>>;
-extern template class BasicSymbolRepository<Function<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::FunctionTerm<StaticTag>>;
-extern template class BasicSymbolRepository<datalog::FunctionTerm<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundFunctionTerm<StaticTag>>;
-extern template class BasicSymbolRepository<datalog::GroundFunctionTerm<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundFunctionTermValue<StaticTag>>;
-extern template class BasicSymbolRepository<datalog::GroundFunctionTermValue<FluentTag>>;
-extern template class BasicSymbolRepository<datalog::UnaryOperator<Sub, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Add, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Sub, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Mul, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Div, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::MultiOperator<Add, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::MultiOperator<Mul, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Eq, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Ne, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Le, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Lt, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Ge, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Gt, Data<datalog::FunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::UnaryOperator<Sub, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Add, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Sub, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Mul, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Div, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::MultiOperator<Add, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::MultiOperator<Mul, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Eq, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Ne, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Le, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Lt, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Ge, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::BinaryOperator<Gt, Data<datalog::GroundFunctionExpression>>>;
-extern template class BasicSymbolRepository<datalog::NumericEffect<Assign, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::NumericEffect<Increase, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::NumericEffect<Decrease, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::NumericEffect<ScaleUp, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::NumericEffect<ScaleDown, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundNumericEffect<Assign, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundNumericEffect<Increase, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundNumericEffect<Decrease, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundNumericEffect<ScaleUp, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::GroundNumericEffect<ScaleDown, FluentTag>>;
-extern template class BasicSymbolRepository<datalog::ConjunctiveCondition>;
-extern template class BasicSymbolRepository<datalog::Rule>;
-extern template class BasicSymbolRepository<datalog::GroundConjunctiveCondition>;
-extern template class BasicSymbolRepository<datalog::GroundRule>;
-extern template class BasicSymbolRepository<datalog::Program>;
-
-// Outer repository
-extern template class Repository<tyr::formalism::datalog::SymbolRepository, tyr::formalism::datalog::RelationRepository>;
-}
-
-namespace tyr
-{
-/**
- * Views
- */
-
-extern template struct View<Index<formalism::Variable>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::Object>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::Predicate<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::Predicate<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::Atom<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::Atom<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::GroundAtom<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundAtom<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::Literal<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::Literal<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::GroundLiteral<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundLiteral<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::Function<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::Function<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::FunctionTerm<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::FunctionTerm<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::GroundFunctionTerm<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundFunctionTerm<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::GroundFunctionTermValue<formalism::StaticTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundFunctionTermValue<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::UnaryOperator<formalism::Sub, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Add, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Sub, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Mul, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Div, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Eq, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Ne, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Le, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Lt, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Ge, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Gt, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::MultiOperator<formalism::Add, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::MultiOperator<formalism::Mul, Data<formalism::datalog::FunctionExpression>>>,
-                            formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::UnaryOperator<formalism::Sub, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Add, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Sub, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Mul, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Div, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Eq, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Ne, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Le, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Lt, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Ge, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::BinaryOperator<formalism::Gt, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::MultiOperator<formalism::Add, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::MultiOperator<formalism::Mul, Data<formalism::datalog::GroundFunctionExpression>>>,
-                            formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::NumericEffect<formalism::Assign, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::NumericEffect<formalism::Increase, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::NumericEffect<formalism::Decrease, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::NumericEffect<formalism::ScaleUp, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::NumericEffect<formalism::ScaleDown, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundNumericEffect<formalism::Assign, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundNumericEffect<formalism::Increase, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundNumericEffect<formalism::Decrease, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundNumericEffect<formalism::ScaleUp, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundNumericEffect<formalism::ScaleDown, formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Data<formalism::datalog::NumericEffectOperator<formalism::FluentTag>>, formalism::datalog::Repository>;
-extern template struct View<Data<formalism::datalog::GroundNumericEffectOperator<formalism::FluentTag>>, formalism::datalog::Repository>;
-
-extern template struct View<Data<formalism::datalog::ArithmeticOperator<Data<formalism::datalog::FunctionExpression>>>, formalism::datalog::Repository>;
-extern template struct View<Data<formalism::datalog::ArithmeticOperator<Data<formalism::datalog::GroundFunctionExpression>>>, formalism::datalog::Repository>;
-
-extern template struct View<Data<formalism::datalog::BooleanOperator<Data<formalism::datalog::FunctionExpression>>>, formalism::datalog::Repository>;
-extern template struct View<Data<formalism::datalog::BooleanOperator<Data<formalism::datalog::GroundFunctionExpression>>>, formalism::datalog::Repository>;
-
-extern template struct View<Data<formalism::datalog::FunctionExpression>, formalism::datalog::Repository>;
-extern template struct View<Data<formalism::datalog::GroundFunctionExpression>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::ConjunctiveCondition>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundConjunctiveCondition>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::datalog::Rule>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::GroundRule>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::datalog::Program>, formalism::datalog::Repository>;
-
-extern template struct View<Data<formalism::Term>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::RelationBinding<formalism::Predicate<formalism::StaticTag>>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::RelationBinding<formalism::Predicate<formalism::FluentTag>>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::RelationBinding<formalism::Function<formalism::StaticTag>>>, formalism::datalog::Repository>;
-extern template struct View<Index<formalism::RelationBinding<formalism::Function<formalism::FluentTag>>>, formalism::datalog::Repository>;
-
-extern template struct View<Index<formalism::RelationBinding<formalism::datalog::Rule>>, formalism::datalog::Repository>;
-}
-
-#endif
 
 #endif

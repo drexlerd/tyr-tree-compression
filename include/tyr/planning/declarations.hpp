@@ -18,13 +18,25 @@
 #ifndef TYR_PLANNING_DECLARATIONS_HPP_
 #define TYR_PLANNING_DECLARATIONS_HPP_
 
-#include "tyr/common/types.hpp"
+#include <yggdrasil/execution/onetbb.hpp>
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/containers/vector.hpp>
 
 #include <concepts>
 #include <memory>
 
+namespace tyr
+{
+template<typename T>
+struct Builder;
+}
+
 namespace tyr::planning
 {
+
 
 struct GroundTag
 {

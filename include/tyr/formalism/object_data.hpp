@@ -18,17 +18,19 @@
 #ifndef TYR_FORMALISM_OBJECT_DATA_HPP_
 #define TYR_FORMALISM_OBJECT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/object_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::Object>
+struct Data<::tyr::formalism::Object>
 {
-    Index<formalism::Object> index;
+    ygg::Index<::tyr::formalism::Object> index;
     ::cista::offset::string name;
 
     Data() = default;
@@ -42,15 +44,15 @@ struct Data<formalism::Object>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(name);
+        ygg::clear(index);
+        ygg::clear(name);
     }
 
     auto cista_members() const noexcept { return std::tie(index, name); }
     auto identifying_members() const noexcept { return std::tie(name); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::Object>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::Object>);
 }
 
 #endif

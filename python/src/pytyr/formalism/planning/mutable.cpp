@@ -19,8 +19,8 @@
 
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <tyr/common/python/bindings.hpp>
-#include <tyr/common/python/type_casters.hpp>
+#include "pytyr/bindings.hpp"
+#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
 
 namespace tyr::formalism::planning

@@ -16,7 +16,6 @@ set(PYTYR_NATIVE_CMAKEDIR "${PYTYR_NATIVE_LIBDIR}/cmake")
 nanobind_add_module(_pytyr
     module.cpp
     pytyr/module.cpp
-    pytyr/common/module.cpp
     pytyr/formalism/module.cpp
     pytyr/formalism/planning.cpp
     pytyr/formalism/planning/datas.cpp
@@ -41,6 +40,7 @@ nanobind_add_module(_pytyr
 )
 
 target_link_libraries(_pytyr PRIVATE tyr::core TBB::tbb)
+target_include_directories(_pytyr PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(APPLE)
     tyr_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "@loader_path" "../")
@@ -107,7 +107,6 @@ endif()
 set(PYTYR_PYTHON_FILES
     pytyr/__init__.py
     pytyr/__init__.pyi
-    pytyr/common/__init__.py
     pytyr/formalism/__init__.py
     pytyr/formalism/planning/__init__.py
     pytyr/planning/__init__.py

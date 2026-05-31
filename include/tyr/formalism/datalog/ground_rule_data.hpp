@@ -18,10 +18,10 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_RULE_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_RULE_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
-#include "tyr/common/variant.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/boolean_operator_data.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -32,23 +32,25 @@
 #include "tyr/formalism/datalog/ground_rule_index.hpp"
 #include "tyr/formalism/datalog/rule_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<>
-struct Data<formalism::datalog::GroundRule>
-{
-    using Head = ::cista::offset::variant<Index<formalism::datalog::GroundAtom<formalism::FluentTag>>,
-                                         Data<formalism::datalog::GroundNumericEffectOperator<formalism::FluentTag>>>;
+using namespace ::tyr;
 
-    Index<formalism::datalog::GroundRule> index;
-    Index<formalism::RelationBinding<formalism::datalog::Rule>> binding;
-    Index<formalism::datalog::GroundConjunctiveCondition> body;
+template<>
+struct Data<::tyr::formalism::datalog::GroundRule>
+{
+    using Head = ::cista::offset::variant<ygg::Index<::tyr::formalism::datalog::GroundAtom<::tyr::formalism::FluentTag>>,
+                                         ygg::Data<::tyr::formalism::datalog::GroundNumericEffectOperator<::tyr::formalism::FluentTag>>>;
+
+    ygg::Index<::tyr::formalism::datalog::GroundRule> index;
+    ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::datalog::Rule>> binding;
+    ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition> body;
     Head head;
 
     Data() = default;
-    Data(Index<formalism::datalog::GroundRule> index,
-         Index<formalism::RelationBinding<formalism::datalog::Rule>> binding,
-         Index<formalism::datalog::GroundConjunctiveCondition> body,
+    Data(ygg::Index<::tyr::formalism::datalog::GroundRule> index,
+         ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::datalog::Rule>> binding,
+         ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition> body,
          Head head) :
         index(index),
         binding(binding),
@@ -63,17 +65,17 @@ struct Data<formalism::datalog::GroundRule>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(binding);
-        tyr::clear(body);
-        tyr::clear(head);
+        ygg::clear(index);
+        ygg::clear(binding);
+        ygg::clear(body);
+        ygg::clear(head);
     }
 
     auto cista_members() const noexcept { return std::tie(index, binding, body, head); }
     auto identifying_members() const noexcept { return std::tie(binding); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::GroundRule>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::GroundRule>);
 
 }
 

@@ -18,7 +18,7 @@
 #ifndef TYR_SOLVER_POLICIES_TERMINATION_HPP_
 #define TYR_SOLVER_POLICIES_TERMINATION_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/datalog/policies/numeric_support.hpp"
@@ -39,7 +39,7 @@ class NoTerminationPolicy
 public:
     NoTerminationPolicy() = default;
 
-    void set_goals(formalism::datalog::GroundConjunctiveConditionView goals) {}
+    void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals) {}
     bool check(const FactSets& fact_sets) const noexcept { return false; }
     Cost get_total_cost(const FactSets& fact_sets,
                         const SelectedPredicateAnnotations& and_annot,
@@ -56,10 +56,10 @@ template<typename AggregationFunction>
 class TerminationPolicy
 {
 public:
-    TerminationPolicy(formalism::datalog::PredicateListView<formalism::FluentTag> fluent_predicates,
-                      const formalism::datalog::Repository& repository);
+    TerminationPolicy(::tyr::formalism::datalog::PredicateListView<::tyr::formalism::FluentTag> fluent_predicates,
+                      const ::tyr::formalism::datalog::Repository& repository);
 
-    void set_goals(formalism::datalog::GroundConjunctiveConditionView goals);
+    void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals);
 
     bool check(const FactSets& fact_sets) const noexcept;
 
@@ -75,7 +75,7 @@ public:
     void clear() noexcept;
 
 private:
-    std::optional<formalism::datalog::GroundConjunctiveConditionView> goal;
+    std::optional<::tyr::formalism::datalog::GroundConjunctiveConditionView> goal;
 
     mutable NumericSupportSelectorWorkspace numeric_support_selector_workspace;
     AggregationFunction agg;

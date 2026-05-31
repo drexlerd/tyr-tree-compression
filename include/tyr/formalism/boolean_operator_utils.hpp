@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_BOOLEAN_OPERATOR_UTILS_HPP_
 #define TYR_FORMALISM_BOOLEAN_OPERATOR_UTILS_HPP_
 
-#include "tyr/common/closed_interval.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 
 #include <cmath>
@@ -33,7 +33,7 @@ namespace tyr::formalism
 template<std::floating_point T>
 struct FloatCmp
 {
-    static T tol(T a, T b) noexcept { return FloatTolerance<T>::tolerance(a, b); }
+    static T tol(T a, T b) noexcept { return ygg::FloatTolerance<T>::tolerance(a, b); }
 
     static bool eq(T a, T b) noexcept { return std::abs(a - b) <= tol(a, b); }
 
@@ -150,7 +150,7 @@ bool apply(Lt, T lhs, T rhs) noexcept
  */
 
 template<std::floating_point A>
-bool apply_existential(Eq, const ClosedInterval<A>& lhs, const ClosedInterval<A>& rhs)
+bool apply_existential(Eq, const ygg::ClosedInterval<A>& lhs, const ygg::ClosedInterval<A>& rhs)
 {
     if (empty(lhs) || empty(rhs))
         return false;
@@ -159,7 +159,7 @@ bool apply_existential(Eq, const ClosedInterval<A>& lhs, const ClosedInterval<A>
 }
 
 template<std::floating_point A>
-bool apply_existential(Ne, const ClosedInterval<A>& lhs, const ClosedInterval<A>& rhs)
+bool apply_existential(Ne, const ygg::ClosedInterval<A>& lhs, const ygg::ClosedInterval<A>& rhs)
 {
     if (empty(lhs) || empty(rhs))
         return false;
@@ -174,7 +174,7 @@ bool apply_existential(Ne, const ClosedInterval<A>& lhs, const ClosedInterval<A>
 }
 
 template<std::floating_point A>
-bool apply_existential(Ge, const ClosedInterval<A>& lhs, const ClosedInterval<A>& rhs)
+bool apply_existential(Ge, const ygg::ClosedInterval<A>& lhs, const ygg::ClosedInterval<A>& rhs)
 {
     if (empty(lhs) || empty(rhs))
         return false;
@@ -183,7 +183,7 @@ bool apply_existential(Ge, const ClosedInterval<A>& lhs, const ClosedInterval<A>
 }
 
 template<std::floating_point A>
-bool apply_existential(Gt, const ClosedInterval<A>& lhs, const ClosedInterval<A>& rhs)
+bool apply_existential(Gt, const ygg::ClosedInterval<A>& lhs, const ygg::ClosedInterval<A>& rhs)
 {
     if (empty(lhs) || empty(rhs))
         return false;
@@ -192,7 +192,7 @@ bool apply_existential(Gt, const ClosedInterval<A>& lhs, const ClosedInterval<A>
 }
 
 template<std::floating_point A>
-bool apply_existential(Le, const ClosedInterval<A>& lhs, const ClosedInterval<A>& rhs)
+bool apply_existential(Le, const ygg::ClosedInterval<A>& lhs, const ygg::ClosedInterval<A>& rhs)
 {
     if (empty(lhs) || empty(rhs))
         return false;
@@ -201,7 +201,7 @@ bool apply_existential(Le, const ClosedInterval<A>& lhs, const ClosedInterval<A>
 }
 
 template<std::floating_point A>
-bool apply_existential(Lt, const ClosedInterval<A>& lhs, const ClosedInterval<A>& rhs)
+bool apply_existential(Lt, const ygg::ClosedInterval<A>& lhs, const ygg::ClosedInterval<A>& rhs)
 {
     if (empty(lhs) || empty(rhs))
         return false;

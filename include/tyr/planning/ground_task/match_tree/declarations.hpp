@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_DECLARATIONS_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_DECLARATIONS_HPP_
 
-#include "tyr/common/type_list.hpp"
+#include <yggdrasil/core/type_list.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 
 #include <concepts>
@@ -63,7 +63,7 @@ struct Node
 
 template<typename Tag>
 using RepositoryTypes =
-    TypeList<AtomSelectorNode<Tag>, VariableSelectorNode<Tag>, NegativeFactSelectorNode<Tag>, NumericConstraintSelectorNode<Tag>, ElementGeneratorNode<Tag>>;
+    ygg::TypeList<AtomSelectorNode<Tag>, VariableSelectorNode<Tag>, NegativeFactSelectorNode<Tag>, NumericConstraintSelectorNode<Tag>, ElementGeneratorNode<Tag>>;
 
 /**
  * MatchTree
@@ -84,19 +84,19 @@ template<typename Tag>
 using RepositoryPtr = std::unique_ptr<Repository<Tag>>;
 
 template<typename Repo, typename Tag>
-concept RepositoryAccess = requires(const Repo& r, Index<Tag> idx) {
-    { r[idx] } -> std::same_as<const Data<Tag>&>;
+concept RepositoryAccess = requires(const Repo& r, ygg::Index<Tag> idx) {
+    { r[idx] } -> std::same_as<const ygg::Data<Tag>&>;
 };
 
 template<typename Repo, typename... Tags>
-constexpr bool match_tree_repository_access_for_types(TypeList<Tags...>) noexcept
+constexpr bool match_tree_repository_access_for_types(ygg::TypeList<Tags...>) noexcept
 {
     return (RepositoryAccess<Repo, Tags> && ...);
 }
 
 template<typename T>
 concept HasFormalismRepository = requires(const T& r) {
-    { r.get_formalism_repository() } -> formalism::planning::Context;
+    { r.get_formalism_repository() } -> ::tyr::formalism::planning::Context;
 };
 
 template<typename T, typename Tag>

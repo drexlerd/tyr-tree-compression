@@ -18,18 +18,18 @@
 #ifndef TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_INDEX_HPP_
 #define TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::NumericEffectOpKind Op, formalism::FactKind T>
-struct Index<formalism::datalog::NumericEffect<Op, T>> : IndexMixin<Index<formalism::datalog::NumericEffect<Op, T>>>
+template<tyr::formalism::NumericEffectOpKind Op, tyr::formalism::FactKind T>
+struct Index<tyr::formalism::datalog::NumericEffect<Op, T>> : ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::NumericEffect<Op, T>>>
 {
-    static_assert(std::same_as<T, formalism::FluentTag>, "Datalog numeric effects are currently only supported for fluent functions.");
+    static_assert(std::same_as<T, tyr::formalism::FluentTag>, "Datalog numeric effects are currently only supported for fluent functions.");
 
-    using Base = IndexMixin<Index<formalism::datalog::NumericEffect<Op, T>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::NumericEffect<Op, T>>>;
     using Base::Base;
 };
 

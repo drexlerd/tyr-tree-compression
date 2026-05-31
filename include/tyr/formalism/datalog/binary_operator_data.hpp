@@ -18,26 +18,28 @@
 #ifndef TYR_FORMALISM_DATALOG_BINARY_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_BINARY_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/binary_operator_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/function_expression_data.hpp"
 #include "tyr/formalism/datalog/ground_function_expression_data.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T>
-struct Data<formalism::datalog::BinaryOperator<Op, T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::OpKind Op, typename T>
+struct Data<::tyr::formalism::datalog::BinaryOperator<Op, T>>
 {
     using OpType = Op;
 
-    Index<formalism::datalog::BinaryOperator<Op, T>> index;
+    ygg::Index<::tyr::formalism::datalog::BinaryOperator<Op, T>> index;
     T lhs;
     T rhs;
 
     Data() = default;
-    Data(Index<formalism::datalog::BinaryOperator<Op, T>> index, T lhs, T rhs) : index(index), lhs(lhs), rhs(rhs) {}
+    Data(ygg::Index<::tyr::formalism::datalog::BinaryOperator<Op, T>> index, T lhs, T rhs) : index(index), lhs(lhs), rhs(rhs) {}
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
     Data(Data&& other) = default;
@@ -45,16 +47,16 @@ struct Data<formalism::datalog::BinaryOperator<Op, T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(lhs);
-        tyr::clear(rhs);
+        ygg::clear(index);
+        ygg::clear(lhs);
+        ygg::clear(rhs);
     }
 
     auto cista_members() const noexcept { return std::tie(index, lhs, rhs); }
     auto identifying_members() const noexcept { return std::tie(Op::kind, lhs, rhs); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::BinaryOperator<formalism::Add, Data<formalism::datalog::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Add, ygg::Data<::tyr::formalism::datalog::FunctionExpression>>>);
 
 }
 

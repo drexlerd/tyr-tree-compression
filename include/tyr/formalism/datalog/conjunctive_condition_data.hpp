@@ -18,31 +18,33 @@
 #ifndef TYR_FORMALISM_DATALOG_CONJUNCTIVE_CONDITION_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_CONJUNCTIVE_CONDITION_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/boolean_operator_data.hpp"
 #include "tyr/formalism/datalog/conjunctive_condition_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/literal_index.hpp"
 #include "tyr/formalism/variable_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::datalog::ConjunctiveCondition>
+struct Data<::tyr::formalism::datalog::ConjunctiveCondition>
 {
-    Index<formalism::datalog::ConjunctiveCondition> index;
-    IndexList<formalism::Variable> variables;
-    IndexList<formalism::datalog::Literal<formalism::StaticTag>> static_literals;
-    IndexList<formalism::datalog::Literal<formalism::FluentTag>> fluent_literals;
-    DataList<formalism::datalog::BooleanOperator<Data<formalism::datalog::FunctionExpression>>> numeric_constraints;
+    ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> index;
+    ygg::IndexList<::tyr::formalism::Variable> variables;
+    ygg::IndexList<::tyr::formalism::datalog::Literal<::tyr::formalism::StaticTag>> static_literals;
+    ygg::IndexList<::tyr::formalism::datalog::Literal<::tyr::formalism::FluentTag>> fluent_literals;
+    ygg::DataList<::tyr::formalism::datalog::BooleanOperator<ygg::Data<::tyr::formalism::datalog::FunctionExpression>>> numeric_constraints;
 
     Data() = default;
-    Data(Index<formalism::datalog::ConjunctiveCondition> index,
-         IndexList<formalism::Variable> variables,
-         IndexList<formalism::datalog::Literal<formalism::StaticTag>> static_literals,
-         IndexList<formalism::datalog::Literal<formalism::FluentTag>> fluent_literals,
-         DataList<formalism::datalog::BooleanOperator<Data<formalism::datalog::FunctionExpression>>> numeric_constraints) :
+    Data(ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> index,
+         ygg::IndexList<::tyr::formalism::Variable> variables,
+         ygg::IndexList<::tyr::formalism::datalog::Literal<::tyr::formalism::StaticTag>> static_literals,
+         ygg::IndexList<::tyr::formalism::datalog::Literal<::tyr::formalism::FluentTag>> fluent_literals,
+         ygg::DataList<::tyr::formalism::datalog::BooleanOperator<ygg::Data<::tyr::formalism::datalog::FunctionExpression>>> numeric_constraints) :
         index(index),
         variables(std::move(variables)),
         static_literals(std::move(static_literals)),
@@ -57,29 +59,29 @@ struct Data<formalism::datalog::ConjunctiveCondition>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(variables);
-        tyr::clear(static_literals);
-        tyr::clear(fluent_literals);
-        tyr::clear(numeric_constraints);
+        ygg::clear(index);
+        ygg::clear(variables);
+        ygg::clear(static_literals);
+        ygg::clear(fluent_literals);
+        ygg::clear(numeric_constraints);
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_literals() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_literals;
-        else if constexpr (std::same_as<T, formalism::FluentTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::FluentTag>)
             return fluent_literals;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     auto cista_members() const noexcept { return std::tie(index, variables, static_literals, fluent_literals, numeric_constraints); }
     auto identifying_members() const noexcept { return std::tie(variables, static_literals, fluent_literals, numeric_constraints); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::ConjunctiveCondition>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::ConjunctiveCondition>);
 
 }
 

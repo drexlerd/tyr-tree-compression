@@ -17,7 +17,7 @@
 
 #include "tyr/planning/algorithms/astar_eager/event_handler.hpp"
 
-#include "tyr/common/chrono.hpp"
+#include <yggdrasil/core/chrono.hpp>
 #include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/planning/formatter.hpp"
 #include "tyr/planning/ground_task.hpp"
@@ -70,17 +70,17 @@ void DefaultEventHandler<Kind>::on_prune_node_impl(const Node<Kind>& node) const
 }
 
 template<TaskKind Kind>
-void DefaultEventHandler<Kind>::on_start_search_impl(const Node<Kind>& node, float_t f_value) const
+void DefaultEventHandler<Kind>::on_start_search_impl(const Node<Kind>& node, ygg::float_t f_value) const
 {
     std::cout << "[ASTAR] Search started.\n"
               << "[ASTAR] Start node f_value: " << f_value << std::endl;
 }
 
 template<TaskKind Kind>
-void DefaultEventHandler<Kind>::on_finish_f_layer_impl(float_t f_value, uint64_t num_expanded_states, uint64_t num_generated_states) const
+void DefaultEventHandler<Kind>::on_finish_f_layer_impl(ygg::float_t f_value, uint64_t num_expanded_states, uint64_t num_generated_states) const
 {
     std::cout << "[ASTAR] Finished f-layer: " << f_value << " with num expanded states " << num_expanded_states << " and num generated states "
-              << num_generated_states << " (" << to_ms(this->get_statistics().get_current_search_time()) << " ms)" << std::endl;
+              << num_generated_states << " (" << ygg::to_ms(this->get_statistics().get_current_search_time()) << " ms)" << std::endl;
 }
 
 template<TaskKind Kind>

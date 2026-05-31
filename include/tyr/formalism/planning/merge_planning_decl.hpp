@@ -39,15 +39,15 @@ struct to_planning_payload
 };
 
 template<>
-struct to_planning_payload<Data<formalism::datalog::FunctionExpression>>
+struct to_planning_payload<ygg::Data<::tyr::formalism::datalog::FunctionExpression>>
 {
-    using type = Data<formalism::planning::FunctionExpression>;
+    using type = ygg::Data<::tyr::formalism::planning::FunctionExpression>;
 };
 
 template<>
-struct to_planning_payload<Data<formalism::datalog::GroundFunctionExpression>>
+struct to_planning_payload<ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>>
 {
-    using type = Data<formalism::planning::GroundFunctionExpression>;
+    using type = ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>;
 };
 
 template<typename T>

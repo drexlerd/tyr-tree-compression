@@ -50,7 +50,7 @@ public:
 
     virtual void on_start_search(const Node<Kind>& node) = 0;
 
-    virtual void on_finish_layer(uint_t layer) = 0;
+    virtual void on_finish_layer(ygg::uint_t layer) = 0;
 
     virtual void on_end_search(tyr::planning::SearchStatus status) = 0;
 
@@ -131,7 +131,7 @@ public:
             self().on_start_search_impl(node);
     }
 
-    void on_finish_layer(uint_t layer) override
+    void on_finish_layer(ygg::uint_t layer) override
     {
         m_progress_statistics.add_snap_shot(m_statistics);
 
@@ -174,7 +174,7 @@ private:
 
     void on_start_search_impl(const Node<Kind>& node) const;
 
-    void on_finish_layer_impl(uint_t layer, uint64_t num_expanded_states, uint64_t num_generated_states) const;
+    void on_finish_layer_impl(ygg::uint_t layer, uint64_t num_expanded_states, uint64_t num_generated_states) const;
 
     void on_end_search_impl(tyr::planning::SearchStatus status) const;
 

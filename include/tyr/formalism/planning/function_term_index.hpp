@@ -18,17 +18,17 @@
 #ifndef TYR_FORMALISM_PLANNING_FUNCTION_TERM_INDEX_HPP_
 #define TYR_FORMALISM_PLANNING_FUNCTION_TERM_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::FactKind T>
-struct Index<formalism::planning::FunctionTerm<T>> : IndexMixin<Index<formalism::planning::FunctionTerm<T>>>
+template<tyr::formalism::FactKind T>
+struct Index<tyr::formalism::planning::FunctionTerm<T>> : ygg::IndexMixin<ygg::Index<tyr::formalism::planning::FunctionTerm<T>>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::planning::FunctionTerm<T>>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::planning::FunctionTerm<T>>>;
     using Base::Base;
 };
 }

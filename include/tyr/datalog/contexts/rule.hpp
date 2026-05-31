@@ -110,8 +110,8 @@ public:
     private:
         RuleWorkspace<AndAP>::Worker& m_ws_worker;
 
-        formalism::datalog::GrounderContext m_ground_context_solve;
-        formalism::datalog::GrounderContext m_ground_context_iteration;
+        ::tyr::formalism::datalog::GrounderContext m_ground_context_solve;
+        ::tyr::formalism::datalog::GrounderContext m_ground_context_iteration;
     };
 
     RuleWorkerExecutionContext(RuleExecutionContext<OrAP, AndAP, TP>& rctx, RuleWorkspace<AndAP>::Worker& ws_worker) :
@@ -158,13 +158,13 @@ struct RuleExecutionContext
     class In
     {
     public:
-        In(Index<formalism::datalog::Rule> rule, const ConstRuleWorkspace& cws_rule) : m_rule(rule), m_cws_rule(cws_rule) {}
+        In(ygg::Index<::tyr::formalism::datalog::Rule> rule, const ConstRuleWorkspace& cws_rule) : m_rule(rule), m_cws_rule(cws_rule) {}
 
         auto rule() const noexcept { return m_rule; }
         const auto& cws_rule() const noexcept { return m_cws_rule; }
 
     private:
-        Index<formalism::datalog::Rule> m_rule;
+        ygg::Index<::tyr::formalism::datalog::Rule> m_rule;
         const ConstRuleWorkspace& m_cws_rule;
     };
 
@@ -188,10 +188,10 @@ struct RuleExecutionContext
         RuleWorkspace<AndAP>& m_ws_rule;
     };
 
-    RuleExecutionContext(Index<formalism::datalog::Rule> rule, StratumExecutionContext<OrAP, AndAP, TP>& ctx) :
+    RuleExecutionContext(ygg::Index<::tyr::formalism::datalog::Rule> rule, StratumExecutionContext<OrAP, AndAP, TP>& ctx) :
         m_ctx(ctx),
-        m_in(rule, *ctx.in().program().rules()[uint_t(rule)]),
-        m_out(*ctx.out().program().rules()[uint_t(rule)])
+        m_in(rule, *ctx.in().program().rules()[ygg::uint_t(rule)]),
+        m_out(*ctx.out().program().rules()[ygg::uint_t(rule)])
     {
     }
 

@@ -17,11 +17,11 @@
 
 #include "tyr/planning/lifted_task.hpp"
 
-#include "tyr/common/comparators.hpp"     // for operat...
-#include "tyr/common/dynamic_bitset.hpp"  // for set
-#include "tyr/common/vector.hpp"          // for View, set
+#include <yggdrasil/semantics/comparators.hpp>     // for operat...
+#include <yggdrasil/containers/dynamic_bitset.hpp>  // for set
+#include <yggdrasil/containers/vector.hpp>          // for ygg::View, set
 #include "tyr/formalism/planning/formatter.hpp"
-#include "tyr/formalism/planning/views.hpp"  // for View
+#include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/lifted_task/task_grounder.hpp"
 #include "tyr/planning/task_utils.hpp"
 
@@ -33,7 +33,7 @@ namespace fp = tyr::formalism::planning;
 
 namespace tyr::planning
 {
-Task<LiftedTag>::Task(formalism::planning::PlanningTask task) :
+Task<LiftedTag>::Task(::tyr::formalism::planning::PlanningTask task) :
     m_task(std::move(task)),
     m_static_atoms_bitset(),
     m_static_numeric_variables(),
@@ -42,15 +42,15 @@ Task<LiftedTag>::Task(formalism::planning::PlanningTask task) :
     m_rpg_program(get_task())
 {
     for (const auto atom : get_task().template get_atoms<f::StaticTag>())
-        set(uint_t(atom.get_index()), true, m_static_atoms_bitset);
+        ygg::set(ygg::uint_t(atom.get_index()), true, m_static_atoms_bitset);
 
     for (const auto fterm_value : get_task().template get_fterm_values<f::StaticTag>())
-        set(uint_t(fterm_value.get_fterm().get_index()), fterm_value.get_value(), m_static_numeric_variables, std::numeric_limits<float_t>::quiet_NaN());
+        ygg::set(ygg::uint_t(fterm_value.get_fterm().get_index()), fterm_value.get_value(), m_static_numeric_variables, std::numeric_limits<ygg::float_t>::quiet_NaN());
 }
 
-TaskPtr<LiftedTag> Task<LiftedTag>::create(formalism::planning::PlanningTask task) { return std::make_shared<Task<LiftedTag>>(std::move(task)); }
+TaskPtr<LiftedTag> Task<LiftedTag>::create(::tyr::formalism::planning::PlanningTask task) { return std::make_shared<Task<LiftedTag>>(std::move(task)); }
 
-GroundTaskInstantiationResult Task<LiftedTag>::instantiate_ground_task(ExecutionContext& execution_context, const GroundTaskInstantiationOptions& options)
+GroundTaskInstantiationResult Task<LiftedTag>::instantiate_ground_task(ygg::ExecutionContext& execution_context, const GroundTaskInstantiationOptions& options)
 {
     return tyr::planning::instantiate_ground_task(*this, execution_context, options);
 }

@@ -18,17 +18,17 @@
 #ifndef TYR_FORMALISM_PLANNING_AXIOM_INDEX_HPP_
 #define TYR_FORMALISM_PLANNING_AXIOM_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
 template<>
-struct Index<formalism::planning::Axiom> : IndexMixin<Index<formalism::planning::Axiom>>
+struct Index<tyr::formalism::planning::Axiom> : ygg::IndexMixin<ygg::Index<tyr::formalism::planning::Axiom>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::planning::Axiom>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::planning::Axiom>>;
     using Base::Base;
 };
 

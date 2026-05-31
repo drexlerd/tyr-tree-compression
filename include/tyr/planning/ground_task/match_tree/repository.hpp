@@ -18,11 +18,11 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_REPOSITORY_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_REPOSITORY_HPP_
 
-#include "tyr/buffer/declarations.hpp"
-#include "tyr/buffer/indexed_hash_set.hpp"
-#include "tyr/buffer/segmented_buffer.hpp"
-#include "tyr/common/tuple.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/buffer/declarations.hpp>
+#include <yggdrasil/buffer/indexed_hash_set.hpp>
+#include <yggdrasil/buffer/segmented_buffer.hpp>
+#include <yggdrasil/containers/tuple.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/formalism/planning/ground_axiom_index.hpp"
@@ -62,29 +62,29 @@ private:
     struct Entry
     {
         using value_type = T;
-        using container_type = buffer::IndexedHashSet<T>;
+        using container_type = ygg::buffer::IndexedHashSet<T>;
 
         container_type container;
 
-        Entry(buffer::Buffer& buffer, buffer::SegmentedBuffer& arena) : container(buffer, arena) {}
+        Entry(ygg::buffer::Buffer& buffer, ygg::buffer::SegmentedBuffer& arena) : container(buffer, arena) {}
     };
 
-    using RepositoryStorage = TypeListToTupleT<MapTypeListT<Entry, RepositoryTypes<Tag>>>;
+    using RepositoryStorage = ygg::TypeListToTupleT<ygg::MapTypeListT<Entry, RepositoryTypes<Tag>>>;
 
-    const formalism::planning::Repository& m_formalism_repository;
-    buffer::SegmentedBuffer m_arena;
-    buffer::Buffer m_buffer;
+    const ::tyr::formalism::planning::Repository& m_formalism_repository;
+    ygg::buffer::SegmentedBuffer m_arena;
+    ygg::buffer::Buffer m_buffer;
     RepositoryStorage m_repository;
-    uint_t m_index;
+    ygg::uint_t m_index;
 
     template<typename... Ts>
-    static RepositoryStorage make_repository_storage(TypeList<Ts...>, buffer::Buffer& buffer, buffer::SegmentedBuffer& arena)
+    static RepositoryStorage make_repository_storage(ygg::TypeList<Ts...>, ygg::buffer::Buffer& buffer, ygg::buffer::SegmentedBuffer& arena)
     {
         return RepositoryStorage(Entry<Ts>(buffer, arena)...);
     }
 
 public:
-    explicit Repository(uint_t index, const formalism::planning::Repository& formalism_repository) :
+    explicit Repository(ygg::uint_t index, const ::tyr::formalism::planning::Repository& formalism_repository) :
         m_formalism_repository(formalism_repository),
         m_arena(),
         m_buffer(),
@@ -99,10 +99,10 @@ public:
 
     const auto& get_index() const noexcept { return m_index; }
 
-    const formalism::planning::Repository& get_formalism_repository() const noexcept { return m_formalism_repository; }
+    const ::tyr::formalism::planning::Repository& get_formalism_repository() const noexcept { return m_formalism_repository; }
 
     template<typename T>
-    std::optional<Index<T>> find(const Data<T>& builder) const noexcept
+    std::optional<ygg::Index<T>> find(const ygg::Data<T>& builder) const noexcept
     {
         const auto& indexed_hash_set = std::get<Entry<T>>(m_repository).container;
 
@@ -113,7 +113,7 @@ public:
     }
 
     template<typename T>
-    std::pair<Index<T>, bool> get_or_create(Data<T>& builder)
+    std::pair<ygg::Index<T>, bool> get_or_create(ygg::Data<T>& builder)
     {
         auto& indexed_hash_set = std::get<Entry<T>>(m_repository).container;
 
@@ -126,9 +126,9 @@ public:
 
     /// @brief Access the element with the given index.
     template<typename T>
-    const Data<T>& operator[](Index<T> index) const noexcept
+    const ygg::Data<T>& operator[](ygg::Index<T> index) const noexcept
     {
-        assert(index != Index<T>::max() && "Unassigned index.");
+        assert(index != ygg::Index<T>::max() && "Unassigned index.");
 
         const auto& repository = std::get<Entry<T>>(m_repository).container;
 
@@ -136,7 +136,7 @@ public:
     }
 
     template<typename T>
-    const Data<T>& front() const
+    const ygg::Data<T>& front() const
     {
         const auto& repository = std::get<Entry<T>>(m_repository).container;
 
@@ -159,9 +159,9 @@ public:
     }
 };
 
-static_assert(RepositoryConcept<Repository<formalism::planning::GroundAction>, formalism::planning::GroundAction>);
+static_assert(RepositoryConcept<Repository<::tyr::formalism::planning::GroundAction>, ::tyr::formalism::planning::GroundAction>);
 
-static_assert(Context<Repository<formalism::planning::GroundAction>, formalism::planning::GroundAction>);
+static_assert(Context<Repository<::tyr::formalism::planning::GroundAction>, ::tyr::formalism::planning::GroundAction>);
 
 }
 

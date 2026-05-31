@@ -18,7 +18,7 @@
 #ifndef TYR_FORMALISM_DATALOG_VARIABLE_DEPENDENCY_GRAPH_DETAILS_HPP_
 #define TYR_FORMALISM_DATALOG_VARIABLE_DEPENDENCY_GRAPH_DETAILS_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/declarations.hpp"
 
 #include <boost/dynamic_bitset.hpp>
@@ -36,7 +36,7 @@ decltype(auto) select_literal_dependency(Dep&& dep) noexcept
         else if constexpr (std::is_same_v<P, NegativeTag>)
             return (std::forward<Dep>(dep).static_negative_literal);
         else
-            static_assert(dependent_false<P>::value, "Missing case");
+            static_assert(ygg::dependent_false<P>::value, "Missing case");
     }
     else if constexpr (std::is_same_v<T, FluentTag>)
     {
@@ -45,11 +45,11 @@ decltype(auto) select_literal_dependency(Dep&& dep) noexcept
         else if constexpr (std::is_same_v<P, NegativeTag>)
             return (std::forward<Dep>(dep).fluent_negative_literal);
         else
-            static_assert(dependent_false<P>::value, "Missing case");
+            static_assert(ygg::dependent_false<P>::value, "Missing case");
     }
     else
     {
-        static_assert(dependent_false<T>::value, "Missing case");
+        static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 }
 
@@ -61,7 +61,7 @@ decltype(auto) select_numeric_dependency(Dep&& dep) noexcept
 
 struct UnaryDependencies
 {
-    explicit UnaryDependencies(uint_t k_) :
+    explicit UnaryDependencies(ygg::uint_t k_) :
         k(k_),
         static_positive_literal(k_),
         static_negative_literal(k_),
@@ -88,25 +88,25 @@ struct UnaryDependencies
      */
 
     template<FactKind T, PolarityKind P>
-    bool has_literal_dependency(uint_t p) const noexcept
+    bool has_literal_dependency(ygg::uint_t p) const noexcept
     {
         assert(p < k);
         return get_literal_dependency<T, P>().test(p);
     }
 
-    bool has_numeric_dependency(uint_t p) const noexcept
+    bool has_numeric_dependency(ygg::uint_t p) const noexcept
     {
         assert(p < k);
         return numeric_constraint.test(p);
     }
 
-    bool has_dependency(uint_t p) const noexcept
+    bool has_dependency(ygg::uint_t p) const noexcept
     {
         return has_literal_dependency<StaticTag, PositiveTag>(p) || has_literal_dependency<StaticTag, NegativeTag>(p)
                || has_literal_dependency<FluentTag, PositiveTag>(p) || has_literal_dependency<FluentTag, NegativeTag>(p) || has_numeric_dependency(p);
     }
 
-    uint_t k;
+    ygg::uint_t k;
 
     boost::dynamic_bitset<> static_positive_literal;
     boost::dynamic_bitset<> static_negative_literal;
@@ -117,7 +117,7 @@ struct UnaryDependencies
 
 struct BinaryDependencies
 {
-    explicit BinaryDependencies(uint_t k_) :
+    explicit BinaryDependencies(ygg::uint_t k_) :
         k(k_),
         static_positive_literal(k_ * k_),
         static_negative_literal(k_ * k_),
@@ -127,7 +127,7 @@ struct BinaryDependencies
     {
     }
 
-    uint_t get_index(uint_t pi, uint_t pj) const noexcept
+    ygg::uint_t get_index(ygg::uint_t pi, ygg::uint_t pj) const noexcept
     {
         assert(pi < k && pj < k);
         return pi * k + pj;
@@ -150,21 +150,21 @@ struct BinaryDependencies
      */
 
     template<FactKind T, PolarityKind P>
-    bool has_literal_dependency(uint_t pi, uint_t pj) const noexcept
+    bool has_literal_dependency(ygg::uint_t pi, ygg::uint_t pj) const noexcept
     {
         return get_literal_dependency<T, P>().test(get_index(pi, pj));
     }
 
-    bool has_numeric_dependency(uint_t pi, uint_t pj) const noexcept { return numeric_constraint.test(get_index(pi, pj)); }
+    bool has_numeric_dependency(ygg::uint_t pi, ygg::uint_t pj) const noexcept { return numeric_constraint.test(get_index(pi, pj)); }
 
-    bool has_dependency(uint_t pi, uint_t pj) const noexcept
+    bool has_dependency(ygg::uint_t pi, ygg::uint_t pj) const noexcept
     {
         return has_literal_dependency<StaticTag, PositiveTag>(pi, pj) || has_literal_dependency<StaticTag, NegativeTag>(pi, pj)
                || has_literal_dependency<FluentTag, PositiveTag>(pi, pj) || has_literal_dependency<FluentTag, NegativeTag>(pi, pj)
                || has_numeric_dependency(pi, pj);
     }
 
-    uint_t k;
+    ygg::uint_t k;
 
     boost::dynamic_bitset<> static_positive_literal;
     boost::dynamic_bitset<> static_negative_literal;

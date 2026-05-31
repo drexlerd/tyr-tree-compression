@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_BASIC_BUILDER_HPP_
 #define TYR_FORMALISM_BASIC_BUILDER_HPP_
 
-#include "tyr/common/tuple.hpp"
-#include "tyr/common/unique_object_pool.hpp"
+#include <yggdrasil/containers/tuple.hpp>
+#include <yggdrasil/containers/unique_object_pool.hpp>
 #include "tyr/formalism/declarations.hpp"
 
 namespace tyr::formalism
@@ -31,7 +31,7 @@ private:
     struct Slot
     {
         using value_type = T;
-        using container_type = UniqueObjectPool<Data<T>>;
+        using container_type = ygg::UniqueObjectPool<ygg::Data<T>>;
 
         container_type container;
 

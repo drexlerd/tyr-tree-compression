@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_INVARIANTS_FORMATTER_HPP_
 #define TYR_FORMALISM_PLANNING_INVARIANTS_FORMATTER_HPP_
 
-#include "tyr/common/cista_formatters.hpp"
-#include "tyr/common/iostream.hpp"
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/io/iostream.hpp>
 #include "tyr/formalism/formatter.hpp"
 #include "tyr/formalism/planning/invariants/invariant.hpp"
 #include "tyr/formalism/planning/mutable/formatter.hpp"
@@ -46,15 +46,15 @@ struct formatter<tyr::formalism::planning::invariant::Invariant, char>
         os << "Invariant(\n";
 
         {
-            tyr::IndentScope indent { os };
+            ygg::IndentScope indent { os };
 
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "num_rigid_variables = {},\n", value.num_rigid_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "num_counted_variables = {},\n", value.num_counted_variables);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "atoms = {},\n", value.atoms);
-            os << tyr::print_indent;
+            os << ygg::print_indent;
             fmt::print(os, "predicates = {},\n", value.predicates);
         }
 

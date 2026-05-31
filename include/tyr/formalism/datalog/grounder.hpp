@@ -19,8 +19,8 @@
 #define TYR_FORMALISM_DATALOG_GROUNDER_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/itertools.hpp"
-#include "tyr/common/tuple.hpp"
+#include <yggdrasil/core/itertools.hpp>
+#include <yggdrasil/containers/tuple.hpp>
 #include "tyr/formalism/datalog/builder.hpp"
 #include "tyr/formalism/datalog/canonicalization.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -44,7 +44,7 @@ std::pair<FunctionBindingView<T>, bool> ground(TermListView terms, FunctionView<
 template<FactKind T>
 std::pair<GroundFunctionTermView<T>, bool> ground(FunctionTermView<T> element, GrounderContext& context);
 
-Data<GroundFunctionExpression> ground(FunctionExpressionView element, GrounderContext& context);
+ygg::Data<GroundFunctionExpression> ground(FunctionExpressionView element, GrounderContext& context);
 
 template<OpKind O>
 std::pair<GroundUnaryOperatorView<O>, bool> ground(LiftedUnaryOperatorView<O> element, GrounderContext& context);
@@ -55,9 +55,9 @@ std::pair<GroundBinaryOperatorView<O>, bool> ground(LiftedBinaryOperatorView<O> 
 template<OpKind O>
 std::pair<GroundMultiOperatorView<O>, bool> ground(LiftedMultiOperatorView<O> element, GrounderContext& context);
 
-Data<BooleanOperator<Data<GroundFunctionExpression>>> ground(LiftedBooleanOperatorView element, GrounderContext& context);
+ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>> ground(LiftedBooleanOperatorView element, GrounderContext& context);
 
-Data<ArithmeticOperator<Data<GroundFunctionExpression>>> ground(LiftedArithmeticOperatorView element, GrounderContext& context);
+ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>> ground(LiftedArithmeticOperatorView element, GrounderContext& context);
 
 template<FactKind T>
 std::pair<PredicateBindingView<T>, bool> ground(TermListView terms, PredicateView<T> predicate, GrounderContext& context);
@@ -72,7 +72,7 @@ template<NumericEffectOpKind Op, FactKind T>
 std::pair<GroundNumericEffectView<Op, T>, bool> ground(NumericEffectView<Op, T> element, GrounderContext& context);
 
 template<FactKind T>
-Data<GroundNumericEffectOperator<T>> ground(NumericEffectOperatorView<T> element, GrounderContext& context);
+ygg::Data<GroundNumericEffectOperator<T>> ground(NumericEffectOperatorView<T> element, GrounderContext& context);
 
 std::pair<GroundConjunctiveConditionView, bool> ground(ConjunctiveConditionView element, GrounderContext& context);
 
@@ -117,11 +117,11 @@ std::pair<FunctionBindingView<T>, bool> ground(TermListView terms, FunctionView<
                 using Alternative = std::decay_t<decltype(arg)>;
 
                 if constexpr (std::is_same_v<Alternative, ParameterIndex>)
-                    binding.objects.push_back(context.binding[uint_t(arg)]);
+                    binding.objects.push_back(context.binding[ygg::uint_t(arg)]);
                 else if constexpr (std::is_same_v<Alternative, ObjectView>)
                     binding.objects.push_back(arg.get_index());
                 else
-                    static_assert(dependent_false<Alternative>::value, "Missing case");
+                    static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             },
             term.get_variant());
     }
@@ -147,19 +147,19 @@ std::pair<GroundFunctionTermView<T>, bool> ground(FunctionTermView<T> element, G
     return context.destination.get_or_create(fterm);
 }
 
-inline Data<GroundFunctionExpression> ground(FunctionExpressionView element, GrounderContext& context)
+inline ygg::Data<GroundFunctionExpression> ground(FunctionExpressionView element, GrounderContext& context)
 {
     return visit(
         [&](auto&& arg)
         {
             using Alternative = std::decay_t<decltype(arg)>;
 
-            if constexpr (std::is_same_v<Alternative, float_t>)
-                return Data<GroundFunctionExpression>(arg);
+            if constexpr (std::is_same_v<Alternative, ygg::float_t>)
+                return ygg::Data<GroundFunctionExpression>(arg);
             else if constexpr (std::is_same_v<Alternative, LiftedArithmeticOperatorView>)
-                return Data<GroundFunctionExpression>(ground(arg, context));
+                return ygg::Data<GroundFunctionExpression>(ground(arg, context));
             else
-                return Data<GroundFunctionExpression>(ground(arg, context).first.get_index());
+                return ygg::Data<GroundFunctionExpression>(ground(arg, context).first.get_index());
         },
         element.get_variant());
 }
@@ -168,7 +168,7 @@ template<OpKind O>
 std::pair<GroundUnaryOperatorView<O>, bool> ground(LiftedUnaryOperatorView<O> element, GrounderContext& context)
 {
     // Fetch and clear
-    auto unary_ptr = context.builder.template get_builder<UnaryOperator<O, Data<GroundFunctionExpression>>>();
+    auto unary_ptr = context.builder.template get_builder<UnaryOperator<O, ygg::Data<GroundFunctionExpression>>>();
     auto& unary = *unary_ptr;
     unary.clear();
 
@@ -184,7 +184,7 @@ template<OpKind O>
 std::pair<GroundBinaryOperatorView<O>, bool> ground(LiftedBinaryOperatorView<O> element, GrounderContext& context)
 {
     // Fetch and clear
-    auto binary_ptr = context.builder.template get_builder<BinaryOperator<O, Data<GroundFunctionExpression>>>();
+    auto binary_ptr = context.builder.template get_builder<BinaryOperator<O, ygg::Data<GroundFunctionExpression>>>();
     auto& binary = *binary_ptr;
     binary.clear();
 
@@ -201,7 +201,7 @@ template<OpKind O>
 std::pair<GroundMultiOperatorView<O>, bool> ground(LiftedMultiOperatorView<O> element, GrounderContext& context)
 {
     // Fetch and clear
-    auto multi_ptr = context.builder.template get_builder<MultiOperator<O, Data<GroundFunctionExpression>>>();
+    auto multi_ptr = context.builder.template get_builder<MultiOperator<O, ygg::Data<GroundFunctionExpression>>>();
     auto& multi = *multi_ptr;
     multi.clear();
 
@@ -214,15 +214,15 @@ std::pair<GroundMultiOperatorView<O>, bool> ground(LiftedMultiOperatorView<O> el
     return context.destination.get_or_create(multi);
 }
 
-inline Data<BooleanOperator<Data<GroundFunctionExpression>>> ground(LiftedBooleanOperatorView element, GrounderContext& context)
+inline ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>> ground(LiftedBooleanOperatorView element, GrounderContext& context)
 {
-    return visit([&](auto&& arg) { return Data<BooleanOperator<Data<GroundFunctionExpression>>>(ground(arg, context).first.get_index()); },
+    return visit([&](auto&& arg) { return ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>>(ground(arg, context).first.get_index()); },
                  element.get_variant());
 }
 
-inline Data<ArithmeticOperator<Data<GroundFunctionExpression>>> ground(LiftedArithmeticOperatorView element, GrounderContext& context)
+inline ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>> ground(LiftedArithmeticOperatorView element, GrounderContext& context)
 {
-    return visit([&](auto&& arg) { return Data<ArithmeticOperator<Data<GroundFunctionExpression>>>(ground(arg, context).first.get_index()); },
+    return visit([&](auto&& arg) { return ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>(ground(arg, context).first.get_index()); },
                  element.get_variant());
 }
 
@@ -242,11 +242,11 @@ std::pair<PredicateBindingView<T>, bool> ground(TermListView terms, PredicateVie
                 using Alternative = std::decay_t<decltype(arg)>;
 
                 if constexpr (std::is_same_v<Alternative, ParameterIndex>)
-                    binding.objects.push_back(context.binding[uint_t(arg)]);
+                    binding.objects.push_back(context.binding[ygg::uint_t(arg)]);
                 else if constexpr (std::is_same_v<Alternative, ObjectView>)
                     binding.objects.push_back(arg.get_index());
                 else
-                    static_assert(dependent_false<Alternative>::value, "Missing case");
+                    static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             },
             term.get_variant());
     }
@@ -304,9 +304,9 @@ std::pair<GroundNumericEffectView<Op, T>, bool> ground(NumericEffectView<Op, T> 
 }
 
 template<FactKind T>
-Data<GroundNumericEffectOperator<T>> ground(NumericEffectOperatorView<T> element, GrounderContext& context)
+ygg::Data<GroundNumericEffectOperator<T>> ground(NumericEffectOperatorView<T> element, GrounderContext& context)
 {
-    return visit([&](auto&& arg) { return Data<GroundNumericEffectOperator<T>>(ground(arg, context).first.get_index()); }, element.get_variant());
+    return visit([&](auto&& arg) { return ygg::Data<GroundNumericEffectOperator<T>>(ground(arg, context).first.get_index()); }, element.get_variant());
 }
 
 inline std::pair<GroundConjunctiveConditionView, bool> ground(ConjunctiveConditionView element, GrounderContext& context)
@@ -349,7 +349,7 @@ inline std::pair<GroundRuleView, bool> ground(RuleView element, GrounderContext&
             else if constexpr (std::is_same_v<Alternative, NumericEffectOperatorView<FluentTag>>)
                 return ground(arg, context);
             else
-                static_assert(dependent_false<Alternative>::value, "Missing case");
+                static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
         },
         element.get_head());
 
@@ -378,11 +378,11 @@ std::pair<PredicateBindingView<T>, bool> ground_binding(AtomView<T> element, Gro
                 using Alternative = std::decay_t<decltype(arg)>;
 
                 if constexpr (std::is_same_v<Alternative, ParameterIndex>)
-                    binding.objects.push_back(context.binding[uint_t(arg)]);
+                    binding.objects.push_back(context.binding[ygg::uint_t(arg)]);
                 else if constexpr (std::is_same_v<Alternative, ObjectView>)
                     binding.objects.push_back(arg.get_index());
                 else
-                    static_assert(dependent_false<Alternative>::value, "Missing case");
+                    static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             },
             term.get_variant());
     }
@@ -425,11 +425,11 @@ std::optional<FunctionBindingView<T>> try_ground_binding(FunctionTermView<T> ele
                 using Alternative = std::decay_t<decltype(arg)>;
 
                 if constexpr (std::is_same_v<Alternative, ParameterIndex>)
-                    binding.objects.push_back(context.binding[uint_t(arg)]);
+                    binding.objects.push_back(context.binding[ygg::uint_t(arg)]);
                 else if constexpr (std::is_same_v<Alternative, ObjectView>)
                     binding.objects.push_back(arg.get_index());
                 else
-                    static_assert(dependent_false<Alternative>::value, "Missing case");
+                    static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             },
             term.get_variant());
     }
@@ -454,11 +454,11 @@ std::optional<PredicateBindingView<T>> try_ground_binding(AtomView<T> element, G
                 using Alternative = std::decay_t<decltype(arg)>;
 
                 if constexpr (std::is_same_v<Alternative, ParameterIndex>)
-                    binding.objects.push_back(context.binding[uint_t(arg)]);
+                    binding.objects.push_back(context.binding[ygg::uint_t(arg)]);
                 else if constexpr (std::is_same_v<Alternative, ObjectView>)
                     binding.objects.push_back(arg.get_index());
                 else
-                    static_assert(dependent_false<Alternative>::value, "Missing case");
+                    static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
             },
             term.get_variant());
     }
@@ -509,20 +509,20 @@ extern template std::pair<GroundNumericEffectView<Decrease, FluentTag>, bool> gr
 extern template std::pair<GroundNumericEffectView<ScaleUp, FluentTag>, bool> ground(NumericEffectView<ScaleUp, FluentTag> element, GrounderContext& context);
 extern template std::pair<GroundNumericEffectView<ScaleDown, FluentTag>, bool> ground(NumericEffectView<ScaleDown, FluentTag> element,
                                                                                       GrounderContext& context);
-extern template Data<GroundNumericEffectOperator<FluentTag>> ground(NumericEffectOperatorView<FluentTag> element, GrounderContext& context);
+extern template ygg::Data<GroundNumericEffectOperator<FluentTag>> ground(NumericEffectOperatorView<FluentTag> element, GrounderContext& context);
 
 extern template std::pair<PredicateBindingView<StaticTag>, bool> ground_binding(AtomView<StaticTag> element, GrounderContext& context);
 extern template std::pair<PredicateBindingView<FluentTag>, bool> ground_binding(AtomView<FluentTag> element, GrounderContext& context);
 
-extern template std::optional<FunctionBindingView<StaticTag>> try_ground_binding(formalism::datalog::FunctionTermView<StaticTag> element,
-                                                                                 formalism::datalog::GrounderContext& context);
-extern template std::optional<FunctionBindingView<FluentTag>> try_ground_binding(formalism::datalog::FunctionTermView<FluentTag> element,
-                                                                                 formalism::datalog::GrounderContext& context);
+extern template std::optional<FunctionBindingView<StaticTag>> try_ground_binding(::tyr::formalism::datalog::FunctionTermView<StaticTag> element,
+                                                                                 ::tyr::formalism::datalog::GrounderContext& context);
+extern template std::optional<FunctionBindingView<FluentTag>> try_ground_binding(::tyr::formalism::datalog::FunctionTermView<FluentTag> element,
+                                                                                 ::tyr::formalism::datalog::GrounderContext& context);
 
-extern template std::optional<PredicateBindingView<StaticTag>> try_ground_binding(formalism::datalog::AtomView<StaticTag> element,
-                                                                                  formalism::datalog::GrounderContext& context);
-extern template std::optional<PredicateBindingView<FluentTag>> try_ground_binding(formalism::datalog::AtomView<FluentTag> element,
-                                                                                  formalism::datalog::GrounderContext& context);
+extern template std::optional<PredicateBindingView<StaticTag>> try_ground_binding(::tyr::formalism::datalog::AtomView<StaticTag> element,
+                                                                                  ::tyr::formalism::datalog::GrounderContext& context);
+extern template std::optional<PredicateBindingView<FluentTag>> try_ground_binding(::tyr::formalism::datalog::AtomView<FluentTag> element,
+                                                                                  ::tyr::formalism::datalog::GrounderContext& context);
 }
 
 #endif

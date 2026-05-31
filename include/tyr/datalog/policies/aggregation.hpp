@@ -18,13 +18,13 @@
 #ifndef TYR_SOLVER_POLICIES_AGGREGATION_HPP_
 #define TYR_SOLVER_POLICIES_AGGREGATION_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 
 #include <algorithm>
 
 namespace tyr::datalog
 {
-using Cost = uint_t;
+using Cost = ygg::uint_t;
 
 struct SumAggregation
 {

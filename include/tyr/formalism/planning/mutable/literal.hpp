@@ -18,9 +18,9 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_LITERAL_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_LITERAL_HPP_
 
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/mutable/atom.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/unification/structure_traits.hpp"
@@ -45,9 +45,9 @@ struct MutableLiteral
 
     auto identifying_members() const noexcept { return std::tie(atom, polarity); }
 
-    friend bool operator==(const MutableLiteral& lhs, const MutableLiteral& rhs) { return EqualTo<MutableLiteral> {}(lhs, rhs); }
+    friend bool operator==(const MutableLiteral& lhs, const MutableLiteral& rhs) { return ygg::EqualTo<MutableLiteral> {}(lhs, rhs); }
 
-    friend bool operator<(const MutableLiteral& lhs, const MutableLiteral& rhs) { return Less<MutableLiteral> {}(lhs, rhs); }
+    friend bool operator<(const MutableLiteral& lhs, const MutableLiteral& rhs) { return ygg::Less<MutableLiteral> {}(lhs, rhs); }
 };
 
 template<FactKind T>

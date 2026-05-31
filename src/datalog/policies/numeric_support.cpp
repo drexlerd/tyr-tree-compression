@@ -15,12 +15,12 @@ namespace tyr::datalog
 {
 namespace
 {
-ClosedInterval<float_t> evaluate(float_t element, const FactSets&, const NumericSupportSelector&, std::vector<NumericSupportSelectorWorkspace::SelectionEntry>&)
+ygg::ClosedInterval<ygg::float_t> evaluate(ygg::float_t element, const FactSets&, const NumericSupportSelector&, std::vector<NumericSupportSelectorWorkspace::SelectionEntry>&)
 {
-    return ClosedInterval<float_t>(element, element);
+    return ygg::ClosedInterval<ygg::float_t>(element, element);
 }
 
-ClosedInterval<float_t> evaluate(fd::GroundFunctionTermView<f::StaticTag> element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundFunctionTermView<f::StaticTag> element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector&,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>&)
@@ -28,7 +28,7 @@ ClosedInterval<float_t> evaluate(fd::GroundFunctionTermView<f::StaticTag> elemen
     return fact_sets.get<f::StaticTag>().function[element];
 }
 
-ClosedInterval<float_t> evaluate(fd::GroundFunctionTermView<f::FluentTag> element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundFunctionTermView<f::FluentTag> element,
                                  const FactSets&,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
@@ -36,18 +36,18 @@ ClosedInterval<float_t> evaluate(fd::GroundFunctionTermView<f::FluentTag> elemen
     return selector.select_fluent_interval(element.get_row(), selection);
 }
 
-ClosedInterval<float_t> evaluate(fd::GroundFunctionExpressionView element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundFunctionExpressionView element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection);
 
-ClosedInterval<float_t> evaluate(fd::GroundArithmeticOperatorView element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundArithmeticOperatorView element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection);
 
 template<f::ArithmeticOpKind O>
-ClosedInterval<float_t> evaluate(fd::GroundUnaryOperatorView<O> element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundUnaryOperatorView<O> element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
@@ -56,7 +56,7 @@ ClosedInterval<float_t> evaluate(fd::GroundUnaryOperatorView<O> element,
 }
 
 template<f::ArithmeticOpKind O>
-ClosedInterval<float_t> evaluate(fd::GroundBinaryOperatorView<O> element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundBinaryOperatorView<O> element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
@@ -65,7 +65,7 @@ ClosedInterval<float_t> evaluate(fd::GroundBinaryOperatorView<O> element,
 }
 
 template<f::ArithmeticOpKind O>
-ClosedInterval<float_t> evaluate(fd::GroundMultiOperatorView<O> element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundMultiOperatorView<O> element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
@@ -87,7 +87,7 @@ bool evaluate(fd::GroundBinaryOperatorView<O> element,
     return f::apply_existential(O {}, evaluate(element.get_lhs(), fact_sets, selector, selection), evaluate(element.get_rhs(), fact_sets, selector, selection));
 }
 
-ClosedInterval<float_t> evaluate(fd::GroundFunctionExpressionView element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundFunctionExpressionView element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
@@ -95,7 +95,7 @@ ClosedInterval<float_t> evaluate(fd::GroundFunctionExpressionView element,
     return visit([&](auto&& arg) { return evaluate(arg, fact_sets, selector, selection); }, element.get_variant());
 }
 
-ClosedInterval<float_t> evaluate(fd::GroundArithmeticOperatorView element,
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundArithmeticOperatorView element,
                                  const FactSets& fact_sets,
                                  const NumericSupportSelector& selector,
                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
@@ -128,7 +128,7 @@ bool NumericSupportSelector::is_supported(fd::GroundBooleanOperatorView element,
     return evaluate(element, m_fact_sets, *this, selection);
 }
 
-ClosedInterval<float_t> NumericSupportSelector::select_fluent_interval(fd::FunctionBindingView<f::FluentTag> binding,
+ygg::ClosedInterval<ygg::float_t> NumericSupportSelector::select_fluent_interval(fd::FunctionBindingView<f::FluentTag> binding,
                                                                        std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const
 {
     if (const auto* entry = find_selection_entry(binding, selection))
@@ -136,11 +136,11 @@ ClosedInterval<float_t> NumericSupportSelector::select_fluent_interval(fd::Funct
 
     const auto current = current_interval(binding);
     if (empty(current))
-        return ClosedInterval<float_t>();
+        return ygg::ClosedInterval<ygg::float_t>();
 
     const auto cost = get_current_interval_cost(binding, current);
     if (cost == std::numeric_limits<Cost>::max())
-        return ClosedInterval<float_t>();
+        return ygg::ClosedInterval<ygg::float_t>();
 
     selection.push_back(NumericSupportSelectorWorkspace::SelectionEntry { binding, current, nullptr, cost });
     return current;
@@ -156,12 +156,12 @@ const NumericIntervalAnnotations::Entries* NumericSupportSelector::find_entries(
     return row_it == relation_it->second.end() ? nullptr : &row_it->second;
 }
 
-ClosedInterval<float_t> NumericSupportSelector::current_interval(fd::FunctionBindingView<f::FluentTag> binding) const
+ygg::ClosedInterval<ygg::float_t> NumericSupportSelector::current_interval(fd::FunctionBindingView<f::FluentTag> binding) const
 {
     return m_fact_sets.get<f::FluentTag>().function[binding];
 }
 
-Cost NumericSupportSelector::get_current_interval_cost(fd::FunctionBindingView<f::FluentTag> binding, ClosedInterval<float_t> current) const
+Cost NumericSupportSelector::get_current_interval_cost(fd::FunctionBindingView<f::FluentTag> binding, ygg::ClosedInterval<ygg::float_t> current) const
 {
     const auto* entries = find_entries(binding);
     if (!entries)
@@ -171,7 +171,7 @@ Cost NumericSupportSelector::get_current_interval_cost(fd::FunctionBindingView<f
         std::is_sorted(entries->begin(), entries->end(), [](const auto& lhs, const auto& rhs) { return get_cost(lhs.annotation) < get_cost(rhs.annotation); }));
 
     auto best_cost = std::numeric_limits<Cost>::max();
-    auto covered = ClosedInterval<float_t>();
+    auto covered = ygg::ClosedInterval<ygg::float_t>();
 
     for (auto it = entries->begin(); it != entries->end();)
     {
@@ -199,7 +199,7 @@ Cost NumericSupportSelector::get_current_interval_cost(fd::FunctionBindingView<f
     return best_cost;
 }
 
-bool NumericSupportSelector::is_available(fd::FunctionBindingView<f::FluentTag> binding, ClosedInterval<float_t> interval) const
+bool NumericSupportSelector::is_available(fd::FunctionBindingView<f::FluentTag> binding, ygg::ClosedInterval<ygg::float_t> interval) const
 {
     const auto current = current_interval(binding);
     return !empty(current) && subset(interval, current);

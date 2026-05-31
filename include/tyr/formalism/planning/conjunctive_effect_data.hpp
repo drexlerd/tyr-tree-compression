@@ -18,28 +18,30 @@
 #ifndef TYR_FORMALISM_PLANNING_CONJUNCTIVE_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_CONJUNCTIVE_EFFECT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/conjunctive_effect_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/literal_index.hpp"
 #include "tyr/formalism/planning/numeric_effect_operator_data.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::ConjunctiveEffect>
+struct Data<::tyr::formalism::planning::ConjunctiveEffect>
 {
-    Index<formalism::planning::ConjunctiveEffect> index;
-    IndexList<formalism::planning::Literal<formalism::FluentTag>> literals;
-    DataList<formalism::planning::NumericEffectOperator<formalism::FluentTag>> numeric_effects;
-    ::cista::optional<Data<formalism::planning::NumericEffectOperator<formalism::AuxiliaryTag>>> auxiliary_numeric_effect;  // :action-cost
+    ygg::Index<::tyr::formalism::planning::ConjunctiveEffect> index;
+    ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::FluentTag>> literals;
+    ygg::DataList<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::FluentTag>> numeric_effects;
+    ::cista::optional<ygg::Data<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::AuxiliaryTag>>> auxiliary_numeric_effect;  // :action-cost
 
     Data() = default;
-    Data(IndexList<formalism::planning::Literal<formalism::FluentTag>> literals_,
-         DataList<formalism::planning::NumericEffectOperator<formalism::FluentTag>> numeric_effects_,
-         ::cista::optional<Data<formalism::planning::NumericEffectOperator<formalism::AuxiliaryTag>>> auxiliary_numeric_effect_) :
+    Data(ygg::IndexList<::tyr::formalism::planning::Literal<::tyr::formalism::FluentTag>> literals_,
+         ygg::DataList<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::FluentTag>> numeric_effects_,
+         ::cista::optional<ygg::Data<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::AuxiliaryTag>>> auxiliary_numeric_effect_) :
         index(),
         literals(std::move(literals_)),
         numeric_effects(std::move(numeric_effects_)),
@@ -48,9 +50,9 @@ struct Data<formalism::planning::ConjunctiveEffect>
     }
     // Python constructor
     template<typename C>
-    Data(const std::vector<View<Index<formalism::planning::Literal<formalism::FluentTag>>, C>>& literals_,
-         const std::vector<View<Data<formalism::planning::NumericEffectOperator<formalism::FluentTag>>, C>>& numeric_effects_,
-         const std::optional<View<Data<formalism::planning::NumericEffectOperator<formalism::AuxiliaryTag>>, C>>& auxiliary_numeric_effect_) :
+    Data(const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::Literal<::tyr::formalism::FluentTag>>, C>>& literals_,
+         const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::FluentTag>>, C>>& numeric_effects_,
+         const std::optional<::ygg::View<ygg::Data<::tyr::formalism::planning::NumericEffectOperator<::tyr::formalism::AuxiliaryTag>>, C>>& auxiliary_numeric_effect_) :
         index(),
         literals(),
         numeric_effects(),
@@ -67,17 +69,17 @@ struct Data<formalism::planning::ConjunctiveEffect>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(literals);
-        tyr::clear(numeric_effects);
-        tyr::clear(auxiliary_numeric_effect);
+        ygg::clear(index);
+        ygg::clear(literals);
+        ygg::clear(numeric_effects);
+        ygg::clear(auxiliary_numeric_effect);
     }
 
     auto cista_members() const noexcept { return std::tie(index, literals, numeric_effects, auxiliary_numeric_effect); }
     auto identifying_members() const noexcept { return std::tie(literals, numeric_effects, auxiliary_numeric_effect); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::ConjunctiveEffect>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::ConjunctiveEffect>);
 }
 
 #endif

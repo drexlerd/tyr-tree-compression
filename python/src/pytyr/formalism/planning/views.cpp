@@ -20,8 +20,8 @@
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <tyr/common/python/bindings.hpp>
-#include <tyr/common/python/type_casters.hpp>
+#include "pytyr/bindings.hpp"
+#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
 namespace tyr::formalism::planning
 {
@@ -63,7 +63,7 @@ void bind_term(nb::module_& m, const std::string& name)
 template<typename T>
 void bind_relation_binding(nb::module_& m, const std::string& name)
 {
-    using V = View<Index<RelationBinding<T>>, Repository>;
+    using V = ygg::View<ygg::Index<RelationBinding<T>>, Repository>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
@@ -629,23 +629,23 @@ void bind_views(nb::module_& m)
     bind_ground_function_term_value<FluentTag>(m, "FluentGroundFunctionTermValue");
     bind_ground_function_term_value<AuxiliaryTag>(m, "AuxiliaryGroundFunctionTermValue");
 
-    bind_unary_operator<Sub, Data<FunctionExpression>>(m, "UnaryOperatorSub");
-    bind_binary_operator<Add, Data<FunctionExpression>>(m, "BinaryOperatorAdd");
-    bind_binary_operator<Sub, Data<FunctionExpression>>(m, "BinaryOperatorSub");
-    bind_binary_operator<Mul, Data<FunctionExpression>>(m, "BinaryOperatorMul");
-    bind_binary_operator<Div, Data<FunctionExpression>>(m, "BinaryOperatorDiv");
-    bind_binary_operator<Eq, Data<FunctionExpression>>(m, "BinaryOperatorEq");
-    bind_binary_operator<Ne, Data<FunctionExpression>>(m, "BinaryOperatorNe");
-    bind_binary_operator<Le, Data<FunctionExpression>>(m, "BinaryOperatorLe");
-    bind_binary_operator<Lt, Data<FunctionExpression>>(m, "BinaryOperatorLt");
-    bind_binary_operator<Ge, Data<FunctionExpression>>(m, "BinaryOperatorGe");
-    bind_binary_operator<Gt, Data<FunctionExpression>>(m, "BinaryOperatorGt");
+    bind_unary_operator<Sub, ygg::Data<FunctionExpression>>(m, "UnaryOperatorSub");
+    bind_binary_operator<Add, ygg::Data<FunctionExpression>>(m, "BinaryOperatorAdd");
+    bind_binary_operator<Sub, ygg::Data<FunctionExpression>>(m, "BinaryOperatorSub");
+    bind_binary_operator<Mul, ygg::Data<FunctionExpression>>(m, "BinaryOperatorMul");
+    bind_binary_operator<Div, ygg::Data<FunctionExpression>>(m, "BinaryOperatorDiv");
+    bind_binary_operator<Eq, ygg::Data<FunctionExpression>>(m, "BinaryOperatorEq");
+    bind_binary_operator<Ne, ygg::Data<FunctionExpression>>(m, "BinaryOperatorNe");
+    bind_binary_operator<Le, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLe");
+    bind_binary_operator<Lt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLt");
+    bind_binary_operator<Ge, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGe");
+    bind_binary_operator<Gt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGt");
 
-    bind_multi_operator<Add, Data<FunctionExpression>>(m, "MultiOperatorAdd");
-    bind_multi_operator<Mul, Data<FunctionExpression>>(m, "MultiOperatorMul");
+    bind_multi_operator<Add, ygg::Data<FunctionExpression>>(m, "MultiOperatorAdd");
+    bind_multi_operator<Mul, ygg::Data<FunctionExpression>>(m, "MultiOperatorMul");
 
-    bind_arithmethic_operator<Data<FunctionExpression>>(m, "ArithmeticOperator");
-    bind_boolean_operator<Data<FunctionExpression>>(m, "BooleanOperator");
+    bind_arithmethic_operator<ygg::Data<FunctionExpression>>(m, "ArithmeticOperator");
+    bind_boolean_operator<ygg::Data<FunctionExpression>>(m, "BooleanOperator");
 
     bind_function_expression(m, "FunctionExpression");
     bind_conjunctive_condition(m, "ConjunctiveCondition");
@@ -665,23 +665,23 @@ void bind_views(nb::module_& m)
     bind_action(m, "Action");
     bind_axiom(m, "Axiom");
 
-    bind_unary_operator<Sub, Data<GroundFunctionExpression>>(m, "GroundUnaryOperatorSub");
-    bind_binary_operator<Add, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorAdd");
-    bind_binary_operator<Sub, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorSub");
-    bind_binary_operator<Mul, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorMul");
-    bind_binary_operator<Div, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorDiv");
-    bind_binary_operator<Eq, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorEq");
-    bind_binary_operator<Ne, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorNe");
-    bind_binary_operator<Le, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLe");
-    bind_binary_operator<Lt, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLt");
-    bind_binary_operator<Ge, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGe");
-    bind_binary_operator<Gt, Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGt");
+    bind_unary_operator<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundUnaryOperatorSub");
+    bind_binary_operator<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorAdd");
+    bind_binary_operator<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorSub");
+    bind_binary_operator<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorMul");
+    bind_binary_operator<Div, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorDiv");
+    bind_binary_operator<Eq, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorEq");
+    bind_binary_operator<Ne, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorNe");
+    bind_binary_operator<Le, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLe");
+    bind_binary_operator<Lt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLt");
+    bind_binary_operator<Ge, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGe");
+    bind_binary_operator<Gt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGt");
 
-    bind_multi_operator<Add, Data<GroundFunctionExpression>>(m, "GroundMultiOperatorAdd");
-    bind_multi_operator<Mul, Data<GroundFunctionExpression>>(m, "GroundMultiOperatorMul");
+    bind_multi_operator<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorAdd");
+    bind_multi_operator<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorMul");
 
-    bind_arithmethic_operator<Data<GroundFunctionExpression>>(m, "GroundArithmeticOperator");
-    bind_boolean_operator<Data<GroundFunctionExpression>>(m, "GroundBooleanOperator");
+    bind_arithmethic_operator<ygg::Data<GroundFunctionExpression>>(m, "GroundArithmeticOperator");
+    bind_boolean_operator<ygg::Data<GroundFunctionExpression>>(m, "GroundBooleanOperator");
 
     bind_ground_function_expression(m, "GroundFunctionExpression");
     bind_ground_conjunctive_condition(m, "GroundConjunctiveCondition");

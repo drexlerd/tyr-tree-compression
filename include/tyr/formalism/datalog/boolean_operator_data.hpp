@@ -18,41 +18,45 @@
 #ifndef TYR_FORMALISM_DATALOG_BOOLEAN_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_BOOLEAN_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/binary_operator_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<typename T>
-struct Data<formalism::datalog::BooleanOperator<T>>
+struct Data<::tyr::formalism::datalog::BooleanOperator<T>>
 {
-    using Variant = ::cista::offset::variant<Index<formalism::datalog::BinaryOperator<formalism::Eq, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Ne, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Le, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Lt, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Ge, T>>,
-                                             Index<formalism::datalog::BinaryOperator<formalism::Gt, T>>>;
+    using Variant = ::cista::offset::variant<ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Eq, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Ne, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Le, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Lt, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Ge, T>>,
+                                             ygg::Index<::tyr::formalism::datalog::BinaryOperator<::tyr::formalism::Gt, T>>>;
 
     Variant value;
 
     Data() = default;
     Data(Variant value) : value(value) {}
 
-    void clear() noexcept { tyr::clear(value); }
+    void clear() noexcept { ygg::clear(value); }
 
     auto cista_members() const noexcept { return std::tie(value); }
     auto identifying_members() const noexcept { return std::tie(value); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::BooleanOperator<Data<formalism::datalog::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::BooleanOperator<ygg::Data<::tyr::formalism::datalog::FunctionExpression>>>);
 
-namespace formalism::datalog
+}
+
+namespace tyr::formalism::datalog
 {
-using BooleanOperatorData = Data<BooleanOperator<Data<FunctionExpression>>>;
-using GroundBooleanOperatorData = Data<BooleanOperator<Data<GroundFunctionExpression>>>;
+using BooleanOperatorData = ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>>;
+using GroundBooleanOperatorData = ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>>;
 }
-}
+
 
 #endif

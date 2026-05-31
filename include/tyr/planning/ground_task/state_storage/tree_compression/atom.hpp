@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_TASK_STATE_STORAGE_TREE_COMPRESSION_ATOM_HPP_
 #define TYR_PLANNING_GROUND_TASK_STATE_STORAGE_TREE_COMPRESSION_ATOM_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task/state_storage.hpp"
 #include "tyr/planning/ground_task/state_storage/tree_compression/context.hpp"
@@ -34,7 +34,7 @@ namespace tyr::planning
 template<>
 struct AtomPackedStorage<GroundTag, TreeCompression>
 {
-    uint_t index;
+    ygg::uint_t index;
 
     auto identifying_members() const noexcept { return std::tie(index); }
 };
@@ -53,10 +53,10 @@ public:
     void unpack(const Packed& packed, Unpacked& unpacked);
 
 private:
-    RawArraySet<uint_t>& m_array_set;
-    uint_t m_num_bits;
+    ygg::RawArraySet<ygg::uint_t>& m_array_set;
+    ygg::uint_t m_num_bits;
 
-    std::vector<uint_t> m_buffer;
+    std::vector<ygg::uint_t> m_buffer;
 };
 
 }

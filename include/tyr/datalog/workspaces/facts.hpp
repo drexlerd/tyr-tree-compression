@@ -27,34 +27,34 @@ namespace tyr::datalog
 {
 struct FactsWorkspace
 {
-    TaggedFactSets<formalism::FluentTag> fact_sets;
-    TaggedAssignmentSets<formalism::FluentTag> assignment_sets;
+    TaggedFactSets<::tyr::formalism::FluentTag> fact_sets;
+    TaggedAssignmentSets<::tyr::formalism::FluentTag> assignment_sets;
 
-    explicit FactsWorkspace(formalism::datalog::PredicateListView<formalism::FluentTag> predicates,
-                            formalism::datalog::FunctionListView<formalism::FluentTag> functions,
-                            const analysis::PredicateDomainMap<formalism::FluentTag>& predicate_domains,
-                            const analysis::FunctionDomainMap<formalism::FluentTag>& function_domains,
+    explicit FactsWorkspace(::tyr::formalism::datalog::PredicateListView<::tyr::formalism::FluentTag> predicates,
+                            ::tyr::formalism::datalog::FunctionListView<::tyr::formalism::FluentTag> functions,
+                            const analysis::PredicateDomainMap<::tyr::formalism::FluentTag>& predicate_domains,
+                            const analysis::FunctionDomainMap<::tyr::formalism::FluentTag>& function_domains,
                             size_t num_objects,
-                            formalism::datalog::GroundAtomListView<formalism::FluentTag> atoms,
-                            formalism::datalog::GroundFunctionTermValueListView<formalism::FluentTag> fterm_values,
-                            const formalism::datalog::Repository& workspace_repository);
+                            ::tyr::formalism::datalog::GroundAtomListView<::tyr::formalism::FluentTag> atoms,
+                            ::tyr::formalism::datalog::GroundFunctionTermValueListView<::tyr::formalism::FluentTag> fterm_values,
+                            const ::tyr::formalism::datalog::Repository& workspace_repository);
 
     void reset();
 };
 
 struct ConstFactsWorkspace
 {
-    const TaggedFactSets<formalism::StaticTag> fact_sets;
-    const TaggedAssignmentSets<formalism::StaticTag> assignment_sets;
+    const TaggedFactSets<::tyr::formalism::StaticTag> fact_sets;
+    const TaggedAssignmentSets<::tyr::formalism::StaticTag> assignment_sets;
 
-    explicit ConstFactsWorkspace(formalism::datalog::PredicateListView<formalism::StaticTag> predicates,
-                                 formalism::datalog::FunctionListView<formalism::StaticTag> functions,
-                                 const analysis::PredicateDomainMap<formalism::StaticTag>& predicate_domains,
-                                 const analysis::FunctionDomainMap<formalism::StaticTag>& function_domains,
+    explicit ConstFactsWorkspace(::tyr::formalism::datalog::PredicateListView<::tyr::formalism::StaticTag> predicates,
+                                 ::tyr::formalism::datalog::FunctionListView<::tyr::formalism::StaticTag> functions,
+                                 const analysis::PredicateDomainMap<::tyr::formalism::StaticTag>& predicate_domains,
+                                 const analysis::FunctionDomainMap<::tyr::formalism::StaticTag>& function_domains,
                                  size_t num_objects,
-                                 formalism::datalog::GroundAtomListView<formalism::StaticTag> atoms,
-                                 formalism::datalog::GroundFunctionTermValueListView<formalism::StaticTag> fterm_values,
-                                 const formalism::datalog::Repository& program_repository);
+                                 ::tyr::formalism::datalog::GroundAtomListView<::tyr::formalism::StaticTag> atoms,
+                                 ::tyr::formalism::datalog::GroundFunctionTermValueListView<::tyr::formalism::StaticTag> fterm_values,
+                                 const ::tyr::formalism::datalog::Repository& program_repository);
 };
 
 }

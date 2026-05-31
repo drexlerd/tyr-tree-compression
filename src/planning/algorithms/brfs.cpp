@@ -17,8 +17,8 @@
 
 #include "tyr/planning/algorithms/brfs.hpp"
 
-#include "tyr/common/chrono.hpp"
-#include "tyr/common/segmented_vector.hpp"
+#include <yggdrasil/core/chrono.hpp>
+#include <yggdrasil/containers/segmented_vector.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/algorithms/brfs/event_handler.hpp"
@@ -53,8 +53,8 @@ namespace tyr::planning::brfs
 template<TaskKind Kind>
 struct SearchNode
 {
-    uint_t g_value;
-    Index<State<Kind>> parent_state;
+    ygg::uint_t g_value;
+    ygg::Index<State<Kind>> parent_state;
     SearchNodeStatus status;
 };
 
@@ -62,18 +62,18 @@ static_assert(sizeof(SearchNode<LiftedTag>) == 12);
 static_assert(sizeof(SearchNode<GroundTag>) == 12);
 
 template<TaskKind Kind>
-using SearchNodeVector = SegmentedVector<SearchNode<Kind>>;
+using SearchNodeVector = ygg::SegmentedVector<SearchNode<Kind>>;
 
 template<TaskKind Kind>
-static SearchNode<Kind>& get_or_create_search_node(Index<State<Kind>> state_index, SearchNodeVector<Kind>& search_nodes)
+static SearchNode<Kind>& get_or_create_search_node(ygg::Index<State<Kind>> state_index, SearchNodeVector<Kind>& search_nodes)
 {
-    static auto default_node = SearchNode { std::numeric_limits<uint_t>::max(), Index<State<Kind>>::max(), SearchNodeStatus::NEW };
+    static auto default_node = SearchNode { std::numeric_limits<ygg::uint_t>::max(), ygg::Index<State<Kind>>::max(), SearchNodeStatus::NEW };
 
-    while (uint_t(state_index) >= search_nodes.size())
+    while (ygg::uint_t(state_index) >= search_nodes.size())
     {
         search_nodes.push_back(default_node);
     }
-    return search_nodes[uint_t(state_index)];
+    return search_nodes[ygg::uint_t(state_index)];
 }
 
 template<TaskKind Kind>
@@ -90,7 +90,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
     auto result = SearchResult<Kind>();
     auto search_nodes = SearchNodeVector<Kind>();
-    auto queue = std::deque<Index<State<Kind>>> {};
+    auto queue = std::deque<ygg::Index<State<Kind>>> {};
 
     auto& start_search_node = get_or_create_search_node(start_state_index, search_nodes);
     start_search_node.status = SearchNodeStatus::OPEN;
@@ -125,10 +125,10 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
     }
 
     auto labeled_succ_nodes = std::vector<LabeledNode<Kind>> {};
-    auto current_layer = uint_t { 0 };
+    auto current_layer = ygg::uint_t { 0 };
     queue.push_back(start_state_index);
 
-    auto stopwatch = options.max_time ? std::optional<CountdownWatch>(options.max_time.value()) : std::nullopt;
+    auto stopwatch = options.max_time ? std::optional<ygg::CountdownWatch>(options.max_time.value()) : std::nullopt;
 
     while (!queue.empty())
     {

@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_NODE_VIEW_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_NODE_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/variant.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/containers/variant.hpp>
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/atom_view.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/constraint_view.hpp"
@@ -27,23 +27,24 @@
 #include "tyr/planning/ground_task/match_tree/nodes/node_data.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/variable_view.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 template<typename Tag, planning::match_tree::Context<Tag> C>
-class View<Data<planning::match_tree::Node<Tag>>, C>
+class View<ygg::Data<planning::match_tree::Node<Tag>>, C>
 {
 private:
     const C* m_context;
-    Data<planning::match_tree::Node<Tag>> m_handle;
+    ygg::Data<planning::match_tree::Node<Tag>> m_handle;
 
 public:
-    View(Data<planning::match_tree::Node<Tag>> data, const C& context) noexcept : m_context(&context), m_handle(data) {}
+    View(ygg::Data<planning::match_tree::Node<Tag>> data, const C& context) noexcept : m_context(&context), m_handle(data) {}
 
     const auto& get_data() const noexcept { return m_handle; }
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
 
-    auto get_variant() const noexcept { return make_view(m_handle.value, *m_context); }
+    auto get_variant() const noexcept { return ygg::make_view(m_handle.value, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

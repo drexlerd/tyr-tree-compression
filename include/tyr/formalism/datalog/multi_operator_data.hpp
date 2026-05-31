@@ -18,25 +18,27 @@
 #ifndef TYR_FORMALISM_DATALOG_MULTI_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_MULTI_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/function_expression_data.hpp"
 #include "tyr/formalism/datalog/ground_function_expression_data.hpp"
 #include "tyr/formalism/datalog/multi_operator_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T>
-struct Data<formalism::datalog::MultiOperator<Op, T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::OpKind Op, typename T>
+struct Data<::tyr::formalism::datalog::MultiOperator<Op, T>>
 {
     using OpType = Op;
 
-    Index<formalism::datalog::MultiOperator<Op, T>> index;
+    ygg::Index<::tyr::formalism::datalog::MultiOperator<Op, T>> index;
     ::cista::offset::vector<T> args;
 
     Data() = default;
-    Data(Index<formalism::datalog::MultiOperator<Op, T>> index, ::cista::offset::vector<T> args) : index(index), args(std::move(args)) {}
+    Data(ygg::Index<::tyr::formalism::datalog::MultiOperator<Op, T>> index, ::cista::offset::vector<T> args) : index(index), args(std::move(args)) {}
     Data(const Data& other) = delete;
     Data& operator=(const Data& other) = delete;
     Data(Data&& other) = default;
@@ -44,15 +46,15 @@ struct Data<formalism::datalog::MultiOperator<Op, T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(args);
+        ygg::clear(index);
+        ygg::clear(args);
     }
 
     auto cista_members() const noexcept { return std::tie(index, args); }
     auto identifying_members() const noexcept { return std::tie(Op::kind, args); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::MultiOperator<formalism::Add, Data<formalism::datalog::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::MultiOperator<::tyr::formalism::Add, ygg::Data<::tyr::formalism::datalog::FunctionExpression>>>);
 
 }
 

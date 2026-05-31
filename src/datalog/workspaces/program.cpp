@@ -31,13 +31,13 @@ template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, Termi
 ProgramWorkspace<OrAP, AndAP, TP>::ProgramWorkspace(ProgramContext& context, const ConstProgramWorkspace& cws, OrAP or_ap, AndAP and_ap, TP tp) :
     program_repository(context.get_program_repository()),
     workspace_repository(context.get_workspace_repository()),
-    facts(context.get_program().get_predicates<formalism::FluentTag>(),
-          context.get_program().get_functions<formalism::FluentTag>(),
+    facts(context.get_program().get_predicates<::tyr::formalism::FluentTag>(),
+          context.get_program().get_functions<::tyr::formalism::FluentTag>(),
           context.get_domains().fluent_predicate_domains,
           context.get_domains().fluent_function_domains,
           context.get_program().get_objects().size(),
-          context.get_program().get_atoms<formalism::FluentTag>(),
-          context.get_program().get_fterm_values<formalism::FluentTag>(),
+          context.get_program().get_atoms<::tyr::formalism::FluentTag>(),
+          context.get_program().get_fterm_values<::tyr::formalism::FluentTag>(),
           context.get_workspace_repository()),
     or_ap(or_ap),
     and_annot(),
@@ -50,12 +50,12 @@ ProgramWorkspace<OrAP, AndAP, TP>::ProgramWorkspace(ProgramContext& context, con
     schedulers(create_schedulers(context.get_strata(),
                                  context.get_listeners(),
                                  program_repository,
-                                 context.get_program().get_predicates<formalism::FluentTag>().size(),
-                                 context.get_program().get_functions<formalism::FluentTag>().size())),
+                                 context.get_program().get_predicates<::tyr::formalism::FluentTag>().size(),
+                                 context.get_program().get_functions<::tyr::formalism::FluentTag>().size())),
     cost_buckets(),
     statistics()
 {
-    for (uint_t i = 0; i < context.get_program().get_rules().size(); ++i)
+    for (ygg::uint_t i = 0; i < context.get_program().get_rules().size(); ++i)
         rules.emplace_back(cws.rules[i].has_value() ?
                                std::make_unique<RuleWorkspace<AndAP>>(context.get_repository_factory(), program_repository, workspace_repository, *cws.rules[i], and_ap) :
                                nullptr);
@@ -68,25 +68,25 @@ template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggr
 template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, TerminationPolicy<MaxAggregation>>;
 
 ConstProgramWorkspace::ConstProgramWorkspace(ProgramContext& context) :
-    facts(context.get_program().get_predicates<formalism::StaticTag>(),
-          context.get_program().get_functions<formalism::StaticTag>(),
+    facts(context.get_program().get_predicates<::tyr::formalism::StaticTag>(),
+          context.get_program().get_functions<::tyr::formalism::StaticTag>(),
           context.get_domains().static_predicate_domains,
           context.get_domains().static_function_domains,
           context.get_program().get_objects().size(),
-          context.get_program().get_atoms<formalism::StaticTag>(),
-          context.get_program().get_fterm_values<formalism::StaticTag>(),
+          context.get_program().get_atoms<::tyr::formalism::StaticTag>(),
+          context.get_program().get_fterm_values<::tyr::formalism::StaticTag>(),
           context.get_program_repository()),
     rules()
 {
     rules.resize(context.get_program().get_rules().size());  // Ensure enough space to avoid move on reallocation
-    for (uint_t i = 0; i < context.get_program().get_rules().size(); ++i)
+    for (ygg::uint_t i = 0; i < context.get_program().get_rules().size(); ++i)
     {
         const auto rule = context.get_program().get_rules()[i];
         rules[i].emplace(rule,
                          context.get_workspace_repository(),
                          context.get_domains().rule_domains.at(rule.get_index()).payload,
                          context.get_program().get_objects().size(),
-                         context.get_program().get_predicates<formalism::FluentTag>().size(),
+                         context.get_program().get_predicates<::tyr::formalism::FluentTag>().size(),
                          facts.assignment_sets);
     }
 }

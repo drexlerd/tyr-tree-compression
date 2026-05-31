@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_SEARCH_SPACE_HPP_
 #define TYR_PLANNING_SEARCH_SPACE_HPP_
 
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/segmented_vector.hpp"
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/containers/segmented_vector.hpp>
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/node.hpp"
@@ -30,7 +30,7 @@ namespace tyr::planning
 
 template<TaskKind Kind, typename SearchNode>
     requires SearchNodeConcept<SearchNode, Kind>
-NodeList<Kind> extract_node_trajectory(const SegmentedVector<SearchNode>& search_nodes,
+NodeList<Kind> extract_node_trajectory(const ygg::SegmentedVector<SearchNode>& search_nodes,
                                        const SearchNode& final_search_node,
                                        const Node<Kind>& final_node,
                                        SuccessorGenerator<Kind>& successor_generator)
@@ -41,11 +41,11 @@ NodeList<Kind> extract_node_trajectory(const SegmentedVector<SearchNode>& search
     auto cur_search_node = &final_search_node;
     auto& state_repository = *successor_generator.get_state_repository();
 
-    while (cur_search_node->parent_state != Index<State<Kind>>::max())
+    while (cur_search_node->parent_state != ygg::Index<State<Kind>>::max())
     {
         const auto parent_state_index = cur_search_node->parent_state;
 
-        cur_search_node = &search_nodes.at(uint_t(cur_search_node->parent_state));
+        cur_search_node = &search_nodes.at(ygg::uint_t(cur_search_node->parent_state));
 
         trajectory.push_back(Node<Kind>(state_repository.get_registered_state(parent_state_index), cur_search_node->g_value));
     }
@@ -76,7 +76,7 @@ LabeledNodeList<Kind> extract_labeled_node_trajectory(const NodeList<Kind>& node
                 compute_successor_g_value(cur_node.get_metric(), labeled_succ_node.node.get_metric(), action_cost_mode);
             const auto normalized_succ_node = Node<Kind>(labeled_succ_node.node.get_state(), successor_g_value);
 
-            if (EqualTo<Node<Kind>> {}(normalized_succ_node, node_trajectory[i]))
+            if (ygg::EqualTo<Node<Kind>> {}(normalized_succ_node, node_trajectory[i]))
             {
                 labeled_node_trajectory.push_back(LabeledNode<Kind> { labeled_succ_node.label, normalized_succ_node });
                 cur_node = normalized_succ_node;
@@ -92,7 +92,7 @@ template<TaskKind Kind, typename SearchNode>
     requires SearchNodeConcept<SearchNode, Kind>
 inline Plan<Kind> extract_total_ordered_plan(const SearchNode& final_search_node,
                                              const Node<Kind>& final_node,
-                                             const SegmentedVector<SearchNode>& search_nodes,
+                                             const ygg::SegmentedVector<SearchNode>& search_nodes,
                                              SuccessorGenerator<Kind>& successor_generator,
                                              ActionCostMode action_cost_mode = ActionCostMode::GENERAL)
 {

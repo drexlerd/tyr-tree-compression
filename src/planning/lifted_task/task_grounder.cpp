@@ -18,11 +18,11 @@
 #include "tyr/planning/lifted_task/task_grounder.hpp"
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/comparators.hpp"
-#include "tyr/common/dynamic_bitset.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/vector.hpp"
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/containers/dynamic_bitset.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/bottom_up.hpp"
 #include "tyr/datalog/contexts/program.hpp"
 #include "tyr/datalog/policies/annotation.hpp"
@@ -68,7 +68,7 @@ enum class RemapStatus
 };
 
 template<f::FactKind T>
-RemapStatus classify_literal(fp::GroundAtomView<T> atom, bool polarity, const UnorderedSet<fp::GroundAtomView<T>>& atoms)
+RemapStatus classify_literal(fp::GroundAtomView<T> atom, bool polarity, const ygg::UnorderedSet<fp::GroundAtomView<T>>& atoms)
 {
     const bool present = atoms.contains(atom);
 
@@ -79,7 +79,7 @@ RemapStatus classify_literal(fp::GroundAtomView<T> atom, bool polarity, const Un
 }
 
 template<f::FactKind T>
-RemapStatus classify_literal(fp::GroundLiteralView<T> literal, const UnorderedSet<fp::GroundAtomView<T>>& atoms)
+RemapStatus classify_literal(fp::GroundLiteralView<T> literal, const ygg::UnorderedSet<fp::GroundAtomView<T>>& atoms)
 {
     return classify_literal(literal.get_atom(), literal.get_polarity(), atoms);
 }
@@ -87,12 +87,12 @@ RemapStatus classify_literal(fp::GroundLiteralView<T> literal, const UnorderedSe
 struct RemappedFDRFact
 {
     RemapStatus status;
-    std::optional<Data<fp::FDRFact<f::FluentTag>>> fact;
+    std::optional<ygg::Data<fp::FDRFact<f::FluentTag>>> fact;
 };
 
 RemappedFDRFact remap_fdr_fact(fp::FDRFactView<f::FluentTag> fact,
                                bool polarity,
-                               const UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
+                               const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
                                fp::FDRContext& fdr_context,
                                fp::MergeContext& context)
 {
@@ -115,7 +115,7 @@ struct RemappedLiteral
 };
 
 template<f::FactKind T>
-RemappedLiteral<T> remap_literal(fp::GroundLiteralView<T> literal, fp::MergeContext& context, const UnorderedSet<fp::GroundAtomView<T>>& atoms)
+RemappedLiteral<T> remap_literal(fp::GroundLiteralView<T> literal, fp::MergeContext& context, const ygg::UnorderedSet<fp::GroundAtomView<T>>& atoms)
 {
     const auto new_literal = merge_p2p(literal, context).first;
     const auto status = classify_literal(new_literal, atoms);
@@ -127,7 +127,7 @@ RemappedLiteral<T> remap_literal(fp::GroundLiteralView<T> literal, fp::MergeCont
 }
 
 template<f::FactKind T>
-RemappedLiteral<T> remap_literal(fp::GroundLiteralView<T> literal, const UnorderedSet<fp::GroundAtomView<T>>& atoms)
+RemappedLiteral<T> remap_literal(fp::GroundLiteralView<T> literal, const ygg::UnorderedSet<fp::GroundAtomView<T>>& atoms)
 {
     const auto status = classify_literal(literal, atoms);
 
@@ -138,8 +138,8 @@ RemappedLiteral<T> remap_literal(fp::GroundLiteralView<T> literal, const Unorder
 }
 
 std::optional<fp::GroundConjunctiveConditionView> create_ground_fdr_conjunctive_condition(fp::GroundConjunctiveConditionView element,
-                                                                                          const UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
-                                                                                          const UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                                                          const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
+                                                                                          const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
                                                                                           fp::FDRContext& fdr_context,
                                                                                           fp::MergeContext& context)
 {
@@ -197,8 +197,8 @@ std::optional<fp::GroundConjunctiveConditionView> create_ground_fdr_conjunctive_
 }
 
 std::optional<fp::GroundConjunctiveConditionView> ground_pruned(fp::ConjunctiveConditionView element,
-                                                                const UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
-                                                                const UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                                const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
+                                                                const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
                                                                 fp::GrounderContext& context,
                                                                 fp::FDRContext& fdr_context)
 {
@@ -249,7 +249,7 @@ std::optional<fp::GroundConjunctiveConditionView> ground_pruned(fp::ConjunctiveC
 }
 
 std::optional<fp::GroundConjunctiveEffectView> ground_pruned(fp::ConjunctiveEffectView element,
-                                                             const UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
+                                                             const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
                                                              fp::GrounderContext& context,
                                                              fp::FDRContext& fdr)
 {
@@ -281,8 +281,8 @@ std::optional<fp::GroundConjunctiveEffectView> ground_pruned(fp::ConjunctiveEffe
 }
 
 std::optional<fp::GroundConditionalEffectView> ground_pruned(fp::ConditionalEffectView element,
-                                                             const UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
-                                                             const UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                             const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
+                                                             const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
                                                              fp::GrounderContext& context,
                                                              fp::FDRContext& fdr_context)
 {
@@ -310,10 +310,10 @@ std::optional<fp::GroundConditionalEffectView> ground_pruned(fp::ConditionalEffe
 }
 
 std::optional<fp::GroundActionView> ground_pruned(fp::ActionView element,
-                                                  const UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
-                                                  const UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                  const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
+                                                  const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
                                                   const analysis::ActionDomain& action_domains,
-                                                  itertools::cartesian_set::Workspace<Index<f::Object>>& iter_workspace,
+                                                  ygg::itertools::cartesian_set::Workspace<ygg::Index<f::Object>>& iter_workspace,
                                                   fp::GrounderContext& context,
                                                   fp::FDRContext& fdr_context)
 {
@@ -333,14 +333,14 @@ std::optional<fp::GroundActionView> ground_pruned(fp::ActionView element,
 
     auto binding_size = context.binding.size();
 
-    for (uint_t cond_effect_index = 0; cond_effect_index < element.get_effects().size(); ++cond_effect_index)
+    for (ygg::uint_t cond_effect_index = 0; cond_effect_index < element.get_effects().size(); ++cond_effect_index)
     {
         const auto cond_effect = element.get_effects()[cond_effect_index];
         const auto& parameter_domains = action_domains.payload.effect_domains.at(cond_effect.get_index()).payload.effect_domain.payload;
 
         assert(std::distance(parameter_domains.begin(), parameter_domains.end()) == static_cast<int>(element.get_arity() + cond_effect.get_arity()));
 
-        itertools::cartesian_set::for_each_element(parameter_domains.begin() + element.get_arity(),
+        ygg::itertools::cartesian_set::for_each_element(parameter_domains.begin() + element.get_arity(),
                                                    parameter_domains.end(),
                                                    iter_workspace,
                                                    [&](auto&& binding_cond)
@@ -366,8 +366,8 @@ std::optional<fp::GroundActionView> ground_pruned(fp::ActionView element,
 }
 
 std::optional<fp::GroundAxiomView> ground_pruned(fp::AxiomView element,
-                                                 const UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
-                                                 const UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                 const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
+                                                 const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
                                                  fp::GrounderContext& context,
                                                  fp::FDRContext& fdr_context)
 {
@@ -407,14 +407,14 @@ auto sorted_predicate_bindings(const d::PredicateFactSets<T>& fact_sets)
 
     std::sort(result.begin(),
               result.end(),
-              [](const auto lhs, const auto rhs) { return Less<decltype(lhs.get_key())> {}(lhs.get_key(), rhs.get_key()); });
+              [](const auto lhs, const auto rhs) { return ygg::Less<decltype(lhs.get_key())> {}(lhs.get_key(), rhs.get_key()); });
 
     return result;
 }
 }
 
 GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_task,  //
-                                                      ExecutionContext& execution_context,
+                                                      ygg::ExecutionContext& execution_context,
                                                       const GroundTaskInstantiationOptions& options)
 {
     /**
@@ -468,10 +468,10 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
     const auto predicate_bindings = sorted_predicate_bindings<f::FluentTag>(workspace.facts.fact_sets.predicate);
 
     auto fluent_predicates = task.get_domain().get_predicates<f::FluentTag>();
-    auto fluent_predicates_set = UnorderedSet<fp::PredicateView<f::FluentTag>>(fluent_predicates.begin(), fluent_predicates.end());
+    auto fluent_predicates_set = ygg::UnorderedSet<fp::PredicateView<f::FluentTag>>(fluent_predicates.begin(), fluent_predicates.end());
     auto fluent_atoms = fp::GroundAtomViewList<f::FluentTag> {};
     auto derived_predicates = task.get_domain().get_predicates<f::DerivedTag>();
-    auto derived_predicates_set = UnorderedSet<fp::PredicateView<f::DerivedTag>>(derived_predicates.begin(), derived_predicates.end());
+    auto derived_predicates_set = ygg::UnorderedSet<fp::PredicateView<f::DerivedTag>>(derived_predicates.begin(), derived_predicates.end());
     auto derived_atoms = fp::GroundAtomViewList<f::DerivedTag> {};
     {
         auto merge_planning_context = fp::MergePlanningContext { builder, *repository };
@@ -503,11 +503,11 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
             }
         }
     }
-    std::sort(fluent_atoms.begin(), fluent_atoms.end(), tyr::Less<fp::GroundAtomView<f::FluentTag>> {});
-    std::sort(derived_atoms.begin(), derived_atoms.end(), tyr::Less<fp::GroundAtomView<f::DerivedTag>> {});
+    std::sort(fluent_atoms.begin(), fluent_atoms.end(), ygg::Less<fp::GroundAtomView<f::FluentTag>> {});
+    std::sort(derived_atoms.begin(), derived_atoms.end(), ygg::Less<fp::GroundAtomView<f::DerivedTag>> {});
 
-    auto fluent_atoms_set = UnorderedSet<fp::GroundAtomView<f::FluentTag>>(fluent_atoms.begin(), fluent_atoms.end());
-    auto derived_atoms_set = UnorderedSet<fp::GroundAtomView<f::DerivedTag>>(derived_atoms.begin(), derived_atoms.end());
+    auto fluent_atoms_set = ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>(fluent_atoms.begin(), fluent_atoms.end());
+    auto derived_atoms_set = ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>(derived_atoms.begin(), derived_atoms.end());
 
     // std::cout << "Fluent atoms:" << std::endl;
     // std::cout << fluent_atoms << std::endl;
@@ -569,13 +569,13 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
 
     /// --- Create FDR actions and axioms
 
-    auto fluent_assign = UnorderedMap<Index<fp::FDRVariable<f::FluentTag>>, fp::FDRValue> {};
-    auto derived_assign = UnorderedMap<Index<fp::GroundAtom<f::DerivedTag>>, bool> {};
-    auto iter_workspace = itertools::cartesian_set::Workspace<Index<f::Object>> {};
+    auto fluent_assign = ygg::UnorderedMap<ygg::Index<fp::FDRVariable<f::FluentTag>>, fp::FDRValue> {};
+    auto derived_assign = ygg::UnorderedMap<ygg::Index<fp::GroundAtom<f::DerivedTag>>, bool> {};
+    auto iter_workspace = ygg::itertools::cartesian_set::Workspace<ygg::Index<f::Object>> {};
 
     auto static_atoms_bitset = boost::dynamic_bitset<>();
     for (const auto atom : task.get_atoms<f::StaticTag>())
-        set(uint_t(atom.get_index()), true, static_atoms_bitset);
+        ygg::set(ygg::uint_t(atom.get_index()), true, static_atoms_bitset);
 
     for (const auto binding : predicate_bindings)
     {
@@ -616,7 +616,7 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
 
     /// --- Ground Axioms
 
-    auto ground_axioms_set = UnorderedSet<Index<fp::GroundAxiom>> {};
+    auto ground_axioms_set = ygg::UnorderedSet<ygg::Index<fp::GroundAxiom>> {};
 
     for (const auto binding : predicate_bindings)
     {

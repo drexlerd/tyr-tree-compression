@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_GENERATOR_VIEW_HPP_
 #define TYR_PLANNING_GROUND_TASK_MATCH_TREE_NODES_GENERATOR_VIEW_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/formalism/planning/ground_axiom_view.hpp"
 #include "tyr/planning/ground_task/match_tree/declarations.hpp"
@@ -27,23 +27,24 @@
 #include "tyr/planning/ground_task/match_tree/nodes/generator_index.hpp"
 #include "tyr/planning/ground_task/match_tree/nodes/node_view.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 template<typename Tag, planning::match_tree::Context<Tag> C>
-class View<Index<planning::match_tree::ElementGeneratorNode<Tag>>, C>
+class View<ygg::Index<planning::match_tree::ElementGeneratorNode<Tag>>, C>
 {
 private:
     const C* m_context;
-    Index<planning::match_tree::ElementGeneratorNode<Tag>> m_handle;
+    ygg::Index<planning::match_tree::ElementGeneratorNode<Tag>> m_handle;
 
 public:
-    View(Index<planning::match_tree::ElementGeneratorNode<Tag>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
+    View(ygg::Index<planning::match_tree::ElementGeneratorNode<Tag>> handle, const C& context) noexcept : m_context(&context), m_handle(handle) {}
 
     const auto& get_data() const noexcept { return get_repository(*m_context)[m_handle]; }
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
 
-    auto get_elements() const noexcept { return make_view(get_data().elements, m_context->get_formalism_repository()); }
+    auto get_elements() const noexcept { return ygg::make_view(get_data().elements, m_context->get_formalism_repository()); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

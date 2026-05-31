@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_STATE_REPOSITORY_HPP_
 #define TYR_PLANNING_STATE_REPOSITORY_HPP_
 
-#include "tyr/common/onetbb.hpp"
-#include "tyr/common/shared_object_pool.hpp"
+#include <yggdrasil/execution/onetbb.hpp>
+#include <yggdrasil/containers/shared_object_pool.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_builder.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -38,21 +38,21 @@ class StateRepository;
 template<typename T, typename Kind>
 concept StateRepositoryConcept =
     requires(T& r,
-             Index<State<Kind>> index,
-             SharedObjectPoolPtr<UnpackedState<Kind>> unregistered_state,
-             const std::vector<Data<formalism::planning::FDRFact<formalism::FluentTag>>>& fluent_facts,
-             const std::vector<std::pair<Index<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>, float_t>>& fterm_values,
-             const std::vector<formalism::planning::FDRFactView<formalism::FluentTag>>& fluent_fact_views,
-             const std::vector<formalism::planning::GroundFunctionTermViewValuePair<formalism::FluentTag>>& fterm_value_views) {
+             ygg::Index<State<Kind>> index,
+             ygg::SharedObjectPoolPtr<UnpackedState<Kind>> unregistered_state,
+             const std::vector<ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>>& fluent_facts,
+             const std::vector<std::pair<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::FluentTag>>, ygg::float_t>>& fterm_values,
+             const std::vector<::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag>>& fluent_fact_views,
+             const std::vector<::tyr::formalism::planning::GroundFunctionTermViewValuePair<::tyr::formalism::FluentTag>>& fterm_value_views) {
         requires TaskKind<Kind>;
         { r.get_initial_state() } -> std::same_as<StateView<Kind>>;
         { r.get_registered_state(index) } -> std::same_as<StateView<Kind>>;
         { r.create_state(fluent_facts, fterm_values) } -> std::same_as<StateView<Kind>>;
         { r.create_state(fluent_fact_views, fterm_value_views) } -> std::same_as<StateView<Kind>>;
-        { r.get_unregistered_state() } -> std::same_as<SharedObjectPoolPtr<UnpackedState<Kind>>>;
+        { r.get_unregistered_state() } -> std::same_as<ygg::SharedObjectPoolPtr<UnpackedState<Kind>>>;
         { r.register_state(unregistered_state) } -> std::same_as<StateView<Kind>>;
         { r.get_task() } -> std::same_as<const TaskPtr<Kind>&>;
-        { r.get_index() } -> std::same_as<uint_t>;
+        { r.get_index() } -> std::same_as<ygg::uint_t>;
     };
 }
 

@@ -18,9 +18,9 @@
 #ifndef TYR_DATALOG_FACT_SETS_HPP_
 #define TYR_DATALOG_FACT_SETS_HPP_
 
-#include "tyr/common/closed_interval.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <boost/dynamic_bitset.hpp>
@@ -29,135 +29,135 @@
 namespace tyr::datalog
 {
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class PredicateFactSet
 {
 private:
-    formalism::datalog::PredicateView<T> m_predicate;
-    const formalism::datalog::Repository& m_repository;
+    ::tyr::formalism::datalog::PredicateView<T> m_predicate;
+    const ::tyr::formalism::datalog::Repository& m_repository;
 
-    Index<formalism::Predicate<T>> m_predicate_index;
-    std::vector<Index<formalism::Row>> m_bindings;
+    ygg::Index<::tyr::formalism::Predicate<T>> m_predicate_index;
+    std::vector<ygg::Index<::tyr::formalism::Row>> m_bindings;
 
     boost::dynamic_bitset<> m_bitset;
 
 public:
-    explicit PredicateFactSet(formalism::datalog::PredicateView<T> predicate, const formalism::datalog::Repository& repository);
+    explicit PredicateFactSet(::tyr::formalism::datalog::PredicateView<T> predicate, const ::tyr::formalism::datalog::Repository& repository);
 
     auto get_predicate() const noexcept { return m_predicate; }
 
     void reset() noexcept;
 
     bool insert(const PredicateFactSet<T>& other);
-    bool insert(formalism::datalog::GroundAtomView<T> ground_atom);
-    bool insert(formalism::datalog::PredicateBindingView<T> binding);
-    bool insert(formalism::datalog::PredicateBindingForwardRangeView<T> bindings);
-    bool insert(const std::vector<formalism::datalog::PredicateBindingView<T>>& bindings);
+    bool insert(::tyr::formalism::datalog::GroundAtomView<T> ground_atom);
+    bool insert(::tyr::formalism::datalog::PredicateBindingView<T> binding);
+    bool insert(::tyr::formalism::datalog::PredicateBindingForwardRangeView<T> bindings);
+    bool insert(const std::vector<::tyr::formalism::datalog::PredicateBindingView<T>>& bindings);
 
-    bool contains(formalism::datalog::PredicateBindingView<T> binding) const noexcept;
+    bool contains(::tyr::formalism::datalog::PredicateBindingView<T> binding) const noexcept;
 
-    formalism::datalog::PredicateBindingForwardRangeView<T> get_bindings() const noexcept;
+    ::tyr::formalism::datalog::PredicateBindingForwardRangeView<T> get_bindings() const noexcept;
 };
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class PredicateFactSets
 {
 private:
     std::vector<PredicateFactSet<T>> m_sets;
 
 public:
-    explicit PredicateFactSets(formalism::datalog::PredicateListView<T> predicates, const formalism::datalog::Repository& repository);
+    explicit PredicateFactSets(::tyr::formalism::datalog::PredicateListView<T> predicates, const ::tyr::formalism::datalog::Repository& repository);
 
     void reset() noexcept;
 
     bool insert(const PredicateFactSets<T>& other);
-    bool insert(formalism::datalog::GroundAtomView<T> ground_atom);
-    bool insert(formalism::datalog::PredicateBindingView<T> binding);
-    bool insert(formalism::datalog::PredicateBindingForwardRangeView<T> bindings);
+    bool insert(::tyr::formalism::datalog::GroundAtomView<T> ground_atom);
+    bool insert(::tyr::formalism::datalog::PredicateBindingView<T> binding);
+    bool insert(::tyr::formalism::datalog::PredicateBindingForwardRangeView<T> bindings);
 
-    bool contains(formalism::datalog::PredicateBindingView<T> binding) const noexcept;
+    bool contains(::tyr::formalism::datalog::PredicateBindingView<T> binding) const noexcept;
 
     const std::vector<PredicateFactSet<T>>& get_sets() const noexcept;
 };
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class FunctionFactSet
 {
 private:
-    formalism::datalog::FunctionView<T> m_function;
-    const formalism::datalog::Repository& m_repository;
+    ::tyr::formalism::datalog::FunctionView<T> m_function;
+    const ::tyr::formalism::datalog::Repository& m_repository;
 
-    Index<formalism::Function<T>> m_function_index;
-    std::vector<uint_t> m_remap;
-    std::vector<Index<formalism::Row>> m_bindings;
-    std::vector<ClosedInterval<float_t>> m_values;
+    ygg::Index<::tyr::formalism::Function<T>> m_function_index;
+    std::vector<ygg::uint_t> m_remap;
+    std::vector<ygg::Index<::tyr::formalism::Row>> m_bindings;
+    std::vector<ygg::ClosedInterval<ygg::float_t>> m_values;
 
 public:
-    explicit FunctionFactSet(formalism::datalog::FunctionView<T> function, const formalism::datalog::Repository& repository);
+    explicit FunctionFactSet(::tyr::formalism::datalog::FunctionView<T> function, const ::tyr::formalism::datalog::Repository& repository);
 
     void reset() noexcept;
 
     bool insert(const FunctionFactSet& other);
-    bool insert(formalism::datalog::FunctionBindingView<T> binding, ClosedInterval<float_t> interval);
-    bool insert(formalism::datalog::FunctionBindingView<T> binding, float_t value);
-    bool insert(formalism::datalog::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<ClosedInterval<float_t>>& intervals);
-    bool insert(formalism::datalog::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<float_t>& values);
-    bool insert(const std::vector<formalism::datalog::FunctionBindingView<T>>& bindings, const std::vector<ClosedInterval<float_t>>& intervals);
-    bool insert(const std::vector<formalism::datalog::FunctionBindingView<T>>& bindings, const std::vector<float_t>& values);
-    bool insert(formalism::datalog::GroundFunctionTermView<T> fterm, ClosedInterval<float_t> interval);
-    bool insert(formalism::datalog::GroundFunctionTermView<T> fterm, float_t value);
-    bool insert(formalism::datalog::GroundFunctionTermValueView<T> fterm_value);
-    bool insert(formalism::datalog::GroundFunctionTermValueListView<T> fterm_values);
+    bool insert(::tyr::formalism::datalog::FunctionBindingView<T> binding, ygg::ClosedInterval<ygg::float_t> interval);
+    bool insert(::tyr::formalism::datalog::FunctionBindingView<T> binding, ygg::float_t value);
+    bool insert(::tyr::formalism::datalog::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<ygg::ClosedInterval<ygg::float_t>>& intervals);
+    bool insert(::tyr::formalism::datalog::FunctionBindingRandomAccessRangeView<T> bindings, const std::vector<ygg::float_t>& values);
+    bool insert(const std::vector<::tyr::formalism::datalog::FunctionBindingView<T>>& bindings, const std::vector<ygg::ClosedInterval<ygg::float_t>>& intervals);
+    bool insert(const std::vector<::tyr::formalism::datalog::FunctionBindingView<T>>& bindings, const std::vector<ygg::float_t>& values);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermView<T> fterm, ygg::ClosedInterval<ygg::float_t> interval);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermView<T> fterm, ygg::float_t value);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermValueView<T> fterm_value);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermValueListView<T> fterm_values);
 
-    ClosedInterval<float_t> operator[](formalism::datalog::FunctionBindingView<T> binding) const noexcept;
-    ClosedInterval<float_t> operator[](formalism::datalog::GroundFunctionTermView<T> fterm) const noexcept;
+    ygg::ClosedInterval<ygg::float_t> operator[](::tyr::formalism::datalog::FunctionBindingView<T> binding) const noexcept;
+    ygg::ClosedInterval<ygg::float_t> operator[](::tyr::formalism::datalog::GroundFunctionTermView<T> fterm) const noexcept;
 
-    const std::vector<uint_t>& get_remap() const noexcept;
-    formalism::datalog::FunctionBindingRandomAccessRangeView<T> get_bindings() const noexcept;
-    const std::vector<ClosedInterval<float_t>>& get_values() const noexcept;
+    const std::vector<ygg::uint_t>& get_remap() const noexcept;
+    ::tyr::formalism::datalog::FunctionBindingRandomAccessRangeView<T> get_bindings() const noexcept;
+    const std::vector<ygg::ClosedInterval<ygg::float_t>>& get_values() const noexcept;
 };
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 class FunctionFactSets
 {
 private:
     std::vector<FunctionFactSet<T>> m_sets;
 
 public:
-    explicit FunctionFactSets(formalism::datalog::FunctionListView<T> functions, const formalism::datalog::Repository& repository);
+    explicit FunctionFactSets(::tyr::formalism::datalog::FunctionListView<T> functions, const ::tyr::formalism::datalog::Repository& repository);
 
     void reset() noexcept;
 
     bool insert(const FunctionFactSets& other);
-    bool insert(formalism::datalog::FunctionBindingView<T> binding, ClosedInterval<float_t> interval);
-    bool insert(formalism::datalog::FunctionBindingView<T> binding, float_t value);
-    bool insert(formalism::datalog::GroundFunctionTermView<T> function_term, ClosedInterval<float_t> interval);
-    bool insert(formalism::datalog::GroundFunctionTermView<T> function_term, float_t value);
-    bool insert(formalism::datalog::GroundFunctionTermListView<T> function_terms, const std::vector<float_t>& values);
-    bool insert(formalism::datalog::GroundFunctionTermValueView<T> fterm_value);
-    bool insert(formalism::datalog::GroundFunctionTermValueListView<T> fterm_values);
+    bool insert(::tyr::formalism::datalog::FunctionBindingView<T> binding, ygg::ClosedInterval<ygg::float_t> interval);
+    bool insert(::tyr::formalism::datalog::FunctionBindingView<T> binding, ygg::float_t value);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermView<T> function_term, ygg::ClosedInterval<ygg::float_t> interval);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermView<T> function_term, ygg::float_t value);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermListView<T> function_terms, const std::vector<ygg::float_t>& values);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermValueView<T> fterm_value);
+    bool insert(::tyr::formalism::datalog::GroundFunctionTermValueListView<T> fterm_values);
 
-    ClosedInterval<float_t> operator[](formalism::datalog::FunctionBindingView<T> binding) const noexcept;
-    ClosedInterval<float_t> operator[](formalism::datalog::GroundFunctionTermView<T> fterm) const noexcept;
+    ygg::ClosedInterval<ygg::float_t> operator[](::tyr::formalism::datalog::FunctionBindingView<T> binding) const noexcept;
+    ygg::ClosedInterval<ygg::float_t> operator[](::tyr::formalism::datalog::GroundFunctionTermView<T> fterm) const noexcept;
 
     const std::vector<FunctionFactSet<T>>& get_sets() const noexcept;
 };
 
-template<formalism::FactKind T>
+template<::tyr::formalism::FactKind T>
 struct TaggedFactSets
 {
     PredicateFactSets<T> predicate;
     FunctionFactSets<T> function;
 
-    TaggedFactSets(formalism::datalog::PredicateListView<T> predicates,
-                   formalism::datalog::FunctionListView<T> functions,
-                   const formalism::datalog::Repository& repository);
+    TaggedFactSets(::tyr::formalism::datalog::PredicateListView<T> predicates,
+                   ::tyr::formalism::datalog::FunctionListView<T> functions,
+                   const ::tyr::formalism::datalog::Repository& repository);
 
-    TaggedFactSets(formalism::datalog::PredicateListView<T> predicates,
-                   formalism::datalog::FunctionListView<T> functions,
-                   formalism::datalog::GroundAtomListView<T> atoms,
-                   formalism::datalog::GroundFunctionTermValueListView<T> fterm_values,
-                   const formalism::datalog::Repository& repository);
+    TaggedFactSets(::tyr::formalism::datalog::PredicateListView<T> predicates,
+                   ::tyr::formalism::datalog::FunctionListView<T> functions,
+                   ::tyr::formalism::datalog::GroundAtomListView<T> atoms,
+                   ::tyr::formalism::datalog::GroundFunctionTermValueListView<T> fterm_values,
+                   const ::tyr::formalism::datalog::Repository& repository);
 
     void insert(const TaggedFactSets<T>& other);
 
@@ -166,12 +166,12 @@ struct TaggedFactSets
 
 struct FactSets
 {
-    const TaggedFactSets<formalism::StaticTag>& static_sets;
-    const TaggedFactSets<formalism::FluentTag>& fluent_sets;
+    const TaggedFactSets<::tyr::formalism::StaticTag>& static_sets;
+    const TaggedFactSets<::tyr::formalism::FluentTag>& fluent_sets;
 
-    FactSets(const TaggedFactSets<formalism::StaticTag>& static_sets, const TaggedFactSets<formalism::FluentTag>& fluent_sets) noexcept;
+    FactSets(const TaggedFactSets<::tyr::formalism::StaticTag>& static_sets, const TaggedFactSets<::tyr::formalism::FluentTag>& fluent_sets) noexcept;
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const TaggedFactSets<T>& get() const noexcept;
 };
 

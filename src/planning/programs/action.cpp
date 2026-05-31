@@ -59,8 +59,8 @@ auto create_applicability_atom(fp::ActionView action, fp::MergeDatalogContext& c
     const auto applicability_predicate = create_applicability_predicate(action, context).first;
 
     atom.predicate = applicability_predicate.get_index();
-    for (uint_t i = 0; i < applicability_predicate.get_arity(); ++i)
-        atom.terms.push_back(Data<f::Term>(f::ParameterIndex(i)));
+    for (ygg::uint_t i = 0; i < applicability_predicate.get_arity(); ++i)
+        atom.terms.push_back(ygg::Data<f::Term>(f::ParameterIndex(i)));
 
     canonicalize(atom);
     return context.destination.get_or_create(atom);

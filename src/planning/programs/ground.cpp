@@ -66,8 +66,8 @@ auto create_applicability_atom(fp::ActionView action, fp::MergeDatalogContext& c
     const auto applicability_predicate = create_applicability_predicate(action, context).first;
 
     atom.predicate = applicability_predicate.get_index();
-    for (uint_t i = 0; i < applicability_predicate.get_arity(); ++i)
-        atom.terms.push_back(Data<f::Term>(f::ParameterIndex(i)));
+    for (ygg::uint_t i = 0; i < applicability_predicate.get_arity(); ++i)
+        atom.terms.push_back(ygg::Data<f::Term>(f::ParameterIndex(i)));
 
     canonicalize(atom);
     return context.destination.get_or_create(atom);
@@ -95,8 +95,8 @@ auto create_applicability_atom(fp::AxiomView axiom, fp::MergeDatalogContext& con
     const auto applicability_predicate = create_applicability_predicate(axiom, context).first;
 
     atom.predicate = applicability_predicate.get_index();
-    for (uint_t i = 0; i < applicability_predicate.get_arity(); ++i)
-        atom.terms.push_back(Data<f::Term>(f::ParameterIndex(i)));
+    for (ygg::uint_t i = 0; i < applicability_predicate.get_arity(); ++i)
+        atom.terms.push_back(ygg::Data<f::Term>(f::ParameterIndex(i)));
 
     canonicalize(atom);
     return context.destination.get_or_create(atom);
@@ -105,7 +105,7 @@ auto create_applicability_atom(fp::AxiomView axiom, fp::MergeDatalogContext& con
 void append_from_condition(fp::ConjunctiveConditionView cond,
                            const TranslationContext& translation_context,
                            fp::MergeDatalogContext& context,
-                           Data<fd::ConjunctiveCondition>& conj_cond)
+                           ygg::Data<fd::ConjunctiveCondition>& conj_cond)
 {
     // Keep negated static atoms because they are monotonic
     for (const auto literal : cond.template get_literals<f::StaticTag>())
@@ -259,7 +259,7 @@ auto create_effect_rule(fp::AxiomView axiom, fd::AtomView<f::FluentTag> effect, 
 }
 
 void translate_action_to_delete_free_rules(fp::ActionView action,
-                                           Data<fd::Program>& program,
+                                           ygg::Data<fd::Program>& program,
                                            const TranslationContext& translation_context,
                                            fp::MergeDatalogContext& context,
                                            GroundTaskProgram::AppPredicateToActionMapping& predicate_to_actions)
@@ -294,7 +294,7 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
 }
 
 void translate_axiom_to_delete_free_axiom_rules(fp::AxiomView axiom,
-                                                Data<fd::Program>& program,
+                                                ygg::Data<fd::Program>& program,
                                                 const TranslationContext& translation_context,
                                                 fp::MergeDatalogContext& context,
                                                 GroundTaskProgram::AppPredicateToAxiomMapping& predicate_to_axioms)

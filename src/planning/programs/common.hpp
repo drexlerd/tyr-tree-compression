@@ -19,7 +19,7 @@
 #define TYR_SRC_PLANNING_PROGRAMS_COMMON_HPP_
 
 #include <cista/containers/string.h>
-#include "tyr/common/types.hpp"
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -29,11 +29,11 @@
 
 namespace tyr::planning
 {
-extern ::cista::offset::string create_applicability_name(formalism::planning::ActionView action);
+extern ::cista::offset::string create_applicability_name(::tyr::formalism::planning::ActionView action);
 
-extern ::cista::offset::string create_triggered_name(formalism::planning::ActionView action, formalism::planning::ConditionalEffectView cond_eff);
+extern ::cista::offset::string create_triggered_name(::tyr::formalism::planning::ActionView action, ::tyr::formalism::planning::ConditionalEffectView cond_eff);
 
-extern ::cista::offset::string create_applicability_name(formalism::planning::AxiomView axiom);
+extern ::cista::offset::string create_applicability_name(::tyr::formalism::planning::AxiomView axiom);
 
 }
 

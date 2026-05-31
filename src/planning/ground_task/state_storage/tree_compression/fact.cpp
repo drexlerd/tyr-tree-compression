@@ -17,7 +17,7 @@
 
 #include "tyr/planning/ground_task/state_storage/tree_compression/fact.hpp"
 
-#include "tyr/common/bit.hpp"
+#include <yggdrasil/core/bit.hpp>
 #include "tyr/planning/ground_task.hpp"
 #include "tyr/planning/ground_task/state_storage/tree_compression/context.hpp"
 
@@ -37,12 +37,12 @@ FactStorageBackend<GroundTag, TreeCompression>::insert(const typename FactStorag
     auto data = m_buffer.data();
     const auto& values = unpacked.values;
 
-    std::fill(m_buffer.begin(), m_buffer.end(), uint_t(0));
-    for (uint_t i = 0; i < m_infos.size(); ++i)
+    std::fill(m_buffer.begin(), m_buffer.end(), ygg::uint_t(0));
+    for (ygg::uint_t i = 0; i < m_infos.size(); ++i)
     {
         const auto& info = m_infos[i];
 
-        bit::int_reference(data + info.begin, info.offset, info.length) = values[i];
+        ygg::bit::int_reference(data + info.begin, info.offset, info.length) = values[i];
     }
 
     return typename FactStorageBackend<GroundTag, TreeCompression>::Packed { m_array_set.insert(m_buffer) };
@@ -57,11 +57,11 @@ void FactStorageBackend<GroundTag, TreeCompression>::unpack(const typename FactS
     if (values.size() != m_infos.size())
         values.resize(m_infos.size());
 
-    for (uint_t i = 0; i < m_infos.size(); ++i)
+    for (ygg::uint_t i = 0; i < m_infos.size(); ++i)
     {
         const auto& info = m_infos[i];
 
-        values[i] = uint_t(bit::int_reference<uint_t>(data + info.begin, info.offset, info.length));
+        values[i] = ygg::uint_t(ygg::bit::int_reference<ygg::uint_t>(data + info.begin, info.offset, info.length));
     }
 }
 

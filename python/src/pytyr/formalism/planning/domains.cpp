@@ -21,8 +21,8 @@
 
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/vector.h>
-#include <tyr/common/python/bindings.hpp>
-#include <tyr/common/python/type_casters.hpp>
+#include "pytyr/bindings.hpp"
+#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
 
 namespace nb = nanobind;
@@ -97,15 +97,15 @@ void bind_task_variable_domains_view(nb::module_& m, const char* name)
 
 void bind_variable_domains(nb::module_& m)
 {
-    using PlanningC = formalism::planning::Repository;
+    using PlanningC = ::tyr::formalism::planning::Repository;
 
     // Basic variable-domain views
     bind_variable_domain_view<PlanningC>(m, "VariableDomain");
 
     // Planning scoped views
-    bind_simple_scoped_domain_view<formalism::planning::Axiom, PlanningC>(m, "AxiomDomain");
-    bind_simple_scoped_domain_view<formalism::planning::ConjunctiveCondition, PlanningC>(m, "ConjunctiveConditionDomain");
-    bind_simple_scoped_domain_view<formalism::planning::ConjunctiveEffect, PlanningC>(m, "ConjunctiveEffectDomain");
+    bind_simple_scoped_domain_view<::tyr::formalism::planning::Axiom, PlanningC>(m, "AxiomDomain");
+    bind_simple_scoped_domain_view<::tyr::formalism::planning::ConjunctiveCondition, PlanningC>(m, "ConjunctiveConditionDomain");
+    bind_simple_scoped_domain_view<::tyr::formalism::planning::ConjunctiveEffect, PlanningC>(m, "ConjunctiveEffectDomain");
 
     // Composite planning views
     bind_conditional_effect_domain_view<PlanningC>(m, "ConditionalEffectDomain");

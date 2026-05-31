@@ -18,7 +18,7 @@
 #ifndef TYR_FORMALISM_BUILDER_HPP_
 #define TYR_FORMALISM_BUILDER_HPP_
 
-#include "tyr/common/tuple.hpp"
+#include <yggdrasil/containers/tuple.hpp>
 #include "tyr/formalism/basic_builder.hpp"
 
 #include <tuple>

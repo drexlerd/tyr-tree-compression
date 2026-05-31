@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_PROGRAMS_GROUND_TASK_HPP_
 #define TYR_PLANNING_PROGRAMS_GROUND_TASK_HPP_
 
-#include "tyr/common/associative_containers.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/datalog/program_context.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -36,10 +36,10 @@ namespace tyr::planning
 class GroundTaskProgram
 {
 public:
-    using AppPredicateToActionMapping = UnorderedMap<formalism::datalog::PredicateView<formalism::FluentTag>, formalism::planning::ActionView>;
-    using AppPredicateToAxiomMapping = UnorderedMap<formalism::datalog::PredicateView<formalism::FluentTag>, formalism::planning::AxiomView>;
+    using AppPredicateToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::ActionView>;
+    using AppPredicateToAxiomMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::AxiomView>;
 
-    explicit GroundTaskProgram(formalism::planning::TaskView task);
+    explicit GroundTaskProgram(::tyr::formalism::planning::TaskView task);
 
     const TranslationContext& get_translation_context() const noexcept;
     const AppPredicateToActionMapping& get_predicate_to_action_mapping() const noexcept;

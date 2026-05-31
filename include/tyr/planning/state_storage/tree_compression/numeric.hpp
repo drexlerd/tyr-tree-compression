@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_STATE_STORAGE_NUMERIC_TREE_COMPRESSION_HPP_
 #define TYR_PLANNING_STATE_STORAGE_NUMERIC_TREE_COMPRESSION_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
 
@@ -31,7 +31,7 @@ namespace tyr::planning
 template<TaskKind Kind>
 struct NumericPackedStorage<Kind, TreeCompression>
 {
-    valla::Slot<uint_t> slot;
+    valla::Slot<ygg::uint_t> slot;
 
     auto identifying_members() const noexcept { return std::tie(slot.i1, slot.i2); }
 };
@@ -50,10 +50,10 @@ public:
     void unpack(const Packed& packed, Unpacked& unpacked);
 
 private:
-    valla::IndexedHashSet<valla::Slot<uint_t>, uint_t>& m_uint_nodes;
-    valla::IndexedHashSet<float_t, uint_t>& m_float_nodes;
+    valla::IndexedHashSet<valla::Slot<ygg::uint_t>, ygg::uint_t>& m_uint_nodes;
+    valla::IndexedHashSet<ygg::float_t, ygg::uint_t>& m_float_nodes;
 
-    std::vector<uint_t> m_uint_node_buffer;
+    std::vector<ygg::uint_t> m_uint_node_buffer;
 };
 
 }

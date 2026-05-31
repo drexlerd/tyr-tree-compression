@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_APPLICABILITY_DECL_HPP_
 #define TYR_PLANNING_APPLICABILITY_DECL_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
 
 namespace tyr::planning
@@ -29,7 +29,7 @@ struct StateContext
 {
     const Task<Kind>& task;
     const UnpackedState<Kind>& unpacked_state;
-    float_t auxiliary_value;
+    ygg::float_t auxiliary_value;
 };
 
 }

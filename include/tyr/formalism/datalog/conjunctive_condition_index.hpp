@@ -18,17 +18,17 @@
 #ifndef TYR_FORMALISM_DATALOG_CONJUNCTIVE_CONDITION_INDEX_HPP_
 #define TYR_FORMALISM_DATALOG_CONJUNCTIVE_CONDITION_INDEX_HPP_
 
-#include "tyr/common/index_mixins.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/ids/index_mixins.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 
-namespace tyr
+namespace ygg
 {
 template<>
-struct Index<formalism::datalog::ConjunctiveCondition> : IndexMixin<Index<formalism::datalog::ConjunctiveCondition>>
+struct Index<tyr::formalism::datalog::ConjunctiveCondition> : ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::ConjunctiveCondition>>
 {
     // Inherit constructors
-    using Base = IndexMixin<Index<formalism::datalog::ConjunctiveCondition>>;
+    using Base = ygg::IndexMixin<ygg::Index<tyr::formalism::datalog::ConjunctiveCondition>>;
     using Base::Base;
 };
 

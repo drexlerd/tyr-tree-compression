@@ -1,5 +1,5 @@
 from ._downstream_tyr import float_t_size, multiply
-from pytyr.common import ExecutionContext
+from pyyggdrasil import ExecutionContext
 
 
 def describe_pytyr_imports():

@@ -18,25 +18,27 @@
 #ifndef TYR_FORMALISM_DATALOG_UNARY_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_UNARY_OPERATOR_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/function_expression_data.hpp"
 #include "tyr/formalism/datalog/ground_function_expression_data.hpp"
 #include "tyr/formalism/datalog/unary_operator_index.hpp"
 
-namespace tyr
+namespace ygg
 {
-template<formalism::OpKind Op, typename T>
-struct Data<formalism::datalog::UnaryOperator<Op, T>>
+using namespace ::tyr;
+
+template<::tyr::formalism::OpKind Op, typename T>
+struct Data<::tyr::formalism::datalog::UnaryOperator<Op, T>>
 {
     using OpType = Op;
 
-    Index<formalism::datalog::UnaryOperator<Op, T>> index;
+    ygg::Index<::tyr::formalism::datalog::UnaryOperator<Op, T>> index;
     T arg;
 
     Data() = default;
-    Data(Index<formalism::datalog::UnaryOperator<Op, T>> index, T arg) : index(index), arg(arg) {}
+    Data(ygg::Index<::tyr::formalism::datalog::UnaryOperator<Op, T>> index, T arg) : index(index), arg(arg) {}
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
     Data(Data&& other) = default;
@@ -44,15 +46,15 @@ struct Data<formalism::datalog::UnaryOperator<Op, T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(arg);
+        ygg::clear(index);
+        ygg::clear(arg);
     }
 
     auto cista_members() const noexcept { return std::tie(index, arg); }
     auto identifying_members() const noexcept { return std::tie(Op::kind, arg); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::datalog::UnaryOperator<formalism::Add, Data<formalism::datalog::FunctionExpression>>>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::UnaryOperator<::tyr::formalism::Add, ygg::Data<::tyr::formalism::datalog::FunctionExpression>>>);
 
 }
 

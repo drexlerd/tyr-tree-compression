@@ -18,24 +18,26 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_LITERAL_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_LITERAL_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
 #include "tyr/formalism/datalog/ground_literal_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
 
-template<formalism::FactKind T>
-struct Data<formalism::datalog::GroundLiteral<T>>
+
+template<::tyr::formalism::FactKind T>
+struct Data<::tyr::formalism::datalog::GroundLiteral<T>>
 {
-    Index<formalism::datalog::GroundLiteral<T>> index;
-    Index<formalism::datalog::GroundAtom<T>> atom;
+    ygg::Index<::tyr::formalism::datalog::GroundLiteral<T>> index;
+    ygg::Index<::tyr::formalism::datalog::GroundAtom<T>> atom;
     bool polarity;
 
     Data() = default;
-    Data(Index<formalism::datalog::GroundLiteral<T>> index, Index<formalism::datalog::GroundAtom<T>> atom, bool polarity) :
+    Data(ygg::Index<::tyr::formalism::datalog::GroundLiteral<T>> index, ygg::Index<::tyr::formalism::datalog::GroundAtom<T>> atom, bool polarity) :
         index(index),
         atom(atom),
         polarity(polarity)
@@ -48,16 +50,16 @@ struct Data<formalism::datalog::GroundLiteral<T>>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(atom);
-        tyr::clear(polarity);
+        ygg::clear(index);
+        ygg::clear(atom);
+        ygg::clear(polarity);
     }
 
     auto cista_members() const noexcept { return std::tie(index, atom, polarity); }
     auto identifying_members() const noexcept { return std::tie(atom, polarity); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::datalog::GroundLiteral<formalism::StaticTag>>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::datalog::GroundLiteral<::tyr::formalism::StaticTag>>);
 }
 
 #endif

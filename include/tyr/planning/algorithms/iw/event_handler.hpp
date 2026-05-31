@@ -36,11 +36,11 @@ public:
     using StatisticsType = Statistics<Kind>;
 
     virtual ~EventHandler() = default;
-    virtual void on_start_search(uint_t max_arity) = 0;
-    virtual void on_start_arity(uint_t arity) = 0;
-    virtual void on_end_arity(uint_t arity, SearchStatus status) = 0;
+    virtual void on_start_search(ygg::uint_t max_arity) = 0;
+    virtual void on_start_arity(ygg::uint_t arity) = 0;
+    virtual void on_end_arity(ygg::uint_t arity, SearchStatus status) = 0;
     virtual void on_end_search(tyr::planning::SearchStatus status) = 0;
-    virtual void on_solved(uint_t arity) = 0;
+    virtual void on_solved(ygg::uint_t arity) = 0;
     virtual const tyr::planning::Statistics& get_search_statistics() const = 0;
     virtual const Statistics<Kind>& get_statistics() const = 0;
 };
@@ -68,7 +68,7 @@ private:
 public:
     explicit EventHandlerBase(size_t verbosity = 0) : m_statistics(), m_search_statistics(), m_verbosity(verbosity) {}
 
-    void on_start_search(uint_t max_arity) override
+    void on_start_search(ygg::uint_t max_arity) override
     {
         m_statistics.clear();
         m_search_statistics = tyr::planning::Statistics();
@@ -78,13 +78,13 @@ public:
             self().on_start_search_impl(max_arity);
     }
 
-    void on_start_arity(uint_t arity) override
+    void on_start_arity(ygg::uint_t arity) override
     {
         if (verbosity(1))
             self().on_start_arity_impl(arity);
     }
 
-    void on_end_arity(uint_t arity, SearchStatus status) override
+    void on_end_arity(ygg::uint_t arity, SearchStatus status) override
     {
         if (verbosity(1))
             self().on_end_arity_impl(arity, status);
@@ -98,7 +98,7 @@ public:
             self().on_end_search_impl(status);
     }
 
-    void on_solved(uint_t arity) override
+    void on_solved(ygg::uint_t arity) override
     {
         m_statistics.set_solution_arity(arity);
 
@@ -116,15 +116,15 @@ class DefaultEventHandler : public EventHandlerBase<DefaultEventHandler<Kind>, K
 private:
     friend class EventHandlerBase<DefaultEventHandler<Kind>, Kind>;
 
-    void on_start_search_impl(uint_t max_arity) const { static_cast<void>(max_arity); }
-    void on_start_arity_impl(uint_t arity) const { static_cast<void>(arity); }
-    void on_end_arity_impl(uint_t arity, SearchStatus status) const
+    void on_start_search_impl(ygg::uint_t max_arity) const { static_cast<void>(max_arity); }
+    void on_start_arity_impl(ygg::uint_t arity) const { static_cast<void>(arity); }
+    void on_end_arity_impl(ygg::uint_t arity, SearchStatus status) const
     {
         static_cast<void>(arity);
         static_cast<void>(status);
     }
     void on_end_search_impl(tyr::planning::SearchStatus status) const { static_cast<void>(status); }
-    void on_solved_impl(uint_t arity) const { static_cast<void>(arity); }
+    void on_solved_impl(ygg::uint_t arity) const { static_cast<void>(arity); }
 
 public:
     explicit DefaultEventHandler(size_t verbosity = 0) : EventHandlerBase<DefaultEventHandler<Kind>, Kind>(verbosity) {}

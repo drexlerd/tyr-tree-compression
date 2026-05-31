@@ -32,11 +32,11 @@ namespace tyr::formalism::planning::invariant
 namespace
 {
 
-using TermMatchState = tyr::formalism::unification::MatchState<Data<Term>>;
+using TermMatchState = tyr::formalism::unification::MatchState<ygg::Data<Term>>;
 using ParameterRole = tyr::formalism::unification::ParameterRole;
 using DefaultMatchPolicy = tyr::formalism::unification::DefaultMatchPolicy;
 
-bool is_effect_local_parameter(ParameterIndex parameter, size_t num_action_variables) { return static_cast<uint_t>(parameter) >= num_action_variables; }
+bool is_effect_local_parameter(ParameterIndex parameter, size_t num_action_variables) { return static_cast<ygg::uint_t>(parameter) >= num_action_variables; }
 
 struct ActionAlignmentPolicy : tyr::formalism::unification::DefaultMatchPolicy
 {
@@ -46,8 +46,8 @@ struct ActionAlignmentPolicy : tyr::formalism::unification::DefaultMatchPolicy
     template<typename T>
     bool match_parameter_parameter(ParameterIndex lhs, ParameterIndex rhs, tyr::formalism::unification::MatchState<T>& state) const
     {
-        const bool lhs_is_counted = uint_t(lhs) >= num_rigid_variables;
-        const bool rhs_is_action_parameter = uint_t(rhs) < num_action_variables;
+        const bool lhs_is_counted = ygg::uint_t(lhs) >= num_rigid_variables;
+        const bool rhs_is_action_parameter = ygg::uint_t(rhs) < num_action_variables;
 
         if (lhs_is_counted)
             return true;
@@ -61,13 +61,13 @@ struct ActionAlignmentPolicy : tyr::formalism::unification::DefaultMatchPolicy
     template<typename T>
     bool match_parameter_object(ParameterIndex lhs, const T&, tyr::formalism::unification::MatchState<T>&) const
     {
-        return uint_t(lhs) >= num_rigid_variables;
+        return ygg::uint_t(lhs) >= num_rigid_variables;
     }
 
     template<typename T>
     bool match_object_parameter(const T& lhs, ParameterIndex rhs, tyr::formalism::unification::MatchState<T>& state) const
     {
-        if (uint_t(rhs) < num_action_variables)
+        if (ygg::uint_t(rhs) < num_action_variables)
             return state.sigma.assign_or_check(rhs, lhs);
 
         return false;
@@ -82,8 +82,8 @@ struct EffectCoverPolicy : tyr::formalism::unification::DefaultMatchPolicy
     template<typename T>
     bool match_parameter_parameter(ParameterIndex lhs, ParameterIndex rhs, tyr::formalism::unification::MatchState<T>& state) const
     {
-        const bool lhs_is_counted = uint_t(lhs) >= num_rigid_variables;
-        const bool rhs_is_effect_local = uint_t(rhs) >= num_action_variables;
+        const bool lhs_is_counted = ygg::uint_t(lhs) >= num_rigid_variables;
+        const bool rhs_is_effect_local = ygg::uint_t(rhs) >= num_action_variables;
 
         if (!lhs_is_counted)
         {
@@ -104,25 +104,25 @@ struct EffectCoverPolicy : tyr::formalism::unification::DefaultMatchPolicy
         if (state.counted.is_unbound(lhs))
             return state.counted.assign(lhs, T(rhs));
 
-        return tyr::EqualTo<T> {}(*state.counted[lhs], T(rhs));
+        return ygg::EqualTo<T> {}(*state.counted[lhs], T(rhs));
     }
 
     template<typename T>
     bool match_parameter_object(ParameterIndex lhs, const T& rhs, tyr::formalism::unification::MatchState<T>& state) const
     {
-        if (uint_t(lhs) < num_rigid_variables)
+        if (ygg::uint_t(lhs) < num_rigid_variables)
             return false;
 
         if (state.counted.is_unbound(lhs))
             return state.counted.assign(lhs, rhs);
 
-        return tyr::EqualTo<T> {}(*state.counted[lhs], rhs);
+        return ygg::EqualTo<T> {}(*state.counted[lhs], rhs);
     }
 
     template<typename T>
     bool match_object_parameter(const T& lhs, ParameterIndex rhs, tyr::formalism::unification::MatchState<T>& state) const
     {
-        if (uint_t(rhs) >= num_action_variables)
+        if (ygg::uint_t(rhs) >= num_action_variables)
             return state.sigma.assign_or_check(rhs, lhs);
 
         return false;
@@ -133,7 +133,7 @@ template<typename T, typename State, typename Matcher>
 std::optional<State> match_structure(const T& pattern, const T& element, State state, Matcher&& matcher)
 {
     const bool ok =
-        tyr::formalism::unification::zip_terms(pattern, element, [&](const Data<Term>& lhs, const Data<Term>& rhs) { return matcher(lhs, rhs, state); });
+        tyr::formalism::unification::zip_terms(pattern, element, [&](const ygg::Data<Term>& lhs, const ygg::Data<Term>& rhs) { return matcher(lhs, rhs, state); });
 
     if (!ok)
         return std::nullopt;
@@ -145,14 +145,14 @@ std::optional<InvariantSubstitution>
 match_cover_against_atom(const Invariant& inv, const MutableAtom<FluentTag>& pattern, const MutableAtom<FluentTag>& element)
 {
     auto state = TermMatchState {
-        .sigma = InvariantSubstitution::from_range(ParameterIndex { uint_t(inv.num_rigid_variables) }, inv.num_counted_variables),
+        .sigma = InvariantSubstitution::from_range(ParameterIndex { ygg::uint_t(inv.num_rigid_variables) }, inv.num_counted_variables),
         .counted = InvariantSubstitution {},
     };
 
     auto result = match_structure(pattern,
                                   element,
                                   std::move(state),
-                                  [&](const Data<Term>& lhs, const Data<Term>& rhs, TermMatchState& st) -> bool
+                                  [&](const ygg::Data<Term>& lhs, const ygg::Data<Term>& rhs, TermMatchState& st) -> bool
                                   { return tyr::formalism::unification::match_term(lhs, rhs, st, DefaultMatchPolicy {}); });
 
     if (!result.has_value())
@@ -187,7 +187,7 @@ match_effect_cover_against_atom(const Invariant& inv, const MutableAtom<FluentTa
 
     auto state = TermMatchState {
         .sigma = EffectSubstitution(std::move(effect_parameters)),
-        .counted = EffectSubstitution::from_range(ParameterIndex { uint_t(inv.num_rigid_variables) }, inv.num_counted_variables),
+        .counted = EffectSubstitution::from_range(ParameterIndex { ygg::uint_t(inv.num_rigid_variables) }, inv.num_counted_variables),
     };
 
     const auto policy = EffectCoverPolicy {
@@ -198,7 +198,7 @@ match_effect_cover_against_atom(const Invariant& inv, const MutableAtom<FluentTa
     auto result = match_structure(pattern,
                                   element,
                                   std::move(state),
-                                  [&](const Data<Term>& lhs, const Data<Term>& rhs, TermMatchState& st) -> bool
+                                  [&](const ygg::Data<Term>& lhs, const ygg::Data<Term>& rhs, TermMatchState& st) -> bool
                                   { return tyr::formalism::unification::match_term(lhs, rhs, st, policy); });
 
     if (!result.has_value())
@@ -231,7 +231,7 @@ match_invariant_against_ground_atom(const Invariant& inv, const MutableAtom<Flue
     auto result = match_structure(pattern,
                                   ground_atom,
                                   std::move(state),
-                                  [&](const Data<Term>& lhs, const Data<Term>& rhs, TermMatchState& st) -> bool
+                                  [&](const ygg::Data<Term>& lhs, const ygg::Data<Term>& rhs, TermMatchState& st) -> bool
                                   { return tyr::formalism::unification::match_term(lhs, rhs, st, DefaultMatchPolicy {}); });
 
     if (!result.has_value())
@@ -259,7 +259,7 @@ std::vector<ActionAlignment> enumerate_action_alignments(const Invariant& inv, c
         auto matched = match_structure(pattern,
                                        element,
                                        std::move(state),
-                                       [&](const Data<Term>& lhs, const Data<Term>& rhs, TermMatchState& st) -> bool
+                                       [&](const ygg::Data<Term>& lhs, const ygg::Data<Term>& rhs, TermMatchState& st) -> bool
                                        { return tyr::formalism::unification::match_term(lhs, rhs, st, policy); });
 
         if (matched.has_value())

@@ -18,15 +18,15 @@
 #ifndef TYR_FORMALISM_PARAMETER_INDEX_HPP_
 #define TYR_FORMALISM_PARAMETER_INDEX_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/uint_mixins.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/ids/uint_mixins.hpp>
 #include "tyr/formalism/declarations.hpp"
 
 namespace tyr::formalism
 {
-struct ParameterIndex : FixedUintMixin<ParameterIndex>
+struct ParameterIndex : ygg::FixedUintMixin<ParameterIndex>
 {
-    using Base = FixedUintMixin<ParameterIndex>;
+    using Base = ygg::FixedUintMixin<ParameterIndex>;
     using Base::Base;
 };
 

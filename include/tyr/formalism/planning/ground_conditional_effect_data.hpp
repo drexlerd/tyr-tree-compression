@@ -18,25 +18,27 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_CONDITIONAL_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_CONDITIONAL_EFFECT_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_conditional_effect_index.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_condition_index.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_effect_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 
 template<>
-struct Data<formalism::planning::GroundConditionalEffect>
+struct Data<::tyr::formalism::planning::GroundConditionalEffect>
 {
-    Index<formalism::planning::GroundConditionalEffect> index;
-    Index<formalism::planning::GroundConjunctiveCondition> condition;
-    Index<formalism::planning::GroundConjunctiveEffect> effect;
+    ygg::Index<::tyr::formalism::planning::GroundConditionalEffect> index;
+    ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition> condition;
+    ygg::Index<::tyr::formalism::planning::GroundConjunctiveEffect> effect;
 
     Data() = default;
-    Data(Index<formalism::planning::GroundConjunctiveCondition> condition_, Index<formalism::planning::GroundConjunctiveEffect> effect_) :
+    Data(ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition> condition_, ygg::Index<::tyr::formalism::planning::GroundConjunctiveEffect> effect_) :
         index(),
         condition(condition_),
         effect(effect_)
@@ -44,7 +46,7 @@ struct Data<formalism::planning::GroundConditionalEffect>
     }
     // Python constructor
     template<typename C>
-    Data(View<Index<formalism::planning::GroundConjunctiveCondition>, C> condition_, View<Index<formalism::planning::GroundConjunctiveEffect>, C> effect_) :
+    Data(::ygg::View<ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition>, C> condition_, ::ygg::View<ygg::Index<::tyr::formalism::planning::GroundConjunctiveEffect>, C> effect_) :
         index(),
         condition(),
         effect()
@@ -59,16 +61,16 @@ struct Data<formalism::planning::GroundConditionalEffect>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(condition);
-        tyr::clear(effect);
+        ygg::clear(index);
+        ygg::clear(condition);
+        ygg::clear(effect);
     }
 
     auto cista_members() const noexcept { return std::tie(index, condition, effect); }
     auto identifying_members() const noexcept { return std::tie(condition, effect); }
 };
 
-static_assert(uses_trivial_storage_v<formalism::planning::GroundConditionalEffect>);
+static_assert(ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundConditionalEffect>);
 }
 
 #endif

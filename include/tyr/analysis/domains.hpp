@@ -19,9 +19,9 @@
 #define TYR_ANALYSIS_DOMAINS_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include "tyr/common/equal_to.hpp"
-#include "tyr/common/hash.hpp"
-#include "tyr/common/types.hpp"
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -31,13 +31,13 @@
 
 namespace tyr::analysis
 {
-ProgramVariableDomains compute_variable_domains(formalism::datalog::ProgramView program);
+ProgramVariableDomains compute_variable_domains(::tyr::formalism::datalog::ProgramView program);
 
-TaskVariableDomains compute_variable_domains(formalism::planning::TaskView task);
+TaskVariableDomains compute_variable_domains(::tyr::formalism::planning::TaskView task);
 
-ProgramVariableDomainsView compute_variable_domain_views(const ProgramVariableDomains& domains, const formalism::datalog::Repository& repository);
+ProgramVariableDomainsView compute_variable_domain_views(const ProgramVariableDomains& domains, const ::tyr::formalism::datalog::Repository& repository);
 
-TaskVariableDomainsView compute_variable_domain_views(const TaskVariableDomains& domains, const formalism::planning::Repository& repository);
+TaskVariableDomainsView compute_variable_domain_views(const TaskVariableDomains& domains, const ::tyr::formalism::planning::Repository& repository);
 }
 
 #endif

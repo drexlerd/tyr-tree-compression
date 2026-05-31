@@ -18,8 +18,8 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_CONJUNCTIVE_CONDITION_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_CONJUNCTIVE_CONDITION_DATA_HPP_
 
-#include "tyr/common/types.hpp"
-#include "tyr/common/types_utils.hpp"
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/planning/boolean_operator_data.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
@@ -27,24 +27,26 @@
 #include "tyr/formalism/planning/ground_conjunctive_condition_index.hpp"
 #include "tyr/formalism/planning/ground_literal_index.hpp"
 
-namespace tyr
+namespace ygg
 {
+using namespace ::tyr;
+
 template<>
-struct Data<formalism::planning::GroundConjunctiveCondition>
+struct Data<::tyr::formalism::planning::GroundConjunctiveCondition>
 {
-    Index<formalism::planning::GroundConjunctiveCondition> index;
-    IndexList<formalism::planning::GroundLiteral<formalism::StaticTag>> static_literals;
-    IndexList<formalism::planning::GroundLiteral<formalism::DerivedTag>> derived_literals;
-    DataList<formalism::planning::FDRFact<formalism::FluentTag>> positive_facts;
-    DataList<formalism::planning::FDRFact<formalism::FluentTag>> negative_facts;
-    DataList<formalism::planning::BooleanOperator<Data<formalism::planning::GroundFunctionExpression>>> numeric_constraints;
+    ygg::Index<::tyr::formalism::planning::GroundConjunctiveCondition> index;
+    ygg::IndexList<::tyr::formalism::planning::GroundLiteral<::tyr::formalism::StaticTag>> static_literals;
+    ygg::IndexList<::tyr::formalism::planning::GroundLiteral<::tyr::formalism::DerivedTag>> derived_literals;
+    ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> positive_facts;
+    ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> negative_facts;
+    ygg::DataList<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>> numeric_constraints;
 
     Data() = default;
-    Data(IndexList<formalism::planning::GroundLiteral<formalism::StaticTag>> static_literals_,
-         IndexList<formalism::planning::GroundLiteral<formalism::DerivedTag>> derived_literals_,
-         DataList<formalism::planning::FDRFact<formalism::FluentTag>> positive_facts_,
-         DataList<formalism::planning::FDRFact<formalism::FluentTag>> negative_facts_,
-         DataList<formalism::planning::BooleanOperator<Data<formalism::planning::GroundFunctionExpression>>> numeric_constraints_) :
+    Data(ygg::IndexList<::tyr::formalism::planning::GroundLiteral<::tyr::formalism::StaticTag>> static_literals_,
+         ygg::IndexList<::tyr::formalism::planning::GroundLiteral<::tyr::formalism::DerivedTag>> derived_literals_,
+         ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> positive_facts_,
+         ygg::DataList<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>> negative_facts_,
+         ygg::DataList<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>> numeric_constraints_) :
         index(),
         static_literals(std::move(static_literals_)),
         derived_literals(std::move(derived_literals_)),
@@ -55,11 +57,11 @@ struct Data<formalism::planning::GroundConjunctiveCondition>
     }
     // Python constructor
     template<typename C>
-    Data(const std::vector<View<Index<formalism::planning::GroundLiteral<formalism::StaticTag>>, C>>& static_literals_,
-         const std::vector<View<Index<formalism::planning::GroundLiteral<formalism::DerivedTag>>, C>>& derived_literals_,
-         const std::vector<View<Data<formalism::planning::FDRFact<formalism::FluentTag>>, C>>& positive_facts_,
-         const std::vector<View<Data<formalism::planning::FDRFact<formalism::FluentTag>>, C>>& negative_facts_,
-         const std::vector<View<Data<formalism::planning::BooleanOperator<Data<formalism::planning::GroundFunctionExpression>>>, C>>& numeric_constraints_) :
+    Data(const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::GroundLiteral<::tyr::formalism::StaticTag>>, C>>& static_literals_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::GroundLiteral<::tyr::formalism::DerivedTag>>, C>>& derived_literals_,
+         const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>, C>>& positive_facts_,
+         const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>, C>>& negative_facts_,
+         const std::vector<::ygg::View<ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>, C>>& numeric_constraints_) :
         index(),
         static_literals(),
         derived_literals(),
@@ -80,41 +82,41 @@ struct Data<formalism::planning::GroundConjunctiveCondition>
 
     void clear() noexcept
     {
-        tyr::clear(index);
-        tyr::clear(static_literals);
-        tyr::clear(derived_literals);
-        tyr::clear(positive_facts);
-        tyr::clear(negative_facts);
-        tyr::clear(numeric_constraints);
+        ygg::clear(index);
+        ygg::clear(static_literals);
+        ygg::clear(derived_literals);
+        ygg::clear(positive_facts);
+        ygg::clear(negative_facts);
+        ygg::clear(numeric_constraints);
     }
 
-    template<formalism::FactKind T>
+    template<::tyr::formalism::FactKind T>
     const auto& get_literals() const
     {
-        if constexpr (std::same_as<T, formalism::StaticTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::StaticTag>)
             return static_literals;
-        else if constexpr (std::same_as<T, formalism::DerivedTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::DerivedTag>)
             return derived_literals;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
-    template<formalism::PolarityKind T>
+    template<::tyr::formalism::PolarityKind T>
     const auto& get_facts() const
     {
-        if constexpr (std::same_as<T, formalism::PositiveTag>)
+        if constexpr (std::same_as<T, ::tyr::formalism::PositiveTag>)
             return positive_facts;
-        else if constexpr (std::same_as<T, formalism::NegativeTag>)
+        else if constexpr (std::same_as<T, ::tyr::formalism::NegativeTag>)
             return negative_facts;
         else
-            static_assert(dependent_false<T>::value, "Missing case");
+            static_assert(ygg::dependent_false<T>::value, "Missing case");
     }
 
     auto cista_members() const noexcept { return std::tie(index, positive_facts, negative_facts, static_literals, derived_literals, numeric_constraints); }
     auto identifying_members() const noexcept { return std::tie(positive_facts, negative_facts, static_literals, derived_literals, numeric_constraints); }
 };
 
-static_assert(!uses_trivial_storage_v<formalism::planning::GroundConjunctiveCondition>);
+static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::GroundConjunctiveCondition>);
 }
 
 #endif

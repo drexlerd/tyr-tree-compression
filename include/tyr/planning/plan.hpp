@@ -18,7 +18,7 @@
 #ifndef TYR_PLANNING_PLAN_HPP_
 #define TYR_PLANNING_PLAN_HPP_
 
-#include "tyr/common/config.hpp"
+#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/planning/node.hpp"
 
@@ -38,7 +38,7 @@ public:
 
     const Node<Kind>& get_start_node() const noexcept;
     const LabeledNodeList<Kind>& get_labeled_succ_nodes() const noexcept;
-    float_t get_cost() const noexcept;
+    ygg::float_t get_cost() const noexcept;
     size_t get_length() const noexcept;
 };
 }
