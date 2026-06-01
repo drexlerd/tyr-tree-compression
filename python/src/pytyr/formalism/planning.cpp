@@ -56,13 +56,6 @@ auto bind_get_or_create_canonical()
 void bind_module_definitions(nb::module_& m)
 {
     {
-        nb::class_<loki::ParserOptions>(m, "ParserOptions")
-            .def(nb::init<>())
-            .def_rw("strict", &loki::ParserOptions::strict, "Enable strict mode")
-            .def_rw("verbose", &loki::ParserOptions::verbose, "Enable verbose output");
-    }
-
-    {
         nb::class_<Parser>(m, "Parser")
             .def(nb::init<const fs::path&, const loki::ParserOptions&>(), "domain_filepath"_a, "parser_options"_a)
             .def(nb::init<const std::string&, const fs::path&, const loki::ParserOptions&>(), "domain_description"_a, "domain_filepath"_a, "parser_options"_a)

@@ -18,6 +18,7 @@
 #ifndef TYR_SRC_FORMALISM_PLANNING_LOKI_TO_TYR_HPP_
 #define TYR_SRC_FORMALISM_PLANNING_LOKI_TO_TYR_HPP_
 
+#include <yggdrasil/containers/optional.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
 #include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/builder.hpp"
@@ -94,31 +95,38 @@ private:
             this->prepare(element.value());
         }
     }
-    void prepare(loki::FunctionSkeleton element);
-    void prepare(loki::Object element);
-    void prepare(loki::Parameter element);
-    void prepare(loki::Predicate element);
-    void prepare(loki::Requirements element);
-    void prepare(loki::Type element);
-    void prepare(loki::Variable element);
-    void prepare(loki::Term element);
-    void prepare(loki::Atom element);
-    void prepare(loki::Literal element);
-    void prepare(loki::FunctionExpressionNumber element);
-    void prepare(loki::FunctionExpressionBinaryOperator element);
-    void prepare(loki::FunctionExpressionMultiOperator element);
-    void prepare(loki::FunctionExpressionMinus element);
-    void prepare(loki::FunctionExpressionFunction element);
-    void prepare(loki::FunctionExpression element);
-    void prepare(loki::Function element);
-    void prepare(loki::Condition element);
-    void prepare(loki::Effect element);
-    void prepare(loki::Action element);
-    void prepare(loki::Axiom element);
-    void prepare(loki::Domain element);
-    void prepare(loki::FunctionValue element);
-    void prepare(loki::OptimizationMetric element);
-    void prepare(loki::Problem element);
+    template<typename T, typename C>
+    void prepare(const ygg::View<::cista::optional<T>, C>& element)
+    {
+        if (element.has_value())
+        {
+            this->prepare(element.value());
+        }
+    }
+    void prepare(loki::formalism::FunctionSkeletonView element);
+    void prepare(loki::formalism::ObjectView element);
+    void prepare(loki::formalism::ParameterView element);
+    void prepare(loki::formalism::PredicateView element);
+    void prepare(loki::formalism::RequirementView element);
+    void prepare(loki::formalism::TypeView element);
+    void prepare(loki::formalism::VariableView element);
+    void prepare(loki::formalism::TermView element);
+    void prepare(loki::formalism::AtomView element);
+    void prepare(loki::formalism::LiteralView element);
+    void prepare(loki::formalism::FunctionExpressionNumberView element);
+    void prepare(loki::formalism::BinaryFunctionExpressionView element);
+    void prepare(loki::formalism::MultiFunctionExpressionView element);
+    void prepare(loki::formalism::UnaryFunctionExpressionView element);
+    void prepare(loki::formalism::FunctionTermView element);
+    void prepare(loki::formalism::FunctionExpressionView element);
+    void prepare(loki::formalism::ConditionView element);
+    void prepare(loki::formalism::EffectView element);
+    void prepare(loki::formalism::ActionView element);
+    void prepare(loki::formalism::AxiomView element);
+    void prepare(loki::formalism::DomainView element);
+    void prepare(loki::formalism::InitialFunctionValueView element);
+    void prepare(loki::formalism::MetricView element);
+    void prepare(loki::formalism::TaskView element);
 
     /**
      * Common translations.
@@ -139,12 +147,13 @@ private:
 
     ParameterIndexMapping m_param_map;
 
-    template<typename T>
-    auto translate_common(const std::vector<const T*>& input, Builder& builder, Repository& context)
+    template<std::ranges::input_range Range>
+    auto translate_common(const Range& input, Builder& builder, Repository& context)
     {
-        using ReturnType = decltype(this->translate_common(std::declval<const T*>(), builder, context));
+        using Element = std::ranges::range_value_t<Range>;
+        using ReturnType = decltype(this->translate_common(std::declval<Element>(), builder, context));
         auto output = ::cista::offset::vector<ReturnType> {};
-        output.reserve(input.size());
+        output.reserve(std::ranges::size(input));
         std::transform(std::begin(input),
                        std::end(input),
                        std::back_inserter(output),
@@ -152,26 +161,27 @@ private:
         return output;
     }
 
-    FunctionViewVariant translate_common(loki::FunctionSkeleton element, Builder& builder, Repository& context);
+    FunctionViewVariant translate_common(loki::formalism::FunctionSkeletonView element, Builder& builder, Repository& context);
 
-    ygg::Index<Object> translate_common(loki::Object element, Builder& builder, Repository& context);
+    ygg::Index<Object> translate_common(loki::formalism::ObjectView element, Builder& builder, Repository& context);
 
-    ygg::Index<Variable> translate_common(loki::Parameter element, Builder& builder, Repository& context);
+    ygg::Index<Variable> translate_common(loki::formalism::ParameterView element, Builder& builder, Repository& context);
 
-    PredicateViewVariant translate_common(loki::Predicate element, Builder& builder, Repository& context);
+    PredicateViewVariant translate_common(loki::formalism::PredicateView element, Builder& builder, Repository& context);
 
-    ygg::Index<Variable> translate_common(loki::Variable element, Builder& builder, Repository& context);
+    ygg::Index<Variable> translate_common(loki::formalism::VariableView element, Builder& builder, Repository& context);
 
     /**
      * Lifted translation.
      */
 
-    template<typename T>
-    auto translate_lifted(const std::vector<const T*>& input, Builder& builder, Repository& context)
+    template<std::ranges::input_range Range>
+    auto translate_lifted(const Range& input, Builder& builder, Repository& context)
     {
-        using ReturnType = decltype(this->translate_lifted(std::declval<const T*>(), builder, context));
+        using Element = std::ranges::range_value_t<Range>;
+        using ReturnType = decltype(this->translate_lifted(std::declval<Element>(), builder, context));
         auto output = ::cista::offset::vector<ReturnType> {};
-        output.reserve(input.size());
+        output.reserve(std::ranges::size(input));
         std::transform(std::begin(input),
                        std::end(input),
                        std::back_inserter(output),
@@ -179,48 +189,47 @@ private:
         return output;
     }
 
-    ygg::Data<Term> translate_lifted(loki::Term element, Builder& builder, Repository& context);
+    ygg::Data<Term> translate_lifted(loki::formalism::TermView element, Builder& builder, Repository& context);
 
-    AtomViewVariant translate_lifted(loki::Atom element, Builder& builder, Repository& context);
+    AtomViewVariant translate_lifted(loki::formalism::AtomView element, Builder& builder, Repository& context);
 
-    LiteralViewVariant translate_lifted(loki::Literal element, Builder& builder, Repository& context);
+    LiteralViewVariant translate_lifted(loki::formalism::LiteralView element, Builder& builder, Repository& context);
 
-    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionNumber element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::formalism::FunctionExpressionNumberView element, Builder& builder, Repository& context);
 
-    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionBinaryOperator element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::formalism::BinaryFunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionMultiOperator element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::formalism::MultiFunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionMinus element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::formalism::UnaryFunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpressionFunction element, Builder& builder, Repository& context);
+    ygg::Data<FunctionExpression> translate_lifted(loki::formalism::FunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<FunctionExpression> translate_lifted(loki::FunctionExpression element, Builder& builder, Repository& context);
+    FunctionTermViewVariant translate_lifted(loki::formalism::FunctionTermView element, Builder& builder, Repository& context);
 
-    FunctionTermViewVariant translate_lifted(loki::Function element, Builder& builder, Repository& context);
+    ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>> translate_lifted(loki::formalism::ConditionNumericConstraintView element, Builder& builder, Repository& context);
 
-    ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>> translate_lifted(loki::ConditionNumericConstraint element, Builder& builder, Repository& context);
+    ygg::Index<ConjunctiveCondition> translate_lifted(loki::formalism::ConditionView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
 
-    ygg::Index<ConjunctiveCondition> translate_lifted(loki::Condition element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
+    NumericEffectViewVariant translate_lifted(loki::formalism::EffectNumericView element, Builder& builder, Repository& context);
 
-    NumericEffectViewVariant translate_lifted(loki::EffectNumeric element, Builder& builder, Repository& context);
+    ygg::IndexList<ConditionalEffect> translate_lifted(loki::formalism::EffectView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
 
-    ygg::IndexList<ConditionalEffect> translate_lifted(loki::Effect element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
+    ygg::Index<Action> translate_lifted(loki::formalism::ActionView element, Builder& builder, Repository& context);
 
-    ygg::Index<Action> translate_lifted(loki::Action element, Builder& builder, Repository& context);
-
-    ygg::Index<Axiom> translate_lifted(loki::Axiom element, Builder& builder, Repository& context);
+    ygg::Index<Axiom> translate_lifted(loki::formalism::AxiomView element, Builder& builder, Repository& context);
 
     /**
      * Grounded translation
      */
 
-    template<typename T>
-    auto translate_grounded(const std::vector<const T*>& input, Builder& builder, Repository& context)
+    template<std::ranges::input_range Range>
+    auto translate_grounded(const Range& input, Builder& builder, Repository& context)
     {
-        using ReturnType = decltype(this->translate_grounded(std::declval<const T*>(), builder, context));
+        using Element = std::ranges::range_value_t<Range>;
+        using ReturnType = decltype(this->translate_grounded(std::declval<Element>(), builder, context));
         auto output = ::cista::offset::vector<ReturnType> {};
-        output.reserve(input.size());
+        output.reserve(std::ranges::size(input));
         std::transform(std::begin(input),
                        std::end(input),
                        std::back_inserter(output),
@@ -228,44 +237,42 @@ private:
         return output;
     }
 
-    ygg::Index<Object> translate_grounded(loki::Term element, Builder& builder, Repository& context);
+    ygg::Index<Object> translate_grounded(loki::formalism::TermView element, Builder& builder, Repository& context);
 
-    GroundAtomViewVariant translate_grounded(loki::Atom element, Builder& builder, Repository& context);
+    GroundAtomViewVariant translate_grounded(loki::formalism::AtomView element, Builder& builder, Repository& context);
 
-    GroundAtomOrFactViewVariant translate_grounded(loki::Atom element, Builder& builder, Repository& context, FDRContext& fdr_context);
+    GroundAtomOrFactViewVariant translate_grounded(loki::formalism::AtomView element, Builder& builder, Repository& context, FDRContext& fdr_context);
 
-    GroundLiteralViewVariant translate_grounded(loki::Literal element, Builder& builder, Repository& context);
+    GroundLiteralViewVariant translate_grounded(loki::formalism::LiteralView element, Builder& builder, Repository& context);
 
-    GroundLiteralOrFactViewVariant translate_grounded(loki::Literal element, Builder& builder, Repository& context, FDRContext& fdr_context);
+    GroundLiteralOrFactViewVariant translate_grounded(loki::formalism::LiteralView element, Builder& builder, Repository& context, FDRContext& fdr_context);
 
-    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionNumber element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::formalism::FunctionExpressionNumberView element, Builder& builder, Repository& context);
 
-    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionBinaryOperator element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::formalism::BinaryFunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionMultiOperator element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::formalism::MultiFunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionMinus element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::formalism::UnaryFunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpressionFunction element, Builder& builder, Repository& context);
+    ygg::Data<GroundFunctionExpression> translate_grounded(loki::formalism::FunctionExpressionView element, Builder& builder, Repository& context);
 
-    ygg::Data<GroundFunctionExpression> translate_grounded(loki::FunctionExpression element, Builder& builder, Repository& context);
+    GroundFunctionTermViewVariant translate_grounded(loki::formalism::FunctionTermView element, Builder& builder, Repository& context);
 
-    GroundFunctionTermViewVariant translate_grounded(loki::Function element, Builder& builder, Repository& context);
+    GroundFunctionTermValueViewVariant translate_grounded(loki::formalism::InitialFunctionValueView element, Builder& builder, Repository& context);
 
-    GroundFunctionTermValueViewVariant translate_grounded(loki::FunctionValue element, Builder& builder, Repository& context);
+    ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>> translate_grounded(loki::formalism::ConditionNumericConstraintView element, Builder& builder, Repository& context);
 
-    ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>> translate_grounded(loki::ConditionNumericConstraint element, Builder& builder, Repository& context);
+    ygg::Index<GroundConjunctiveCondition> translate_grounded(loki::formalism::ConditionView element, Builder& builder, Repository& context, FDRContext& fdr_context);
 
-    ygg::Index<GroundConjunctiveCondition> translate_grounded(loki::Condition element, Builder& builder, Repository& context, FDRContext& fdr_context);
-
-    ygg::Index<Metric> translate_grounded(loki::OptimizationMetric element, Builder& builder, Repository& context);
+    ygg::Index<Metric> translate_grounded(loki::formalism::MetricView element, Builder& builder, Repository& context);
 
 public:
     LokiToTyrTranslator() = default;
 
-    PlanningDomain translate(const loki::Domain& domain);
+    PlanningDomain translate(const loki::formalism::DomainView& domain);
 
-    PlanningTask translate(const loki::Problem& problem, PlanningDomain domain);
+    PlanningTask translate(const loki::formalism::TaskView& problem, PlanningDomain domain);
 };
 
 }

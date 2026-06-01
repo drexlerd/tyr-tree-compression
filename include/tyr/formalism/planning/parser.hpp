@@ -25,6 +25,10 @@
 
 #include <loki/loki.hpp>
 
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 namespace tyr::formalism::planning
 {
 class Parser

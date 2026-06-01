@@ -1,5 +1,7 @@
 # Import all classes for better IDE support
 
+from pypddl.formalism import ParserOptions
+
 from ..._pytyr.formalism.planning import (
     MutableStaticAtom,
     MutableFluentAtom,
@@ -378,7 +380,6 @@ from ..._pytyr.formalism.planning import (
     PlanningFDRTask,
 
     # Parser
-    ParserOptions,
     Parser,
 
     # Repository,
