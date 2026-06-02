@@ -191,7 +191,7 @@ ygg::float_t evaluate(::tyr::formalism::planning::LiftedMultiOperatorView<O> ele
                            child_fexprs.end(),
                            evaluate(child_fexprs.front(), context),
                            [&](const auto& value, const auto& child_expr)
-                           { return ::tyr::formalism::apply(::tyr::formalism::Mul {}, value, evaluate(child_expr, context)); });
+                           { return ::tyr::formalism::apply(O {}, value, evaluate(child_expr, context)); });
 }
 
 inline ygg::float_t evaluate(::tyr::formalism::planning::FunctionTermView<::tyr::formalism::StaticTag> element, const ApplicabilityContext& context)
