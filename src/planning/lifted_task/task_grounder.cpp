@@ -624,26 +624,27 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
 
         if (const auto it = mapping.find(binding.get_relation()); it != mapping.end())
         {
-            const auto axiom = it->second;
-
             workspace.binding.clear();
             for (const auto object : binding.get_objects())
                 workspace.binding.push_back(object.get_index());
 
             auto grounder_context = fp::GrounderContext { workspace.planning_builder, *repository, workspace.binding };
 
-            const auto ground_axiom_or_nullopt = ground_pruned(axiom, fluent_atoms_set, derived_atoms_set, grounder_context, *fdr_context);
-
-            if (!ground_axiom_or_nullopt.has_value())
-                continue;
-
-            const auto& ground_axiom = ground_axiom_or_nullopt.value();
-
-            assert(is_statically_applicable(ground_axiom, static_atoms_bitset));
-
-            if (is_consistent(ground_axiom, fluent_assign, derived_assign))
+            for (const auto axiom : it->second)
             {
-                fdr_task.ground_axioms.push_back(ground_axiom.get_index());
+                const auto ground_axiom_or_nullopt = ground_pruned(axiom, fluent_atoms_set, derived_atoms_set, grounder_context, *fdr_context);
+
+                if (!ground_axiom_or_nullopt.has_value())
+                    continue;
+
+                const auto& ground_axiom = ground_axiom_or_nullopt.value();
+
+                assert(is_statically_applicable(ground_axiom, static_atoms_bitset));
+
+                if (is_consistent(ground_axiom, fluent_assign, derived_assign))
+                {
+                    fdr_task.ground_axioms.push_back(ground_axiom.get_index());
+                }
             }
         }
     }

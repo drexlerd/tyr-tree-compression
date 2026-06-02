@@ -20,6 +20,7 @@
 #include <fmt/ostream.h>
 #include <fstream>
 #include <queue>
+#include <yggdrasil/core/memory.hpp>
 #include <tyr/tyr.hpp>
 
 using namespace tyr;
@@ -60,7 +61,7 @@ int main(int argc, char** argv)
 
     auto total_time = std::chrono::nanoseconds { 0 };
     {
-        auto stop_watch = StopwatchScope(total_time);
+        auto stop_watch = ygg::StopwatchScope(total_time);
 
         auto domain_filepath = program.get<std::string>("--domain-filepath");
         auto problem_filepath = program.get<std::string>("--problem-filepath");
@@ -90,7 +91,7 @@ int main(int argc, char** argv)
         if (verbosity > 0)
             fmt::print(std::cout, "{}\n", *lifted_task);
 
-        auto execution_context = ExecutionContext::create(num_worker_threads);
+        auto execution_context = ygg::ExecutionContext::create(num_worker_threads);
 
         if (!instantiate_ground_task)
         {
@@ -133,12 +134,12 @@ int main(int argc, char** argv)
                 plan_file.close();
             }
 
-            std::cout << "[Total] Number of fluent atoms: " << lifted_task->get_repository()->size<formalism::planning::GroundAtom<formalism::FluentTag>>()
+            std::cout << "[Total] Number of fluent atoms: " << lifted_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::FluentTag>>()
                       << std::endl;
-            std::cout << "[Total] Number of derived atoms: " << lifted_task->get_repository()->size<formalism::planning::GroundAtom<formalism::DerivedTag>>()
+            std::cout << "[Total] Number of derived atoms: " << lifted_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::DerivedTag>>()
                       << std::endl;
             std::cout << "[Total] Number of fluent fterms: "
-                      << lifted_task->get_repository()->size<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>() << std::endl;
+                      << lifted_task->get_repository()->template size<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>() << std::endl;
             std::cout << "[Total] States memory usage: " << successor_generator->get_state_repository()->memory_usage() << " bytes" << std::endl;
         }
         else
@@ -188,19 +189,19 @@ int main(int argc, char** argv)
                     plan_file.close();
                 }
 
-                std::cout << "[Total] Number of fluent atoms: " << ground_task->get_repository()->size<formalism::planning::GroundAtom<formalism::FluentTag>>()
+                std::cout << "[Total] Number of fluent atoms: " << ground_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::FluentTag>>()
                           << std::endl;
                 std::cout << "[Total] Number of derived atoms: "
-                          << ground_task->get_repository()->size<formalism::planning::GroundAtom<formalism::DerivedTag>>() << std::endl;
+                          << ground_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::DerivedTag>>() << std::endl;
                 std::cout << "[Total] Number of fluent fterms: "
-                          << ground_task->get_repository()->size<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>() << std::endl;
+                          << ground_task->get_repository()->template size<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>() << std::endl;
                 std::cout << "[Total] States memory usage: " << successor_generator->get_state_repository()->memory_usage() << " bytes" << std::endl;
             }
         }
     }
 
-    std::cout << "[Total] Peak memory usage: " << get_peak_memory_usage_in_bytes() << " bytes" << std::endl;
-    std::cout << "[Total] Total time: " << to_ms(total_time) << " ms (" << to_ns(total_time) << " ns)" << std::endl;
+    std::cout << "[Total] Peak memory usage: " << ygg::get_peak_memory_usage_in_bytes() << " bytes" << std::endl;
+    std::cout << "[Total] Total time: " << ygg::to_ms(total_time) << " ms (" << ygg::to_ns(total_time) << " ns)" << std::endl;
 
     return 0;
 }

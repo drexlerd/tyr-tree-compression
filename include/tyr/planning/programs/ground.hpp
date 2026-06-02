@@ -30,6 +30,8 @@
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/programs/translation_context.hpp"
 
+#include <vector>
+
 namespace tyr::planning
 {
 
@@ -37,7 +39,8 @@ class GroundTaskProgram
 {
 public:
     using AppPredicateToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::ActionView>;
-    using AppPredicateToAxiomMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::AxiomView>;
+    using AppPredicateToAxiomMapping =
+        ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, std::vector<::tyr::formalism::planning::AxiomView>>;
 
     explicit GroundTaskProgram(::tyr::formalism::planning::TaskView task);
 

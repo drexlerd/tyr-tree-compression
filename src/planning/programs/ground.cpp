@@ -303,8 +303,7 @@ void translate_axiom_to_delete_free_axiom_rules(fp::AxiomView axiom,
 
     program.fluent_predicates.push_back(applicability_predicate.get_index());
 
-    [[maybe_unused]] const auto [it, inserted] = predicate_to_axioms.emplace(applicability_predicate, axiom);
-    assert(inserted);
+    predicate_to_axioms[applicability_predicate].push_back(axiom);
 
     const auto applicability_rule = create_applicability_rule(axiom, translation_context, context).first.get_index();
 

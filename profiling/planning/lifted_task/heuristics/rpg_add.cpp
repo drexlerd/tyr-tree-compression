@@ -1,13 +1,14 @@
 #include "tyr/planning/lifted_task/heuristics/rpg_add.hpp"
 
-#include "tyr/common/json.hpp"
-#include "tyr/common/json_suite.hpp"
 #include "tyr/formalism/planning/parser.hpp"
 #include "tyr/planning/algorithms/gbfs_lazy.hpp"
 #include "tyr/planning/algorithms/gbfs_lazy/event_handler.hpp"
 #include "tyr/planning/factory.hpp"
 #include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/lifted_task/node.hpp"
+
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 #include "tyr/planning/lifted_task/successor_generator.hpp"
 
 #include <benchmark/benchmark.h>
@@ -45,25 +46,25 @@ struct BenchmarkCase
 
 std::vector<BenchmarkCase> load_cases()
 {
-    const auto document = tyr::common::load_json_file(tyr::common::profiling_path("planning/lifted_task/heuristics/rpg.json"));
-    const auto& root = tyr::common::as_object(document, "suite");
-    const auto prefix = tyr::common::suite_prefix_path(root);
-    const auto& domains = tyr::common::as_object(root, "domains", "suite");
+    const auto document = ygg::common::load_json_file(ygg::common::profiling_path("planning/lifted_task/heuristics/rpg.json"));
+    const auto& root = ygg::common::as_object(document, "suite");
+    const auto prefix = ygg::common::suite_prefix_path(root);
+    const auto& domains = ygg::common::as_object(root, "domains", "suite");
 
     auto result = std::vector<BenchmarkCase>();
 
     for (const auto& [domain_name_key, domain_value] : domains)
     {
-        const auto& domain_object = tyr::common::as_object(domain_value, "domain");
+        const auto& domain_object = ygg::common::as_object(domain_value, "domain");
         const auto domain_name = std::string(domain_name_key);
-        const auto domain = tyr::common::resolve_path(prefix, tyr::common::as_string(domain_object, "domain_file", "domain"));
-        const auto& tasks = tyr::common::as_object(domain_object, "tasks", "domain");
+        const auto domain = ygg::common::resolve_path(prefix, ygg::common::as_string(domain_object, "domain_file", "domain"));
+        const auto& tasks = ygg::common::as_object(domain_object, "tasks", "domain");
 
         for (const auto& [task_name_key, task_value] : tasks)
         {
             const auto task_name = std::string(task_name_key);
             const auto run_name = domain_name + "/" + task_name;
-            const auto task = tyr::common::resolve_path(prefix, tyr::common::as_string(task_value, "task"));
+            const auto task = ygg::common::resolve_path(prefix, ygg::common::as_string(task_value, "task"));
 
             result.push_back(BenchmarkCase { run_name, domain, task });
         }
@@ -80,9 +81,9 @@ p::TaskPtr<p::LiftedTag> create_task(const BenchmarkCase& benchmark_case)
 void benchmark_gbfs_lazy_rpg_add(benchmark::State& state, const BenchmarkCase& benchmark_case)
 {
     auto task = create_task(benchmark_case);
-    auto execution_context = tyr::ExecutionContext::create(1);
-    auto initial_h_value = tyr::float_t(0);
-    auto cost = tyr::float_t(0);
+    auto execution_context = ygg::ExecutionContext::create(1);
+    auto initial_h_value = ygg::float_t(0);
+    auto cost = ygg::float_t(0);
     auto length = std::size_t(0);
     auto num_expanded = uint64_t(0);
     auto num_generated = uint64_t(0);
@@ -110,7 +111,7 @@ void benchmark_gbfs_lazy_rpg_add(benchmark::State& state, const BenchmarkCase& b
         num_expanded = event_handler->get_statistics().get_num_expanded();
         num_generated = event_handler->get_statistics().get_num_generated();
         solved = result.status == p::SearchStatus::SOLVED;
-        cost = result.plan ? result.plan->get_cost() : tyr::float_t(0);
+        cost = result.plan ? result.plan->get_cost() : ygg::float_t(0);
         length = result.plan ? result.plan->get_length() : std::size_t(0);
 
         benchmark::DoNotOptimize(static_cast<int>(result.status));

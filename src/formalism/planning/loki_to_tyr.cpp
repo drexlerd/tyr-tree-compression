@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <functional>
 #include <variant>
+#include <unordered_set>
 #include <vector>
 
 namespace ygg
@@ -1604,6 +1605,24 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
 
     /* Domain */
     task.domain = domain.get_domain().get_index();
+
+    auto domain_derived_predicates = std::unordered_set<std::string> {};
+    for (const auto predicate : domain.get_domain().get_predicates<DerivedTag>())
+        domain_derived_predicates.insert(std::string(predicate.get_name()));
+    for (const auto& predicate_view_variant : translate_common(sorted_by_name(element.get_domain().get_predicates()), builder, *task_context))
+    {
+        ygg::visit(
+            [&](auto&& arg)
+            {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, PredicateView<DerivedTag>>)
+                {
+                    if (!domain_derived_predicates.contains(std::string(arg.get_name())))
+                        task.derived_predicates.push_back(arg.get_index());
+                }
+            },
+            predicate_view_variant);
+    }
 
     /* Requirements section */
 
