@@ -222,6 +222,7 @@ void LokiToTyrTranslator::prepare(loki::formalism::TaskView problem)
     prepare(problem.get_initial_function_values());
     prepare(problem.get_goal());
     prepare(problem.get_metric());
+    prepare(problem.get_predicates());
     prepare(problem.get_axioms());
 
 }
@@ -1606,10 +1607,11 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
     /* Domain */
     task.domain = domain.get_domain().get_index();
 
-    auto domain_derived_predicates = std::unordered_set<std::string> {};
+    auto task_derived_predicates = std::unordered_set<std::string> {};
     for (const auto predicate : domain.get_domain().get_predicates<DerivedTag>())
-        domain_derived_predicates.insert(std::string(predicate.get_name()));
-    for (const auto& predicate_view_variant : translate_common(sorted_by_name(element.get_domain().get_predicates()), builder, *task_context))
+        task_derived_predicates.insert(std::string(predicate.get_name()));
+
+    auto insert_task_predicate = [&](const auto& predicate_view_variant)
     {
         ygg::visit(
             [&](auto&& arg)
@@ -1617,12 +1619,18 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, PredicateView<DerivedTag>>)
                 {
-                    if (!domain_derived_predicates.contains(std::string(arg.get_name())))
+                    if (task_derived_predicates.insert(std::string(arg.get_name())).second)
                         task.derived_predicates.push_back(arg.get_index());
                 }
             },
             predicate_view_variant);
-    }
+    };
+
+    for (const auto& predicate_view_variant : translate_common(sorted_by_name(element.get_domain().get_predicates()), builder, *task_context))
+        insert_task_predicate(predicate_view_variant);
+
+    for (const auto& predicate_view_variant : translate_common(sorted_by_name(element.get_predicates()), builder, *task_context))
+        insert_task_predicate(predicate_view_variant);
 
     /* Requirements section */
 
