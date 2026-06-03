@@ -1,5 +1,5 @@
 {
-    "prefix": "data/planning-benchmarks",
+  "prefix": "data/planning-benchmarks",
   "cases": [
     {
       "name": "Agricola",
@@ -1809,7 +1809,7 @@
           "num_counted_variables": 1,
           "atoms": [
             {
-              "predicate": "at_soil_sample",
+              "predicate": "at_rock_sample",
               "parameters": [
                 0
               ]

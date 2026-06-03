@@ -322,6 +322,11 @@ namespace
 template<typename T>
 auto to_binding(ygg::View<ygg::Index<T>, Repository> element, const ygg::IndexList<Object>& objects, Repository& context)
 {
+    if (element.get_arity() != objects.size())
+    {
+        throw std::invalid_argument("Relation binding arity mismatch for " + std::string(element.get_name()) + ": relation arity "
+                                    + std::to_string(element.get_arity()) + ", object count " + std::to_string(objects.size()));
+    }
     return context.get_or_create(ygg::Data<RelationBinding<T>>(element.get_index(), element.get_arity(), objects));
 }
 
@@ -1078,7 +1083,14 @@ GroundAtomViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism::A
         auto atom_ptr = builder.template get_builder<GroundAtom<Tag>>();
         auto& atom = *atom_ptr;
         atom.clear();
-        atom.binding = to_binding(predicate, this->translate_grounded(element.get_terms(), builder, context), context).first.get_index();
+        auto objects = this->translate_grounded(element.get_terms(), builder, context);
+        if (predicate.get_arity() != objects.size())
+        {
+            throw std::invalid_argument("Ground atom arity mismatch for " + std::string(predicate.get_name()) + ": predicate arity "
+                                        + std::to_string(predicate.get_arity()) + ", loki term count " + std::to_string(element.get_terms().size())
+                                        + ", translated object count " + std::to_string(objects.size()));
+        }
+        atom.binding = to_binding(predicate, objects, context).first.get_index();
         canonicalize(atom);
         return context.get_or_create(atom).first;
     };
