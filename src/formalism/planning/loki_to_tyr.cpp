@@ -25,45 +25,8 @@
 #include <unordered_set>
 #include <vector>
 
-namespace ygg
-{
-template<typename Visitor, typename... Ts>
-decltype(auto) visit(Visitor&& visitor, std::variant<Ts...>& variant)
-{
-    return std::visit(std::forward<Visitor>(visitor), variant);
-}
-template<typename Visitor, typename... Ts>
-decltype(auto) visit(Visitor&& visitor, const std::variant<Ts...>& variant)
-{
-    return std::visit(std::forward<Visitor>(visitor), variant);
-}
-template<typename Visitor, typename... Ts>
-decltype(auto) visit(Visitor&& visitor, std::variant<Ts...>&& variant)
-{
-    return std::visit(std::forward<Visitor>(visitor), std::move(variant));
-}
-}
-
 namespace tyr::formalism::planning
 {
-
-namespace
-{
-template<std::ranges::input_range Range>
-auto sorted_by_name(const Range& input)
-{
-    auto result = std::vector<std::ranges::range_value_t<Range>>(std::ranges::begin(input), std::ranges::end(input));
-    std::ranges::sort(result,
-                      [](const auto& lhs, const auto& rhs)
-                      {
-                          if (lhs.get_name() != rhs.get_name())
-                              return lhs.get_name() < rhs.get_name();
-
-                          return lhs.get_index() < rhs.get_index();
-                      });
-    return result;
-}
-}
 
 /**
  * Prepare common
@@ -368,7 +331,7 @@ AtomViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::AtomView 
         return context.get_or_create(atom).first;
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> AtomViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -401,7 +364,7 @@ LiteralViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::Litera
         return context.get_or_create(literal).first;
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> LiteralViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -496,7 +459,7 @@ ygg::Data<FunctionExpression> LokiToTyrTranslator::translate_lifted(loki::formal
             if constexpr (std::is_same_v<T, loki::formalism::FunctionTermView>)
             {
                 const auto fterm_view_variant = translate_lifted(arg, builder, context);
-                return ygg::visit(
+                return std::visit(
                     [](auto&& fterm) -> ygg::Data<FunctionExpression>
                     {
                         using FunctionTermT = std::decay_t<decltype(fterm)>;
@@ -532,7 +495,7 @@ FunctionTermViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::F
         return context.get_or_create(fterm).first;
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> FunctionTermViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -598,7 +561,7 @@ LokiToTyrTranslator::translate_lifted(loki::formalism::ConditionView element, co
                                         ygg::IndexList<Literal<FluentTag>>& fluent_literals,
                                         ygg::IndexList<Literal<DerivedTag>>& derived_literals)
     {
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
@@ -700,7 +663,7 @@ NumericEffectViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::
         return context.get_or_create(fterm).first;
     };
 
-    auto fterm_view_variant = ygg::visit(
+    auto fterm_view_variant = std::visit(
         [&](auto&& function) -> FunctionTermViewVariant
         {
             using FunctionT = std::decay_t<decltype(function)>;
@@ -761,7 +724,7 @@ NumericEffectViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::
         }
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> NumericEffectViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -862,7 +825,7 @@ LokiToTyrTranslator::translate_lifted(loki::formalism::EffectView element, const
                     {
                         const auto literal_view_variant = translate_lifted(subeffect.get_literal(), builder, context);
 
-                        ygg::visit(
+                        std::visit(
                             [&](auto&& subsubeffect)
                             {
                                 using SubSubEffectT = std::decay_t<decltype(subsubeffect)>;
@@ -882,7 +845,7 @@ LokiToTyrTranslator::translate_lifted(loki::formalism::EffectView element, const
                     {
                         const auto numeric_effect_view_variant = translate_lifted(subeffect, builder, context);
 
-                        ygg::visit(
+                        std::visit(
                             [&](auto&& subsubeffect)
                             {
                                 using SubSubEffectT = std::decay_t<decltype(subsubeffect)>;
@@ -1034,7 +997,7 @@ ygg::Index<Axiom> LokiToTyrTranslator::translate_lifted(loki::formalism::AxiomVi
         axiom.body = translate_lifted(element.get_condition(), parameters, builder, context);
         const auto literal_view_variant = translate_lifted(element.get_head(), builder, context);
 
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
@@ -1095,7 +1058,7 @@ GroundAtomViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism::A
         return context.get_or_create(atom).first;
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> GroundAtomViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -1115,7 +1078,7 @@ GroundAtomOrFactViewVariant LokiToTyrTranslator::translate_grounded(loki::formal
 {
     auto atom_variant = translate_grounded(element, builder, context);
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> GroundAtomOrFactViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -1148,7 +1111,7 @@ GroundLiteralViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism
         return context.get_or_create(literal).first;
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> GroundLiteralViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -1168,7 +1131,7 @@ GroundLiteralOrFactViewVariant LokiToTyrTranslator::translate_grounded(loki::for
 {
     auto literal_view_variant = translate_grounded(element, builder, context);
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> GroundLiteralOrFactViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -1263,7 +1226,7 @@ ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki
             if constexpr (std::is_same_v<T, loki::formalism::FunctionTermView>)
             {
                 const auto fterm_view_variant = translate_grounded(arg, builder, context);
-                return ygg::visit(
+                return std::visit(
                     [](auto&& fterm) -> ygg::Data<GroundFunctionExpression>
                     {
                         return ygg::Data<GroundFunctionExpression>(fterm.get_index());
@@ -1294,7 +1257,7 @@ GroundFunctionTermViewVariant LokiToTyrTranslator::translate_grounded(loki::form
         return context.get_or_create(fterm).first;
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> GroundFunctionTermViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -1336,7 +1299,7 @@ GroundFunctionTermValueViewVariant LokiToTyrTranslator::translate_grounded(loki:
         return context.get_or_create(fterm_value).first;
     };
 
-    return ygg::visit(
+    return std::visit(
         [&](auto&& arg) -> GroundFunctionTermValueViewVariant
         {
             using T = std::decay_t<decltype(arg)>;
@@ -1398,7 +1361,7 @@ LokiToTyrTranslator::translate_grounded(loki::formalism::ConditionView element, 
                                         ygg::DataList<FDRFact<FluentTag>>& positive_facts,
                                         ygg::DataList<FDRFact<FluentTag>>& negative_facts)
     {
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
@@ -1528,7 +1491,7 @@ PlanningDomain LokiToTyrTranslator::translate(const loki::formalism::DomainView&
     /* Requirements section */
 
     /* Constants section */
-    domain.constants = translate_common(sorted_by_name(element.get_constants()), builder, *context);
+    domain.constants = translate_common(element.get_constants(), builder, *context);
 
     /* Predicates section */
     const auto func_insert_predicate = [](PredicateViewVariant predicate_view_variant,
@@ -1536,7 +1499,7 @@ PlanningDomain LokiToTyrTranslator::translate(const loki::formalism::DomainView&
                                           ygg::IndexList<Predicate<FluentTag>>& fluent_predicates,
                                           ygg::IndexList<Predicate<DerivedTag>>& derived_predicates)
     {
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
@@ -1553,7 +1516,7 @@ PlanningDomain LokiToTyrTranslator::translate(const loki::formalism::DomainView&
             predicate_view_variant);
     };
 
-    for (const auto& predicate_view_variant : translate_common(sorted_by_name(element.get_predicates()), builder, *context))
+    for (const auto& predicate_view_variant : translate_common(element.get_predicates(), builder, *context))
     {
         func_insert_predicate(predicate_view_variant, domain.static_predicates, domain.fluent_predicates, domain.derived_predicates);
     }
@@ -1564,7 +1527,7 @@ PlanningDomain LokiToTyrTranslator::translate(const loki::formalism::DomainView&
                                          ygg::IndexList<Function<FluentTag>>& fluent_functions,
                                          ::cista::optional<ygg::Index<Function<AuxiliaryTag>>>& auxiliary_function)
     {
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
@@ -1584,7 +1547,7 @@ PlanningDomain LokiToTyrTranslator::translate(const loki::formalism::DomainView&
             function_view_variant);
     };
 
-    for (const auto& function_view_variant : translate_common(sorted_by_name(element.get_functions()), builder, *context))
+    for (const auto& function_view_variant : translate_common(element.get_functions(), builder, *context))
     {
         func_insert_function(function_view_variant, domain.static_functions, domain.fluent_functions, domain.auxiliary_function);
     }
@@ -1625,7 +1588,7 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
 
     auto insert_task_predicate = [&](const auto& predicate_view_variant)
     {
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
@@ -1638,16 +1601,16 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
             predicate_view_variant);
     };
 
-    for (const auto& predicate_view_variant : translate_common(sorted_by_name(element.get_domain().get_predicates()), builder, *task_context))
+    for (const auto& predicate_view_variant : translate_common(element.get_domain().get_predicates(), builder, *task_context))
         insert_task_predicate(predicate_view_variant);
 
-    for (const auto& predicate_view_variant : translate_common(sorted_by_name(element.get_predicates()), builder, *task_context))
+    for (const auto& predicate_view_variant : translate_common(element.get_predicates(), builder, *task_context))
         insert_task_predicate(predicate_view_variant);
 
     /* Requirements section */
 
     /* Objects section */
-    task.objects = translate_common(sorted_by_name(element.get_objects()), builder, *task_context);
+    task.objects = translate_common(element.get_objects(), builder, *task_context);
 
 
     /* Initial section */
@@ -1655,7 +1618,7 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
                                              ygg::IndexList<GroundAtom<StaticTag>>& static_atoms,
                                              ygg::IndexList<GroundAtom<FluentTag>>& fluent_atoms)
     {
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
@@ -1684,7 +1647,7 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
                                              ygg::IndexList<GroundFunctionTermValue<FluentTag>>& fluent_fterm_values,
                                              ::cista::optional<ygg::Index<GroundFunctionTermValue<AuxiliaryTag>>>& auxiliary_fterm_value)
     {
-        ygg::visit(
+        std::visit(
             [&](auto&& arg)
             {
                 using T = std::decay_t<decltype(arg)>;
