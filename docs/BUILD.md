@@ -2,8 +2,8 @@
 
 Tyr consumes native third-party dependencies from Python packages:
 
-- `pyyggdrasil>=0.0.9` provides shared libraries, headers, and CMake packages for common native dependencies.
-- `pypddl>=1.0.6` provides Loki's PDDL parser library, headers, and CMake package.
+- `pyyggdrasil>=0.0.11` provides shared libraries, headers, and CMake packages for common native dependencies.
+- `pypddl>=1.0.7` provides Loki's PDDL parser library, headers, and CMake package.
 
 ## Requirements
 
@@ -17,7 +17,7 @@ Create a virtual environment and install the native dependency providers:
 
 ```console
 uv venv
-uv pip install pyyggdrasil>=0.0.9 pypddl>=1.0.6
+uv pip install pyyggdrasil>=0.0.11 pypddl>=1.0.7
 ```
 
 For plain `pip`, use:
@@ -25,7 +25,7 @@ For plain `pip`, use:
 ```console
 python -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install pyyggdrasil>=0.0.9 pypddl>=1.0.6
+.venv/bin/python -m pip install pyyggdrasil>=0.0.11 pypddl>=1.0.7
 ```
 
 ## C++ Build

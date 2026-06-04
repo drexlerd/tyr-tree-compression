@@ -8,7 +8,11 @@ if(EXISTS "${PYTYR_STUB_ROOT}")
         set(PYTYR_PATCHED_STUB_CONTENT "${PYTYR_STUB_CONTENT}")
 
         string(REPLACE "pytyr._pytyr." "pytyr." PYTYR_PATCHED_STUB_CONTENT "${PYTYR_PATCHED_STUB_CONTENT}")
+        string(REPLACE "pypddl._pypddl." "pypddl." PYTYR_PATCHED_STUB_CONTENT "${PYTYR_PATCHED_STUB_CONTENT}")
+        string(REPLACE "pyyggdrasil._pyyggdrasil." "pyyggdrasil." PYTYR_PATCHED_STUB_CONTENT "${PYTYR_PATCHED_STUB_CONTENT}")
         string(REPLACE "pytyr._pytyr" "pytyr" PYTYR_PATCHED_STUB_CONTENT "${PYTYR_PATCHED_STUB_CONTENT}")
+        string(REPLACE "pypddl._pypddl" "pypddl" PYTYR_PATCHED_STUB_CONTENT "${PYTYR_PATCHED_STUB_CONTENT}")
+        string(REPLACE "pyyggdrasil._pyyggdrasil" "pyyggdrasil" PYTYR_PATCHED_STUB_CONTENT "${PYTYR_PATCHED_STUB_CONTENT}")
 
         if(NOT PYTYR_STUB_CONTENT STREQUAL PYTYR_PATCHED_STUB_CONTENT)
             file(WRITE "${PYTYR_STUB_FILE}" "${PYTYR_PATCHED_STUB_CONTENT}")
