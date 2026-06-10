@@ -80,12 +80,12 @@ bool instantiate_matches_ground_atom(const MutableAtom<FluentTag>& pattern,
 {
     if (!ygg::EqualTo<PredicateView<FluentTag>> {}(pattern.predicate, ground_atom.get_predicate()))
         return false;
-    if (pattern.terms.size() != ground_atom.get_row().get_objects().size())
+    if (pattern.terms.size() != ground_atom.get_objects().size())
         return false;
 
     for (size_t pos = 0; pos < pattern.terms.size(); ++pos)
     {
-        const auto object = ground_atom.get_row().get_objects()[pos].get_index();
+        const auto object = ground_atom.get_objects()[pos].get_index();
 
         const bool ok = std::visit(
             [&](auto&& arg) -> bool
@@ -156,12 +156,12 @@ instantiate_group(const Invariant& inv, const std::vector<ygg::Index<Object>>& r
         {
             if (!ygg::EqualTo<PredicateView<FluentTag>> {}(pattern.predicate, atom.get_predicate()))
                 continue;
-            if (pattern.terms.size() != atom.get_row().get_objects().size())
+            if (pattern.terms.size() != atom.get_objects().size())
                 continue;
 
             std::optional<ygg::Index<Object>> counted_object = std::nullopt;
             if (counted_position.has_value())
-                counted_object = atom.get_row().get_objects()[*counted_position].get_index();
+                counted_object = atom.get_objects()[*counted_position].get_index();
 
             if (!instantiate_matches_ground_atom(pattern, rigid_values, counted_object, atom))
                 continue;
@@ -197,16 +197,19 @@ struct GroupKey
 
 bool structural_less(GroundAtomView<FluentTag> lhs, GroundAtomView<FluentTag> rhs)
 {
-    const auto lhs_key = std::tuple(lhs.get_predicate(), lhs.get_row().get_objects());
-    const auto rhs_key = std::tuple(rhs.get_predicate(), rhs.get_row().get_objects());
+    const auto lhs_key = std::tuple(lhs.get_predicate(), lhs.get_objects());
+    const auto rhs_key = std::tuple(rhs.get_predicate(), rhs.get_objects());
 
     return ygg::Less<std::remove_cvref_t<decltype(lhs_key)>> {}(lhs_key, rhs_key);
 }
 
 bool structural_less(const GroundAtomViewList<FluentTag>& lhs, const GroundAtomViewList<FluentTag>& rhs)
 {
-    return std::lexicographical_compare(
-        lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), [](const auto lhs_atom, const auto rhs_atom) { return structural_less(lhs_atom, rhs_atom); });
+    return std::lexicographical_compare(lhs.begin(),
+                                        lhs.end(),
+                                        rhs.begin(),
+                                        rhs.end(),
+                                        [](const auto lhs_atom, const auto rhs_atom) { return structural_less(lhs_atom, rhs_atom); });
 }
 
 GroundAtomViewList<FluentTag> uncovered_atoms(const PrecomputedGroup& group, const std::vector<bool>& uncovered)
@@ -292,9 +295,7 @@ precompute_groups(const GroundAtomViewList<FluentTag>& initial_atoms, const Grou
                 if (initial_count > 1)
                     continue;
 
-                std::sort(instantiated_group.begin(),
-                          instantiated_group.end(),
-                          [](const auto lhs, const auto rhs) { return structural_less(lhs, rhs); });
+                std::sort(instantiated_group.begin(), instantiated_group.end(), [](const auto lhs, const auto rhs) { return structural_less(lhs, rhs); });
 
                 groups.push_back(PrecomputedGroup {
                     .inv_index = inv_index,

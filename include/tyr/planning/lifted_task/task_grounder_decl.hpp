@@ -32,8 +32,8 @@ enum class GroundTaskInstantiationStatus
 
 struct GroundTaskInstantiationResult
 {
-    TaskPtr<GroundTag> task;
-    GroundTaskInstantiationStatus status;
+    TaskPtr<GroundTag> task = nullptr;
+    GroundTaskInstantiationStatus status = GroundTaskInstantiationStatus::PROVEN_UNSOLVABLE;
 };
 
 struct GroundTaskInstantiationOptions

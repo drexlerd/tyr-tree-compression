@@ -7,18 +7,26 @@ include(CMakeFindDependencyMacro)
 ##############################################################
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/configure_boost.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake/configure_yggdrasil.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake/configure_pypddl.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/find_python_native_packages.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/tyr_native_dependencies.cmake")
 
 ##############################################################
 # Dependency Handling
 ##############################################################
 
-configure_yggdrasil()
-configure_pypddl()
+tyr_find_python_native_prefix(pyyggdrasil YGGDRASIL_NATIVE_PREFIX)
+tyr_find_python_native_prefix(pypddl PYPDDL_NATIVE_PREFIX)
 tyr_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
 tyr_register_native_dependency_prefix("${PYPDDL_NATIVE_PREFIX}")
+
+# -----------
+# yggdrasil
+# -----------
+
+find_dependency(yggdrasil 0.0.14 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+if(yggdrasil_FOUND)
+  message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
+endif()
 
 # -----------
 # argparse
@@ -107,7 +115,7 @@ endif()
 # Loki
 # -----------
 
-find_dependency(loki 1.0.8 COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_dependency(loki 1.0.9 COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(loki_FOUND)
   message(STATUS "Found loki: ${loki_DIR} (found version ${loki_VERSION})")
 endif()

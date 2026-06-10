@@ -18,18 +18,18 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_FUNCTION_TERM_DATA_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_function_term_index.hpp"
 #include "tyr/formalism/function_index.hpp"
 #include "tyr/formalism/object_index.hpp"
 
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+
 namespace ygg
 {
 using namespace ::tyr;
-
 
 template<::tyr::formalism::FactKind T>
 struct Data<::tyr::formalism::datalog::GroundFunctionTerm<T>>
@@ -38,7 +38,7 @@ struct Data<::tyr::formalism::datalog::GroundFunctionTerm<T>>
     ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>> binding;
 
     Data() = default;
-    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>> binding) : binding(binding) {}
+    Data(ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Function<T>>> binding_) : index(), binding(binding_) {}
     Data(const Data& other) = default;
     Data& operator=(const Data& other) = default;
     Data(Data&& other) = default;

@@ -141,7 +141,7 @@ def main():
     task_filepath: Path = args.task_filepath
 
     parser_options = ParserOptions()
-    parser = Parser(domain_filepath, parser_options)
+    parser = Parser(str(domain_filepath), parser_options)
 
     planning_domain = parser.get_domain()
 
@@ -153,7 +153,7 @@ def main():
         print(f"[{i}] {inv}")
 
     # 2. Parse the task and inspect the variable domains.
-    task = parser.parse_task(task_filepath, parser_options)
+    task = parser.parse_task(str(task_filepath), parser_options)
     task_variable_domains = task.get_variable_domains()
 
     print("\nTask variable domains:")

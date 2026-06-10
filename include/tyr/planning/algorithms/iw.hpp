@@ -27,9 +27,12 @@
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/declarations.hpp"
 
+#include <chrono>
+#include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
-#include <vector>
+#include <stdexcept>
 
 namespace tyr::planning::iw
 {
@@ -58,7 +61,7 @@ struct Solver
     using EventHandlerType = EventHandler<Kind>;
 
     brfs::Solver<Kind> brfs_solver;
-    ygg::uint_t max_arity;
+    ygg::uint_t max_arity = MaxArity;
     Options<Kind> options;
 
     SearchResult<Kind> solve() { return find_solution(brfs_solver, max_arity, options); }

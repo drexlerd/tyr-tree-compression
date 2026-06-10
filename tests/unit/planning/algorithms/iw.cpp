@@ -15,15 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <filesystem>
 #include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <optional>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace p = tyr::planning;
 namespace fp = tyr::formalism::planning;
@@ -169,6 +168,19 @@ TEST_P(IwTest, MatchesExpectedOutcome)
                  to_string(result.status),
                  plan_length ? std::to_string(*plan_length) : std::string("null"),
                  solution_arity ? std::to_string(*solution_arity) : std::string("null"));
+
+    if (result.status == p::SearchStatus::SOLVED)
+    {
+        EXPECT_TRUE(solution_arity);
+        if (solution_arity)
+        {
+            EXPECT_LE(*solution_arity, param.max_arity);
+        }
+    }
+    else
+    {
+        EXPECT_FALSE(solution_arity);
+    }
 
     if (param.expected_status)
     {

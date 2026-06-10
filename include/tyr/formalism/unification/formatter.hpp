@@ -23,6 +23,8 @@
 
 #include <sstream>
 
+#include "tyr/config.hpp"
+
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {

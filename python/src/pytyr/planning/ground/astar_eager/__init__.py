@@ -4,5 +4,6 @@ from ...._pytyr.planning.ground.astar_eager import (
     DefaultEventHandler,
     EventHandler,
     Options,
+    Solver,
     find_solution,
 )

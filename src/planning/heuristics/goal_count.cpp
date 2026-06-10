@@ -32,7 +32,7 @@ GoalCountHeuristic<Kind>::GoalCountHeuristic(std::shared_ptr<const Task<Kind>> t
 template<TaskKind Kind>
 std::shared_ptr<GoalCountHeuristic<Kind>> GoalCountHeuristic<Kind>::create(std::shared_ptr<const Task<Kind>> task)
 {
-    return std::make_shared<GoalCountHeuristic>(std::move(task));
+    return std::make_shared<GoalCountHeuristic<Kind>>(std::move(task));
 }
 
 template<TaskKind Kind>

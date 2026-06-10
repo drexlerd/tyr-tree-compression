@@ -10,7 +10,7 @@ Example usage (run from the repository root):
 Author: Dominik Drexler (dominik.drexler@liu.se)
 """
 
-from pyyggdrasil import ExecutionContext
+from pyyggdrasil.execution import ExecutionContext
 
 from pytyr.formalism.planning import (
     ParameterIndex,
@@ -42,9 +42,7 @@ from pytyr.formalism.planning import (
 
 from pytyr.planning.lifted import (
     Task,
-    GroundTaskInstantiationOptions,    
-    GroundTaskInstantiationStatus,
-    GroundTaskInstantiationResult,
+    GroundTaskInstantiationOptions,
 )
 
 

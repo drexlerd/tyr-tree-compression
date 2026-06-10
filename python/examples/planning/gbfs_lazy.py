@@ -21,10 +21,10 @@ from queue import PriorityQueue
 from dataclasses import dataclass
 from enum import Enum
 
-from pyyggdrasil import ExecutionContext
+from pyyggdrasil.execution import ExecutionContext
 
 from pytyr.formalism.planning import (
-    ParserOptions, 
+    ParserOptions,
     Parser
 )
 
@@ -33,41 +33,38 @@ from pytyr.planning import (
 )
 
 from pytyr.planning.lifted import (
-    StateIndex, 
-    SearchResult, 
+    StateIndex,
+    SearchResult,
     AxiomEvaluatorFactory,
     StateRepositoryFactory,
-    SuccessorGenerator, 
+    SuccessorGenerator,
     SuccessorGeneratorFactory,
-    Heuristic, 
-    FFRPGHeuristic, 
-    PruningStrategy, 
-    GoalStrategy,
-    ConjunctiveGoalStrategy, 
-    State, 
-    Node, 
-    LabeledNode, 
-    Plan, 
+    Heuristic,
+    FFRPGHeuristic,
+    ConjunctiveGoalStrategy,
+    Node,
+    LabeledNode,
+    Plan,
     Task
 )
 
 
 class SearchNodeStatus(Enum):
-        NEW = 0
-        OPEN = 1
-        CLOSED = 2
-        DEADEND = 3
-        GOAL = 4
+    NEW = 0
+    OPEN = 1
+    CLOSED = 2
+    DEADEND = 3
+    GOAL = 4
 
 
 @dataclass
 class SearchNode:
-    g_value : float
-    parent : StateIndex | None
-    status : SearchNodeStatus
+    g_value: float
+    parent: StateIndex | None
+    status: SearchNodeStatus
 
 
-def backtrack_plan(goal_node : Node, goal_search_node : SearchNode, search_nodes : dict[StateIndex, SearchNode], successor_generator : SuccessorGenerator):
+def backtrack_plan(goal_node: Node, goal_search_node: SearchNode, search_nodes: dict[StateIndex, SearchNode], successor_generator: SuccessorGenerator):
     """
     Backtracks from the goal search node to compute the plan inducing state trajectory,
     followed by computing the ground actions connecting subsequent state in the trajectory.
@@ -82,11 +79,12 @@ def backtrack_plan(goal_node : Node, goal_search_node : SearchNode, search_nodes
 
     forward_state_trajectory = list(reversed(backward_state_trajectory))
 
-    assert(forward_state_trajectory)
+    assert forward_state_trajectory
 
-    node = successor_generator.get_node(forward_state_trajectory[0])
-    labeled_succ_nodes : list[LabeledNode] = []
-    
+    start_node = successor_generator.get_node(forward_state_trajectory[0])
+    node = start_node
+    labeled_succ_nodes: list[LabeledNode] = []
+
     for i in range(len(forward_state_trajectory) - 1):
         for labeled_succ_node in successor_generator.get_labeled_successor_nodes(node):
             succ_node = labeled_succ_node.node
@@ -97,11 +95,11 @@ def backtrack_plan(goal_node : Node, goal_search_node : SearchNode, search_nodes
                 labeled_succ_nodes.append(labeled_succ_node)
                 node = labeled_succ_node.node
 
-    return Plan(node, labeled_succ_nodes)
+    return Plan(start_node, labeled_succ_nodes)
 
 
-def find_solution(task : Task, successor_generator : SuccessorGenerator, heuristic : Heuristic) -> SearchResult: 
-    
+def find_solution(task: Task, successor_generator: SuccessorGenerator, heuristic: Heuristic) -> SearchResult:
+
     state_repository = successor_generator.get_state_repository()
 
     goal_strategy = ConjunctiveGoalStrategy(task)
@@ -127,7 +125,7 @@ def find_solution(task : Task, successor_generator : SuccessorGenerator, heurist
     initial_g_value = initial_node.get_metric()
     initial_state_index = initial_state.get_index()
 
-    search_nodes : dict[StateIndex, SearchNode] = dict()
+    search_nodes: dict[StateIndex, SearchNode] = dict()
     search_nodes[initial_state_index] = SearchNode(initial_g_value, None, SearchNodeStatus.NEW)
 
     queue = PriorityQueue()
@@ -142,7 +140,7 @@ def find_solution(task : Task, successor_generator : SuccessorGenerator, heurist
         search_node = search_nodes.get(state_index)
 
         state_h_value = heuristic.evaluate(state)
-        preferred_actions = heuristic.get_preferred_actions()
+        preferred_actions = heuristic.get_preferred_action_views()
 
         search_node.status = SearchNodeStatus.CLOSED
 
@@ -159,8 +157,8 @@ def find_solution(task : Task, successor_generator : SuccessorGenerator, heurist
             if succ_state_index not in search_nodes:
                 search_nodes[succ_state_index] = SearchNode(succ_g_value, state_index, SearchNodeStatus.NEW)
 
-            succ_search_node : SearchNode = search_nodes.get(succ_state_index)
-        
+            succ_search_node: SearchNode = search_nodes.get(succ_state_index)
+
             if not succ_search_node.status == SearchNodeStatus.NEW:
                 continue
 
@@ -175,16 +173,15 @@ def find_solution(task : Task, successor_generator : SuccessorGenerator, heurist
                 search_result.plan = backtrack_plan(succ_node, succ_search_node, search_nodes, successor_generator)
                 search_result.status = SearchStatus.SOLVED
                 return search_result
-            
+
             succ_search_node.status = SearchNodeStatus.OPEN
             queue.put((state_h_value, succ_g_value, succ_state_index))
 
-            
+
     search_result.goal_node = None
     search_result.plan = None
     search_result.status = SearchStatus.EXHAUSTED
     return search_result
-
 
 def main():
     arg_parser = argparse.ArgumentParser(description="GBFS Lazy Search.")
@@ -192,13 +189,13 @@ def main():
     arg_parser.add_argument("-p", "--task-filepath", type=Path, required=True, help="Path to PDDL task file.")
     args = arg_parser.parse_args()
 
-    domain_filepath : Path = args.domain_filepath
-    task_filepath : Path = args.task_filepath
+    domain_filepath: Path = args.domain_filepath
+    task_filepath: Path = args.task_filepath
 
     execution_context = ExecutionContext(2)
     parser_options = ParserOptions()
-    parser = Parser(domain_filepath, parser_options)
-    lifted_task = Task(parser.parse_task(task_filepath, parser_options))
+    parser = Parser(str(domain_filepath), parser_options)
+    lifted_task = Task(parser.parse_task(str(task_filepath), parser_options))
     heuristic = FFRPGHeuristic(lifted_task, execution_context)
     axiom_evaluator_factory = AxiomEvaluatorFactory()
     state_repository_factory = StateRepositoryFactory()
@@ -218,8 +215,6 @@ def main():
         print(plan)
     else:
         print("No solution was found.")
-
-
 
 if __name__ == "__main__":
     main()

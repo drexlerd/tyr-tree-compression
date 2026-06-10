@@ -18,15 +18,16 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_ACTION_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_ACTION_VIEW_HPP_
 
-#include <yggdrasil/containers/array.hpp>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/binding_view.hpp"
 #include "tyr/formalism/planning/action_view.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/formalism/planning/ground_conditional_effect_view.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_condition_data.hpp"
+
+#include <yggdrasil/containers/array.hpp>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace ygg
 {
@@ -49,6 +50,7 @@ public:
     auto get_index() const noexcept { return m_handle; }
     auto get_action() const noexcept { return get_row().get_relation(); }
     auto get_row() const noexcept { return ygg::make_view(get_data().binding, *m_context); }
+    auto get_objects() const noexcept { return get_row().get_objects(); }
     auto get_key() const noexcept { return get_row().get_key(); }
     auto get_condition() const noexcept { return ygg::make_view(get_data().condition, *m_context); }
     auto get_effects() const noexcept { return ygg::make_view(get_data().effects, *m_context); }

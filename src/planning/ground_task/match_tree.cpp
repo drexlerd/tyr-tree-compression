@@ -17,8 +17,6 @@
 
 #include "tyr/planning/ground_task/match_tree/match_tree.hpp"
 
-#include <yggdrasil/buffer/declarations.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -45,20 +43,24 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <yggdrasil/buffer/declarations.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning::match_tree
 {
 
-using PreconditionVariant = std::variant<ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>>,
-                                         ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>>,
-                                         ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>,
-                                         ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>>;
+using PreconditionVariant =
+    std::variant<ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>>,
+                 ygg::Index<::tyr::formalism::planning::FDRVariable<::tyr::formalism::FluentTag>>,
+                 ygg::Data<::tyr::formalism::planning::FDRFact<::tyr::formalism::FluentTag>>,
+                 ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>>;
 
 template<typename Tag>
-using PreconditionOccurences = ygg::UnorderedMap<PreconditionVariant, ygg::IndexList<Tag>>;
+using PreconditionOccurrences = ygg::UnorderedMap<PreconditionVariant, ygg::IndexList<Tag>>;
 
 template<typename Tag>
-using PreconditionDetails = ygg::UnorderedMap<ygg::Index<Tag>, ygg::UnorderedMap<PreconditionVariant, std::variant<std::monostate, bool, ::tyr::formalism::planning::FDRValue>>>;
+using PreconditionDetails =
+    ygg::UnorderedMap<ygg::Index<Tag>, ygg::UnorderedMap<PreconditionVariant, std::variant<std::monostate, bool, ::tyr::formalism::planning::FDRValue>>>;
 
 template<typename Tag>
 struct BaseEntry
@@ -426,8 +428,9 @@ inline auto get_condition(::tyr::formalism::planning::GroundAxiomView el) { retu
 inline auto get_condition(::tyr::formalism::planning::GroundActionView el) { return el.get_condition(); }
 
 template<typename Tag>
-static std::optional<StackEntry<Tag>>
-try_create_atom_stack_entry(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> atom, BaseEntry<Tag> base, const PreconditionDetails<Tag>& details)
+static std::optional<StackEntry<Tag>> try_create_atom_stack_entry(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>> atom,
+                                                                  BaseEntry<Tag> base,
+                                                                  const PreconditionDetails<Tag>& details)
 {
     assert(!base.elements.empty());
 
@@ -550,10 +553,10 @@ static std::optional<StackEntry<Tag>> try_create_negative_fact_stack_entry(ygg::
 }
 
 template<typename Tag>
-static std::optional<StackEntry<Tag>>
-try_create_constraint_stack_entry(ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>> constraint,
-                                  BaseEntry<Tag> base,
-                                  const PreconditionDetails<Tag>& details)
+static std::optional<StackEntry<Tag>> try_create_constraint_stack_entry(
+    ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>> constraint,
+    BaseEntry<Tag> base,
+    const PreconditionDetails<Tag>& details)
 {
     assert(!base.elements.empty());
 
@@ -587,10 +590,11 @@ static StackEntry<Tag> create_generator_stack_entry(BaseEntry<Tag> base)
 }
 
 template<typename Tag>
-static std::optional<StackEntry<Tag>> try_create_selector_stack_entry(BaseEntry<Tag> base,
-                                                                      const std::vector<std::pair<PreconditionVariant, ygg::IndexList<Tag>>>& sorted_preconditions,
-                                                                      const PreconditionDetails<Tag>& details,
-                                                                      const ::tyr::formalism::planning::Repository& context)
+static std::optional<StackEntry<Tag>>
+try_create_selector_stack_entry(BaseEntry<Tag> base,
+                                const std::vector<std::pair<PreconditionVariant, ygg::IndexList<Tag>>>& sorted_preconditions,
+                                const PreconditionDetails<Tag>& details,
+                                const ::tyr::formalism::planning::Repository& context)
 {
     return std::visit(
         [&](auto&& arg)
@@ -603,7 +607,9 @@ static std::optional<StackEntry<Tag>> try_create_selector_stack_entry(BaseEntry<
                 return try_create_negative_fact_stack_entry(arg, base, details);
             else if constexpr (std::same_as<Alternative, ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::DerivedTag>>>)
                 return try_create_atom_stack_entry(arg, base, details);
-            else if constexpr (std::same_as<Alternative, ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>>)
+            else if constexpr (std::same_as<
+                                   Alternative,
+                                   ygg::Data<::tyr::formalism::planning::BooleanOperator<ygg::Data<::tyr::formalism::planning::GroundFunctionExpression>>>>)
                 return try_create_constraint_stack_entry(arg, base, details);
             else
                 static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
@@ -636,7 +642,7 @@ MatchTree<Tag>::MatchTree(ygg::IndexList<Tag> elements_, const ::tyr::formalism:
     m_root(),
     m_evaluate_stack()
 {
-    auto occurences = PreconditionOccurences<Tag> {};
+    auto occurrences = PreconditionOccurrences<Tag> {};
     auto details = PreconditionDetails<Tag> {};
 
     // std::cout << "Num elements: " << m_elements.size() << std::endl;
@@ -650,33 +656,33 @@ MatchTree<Tag>::MatchTree(ygg::IndexList<Tag> elements_, const ::tyr::formalism:
         for (const auto fact : condition.template get_facts<::tyr::formalism::PositiveTag>())
         {
             const auto key = fact.get_variable().get_index();
-            occurences[key].push_back(element);
+            occurrences[key].push_back(element);
             details[element][key] = fact.get_value();
         }
 
         for (const auto fact : condition.template get_facts<::tyr::formalism::NegativeTag>())
         {
             const auto key = fact.get_data();
-            occurences[key].push_back(element);
+            occurrences[key].push_back(element);
             details[element][key] = std::monostate {};
         }
 
         for (const auto literal : condition.template get_literals<::tyr::formalism::DerivedTag>())
         {
             const auto key = literal.get_atom().get_index();
-            occurences[key].push_back(element);
+            occurrences[key].push_back(element);
             details[element][key] = literal.get_polarity();
         }
 
         for (const auto constraint : condition.get_numeric_constraints())
         {
             const auto key = constraint.get_data();
-            occurences[key].push_back(element);
+            occurrences[key].push_back(element);
             details[element][key] = std::monostate {};
         }
     }
 
-    std::vector<std::pair<PreconditionVariant, ygg::IndexList<Tag>>> sorted_preconditions(occurences.begin(), occurences.end());
+    std::vector<std::pair<PreconditionVariant, ygg::IndexList<Tag>>> sorted_preconditions(occurrences.begin(), occurrences.end());
 
     std::sort(sorted_preconditions.begin(), sorted_preconditions.end(), [](const auto& a, const auto& b) { return a.second.size() > b.second.size(); });
 

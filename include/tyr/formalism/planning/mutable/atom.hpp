@@ -18,9 +18,6 @@
 #ifndef TYR_FORMALISM_PLANNING_MUTABLE_ATOM_HPP_
 #define TYR_FORMALISM_PLANNING_MUTABLE_ATOM_HPP_
 
-#include <yggdrasil/semantics/comparators.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/unification/structure_traits.hpp"
 #include "tyr/formalism/unification/structure_traits_impl.hpp"
@@ -33,6 +30,9 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::formalism::planning
 {
@@ -56,7 +56,7 @@ struct MutableAtom
     }
     MutableAtom(GroundAtomView<T> element) : predicate(element.get_predicate()), terms()
     {
-        for (const auto& object : element.get_row().get_objects())
+        for (const auto& object : element.get_objects())
             terms.push_back(ygg::Data<Term>(object.get_index()));
     }
 

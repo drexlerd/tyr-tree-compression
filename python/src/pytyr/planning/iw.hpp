@@ -51,8 +51,12 @@ void bind_statistics(nb::module_& m, const std::string& name)
 {
     using T = Statistics<Kind>;
 
-    nb::class_<T>(m, name.c_str())  //
-        .def("get_solution_arity", &T::get_solution_arity);
+    auto cls = nb::class_<T>(m, name.c_str())  //
+                   .def(nb::init<>())
+                   .def("clear", &T::clear)
+                   .def("set_solution_arity", &T::set_solution_arity, "arity"_a)
+                   .def("get_solution_arity", &T::get_solution_arity);
+    add_print(cls);
 }
 
 template<TaskKind Kind>
@@ -102,13 +106,14 @@ void bind_event_handler(nb::module_& m, const std::string& name)
     using T = EventHandler<Kind>;
 
     nb::class_<T, PyEventHandler<Kind>>(m, name.c_str())
+        .def(nb::init<>())
         .def("on_start_search", &T::on_start_search, "max_arity"_a)
         .def("on_start_arity", &T::on_start_arity, "arity"_a)
         .def("on_end_arity", &T::on_end_arity, "arity"_a, "status"_a)
         .def("on_end_search", &T::on_end_search, "status"_a)
         .def("on_solved", &T::on_solved, "arity"_a)
-        .def("get_search_statistics", &T::get_search_statistics)
-        .def("get_statistics", &T::get_statistics);
+        .def("get_search_statistics", &T::get_search_statistics, nb::rv_policy::reference_internal)
+        .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal);
 }
 
 template<TaskKind Kind>
@@ -117,9 +122,9 @@ void bind_default_event_handler(nb::module_& m, const std::string& name)
     using T = DefaultEventHandler<Kind>;
 
     nb::class_<T, EventHandler<Kind>>(m, name.c_str())  //
-        .def(nb::init<size_t>(), "verbosity"_a)
-        .def("get_search_statistics", &T::get_search_statistics)
-        .def("get_statistics", &T::get_statistics);
+        .def(nb::init<size_t>(), "verbosity"_a = 0)
+        .def("get_search_statistics", &T::get_search_statistics, nb::rv_policy::reference_internal)
+        .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal);
 }
 
 template<TaskKind Kind>

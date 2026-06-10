@@ -26,8 +26,9 @@
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/plan.hpp"
 
-#include <memory>
+#include <cstddef>
 #include <limits>
+#include <memory>
 #include <optional>
 #include <stdexcept>
 #include <vector>
@@ -48,14 +49,15 @@ struct Options
 };
 
 template<typename T, typename Kind>
-concept SerializedSolverConcept = SolverConcept<T, Kind> && requires(T solver, std::optional<Node<Kind>> start_node, GoalStrategyPtr<Kind> goal_strategy) {
-    typename T::EventHandlerType;
-    typename T::EventHandlerType::StatisticsType;
-    solver.options.start_node = start_node;
-    solver.options.goal_strategy = goal_strategy;
-    solver.options.event_handler->get_search_statistics();
-    solver.options.event_handler->get_statistics();
-};
+concept SerializedSolverConcept =
+    TaskKind<Kind> && SolverConcept<T, Kind> && requires(T solver, std::optional<Node<Kind>> start_node, GoalStrategyPtr<Kind> goal_strategy) {
+        typename T::EventHandlerType;
+        typename T::EventHandlerType::StatisticsType;
+        solver.options.start_node = start_node;
+        solver.options.goal_strategy = goal_strategy;
+        solver.options.event_handler->get_search_statistics();
+        solver.options.event_handler->get_statistics();
+    };
 
 namespace detail
 {
@@ -167,7 +169,8 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
         }
 
         if (local_solver.options.event_handler)
-            event_handler->add_subsearch_statistics(local_solver.options.event_handler->get_search_statistics(), local_solver.options.event_handler->get_statistics());
+            event_handler->add_subsearch_statistics(local_solver.options.event_handler->get_search_statistics(),
+                                                    local_solver.options.event_handler->get_statistics());
 
         event_handler->on_end_subsearch(subsearch_index, sub_result.status);
 
@@ -186,7 +189,7 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
         }
 
         auto current_node = combined_labeled_succ_nodes.empty() ? *combined_start_node : combined_labeled_succ_nodes.back().node;
-        if (sub_result.plan->get_length() == 0)
+        if (sub_result.plan->empty())
         {
             auto result = SearchResult<Kind> {};
             result.status =
@@ -240,7 +243,7 @@ SearchResult<Kind> find_solution(Solver& solver, const Options<Kind, Solver>& op
     if (combined_start_node)
     {
         result.plan = Plan<Kind>(*combined_start_node, std::move(combined_labeled_succ_nodes));
-        result.goal_node = result.plan->get_length() > 0 ? result.plan->get_labeled_succ_nodes().back().node : result.plan->get_start_node();
+        result.goal_node = !result.plan->empty() ? result.plan->get_labeled_succ_nodes().back().node : result.plan->get_start_node();
     }
     event_handler->on_end_search(result.status);
     return result;

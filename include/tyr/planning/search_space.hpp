@@ -96,11 +96,11 @@ inline Plan<Kind> extract_total_ordered_plan(const SearchNode& final_search_node
                                              SuccessorGenerator<Kind>& successor_generator,
                                              ActionCostMode action_cost_mode = ActionCostMode::GENERAL)
 {
-    const auto node_trajetory = extract_node_trajectory(search_nodes, final_search_node, final_node, successor_generator);
+    const auto node_trajectory = extract_node_trajectory(search_nodes, final_search_node, final_node, successor_generator);
 
-    auto labeled_node_trajectory = extract_labeled_node_trajectory(node_trajetory, successor_generator, action_cost_mode);
+    auto labeled_node_trajectory = extract_labeled_node_trajectory(node_trajectory, successor_generator, action_cost_mode);
 
-    return Plan<Kind>(node_trajetory.front(), std::move(labeled_node_trajectory));
+    return Plan<Kind>(node_trajectory.front(), std::move(labeled_node_trajectory));
 }
 
 }

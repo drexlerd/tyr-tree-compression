@@ -259,11 +259,11 @@ from ..._pytyr.formalism.planning import (
     ConditionalEffectBuilder,
 
     # Action
-    Action,    
+    Action,
     ActionIndex,
     ActionBuilder,
 
-    # Action
+    # Axiom
     Axiom,
     AxiomIndex,
     AxiomBuilder,
@@ -355,7 +355,7 @@ from ..._pytyr.formalism.planning import (
     GroundActionIndex,
     GroundActionBuilder,
 
-    # GroundAction
+    # GroundAxiom
     GroundAxiom,
     GroundAxiomIndex,
     GroundAxiomBuilder,
@@ -382,7 +382,7 @@ from ..._pytyr.formalism.planning import (
     # Parser
     Parser,
 
-    # Repository,
+    # Repository
     RepositoryFactory,
     Repository,
 

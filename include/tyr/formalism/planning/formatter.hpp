@@ -18,8 +18,6 @@
 #ifndef TYR_FORMALISM_PLANNING_FORMATTER_HPP_
 #define TYR_FORMALISM_PLANNING_FORMATTER_HPP_
 
-#include <yggdrasil/formatting/cista_formatters.hpp>
-#include <yggdrasil/io/iostream.hpp>
 #include "tyr/formalism/formatter.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/planning_domain.hpp"
@@ -32,6 +30,8 @@
 #include <fmt/ranges.h>
 #include <ostream>
 #include <sstream>
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/io/iostream.hpp>
 
 namespace tyr::formalism::planning
 {
@@ -39,6 +39,8 @@ struct PlanFormatting
 {
 };
 }  // namespace tyr::formalism::planning
+
+#include "tyr/config.hpp"
 
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
@@ -823,7 +825,7 @@ struct formatter<tyr::formalism::planning::GroundAtomView<T>, char>
     template<typename FormatContext>
     auto format(const tyr::formalism::planning::GroundAtomView<T>& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "({} {})", value.get_predicate().get_name(), fmt::join(ygg::to_strings(value.get_row().get_objects()), " "));
+        return fmt::format_to(ctx.out(), "({} {})", value.get_predicate().get_name(), fmt::join(ygg::to_strings(value.get_objects()), " "));
     }
 };
 
@@ -860,7 +862,7 @@ struct formatter<tyr::formalism::planning::GroundFunctionTermView<T>, char>
     template<typename FormatContext>
     auto format(const tyr::formalism::planning::GroundFunctionTermView<T>& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "({} {})", value.get_function().get_name(), fmt::join(ygg::to_strings(value.get_row().get_objects()), " "));
+        return fmt::format_to(ctx.out(), "({} {})", value.get_function().get_name(), fmt::join(ygg::to_strings(value.get_objects()), " "));
     }
 };
 
@@ -1205,7 +1207,7 @@ struct formatter<std::pair<tyr::formalism::planning::GroundActionView, tyr::form
         auto out = fmt::format_to(ctx.out(), "({}", value.first.get_action().get_name());
         for (size_t i = 0; i < value.first.get_action().get_original_arity(); ++i)
         {
-            out = fmt::format_to(out, " {}", value.first.get_row().get_objects()[i]);
+            out = fmt::format_to(out, " {}", value.first.get_objects()[i]);
         }
         return fmt::format_to(out, ")");
     }

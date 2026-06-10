@@ -65,6 +65,10 @@ PruningStrategyPtr<Kind> make_pruning_strategy(ygg::uint_t arity, PruningStrateg
 template<TaskKind Kind>
 SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, ygg::uint_t max_arity, const Options<Kind>& options)
 {
+    if (!brfs_solver.task)
+        throw std::invalid_argument("iw::find_solution(...): BRFS task is required.");
+    if (!brfs_solver.successor_generator)
+        throw std::invalid_argument("iw::find_solution(...): BRFS successor generator is required.");
     if (max_arity > MaxArity)
         throw std::invalid_argument("iw::find_solution(...): max_arity exceeds iw::MaxArity.");
 

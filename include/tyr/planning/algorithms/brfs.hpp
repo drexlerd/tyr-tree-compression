@@ -21,9 +21,12 @@
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/declarations.hpp"
 
+#include <chrono>
+#include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
-#include <vector>
+#include <stdexcept>
 
 namespace tyr::planning::brfs
 {
@@ -56,7 +59,15 @@ struct Solver
     SuccessorGeneratorPtr<Kind> successor_generator;
     Options<Kind> options;
 
-    SearchResult<Kind> solve() { return find_solution(*task, *successor_generator, options); }
+    SearchResult<Kind> solve()
+    {
+        if (!task)
+            throw std::invalid_argument("brfs::Solver::solve(): task is required.");
+        if (!successor_generator)
+            throw std::invalid_argument("brfs::Solver::solve(): successor generator is required.");
+
+        return find_solution(*task, *successor_generator, options);
+    }
 };
 
 }

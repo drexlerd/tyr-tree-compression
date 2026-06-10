@@ -95,7 +95,8 @@ void bind_find_solution(nb::module_& m, const std::string& py_name)
 {
     m.def(
         py_name.c_str(),
-        [](Task<Kind>& task, SuccessorGenerator<Kind>& successor_generator, const Options<Kind>& options) { return find_solution(task, successor_generator, options); },
+        [](Task<Kind>& task, SuccessorGenerator<Kind>& successor_generator, const Options<Kind>& options)
+        { return find_solution(task, successor_generator, options); },
         nb::call_guard<nb::gil_scoped_release>(),
         "task"_a,
         "successor_generator"_a,
@@ -108,6 +109,7 @@ void bind_event_handler(nb::module_& m, const std::string& name)
     using T = EventHandler<Kind>;
 
     nb::class_<T, PyEventHandler<Kind>>(m, name.c_str())
+        .def(nb::init<>())
         .def("on_expand_node", &T::on_expand_node, "node"_a)
         .def("on_expand_goal_node", &T::on_expand_goal_node, "node"_a)
         .def("on_generate_node", &T::on_generate_node, "source_node"_a, "labeled_succ_node"_a)
@@ -117,8 +119,8 @@ void bind_event_handler(nb::module_& m, const std::string& name)
         .def("on_finish_layer", &T::on_finish_layer, "layer"_a)
         .def("on_end_search", &T::on_end_search, "status"_a)
         .def("on_solved", &T::on_solved, "plan"_a)
-        .def("get_search_statistics", &T::get_search_statistics)
-        .def("get_statistics", &T::get_statistics);
+        .def("get_search_statistics", &T::get_search_statistics, nb::rv_policy::reference_internal)
+        .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal);
 }
 
 template<TaskKind Kind>
@@ -127,10 +129,10 @@ void bind_default_event_handler(nb::module_& m, const std::string& name)
     using T = DefaultEventHandler<Kind>;
 
     nb::class_<T, EventHandler<Kind>>(m, name.c_str())  //
-        .def(nb::init<size_t>(), "verbosity"_a)
-        .def("get_search_statistics", &T::get_search_statistics)
-        .def("get_statistics", &T::get_statistics)
-        .def("get_progress_statistics", &T::get_progress_statistics);
+        .def(nb::init<size_t>(), "verbosity"_a = 0)
+        .def("get_search_statistics", &T::get_search_statistics, nb::rv_policy::reference_internal)
+        .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal)
+        .def("get_progress_statistics", &T::get_progress_statistics, nb::rv_policy::reference_internal);
 }
 
 template<TaskKind Kind>

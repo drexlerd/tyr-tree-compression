@@ -34,7 +34,7 @@ namespace tyr::planning::astar_eager
  * Interface class
  */
 
-/// @brief `IEventHandler` to react on event during GBFS search.
+/// @brief `IEventHandler` to react on events during A* search.
 ///
 /// Inspired by boost graph library: https://www.boost.org/doc/libs/1_75_0/libs/graph/doc/AStarVisitor.html
 template<TaskKind Kind>
@@ -182,7 +182,8 @@ public:
 
     void on_start_search(const Node<Kind>& node, ygg::float_t f_value) override
     {
-        m_statistics = tyr::planning::Statistics();
+        m_statistics.clear();
+        m_progress_statistics.clear();
 
         m_statistics.set_search_start_time_point(std::chrono::high_resolution_clock::now());
 
@@ -194,7 +195,7 @@ public:
 
     void on_finish_f_layer(ygg::float_t f_value) override
     {
-        m_progress_statistics.add_snap_shot(m_statistics);
+        m_progress_statistics.add_snapshot(m_statistics);
 
         if (verbosity(1))
         {

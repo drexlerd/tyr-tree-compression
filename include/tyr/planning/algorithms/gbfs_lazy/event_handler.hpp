@@ -149,7 +149,7 @@ public:
 
     void on_start_search(const Node<Kind>& node, ygg::float_t h_value) override
     {
-        m_statistics = tyr::planning::Statistics();
+        m_statistics.clear();
 
         m_statistics.set_search_start_time_point(std::chrono::high_resolution_clock::now());
 

@@ -21,9 +21,12 @@
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/declarations.hpp"
 
+#include <chrono>
+#include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
-#include <vector>
+#include <stdexcept>
 
 namespace tyr::planning::gbfs_lazy
 {
@@ -50,7 +53,7 @@ template<TaskKind Kind>
 SearchResult<Kind>
 find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& successor_generator, Heuristic<Kind>& heuristic, const Options<Kind>& options = Options<Kind>());
 
-/// @brief Adapter that exposes A* eager search through the generic solver interface.
+/// @brief Adapter that exposes GBFS lazy search through the generic solver interface.
 template<TaskKind Kind>
 struct Solver
 {
@@ -61,7 +64,17 @@ struct Solver
     HeuristicPtr<Kind> heuristic;
     Options<Kind> options;
 
-    SearchResult<Kind> solve() { return find_solution(*task, *successor_generator, *heuristic, options); }
+    SearchResult<Kind> solve()
+    {
+        if (!task)
+            throw std::invalid_argument("gbfs_lazy::Solver::solve(): task is required.");
+        if (!successor_generator)
+            throw std::invalid_argument("gbfs_lazy::Solver::solve(): successor generator is required.");
+        if (!heuristic)
+            throw std::invalid_argument("gbfs_lazy::Solver::solve(): heuristic is required.");
+
+        return find_solution(*task, *successor_generator, *heuristic, options);
+    }
 };
 }
 

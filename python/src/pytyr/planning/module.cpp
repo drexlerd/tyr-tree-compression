@@ -19,7 +19,9 @@
 
 #include "ground/module.hpp"
 #include "lifted/module.hpp"
+#include "pytyr/bindings.hpp"
 
+#include <cstdint>
 #include <nanobind/stl/chrono.h>
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/shared_ptr.h>
@@ -59,10 +61,54 @@ void bind_module_definitions(nb::module_& m)
         .export_values();
 
     /**
+     * ActionCostMode
+     */
+
+    nb::enum_<ActionCostMode>(m, "ActionCostMode")
+        .value("UNIT", ActionCostMode::UNIT)
+        .value("GENERAL", ActionCostMode::GENERAL)
+        .export_values();
+
+    /**
      * Statistics
      */
 
-    nb::class_<Statistics>(m, "Statistics");
+    auto statistics_cls = nb::class_<Statistics>(m, "Statistics")
+                              .def(nb::init<>())
+                              .def("clear", &Statistics::clear)
+                              .def("increment_num_generated", &Statistics::increment_num_generated)
+                              .def("increment_num_expanded", &Statistics::increment_num_expanded)
+                              .def("increment_num_deadends", &Statistics::increment_num_deadends)
+                              .def("increment_num_pruned", &Statistics::increment_num_pruned)
+                              .def("get_num_generated", &Statistics::get_num_generated)
+                              .def("get_num_expanded", &Statistics::get_num_expanded)
+                              .def("get_num_deadends", &Statistics::get_num_deadends)
+                              .def("get_num_pruned", &Statistics::get_num_pruned)
+                              .def("get_search_time", &Statistics::get_search_time)
+                              .def("get_current_search_time", &Statistics::get_current_search_time);
+    add_print(statistics_cls);
+
+    using ProgressSnapshot = ProgressStatistics::Snapshot;
+
+    auto progress_snapshot_cls =
+        nb::class_<ProgressSnapshot>(m, "ProgressStatisticsSnapshot")
+            .def(nb::init<uint64_t, uint64_t, uint64_t, uint64_t>(), "num_generated"_a, "num_expanded"_a, "num_deadends"_a, "num_pruned"_a)
+            .def("get_num_generated", &ProgressSnapshot::get_num_generated)
+            .def("get_num_expanded", &ProgressSnapshot::get_num_expanded)
+            .def("get_num_deadends", &ProgressSnapshot::get_num_deadends)
+            .def("get_num_pruned", &ProgressSnapshot::get_num_pruned);
+    add_print(progress_snapshot_cls);
+
+    auto progress_statistics_cls = nb::class_<ProgressStatistics>(m, "ProgressStatistics")
+                                       .def(nb::init<>())
+                                       .def("add_snapshot", &ProgressStatistics::add_snapshot, "statistics"_a)
+                                       .def("add_snap_shot", &ProgressStatistics::add_snap_shot, "statistics"_a)
+                                       .def("clear", &ProgressStatistics::clear)
+                                       .def("empty", &ProgressStatistics::empty)
+                                       .def("__len__", &ProgressStatistics::size)
+                                       .def("size", &ProgressStatistics::size)
+                                       .def("get_snapshots", &ProgressStatistics::get_snapshots, nb::rv_policy::copy);
+    add_print(progress_statistics_cls);
 }
 
 }  // namespace tyr::planning

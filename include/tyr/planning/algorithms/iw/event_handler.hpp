@@ -71,7 +71,7 @@ public:
     void on_start_search(ygg::uint_t max_arity) override
     {
         m_statistics.clear();
-        m_search_statistics = tyr::planning::Statistics();
+        m_search_statistics.clear();
         m_search_statistics.set_search_start_time_point(std::chrono::high_resolution_clock::now());
 
         if (verbosity(1))

@@ -16,13 +16,6 @@
  */
 
 #include "tyr/analysis/domains.hpp"
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/formatting/formatter.hpp>
-#include <yggdrasil/ids/index_mixins.hpp>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/containers/unordered_set.hpp>
-#include <yggdrasil/containers/variant.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -33,6 +26,13 @@
 #include <gtl/phmap.hpp>
 #include <stddef.h>
 #include <type_traits>
+#include <yggdrasil/containers/unordered_set.hpp>
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/formatting/formatter.hpp>
+#include <yggdrasil/ids/index_mixins.hpp>
 
 namespace f = tyr::formalism;
 namespace fd = tyr::formalism::datalog;
@@ -162,7 +162,7 @@ void insert_into_predicate_domain_sets(fd::GroundAtomListView<T> atoms, TmpPredi
         auto& variable_domains = predicate_domain_sets.at(predicate.get_index());
 
         auto pos = size_t { 0 };
-        for (const auto object : atom.get_row().get_objects())
+        for (const auto object : atom.get_objects())
             variable_domains[pos++].objects.insert(object.get_index());
     }
 }
@@ -189,7 +189,7 @@ void insert_into_function_domain_sets(fd::GroundFunctionTermValueListView<T> fte
         auto& variable_domains = function_domain_sets.at(function.get_index());
 
         auto pos = size_t { 0 };
-        for (const auto object : fterm.get_row().get_objects())
+        for (const auto object : fterm.get_objects())
             variable_domains[pos++].objects.insert(object.get_index());
     }
 }

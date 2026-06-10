@@ -39,3 +39,22 @@ def native_prefix() -> Path:
         if (parent / "include" / "tyr").is_dir():
             return parent
     return native_dir
+
+
+def cmake_prefix() -> Path:
+    """Return the prefix to put on CMAKE_PREFIX_PATH to find tyr via find_package."""
+    return native_prefix()
+
+
+def cmake_dir() -> Path:
+    """Return the directory containing tyrConfig.cmake."""
+    prefix = native_prefix()
+    for lib_dir_name in ("lib", "lib64"):
+        candidate = prefix / lib_dir_name / "cmake" / "tyr"
+        if (candidate / "tyrConfig.cmake").is_file():
+            return candidate
+
+    raise FileNotFoundError(
+        f"tyrConfig.cmake not found under {prefix}; "
+        "the installed pytyr is too old or incomplete."
+    )

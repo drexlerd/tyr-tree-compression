@@ -18,9 +18,9 @@
 #ifndef TYR_PLANNING_FORMATTER_HPP_
 #define TYR_PLANNING_FORMATTER_HPP_
 
-#include <yggdrasil/core/chrono.hpp>
-#include <yggdrasil/formatting/cista_formatters.hpp>
 #include "tyr/formalism/planning/formatter.hpp"
+#include "tyr/planning/algorithms/iw/statistics.hpp"
+#include "tyr/planning/algorithms/siw/statistics.hpp"
 #include "tyr/planning/algorithms/statistics.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task.hpp"
@@ -32,6 +32,10 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <yggdrasil/core/chrono.hpp>
+#include <yggdrasil/formatting/cista_formatters.hpp>
+
+#include "tyr/config.hpp"
 
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
@@ -130,7 +134,7 @@ struct formatter<tyr::planning::ProgressStatistics, char>
     template<typename FormatContext>
     auto format(const tyr::planning::ProgressStatistics& value, FormatContext& ctx) const
     {
-        if (value.get_snapshots().empty())
+        if (value.empty())
         {
             return fmt::format_to(ctx.out(), "[Search] No progress statistics available.");
         }
@@ -139,10 +143,63 @@ struct formatter<tyr::planning::ProgressStatistics, char>
         return fmt::format_to(ctx.out(),
                               "[Search] Number of expanded states at last snapshot: {}\n"
                               "[Search] Number of generated states at last snapshot: {}\n"
+                              "[Search] Number of deadend states at last snapshot: {}\n"
                               "[Search] Number of pruned states at last snapshot: {}",
                               last.get_num_expanded(),
                               last.get_num_generated(),
+                              last.get_num_deadends(),
                               last.get_num_pruned());
+    }
+};
+
+template<>
+struct formatter<tyr::planning::ProgressStatistics::Snapshot, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::planning::ProgressStatistics::Snapshot& value, FormatContext& ctx) const
+    {
+        return fmt::format_to(ctx.out(),
+                              "[Search] Number of expanded states at snapshot: {}\n"
+                              "[Search] Number of generated states at snapshot: {}\n"
+                              "[Search] Number of deadend states at snapshot: {}\n"
+                              "[Search] Number of pruned states at snapshot: {}",
+                              value.get_num_expanded(),
+                              value.get_num_generated(),
+                              value.get_num_deadends(),
+                              value.get_num_pruned());
+    }
+};
+
+template<tyr::planning::TaskKind Kind>
+struct formatter<tyr::planning::iw::Statistics<Kind>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::planning::iw::Statistics<Kind>& value, FormatContext& ctx) const
+    {
+        if (const auto solution_arity = value.get_solution_arity())
+            return fmt::format_to(ctx.out(), "[IW] Solution arity: {}", *solution_arity);
+        return fmt::format_to(ctx.out(), "[IW] Solution arity: none");
+    }
+};
+
+template<tyr::planning::TaskKind Kind>
+struct formatter<tyr::planning::siw::Statistics<Kind>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::planning::siw::Statistics<Kind>& value, FormatContext& ctx) const
+    {
+        const auto maximum_effective_width = value.get_maximum_effective_width();
+        const auto average_effective_width = value.get_average_effective_width();
+        return fmt::format_to(ctx.out(),
+                              "[SIW] Maximum effective width: {}\n"
+                              "[SIW] Average effective width: {}\n"
+                              "[SIW] Number of solved subsearches: {}",
+                              maximum_effective_width ? fmt::format("{}", *maximum_effective_width) : "none",
+                              average_effective_width ? fmt::format("{}", *average_effective_width) : "none",
+                              value.get_num_solved_subsearches());
     }
 };
 
@@ -224,6 +281,27 @@ struct formatter<tyr::planning::Node<Kind>, char>
             fmt::print(os, "{}{}\n", "metric value = ", value.get_metric());
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "state = ", value.get_state());
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<tyr::planning::TaskKind Kind>
+struct formatter<tyr::planning::LabeledNode<Kind>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::planning::LabeledNode<Kind>& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "LabeledNode(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "label = ", value.label);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "node = ", value.node);
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());

@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml" TYR_PROJECT_VERSION_LINE REGEX "^version[ \t]*=" LIMIT_COUNT 1)
-if(NOT TYR_PROJECT_VERSION_LINE)
-    message(FATAL_ERROR "Could not read project version from pyproject.toml")
-endif()
-string(REGEX REPLACE "^version[ \t]*=[ \t]*\"([^\"]+)\".*$" "\\1" TYR_PROJECT_VERSION "${TYR_PROJECT_VERSION_LINE}")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/read_project_version.cmake")
+tyr_read_project_version(TYR_PROJECT_VERSION "${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml")
 
 project(tyr VERSION "${TYR_PROJECT_VERSION}")
 
@@ -30,9 +27,9 @@ endif()
 
 option(TYR_ENABLE_FMT_FORMATTERS "Enable Tyr's public fmt::formatter specializations." ON)
 if(TYR_ENABLE_FMT_FORMATTERS)
-    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=1 YGG_ENABLE_FMT_FORMATTERS=1)
+    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=1 LOKI_ENABLE_FMT_FORMATTERS=1 YGG_ENABLE_FMT_FORMATTERS=1)
 else()
-    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=0 YGG_ENABLE_FMT_FORMATTERS=0)
+    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=0 LOKI_ENABLE_FMT_FORMATTERS=0 YGG_ENABLE_FMT_FORMATTERS=0)
 endif()
 
 option(TYR_USE_LLD "Use LLVM lld linker when available" ON)
@@ -170,8 +167,7 @@ list(APPEND CMAKE_MODULE_PATH
 )
 include("configure_boost")
 include("configure_ccache")
-include("configure_yggdrasil")
-include("configure_pypddl")
+include("find_python_native_packages")
 include("tyr_native_dependencies")
 
 ##############################################################
@@ -188,12 +184,21 @@ configure_ccache()
 
 # set(CMAKE_FIND_DEBUG_MODE TRUE)
 
-configure_yggdrasil()
-configure_pypddl()
+tyr_find_python_native_prefix(pyyggdrasil YGGDRASIL_NATIVE_PREFIX)
+tyr_find_python_native_prefix(pypddl PYPDDL_NATIVE_PREFIX)
 tyr_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
 tyr_register_native_dependency_prefix("${PYPDDL_NATIVE_PREFIX}")
 tyr_register_python_native_runtime_prefix("pypddl/native")
 tyr_register_python_native_runtime_prefix("pyyggdrasil")
+
+# ---------
+# yggdrasil
+# ---------
+
+find_package(yggdrasil 0.0.14 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+if(yggdrasil_FOUND)
+  message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
+endif()
 
 # -----
 # argparse
@@ -277,7 +282,7 @@ endif()
 # Loki
 # -----
 
-find_package(loki 1.0.8 COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(loki 1.0.9 COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(loki_FOUND)
   message(STATUS "Found loki: ${loki_DIR} (found version ${loki_VERSION})")
 endif()
@@ -341,7 +346,7 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/"
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/tyrConfigVersion.cmake"
     VERSION ${tyr_VERSION}
-    COMPATIBILITY ExactVersion
+    COMPATIBILITY SameMinorVersion
 )
 
 configure_package_config_file(

@@ -122,8 +122,8 @@ public:
 
     void on_start_search(const Node<Kind>& node) override
     {
-        m_statistics = tyr::planning::Statistics();
-        m_progress_statistics = tyr::planning::ProgressStatistics();
+        m_statistics.clear();
+        m_progress_statistics.clear();
 
         m_statistics.set_search_start_time_point(std::chrono::high_resolution_clock::now());
 
@@ -133,7 +133,7 @@ public:
 
     void on_finish_layer(ygg::uint_t layer) override
     {
-        m_progress_statistics.add_snap_shot(m_statistics);
+        m_progress_statistics.add_snapshot(m_statistics);
 
         if (verbosity(1))
             self().on_finish_layer_impl(layer, m_statistics.get_num_expanded(), m_statistics.get_num_generated());

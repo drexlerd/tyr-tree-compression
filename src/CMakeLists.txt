@@ -158,6 +158,7 @@ target_compile_features(core PUBLIC cxx_std_20)
 
 target_link_libraries(core
   PUBLIC
+    yggdrasil::yggdrasil
     TBB::tbb
     valla::core
     fmt::fmt-header-only

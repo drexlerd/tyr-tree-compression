@@ -79,10 +79,10 @@ The `formalism_task` is **moved** into the planning task. After calling this
 constructor, the original formalism task should be considered consumed and
 should not be used further.
         )doc")
-        .def("get_formalism_task", &Task<LiftedTag>::get_formalism_task)
+        .def("get_formalism_task", &Task<LiftedTag>::get_formalism_task, nb::rv_policy::reference_internal)
         .def("get_repository", &Task<LiftedTag>::get_repository)
-        .def("get_task", &Task<LiftedTag>::get_task)
-        .def("get_fdr_context", nb::overload_cast<>(&Task<LiftedTag>::get_fdr_context, nb::const_))
+        .def("get_task", &Task<LiftedTag>::get_task, nb::keep_alive<0, 1>())
+        .def("get_fdr_context", nb::overload_cast<>(&Task<LiftedTag>::get_fdr_context, nb::const_), nb::rv_policy::reference_internal)
         .def("instantiate_ground_task", &Task<LiftedTag>::instantiate_ground_task, "execution_context"_a, "options"_a);
 
     bind_index<ygg::Index<State<LiftedTag>>>(m, "StateIndex");

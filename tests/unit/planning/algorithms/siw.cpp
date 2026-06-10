@@ -15,15 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <filesystem>
 #include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <optional>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace p = tyr::planning;
 namespace fp = tyr::formalism::planning;
@@ -162,12 +161,25 @@ TEST_P(SiwTest, MatchesExpectedOutcome)
     const auto plan_length = result.plan ? std::optional<ygg::uint_t>(result.plan->get_length()) : std::nullopt;
     const auto maximum_effective_width = event_handler->get_statistics().get_maximum_effective_width();
     const auto average_effective_width = event_handler->get_statistics().get_average_effective_width();
+    const auto num_solved_subsearches = event_handler->get_statistics().get_num_solved_subsearches();
     fmt::println("SIW_OBSERVED {} {} {} {} {}",
                  param.name,
                  to_string(result.status),
                  plan_length ? std::to_string(*plan_length) : std::string("null"),
                  maximum_effective_width ? std::to_string(*maximum_effective_width) : std::string("null"),
                  average_effective_width ? std::to_string(*average_effective_width) : std::string("null"));
+
+    if (maximum_effective_width)
+    {
+        EXPECT_TRUE(average_effective_width);
+        EXPECT_GT(num_solved_subsearches, 0);
+        EXPECT_LE(*average_effective_width, static_cast<double>(*maximum_effective_width));
+    }
+    else
+    {
+        EXPECT_FALSE(average_effective_width);
+        EXPECT_EQ(num_solved_subsearches, 0);
+    }
 
     if (param.expected_status)
     {
@@ -180,6 +192,9 @@ TEST_P(SiwTest, MatchesExpectedOutcome)
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(TyrPlanningSiw, SiwTest, ::testing::ValuesIn(load_cases()), [](const testing::TestParamInfo<SiwCase>& info) { return info.param.name; });
+INSTANTIATE_TEST_SUITE_P(TyrPlanningSiw,
+                         SiwTest,
+                         ::testing::ValuesIn(load_cases()),
+                         [](const testing::TestParamInfo<SiwCase>& info) { return info.param.name; });
 
 }

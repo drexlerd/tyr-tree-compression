@@ -18,8 +18,6 @@
 #ifndef TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 #define TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 
-#include <yggdrasil/formatting/cista_formatters.hpp>
-#include <yggdrasil/io/iostream.hpp>
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/variable_dependency_graph.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -30,6 +28,10 @@
 #include <fmt/ranges.h>
 #include <ostream>
 #include <sstream>
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/io/iostream.hpp>
+
+#include "tyr/config.hpp"
 
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
@@ -211,7 +213,7 @@ struct formatter<tyr::formalism::datalog::GroundAtomView<T>, char>
     template<typename FormatContext>
     auto format(const tyr::formalism::datalog::GroundAtomView<T>& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "({} {})", value.get_predicate().get_name(), fmt::join(ygg::to_strings(value.get_row().get_objects()), " "));
+        return fmt::format_to(ctx.out(), "({} {})", value.get_predicate().get_name(), fmt::join(ygg::to_strings(value.get_objects()), " "));
     }
 };
 
@@ -281,7 +283,7 @@ struct formatter<tyr::formalism::datalog::GroundFunctionTermView<T>, char>
     template<typename FormatContext>
     auto format(const tyr::formalism::datalog::GroundFunctionTermView<T>& value, FormatContext& ctx) const
     {
-        return fmt::format_to(ctx.out(), "({} {})", value.get_function().get_name(), fmt::join(ygg::to_strings(value.get_row().get_objects()), " "));
+        return fmt::format_to(ctx.out(), "({} {})", value.get_function().get_name(), fmt::join(ygg::to_strings(value.get_objects()), " "));
     }
 };
 

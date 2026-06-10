@@ -109,6 +109,28 @@ TEST(TyrTests, TyrFormalismUnificationSubstitutionTryGet)
     EXPECT_FALSE(sigma.has_binding(f::ParameterIndex(0)));
 }
 
+TEST(TyrTests, TyrFormalismUnificationSubstitutionAssignOrCheckAndReset)
+{
+    auto sigma = TermSubstitution::from_range(f::ParameterIndex(0), 2);
+
+    EXPECT_TRUE(sigma.assign_or_check(f::ParameterIndex(0), object(5)));
+    EXPECT_TRUE(sigma.assign_or_check(f::ParameterIndex(0), object(5)));
+    EXPECT_FALSE(sigma.assign_or_check(f::ParameterIndex(0), object(6)));
+    EXPECT_TRUE(sigma.has_binding(f::ParameterIndex(0)));
+    expect_term_eq(*sigma[f::ParameterIndex(0)], object(5));
+
+    EXPECT_TRUE(sigma.assign_or_check(f::ParameterIndex(1), parameter(0)));
+    EXPECT_FALSE(sigma.is_identity());
+
+    sigma.reset();
+
+    EXPECT_TRUE(sigma.is_identity());
+    EXPECT_FALSE(sigma.has_binding(f::ParameterIndex(0)));
+    EXPECT_FALSE(sigma.has_binding(f::ParameterIndex(1)));
+    EXPECT_TRUE(sigma.is_unbound(f::ParameterIndex(0)));
+    EXPECT_TRUE(sigma.is_unbound(f::ParameterIndex(1)));
+}
+
 TEST(TyrTests, TyrFormalismUnificationSubstitutionForEachBindingAndIdentity)
 {
     auto sigma = TermSubstitution::from_range(f::ParameterIndex(0), 3);

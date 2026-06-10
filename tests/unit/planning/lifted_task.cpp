@@ -15,15 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <algorithm>
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <string>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
+#include <vector>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace p = tyr::planning;
 namespace f = tyr::formalism;
@@ -87,6 +87,28 @@ void expect_same_binding(fp::ActionBindingView expected, const ygg::Data<::tyr::
         EXPECT_EQ(ygg::uint_t(expected_objects[i]), ygg::uint_t(actual.objects[i]));
 }
 
+void expect_ground_action_objects_match_binding(fp::GroundActionView ground_action, fp::ActionBindingView binding)
+{
+    EXPECT_EQ(ygg::uint_t(ground_action.get_action().get_index()), ygg::uint_t(binding.get_relation().get_index()));
+
+    const auto objects = ground_action.get_objects();
+    const auto binding_objects = binding.get_data();
+    ASSERT_EQ(objects.size(), binding_objects.size());
+    for (size_t i = 0; i < objects.size(); ++i)
+        EXPECT_EQ(ygg::uint_t(objects[i].get_index()), ygg::uint_t(binding_objects[i]));
+}
+
+void expect_ground_action_objects_match_binding(fp::GroundActionView ground_action,
+                                                const ygg::Data<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>>& binding)
+{
+    EXPECT_EQ(ygg::uint_t(ground_action.get_action().get_index()), ygg::uint_t(binding.relation));
+
+    const auto objects = ground_action.get_objects();
+    ASSERT_EQ(objects.size(), binding.objects.size());
+    for (size_t i = 0; i < objects.size(); ++i)
+        EXPECT_EQ(ygg::uint_t(objects[i].get_index()), ygg::uint_t(binding.objects[i]));
+}
+
 bool are_same_binding(fp::ActionBindingView lhs, fp::ActionBindingView rhs)
 {
     if (lhs.get_relation().get_index() != rhs.get_relation().get_index())
@@ -125,6 +147,7 @@ void expect_action_binding_apis_match_ground_actions(const LiftedSuccessorCountC
         ASSERT_NE(expected, ground_successors.end());
 
         expect_same_binding(expected->label.get_row(), binding);
+        expect_ground_action_objects_match_binding(expected->label, binding);
         expect_same_node(expected->node, successor_generator->get_successor_node(initial_node, binding));
     }
 
@@ -138,6 +161,7 @@ void expect_action_binding_apis_match_ground_actions(const LiftedSuccessorCountC
             ASSERT_NE(expected, ground_successors.end());
 
             expect_same_binding(expected->label.get_row(), binding);
+            expect_ground_action_objects_match_binding(expected->label, binding);
             expect_same_node(expected->node, successor_generator->get_successor_node(initial_node, binding));
             ++no_interning_pos;
         });
@@ -149,6 +173,14 @@ void expect_action_binding_apis_match_ground_actions(const LiftedSuccessorCountC
 class LiftedTaskSuccessorCountTest : public ::testing::TestWithParam<LiftedSuccessorCountCase>
 {
 };
+
+TEST(LiftedTaskGrounderResultTest, DefaultConstructionRepresentsExplicitFailure)
+{
+    const auto result = p::GroundTaskInstantiationResult {};
+
+    EXPECT_EQ(result.task, nullptr);
+    EXPECT_EQ(result.status, p::GroundTaskInstantiationStatus::PROVEN_UNSOLVABLE);
+}
 
 TEST_P(LiftedTaskSuccessorCountTest, InitialNodeHasExpectedSuccessorCount)
 {
@@ -164,7 +196,87 @@ TEST_P(LiftedTaskSuccessorCountTest, InitialNodeHasExpectedSuccessorCount)
 
 TEST_P(LiftedTaskSuccessorCountTest, ActionBindingApisMatchGroundActions) { expect_action_binding_apis_match_ground_actions(GetParam()); }
 
-TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryIndexForIdentity)
+TEST_P(LiftedTaskSuccessorCountTest, CreateStateOverloadsCanonicalizeToSameRegisteredState)
+{
+    const auto& param = GetParam();
+    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
+    auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
+
+    const auto initial_state = state_repository->get_initial_state();
+
+    auto fluent_facts = std::vector<ygg::Data<fp::FDRFact<f::FluentTag>>> {};
+    for (const auto fact : initial_state.get_fluent_facts())
+        fluent_facts.push_back(fact);
+
+    auto fluent_fact_views = std::vector<fp::FDRFactView<f::FluentTag>> {};
+    for (const auto fact : initial_state.get_fluent_facts_view())
+        fluent_fact_views.push_back(fact);
+
+    auto fterm_values = std::vector<std::pair<ygg::Index<fp::GroundFunctionTerm<f::FluentTag>>, ygg::float_t>> {};
+    for (const auto value : initial_state.get_fluent_fterm_values())
+        fterm_values.push_back(value);
+
+    auto fterm_value_views = std::vector<fp::GroundFunctionTermViewValuePair<f::FluentTag>> {};
+    for (const auto value : initial_state.get_fluent_fterm_values_view())
+        fterm_value_views.push_back(value);
+
+    const auto data_state = state_repository->create_state(fluent_facts, fterm_values);
+    const auto view_state = state_repository->create_state(fluent_fact_views, fterm_value_views);
+
+    EXPECT_EQ(data_state.get_index(), initial_state.get_index());
+    EXPECT_EQ(view_state.get_index(), initial_state.get_index());
+    EXPECT_TRUE(ygg::EqualTo<p::StateView<p::LiftedTag>> {}(data_state, initial_state));
+    EXPECT_TRUE(ygg::EqualTo<p::StateView<p::LiftedTag>> {}(view_state, initial_state));
+    EXPECT_EQ(state_repository->num_states(), 1);
+}
+
+TEST_P(LiftedTaskSuccessorCountTest, LabeledSuccessorOutputBufferIsReplaced)
+{
+    const auto& param = GetParam();
+    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
+    auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
+    auto successor_generator = p::SuccessorGeneratorFactory<p::LiftedTag>().create(lifted_task, execution_context, state_repository);
+    const auto initial_node = successor_generator->get_initial_node();
+
+    auto out_nodes = p::LabeledNodeList<p::LiftedTag> {};
+    successor_generator->get_labeled_successor_nodes(initial_node, out_nodes);
+    ASSERT_EQ(out_nodes.size(), param.expected_successors);
+    ASSERT_FALSE(out_nodes.empty());
+
+    out_nodes.push_back(out_nodes.front());
+    ASSERT_EQ(out_nodes.size(), param.expected_successors + 1);
+
+    successor_generator->get_labeled_successor_nodes(initial_node, out_nodes);
+    EXPECT_EQ(out_nodes.size(), param.expected_successors);
+}
+
+TEST_P(LiftedTaskSuccessorCountTest, ApplicableActionBindingOutputBufferIsReplaced)
+{
+    const auto& param = GetParam();
+    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
+    auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
+    auto successor_generator = p::SuccessorGeneratorFactory<p::LiftedTag>().create(lifted_task, execution_context, state_repository);
+    const auto initial_node = successor_generator->get_initial_node();
+
+    auto out_bindings = std::vector<fp::ActionBindingView> {};
+    successor_generator->get_applicable_action_bindings(initial_node, out_bindings);
+    ASSERT_EQ(out_bindings.size(), param.expected_successors);
+    ASSERT_FALSE(out_bindings.empty());
+
+    out_bindings.push_back(out_bindings.front());
+    ASSERT_EQ(out_bindings.size(), param.expected_successors + 1);
+
+    successor_generator->get_applicable_action_bindings(initial_node, out_bindings);
+    EXPECT_EQ(out_bindings.size(), param.expected_successors);
+}
+
+TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryContextForIdentity)
 {
     const auto& param = GetParam();
     auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
@@ -196,6 +308,31 @@ TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryIndexForIdentity)
     EXPECT_EQ(first_state.get_index(), second_state.get_index());
     EXPECT_FALSE(ygg::EqualTo<p::StateView<p::LiftedTag>> {}(first_state, second_state));
     EXPECT_NE(ygg::Hash<p::StateView<p::LiftedTag>> {}(first_state), ygg::Hash<p::StateView<p::LiftedTag>> {}(second_state));
+}
+
+TEST_P(LiftedTaskSuccessorCountTest, StateViewsFromIndependentFactoriesUseDeterministicFactoryLocalIdentity)
+{
+    const auto& param = GetParam();
+    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::LiftedTag>();
+    auto first_state_repository_factory = p::StateRepositoryFactory<p::LiftedTag>();
+    auto second_state_repository_factory = p::StateRepositoryFactory<p::LiftedTag>();
+
+    auto first_axiom_evaluator = axiom_evaluator_factory.create(lifted_task, execution_context);
+    auto second_axiom_evaluator = axiom_evaluator_factory.create(lifted_task, execution_context);
+
+    auto first_repository = first_state_repository_factory.create(lifted_task, first_axiom_evaluator);
+    auto second_repository = second_state_repository_factory.create(lifted_task, second_axiom_evaluator);
+
+    const auto first_state = first_repository->get_initial_state();
+    const auto second_state = second_repository->get_initial_state();
+
+    EXPECT_EQ(first_repository->get_index(), 0);
+    EXPECT_EQ(second_repository->get_index(), 0);
+    EXPECT_EQ(first_state.get_index(), second_state.get_index());
+    EXPECT_TRUE(ygg::EqualTo<p::StateView<p::LiftedTag>> {}(first_state, second_state));
+    EXPECT_EQ(ygg::Hash<p::StateView<p::LiftedTag>> {}(first_state), ygg::Hash<p::StateView<p::LiftedTag>> {}(second_state));
 }
 
 INSTANTIATE_TEST_SUITE_P(TyrPlanningLiftedTask,

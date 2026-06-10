@@ -28,6 +28,7 @@
 
 #include <limits>
 #include <optional>
+#include <stdexcept>
 
 namespace tyr::planning::siw
 {
@@ -47,6 +48,11 @@ struct Options
 template<TaskKind Kind>
 SearchResult<Kind> find_solution(iw::Solver<Kind>& iw_solver, const Options<Kind>& options = Options<Kind>())
 {
+    if (!iw_solver.brfs_solver.task)
+        throw std::invalid_argument("siw::find_solution(...): IW BRFS task is required.");
+    if (!iw_solver.brfs_solver.successor_generator)
+        throw std::invalid_argument("siw::find_solution(...): IW BRFS successor generator is required.");
+
     auto serialized_options = serialized::Options<Kind, iw::Solver<Kind>> {};
     serialized_options.start_node = options.start_node;
     serialized_options.event_handler = options.event_handler ? options.event_handler : DefaultEventHandler<Kind>::create();

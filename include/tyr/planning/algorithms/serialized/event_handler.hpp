@@ -23,6 +23,7 @@
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/declarations.hpp"
 
+#include <cstddef>
 #include <memory>
 
 namespace tyr::planning::serialized
@@ -36,7 +37,8 @@ public:
 
     virtual void on_start_search() = 0;
     virtual void on_start_subsearch(ygg::uint_t subsearch_index) = 0;
-    virtual void add_subsearch_statistics(const tyr::planning::Statistics& search_statistics, const typename Subsolver::EventHandlerType::StatisticsType& solver_statistics) = 0;
+    virtual void add_subsearch_statistics(const tyr::planning::Statistics& search_statistics,
+                                          const typename Subsolver::EventHandlerType::StatisticsType& solver_statistics) = 0;
     virtual void on_end_subsearch(ygg::uint_t subsearch_index, tyr::planning::SearchStatus status) = 0;
     virtual void on_end_search(tyr::planning::SearchStatus status) = 0;
     virtual void on_solved(const Plan<Kind>& plan) = 0;
@@ -75,7 +77,8 @@ public:
             self().on_start_subsearch_impl(subsearch_index);
     }
 
-    void add_subsearch_statistics(const tyr::planning::Statistics& search_statistics, const typename Subsolver::EventHandlerType::StatisticsType& solver_statistics) override
+    void add_subsearch_statistics(const tyr::planning::Statistics& search_statistics,
+                                  const typename Subsolver::EventHandlerType::StatisticsType& solver_statistics) override
     {
         m_statistics.add_search_statistics(search_statistics);
         m_statistics.add_solver_statistics(solver_statistics);

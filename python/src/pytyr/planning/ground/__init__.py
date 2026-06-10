@@ -16,6 +16,7 @@ from ..._pytyr.planning.ground import (
     SearchResult,
     GoalStrategy,
     ConjunctiveGoalStrategy,
+    ExhaustiveGoalStrategy,
     PruningStrategy,
     Heuristic,
     BlindHeuristic,

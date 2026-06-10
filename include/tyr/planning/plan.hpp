@@ -40,6 +40,7 @@ public:
     const LabeledNodeList<Kind>& get_labeled_succ_nodes() const noexcept;
     ygg::float_t get_cost() const noexcept;
     size_t get_length() const noexcept;
+    bool empty() const noexcept;
 };
 }
 

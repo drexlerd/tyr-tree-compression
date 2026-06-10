@@ -22,6 +22,7 @@ from ..._pytyr.planning.lifted import (
     SearchResult,
     GoalStrategy,
     ConjunctiveGoalStrategy,
+    ExhaustiveGoalStrategy,
     PruningStrategy,
     Heuristic,
     BlindHeuristic,

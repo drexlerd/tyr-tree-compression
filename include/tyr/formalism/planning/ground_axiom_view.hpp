@@ -18,14 +18,15 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUND_AXIOM_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_GROUND_AXIOM_VIEW_HPP_
 
-#include <yggdrasil/containers/array.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/binding_view.hpp"
 #include "tyr/formalism/planning/axiom_view.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_atom_view.hpp"
 #include "tyr/formalism/planning/ground_axiom_index.hpp"
 #include "tyr/formalism/planning/ground_conjunctive_condition_view.hpp"
+
+#include <yggdrasil/containers/array.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace ygg
 {
@@ -48,6 +49,7 @@ public:
     auto get_index() const noexcept { return m_handle; }
     auto get_axiom() const noexcept { return get_row().get_relation(); }
     auto get_row() const noexcept { return ygg::make_view(get_data().binding, *m_context); }
+    auto get_objects() const noexcept { return get_row().get_objects(); }
     auto get_key() const noexcept { return get_row().get_key(); }
     auto get_body() const noexcept { return ygg::make_view(get_data().body, *m_context); }
     auto get_head() const noexcept { return ygg::make_view(get_data().head, *m_context); }

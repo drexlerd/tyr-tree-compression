@@ -42,7 +42,7 @@ The Python interface for implementing search algorithms is:
 
 ```py
 # Recommended namespace aliases
-from pytyr.common import ExecutionContext
+from pytyr.planning import ExecutionContext
 import pytyr.formalism.planning as tfp
 import pytyr.planning.lifted as tpl  # pytyr.planning.ground also exists
 
@@ -87,7 +87,7 @@ auto parser = tfp::Parser("domain.pddl");
 auto task = tp::Task<tp::LiftedTag>::create(parser.parse_task("problem.pddl"));
 
 // Instantiate a single-threaded execution environment
-auto execution_context = tyr::ExecutionContext::create(1);
+auto execution_context = ygg::ExecutionContext::create(1);
 
 // Instantiate the planning objects. Factories assign unique context indices so
 // state views from different state repositories hash and compare correctly.
@@ -111,8 +111,8 @@ auto labeled_successor_nodes = successor_generator->get_labeled_successor_nodes(
 
 Tyr consumes native dependencies from Python packages:
 
-- `pyyggdrasil >= 0.0.11` for shared third-party native dependencies.
-- `pypddl >= 1.0.8` for Loki's PDDL parser library, headers, and CMake package.
+- `pyyggdrasil >= 0.0.14, < 0.1` for shared third-party native dependencies.
+- `pypddl >= 1.0.9, < 1.1` for Loki's PDDL parser library, headers, and CMake package.
 
 The shared workspace layout and general Python/CMake integration pattern are
 documented in the
@@ -124,14 +124,23 @@ Install Tyr's native dependency providers into the active Python environment,
 then configure CMake with their native prefixes:
 
 ```console
-python -m pip install 'pyyggdrasil>=0.0.11' 'pypddl>=1.0.8'
+python -m pip install 'pyyggdrasil>=0.0.14,<0.1' 'pypddl>=1.0.9,<1.1'
 
 cmake -S . -B build \
   -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-  -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import os, pyyggdrasil, pypddl; print(os.pathsep.join(map(str, [pyyggdrasil.native_prefix(), pypddl.native_prefix()])))')"
+  -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')"
 
 cmake --build build -j4
+```
+
+CMake discovers the installed provider packages automatically through
+`cmake/find_python_native_packages.cmake` and links against the
+`yggdrasil::yggdrasil` and `loki::parsers` targets. To point at different
+prefixes explicitly:
+
+```console
+cmake -S . -B build \
+  -DCMAKE_PREFIX_PATH="$(python -m pyyggdrasil --prefix);$(python -m pypddl --prefix)"
 ```
 
 CMake options:
@@ -142,7 +151,7 @@ CMake options:
 | `TYR_BUILD_EXECUTABLES` | `OFF` | Build Tyr executables. |
 | `TYR_BUILD_PROFILING` | `OFF` | Build Tyr profiling targets. |
 | `TYR_BUILD_PYTYR` | `OFF` | Build `pytyr` Python bindings. |
-| `TYR_ENABLE_FMT_FORMATTERS` | `ON` | Enable Tyr's public `fmt::formatter` specializations. |
+| `TYR_ENABLE_FMT_FORMATTERS` | `ON` | Enable the public `fmt::formatter` specializations of Tyr, Loki, and yggdrasil (`TYR_`/`LOKI_`/`YGG_ENABLE_FMT_FORMATTERS` macros, all default-on in the headers). |
 | `TYR_HEADER_INSTANTIATION` | `OFF` | Enable stronger inlining at higher compile-time cost. |
 | `TYR_ENABLE_INNER_PARALLELISM` | `OFF` | Enable inner rule parallelism. |
 | `TYR_USE_LLD` | `ON` | Use LLVM `lld` when available. |
@@ -168,13 +177,15 @@ pytest python/tests
 ## CMake Integration
 
 The Python package `pytyr` installs Tyr's native headers, shared library, and
-CMake package config under `pytyr.native_prefix()`. Downstream CMake projects
-should include the native prefixes of `pytyr` and its native package
-dependencies in `CMAKE_PREFIX_PATH`:
+CMake package config under `pytyr.native_prefix()`. Use `pytyr.cmake_prefix()`
+and `pytyr.cmake_dir()` (or `python -m pytyr --prefix` / `--cmake-dir` from the
+shell) to locate them. Downstream CMake projects should include the native
+prefixes of `pytyr` and its native package dependencies in
+`CMAKE_PREFIX_PATH`:
 
 ```console
 cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import os, pyyggdrasil, pypddl, pytyr; print(os.pathsep.join(map(str, [pyyggdrasil.native_prefix(), pypddl.native_prefix(), pytyr.native_prefix()])))')"
+  -DCMAKE_PREFIX_PATH="$(python -m pyyggdrasil --prefix);$(python -m pypddl --prefix);$(python -m pytyr --prefix)"
 ```
 
 Tyr exports the `tyr::core` aggregate target.

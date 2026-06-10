@@ -40,7 +40,10 @@ public:
         NB_OVERRIDE_PURE(add_subsearch_statistics, search_statistics, solver_statistics);
     }
 
-    void on_end_subsearch(ygg::uint_t subsearch_index, tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_subsearch, subsearch_index, status); }
+    void on_end_subsearch(ygg::uint_t subsearch_index, tyr::planning::SearchStatus status) override
+    {
+        NB_OVERRIDE_PURE(on_end_subsearch, subsearch_index, status);
+    }
 
     void on_end_search(tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_search, status); }
 
@@ -54,10 +57,14 @@ void bind_statistics(nb::module_& m, const std::string& name)
 {
     using T = Statistics<Kind>;
 
-    nb::class_<T>(m, name.c_str())
-        .def("get_maximum_effective_width", &T::get_maximum_effective_width)
-        .def("get_average_effective_width", &T::get_average_effective_width)
-        .def("get_num_solved_subsearches", &T::get_num_solved_subsearches);
+    auto cls = nb::class_<T>(m, name.c_str())
+                   .def(nb::init<>())
+                   .def("clear", &T::clear)
+                   .def("add_effective_width", &T::add_effective_width, "width"_a)
+                   .def("get_maximum_effective_width", &T::get_maximum_effective_width)
+                   .def("get_average_effective_width", &T::get_average_effective_width)
+                   .def("get_num_solved_subsearches", &T::get_num_solved_subsearches);
+    add_print(cls);
 }
 
 template<TaskKind Kind>
@@ -103,13 +110,14 @@ void bind_event_handler(nb::module_& m, const std::string& name)
     using T = EventHandler<Kind>;
 
     nb::class_<T, PyEventHandler<Kind>>(m, name.c_str())
+        .def(nb::init<>())
         .def("on_start_search", &T::on_start_search)
         .def("on_start_subsearch", &T::on_start_subsearch, "subsearch_index"_a)
         .def("add_subsearch_statistics", &T::add_subsearch_statistics, "search_statistics"_a, "solver_statistics"_a)
         .def("on_end_subsearch", &T::on_end_subsearch, "subsearch_index"_a, "status"_a)
         .def("on_end_search", &T::on_end_search, "status"_a)
         .def("on_solved", &T::on_solved, "plan"_a)
-        .def("get_statistics", &T::get_statistics);
+        .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal);
 }
 
 template<TaskKind Kind>
@@ -118,8 +126,8 @@ void bind_default_event_handler(nb::module_& m, const std::string& name)
     using T = DefaultEventHandler<Kind>;
 
     nb::class_<T, EventHandler<Kind>>(m, name.c_str())  //
-        .def(nb::init<size_t>(), "verbosity"_a)
-        .def("get_statistics", &T::get_statistics);
+        .def(nb::init<size_t>(), "verbosity"_a = 0)
+        .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal);
 }
 
 template<TaskKind Kind>

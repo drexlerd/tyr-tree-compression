@@ -35,6 +35,7 @@ add_gtest(planning_ground_vs_lifted                      "planning/algorithms/gr
 target_link_libraries(planning_ground_vs_lifted PRIVATE Boost::json)
 add_gtest(planning_brfs_vs_astar                        "planning/algorithms/brfs_vs_astar.cpp")
 target_link_libraries(planning_brfs_vs_astar PRIVATE Boost::json)
+add_gtest(planning_algorithm_utils                       "planning/algorithms/utils.cpp")
 add_gtest(planning_iw                                    "planning/algorithms/iw.cpp")
 target_link_libraries(planning_iw PRIVATE Boost::json)
 add_gtest(planning_iw_novelty_table                      "planning/algorithms/iw/novelty_table.cpp")

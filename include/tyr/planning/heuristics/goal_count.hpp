@@ -21,6 +21,8 @@
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/heuristic.hpp"
 
+#include <memory>
+
 namespace tyr::planning
 {
 

@@ -15,14 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <algorithm>
 #include <deque>
 #include <gtest/gtest.h>
+#include <stdexcept>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace p = tyr::planning;
 namespace fp = tyr::formalism::planning;
@@ -54,7 +54,7 @@ public:
     void on_start_search(const p::Node<Kind>& node) override
     {
         static_cast<void>(node);
-        m_statistics = p::Statistics();
+        m_statistics.clear();
     }
     void on_finish_layer(ygg::uint_t layer) override { static_cast<void>(layer); }
     void on_end_search(p::SearchStatus status) override { static_cast<void>(status); }
@@ -126,6 +126,136 @@ public:
 };
 }
 
+TEST(TyrPlanningSerialized, StatisticsClearResetsCountersAndProgressSnapshots)
+{
+    auto statistics = p::Statistics();
+    statistics.increment_num_generated();
+    statistics.increment_num_expanded();
+    statistics.increment_num_deadends();
+    statistics.increment_num_pruned();
+
+    auto progress_statistics = p::ProgressStatistics();
+    progress_statistics.add_snapshot(statistics);
+
+    ASSERT_EQ(progress_statistics.size(), 1);
+    ASSERT_FALSE(progress_statistics.empty());
+    ASSERT_EQ(progress_statistics.get_snapshots().size(), 1);
+    EXPECT_EQ(statistics.get_num_generated(), 1);
+    EXPECT_EQ(statistics.get_num_expanded(), 1);
+    EXPECT_EQ(statistics.get_num_deadends(), 1);
+    EXPECT_EQ(statistics.get_num_pruned(), 1);
+
+    statistics.clear();
+    progress_statistics.clear();
+
+    EXPECT_EQ(statistics.get_num_generated(), 0);
+    EXPECT_EQ(statistics.get_num_expanded(), 0);
+    EXPECT_EQ(statistics.get_num_deadends(), 0);
+    EXPECT_EQ(statistics.get_num_pruned(), 0);
+    EXPECT_TRUE(progress_statistics.empty());
+    EXPECT_EQ(progress_statistics.size(), 0);
+    EXPECT_TRUE(progress_statistics.get_snapshots().empty());
+}
+
+TEST(TyrPlanningSerialized, BrfsEventHandlerClearsProgressSnapshotsOnSearchStart)
+{
+    auto context = create_gripper_context();
+    auto node = context.successor_generator->get_initial_node();
+    auto labeled_succ_nodes = p::LabeledNodeList<p::GroundTag> {};
+    context.successor_generator->get_labeled_successor_nodes(node, labeled_succ_nodes);
+    ASSERT_FALSE(labeled_succ_nodes.empty());
+    auto event_handler = p::brfs::DefaultEventHandler<p::GroundTag>(0);
+
+    event_handler.on_start_search(node);
+    event_handler.on_generate_node(node, labeled_succ_nodes.front());
+    event_handler.on_finish_layer(0);
+
+    ASSERT_EQ(event_handler.get_progress_statistics().size(), 1);
+    EXPECT_EQ(event_handler.get_progress_statistics().get_snapshots().front().get_num_generated(), 1);
+
+    event_handler.on_start_search(node);
+
+    EXPECT_TRUE(event_handler.get_progress_statistics().empty());
+    EXPECT_EQ(event_handler.get_progress_statistics().size(), 0);
+}
+
+TEST(TyrPlanningSerialized, AStarEventHandlerClearsProgressSnapshotsOnSearchStart)
+{
+    auto context = create_gripper_context();
+    auto node = context.successor_generator->get_initial_node();
+    auto labeled_succ_nodes = p::LabeledNodeList<p::GroundTag> {};
+    context.successor_generator->get_labeled_successor_nodes(node, labeled_succ_nodes);
+    ASSERT_FALSE(labeled_succ_nodes.empty());
+    auto event_handler = p::astar_eager::DefaultEventHandler<p::GroundTag>(0);
+
+    event_handler.on_start_search(node, 0);
+    event_handler.on_generate_node(node, labeled_succ_nodes.front());
+    event_handler.on_finish_f_layer(0);
+
+    ASSERT_EQ(event_handler.get_progress_statistics().size(), 1);
+    EXPECT_EQ(event_handler.get_progress_statistics().get_snapshots().front().get_num_generated(), 1);
+
+    event_handler.on_start_search(node, 0);
+
+    EXPECT_TRUE(event_handler.get_progress_statistics().empty());
+    EXPECT_EQ(event_handler.get_progress_statistics().size(), 0);
+}
+
+TEST(TyrPlanningSerialized, ThrowsWhenSubgoalStrategyIsMissing)
+{
+    auto solver = ScriptedSolver({});
+    auto options = p::serialized::Options<p::GroundTag, ScriptedSolver> {};
+    options.goal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+
+    EXPECT_THROW(static_cast<void>(p::serialized::find_solution(solver, options)), std::invalid_argument);
+}
+
+TEST(TyrPlanningSerialized, ThrowsWhenGoalStrategyIsMissing)
+{
+    auto solver = ScriptedSolver({});
+    auto options = p::serialized::Options<p::GroundTag, ScriptedSolver> {};
+    options.subgoal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+
+    EXPECT_THROW(static_cast<void>(p::serialized::find_solution(solver, options)), std::invalid_argument);
+}
+
+TEST(TyrPlanningSerialized, ThrowsWhenZeroSubsearchesHaveNoStartNode)
+{
+    auto solver = ScriptedSolver({});
+    auto options = p::serialized::Options<p::GroundTag, ScriptedSolver> {};
+    options.subgoal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+    options.goal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+    options.max_num_subsearches = 0;
+
+    EXPECT_THROW(static_cast<void>(p::serialized::find_solution(solver, options)), std::invalid_argument);
+}
+
+TEST(TyrPlanningSerialized, ZeroSubsearchesReturnsEmptyPlanFromStartNode)
+{
+    auto context = create_gripper_context();
+    auto start_node = context.successor_generator->get_initial_node();
+    auto solver = ScriptedSolver({});
+
+    auto options = p::serialized::Options<p::GroundTag, ScriptedSolver> {};
+    options.start_node = start_node;
+    options.subgoal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+    options.goal_strategy = std::make_shared<NeverSatisfiedGoalStrategy>();
+    options.max_num_subsearches = 0;
+
+    const auto result = p::serialized::find_solution(solver, options);
+
+    ASSERT_EQ(result.status, p::SearchStatus::SOLVED);
+    ASSERT_TRUE(result.plan);
+    ASSERT_TRUE(result.goal_node);
+    EXPECT_TRUE(result.plan->empty());
+    EXPECT_EQ(result.plan->get_length(), 0);
+    EXPECT_EQ(result.plan->get_cost(), 0);
+    EXPECT_EQ(result.plan->get_start_node().get_state().get_index(), start_node.get_state().get_index());
+    EXPECT_EQ(result.plan->get_start_node().get_metric(), start_node.get_metric());
+    EXPECT_EQ(result.goal_node->get_state().get_index(), start_node.get_state().get_index());
+    EXPECT_EQ(result.goal_node->get_metric(), start_node.get_metric());
+}
+
 TEST(TyrPlanningSerialized, BrfsSubsolverMatchesDirectBrfs)
 {
     auto direct_context = create_gripper_context();
@@ -151,7 +281,9 @@ TEST(TyrPlanningSerialized, BrfsSubsolverMatchesDirectBrfs)
     ASSERT_EQ(serialized_result.status, p::SearchStatus::SOLVED);
     ASSERT_TRUE(serialized_result.plan);
 
+    EXPECT_FALSE(serialized_result.plan->empty());
     EXPECT_EQ(serialized_result.plan->get_length(), direct_result.plan->get_length());
+    EXPECT_EQ(serialized_result.plan->get_cost(), direct_result.plan->get_cost());
     EXPECT_GE(event_handler->get_statistics().get_num_subsearches(), 1);
     EXPECT_EQ(event_handler->get_statistics().get_search_statistics().size(), event_handler->get_statistics().get_num_subsearches());
     EXPECT_EQ(event_handler->get_statistics().get_solver_statistics().size(), event_handler->get_statistics().get_num_subsearches());
@@ -168,8 +300,7 @@ TEST(TyrPlanningSerialized, DetectsRepeatedSubgoalState)
     const auto first_labeled_succ_node_it =
         std::find_if(labeled_succ_nodes.begin(),
                      labeled_succ_nodes.end(),
-                     [&](const auto& labeled_succ_node)
-                     { return labeled_succ_node.node.get_state().get_index() != start_node.get_state().get_index(); });
+                     [&](const auto& labeled_succ_node) { return labeled_succ_node.node.get_state().get_index() != start_node.get_state().get_index(); });
     ASSERT_NE(first_labeled_succ_node_it, labeled_succ_nodes.end());
     const auto first_labeled_succ_node = *first_labeled_succ_node_it;
     const auto first_goal_node = first_labeled_succ_node.node;
@@ -202,7 +333,9 @@ TEST(TyrPlanningSerialized, DetectsRepeatedSubgoalState)
     ASSERT_EQ(result.status, p::SearchStatus::CYCLE);
     ASSERT_TRUE(result.plan);
     ASSERT_TRUE(result.cycle_range);
+    EXPECT_FALSE(result.plan->empty());
     EXPECT_EQ(result.plan->get_length(), 2);
+    EXPECT_EQ(result.plan->get_cost(), 2);
     EXPECT_EQ(result.cycle_range->first, 0);
     EXPECT_EQ(result.cycle_range->second, 2);
 }

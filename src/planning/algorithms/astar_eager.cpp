@@ -17,8 +17,6 @@
 
 #include "tyr/planning/algorithms/astar_eager.hpp"
 
-#include <yggdrasil/core/chrono.hpp>
-#include <yggdrasil/containers/segmented_vector.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/algorithms/astar_eager/event_handler.hpp"
@@ -47,12 +45,14 @@
 
 #include <algorithm>
 #include <random>
+#include <yggdrasil/containers/segmented_vector.hpp>
+#include <yggdrasil/core/chrono.hpp>
 
 namespace tyr::planning::astar_eager
 {
 
 /**
- * GBFS search node
+ * A* search node
  */
 
 template<TaskKind Kind>
@@ -82,7 +82,7 @@ static SearchNode<Kind>& get_or_create_search_node(ygg::Index<State<Kind>> state
 }
 
 /**
- * GBFS queue
+ * A* queue
  */
 
 template<TaskKind Kind>

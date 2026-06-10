@@ -18,14 +18,15 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_ATOM_VIEW_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_ATOM_VIEW_HPP_
 
-#include <yggdrasil/containers/array.hpp>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/binding_view.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
 #include "tyr/formalism/object_view.hpp"
 #include "tyr/formalism/predicate_view.hpp"
+
+#include <yggdrasil/containers/array.hpp>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace ygg
 {
@@ -47,6 +48,7 @@ public:
     auto get_index() const noexcept { return m_handle; }
     auto get_predicate() const noexcept { return get_row().get_relation(); }
     auto get_row() const noexcept { return ygg::make_view(get_data().binding, *m_context); }
+    auto get_objects() const noexcept { return get_row().get_objects(); }
     auto get_key() const noexcept { return get_row().get_key(); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }

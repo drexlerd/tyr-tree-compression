@@ -17,12 +17,13 @@
 
 #include "datas.hpp"
 
+#include "pytyr/bindings.hpp"
+
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include "pytyr/bindings.hpp"
-#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/type_casters.hpp>
 
 namespace tyr::formalism::planning
 {
@@ -548,7 +549,7 @@ void bind_multi_operator_builder(nb::module_& m, const std::string& name)
 }
 
 template<typename T>
-void bind_arithmethic_operator_builder(nb::module_& m, const std::string& name)
+void bind_arithmetic_operator_builder(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<ArithmeticOperator<T>>;
 
@@ -642,7 +643,7 @@ void bind_datas(nb::module_& m)
     bind_multi_operator_builder<Add, ygg::Data<FunctionExpression>>(m, "MultiOperatorAddBuilder");
     bind_multi_operator_builder<Mul, ygg::Data<FunctionExpression>>(m, "MultiOperatorMulBuilder");
 
-    bind_arithmethic_operator_builder<ygg::Data<FunctionExpression>>(m, "ArithmeticOperatorBuilder");
+    bind_arithmetic_operator_builder<ygg::Data<FunctionExpression>>(m, "ArithmeticOperatorBuilder");
     bind_boolean_operator_builder<ygg::Data<FunctionExpression>>(m, "BooleanOperatorBuilder");
 
     bind_function_expression_builder(m, "FunctionExpressionBuilder");
@@ -678,7 +679,7 @@ void bind_datas(nb::module_& m)
     bind_multi_operator_builder<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorAddBuilder");
     bind_multi_operator_builder<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorMulBuilder");
 
-    bind_arithmethic_operator_builder<ygg::Data<GroundFunctionExpression>>(m, "GroundArithmeticOperatorBuilder");
+    bind_arithmetic_operator_builder<ygg::Data<GroundFunctionExpression>>(m, "GroundArithmeticOperatorBuilder");
     bind_boolean_operator_builder<ygg::Data<GroundFunctionExpression>>(m, "GroundBooleanOperatorBuilder");
 
     bind_ground_function_expression_builder(m, "GroundFunctionExpressionBuilder");

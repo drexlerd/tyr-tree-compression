@@ -15,9 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <ostream>
@@ -25,6 +22,8 @@
 #include <string>
 #include <string_view>
 #include <tyr/formalism/formalism.hpp>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace f = tyr::formalism;
 namespace fp = tyr::formalism::planning;
@@ -40,10 +39,7 @@ struct ParserSymbolIndexStabilityCase
     std::filesystem::path task_file;
 };
 
-void PrintTo(const ParserSymbolIndexStabilityCase& test_case, std::ostream* os)
-{
-    *os << test_case.name << " (" << test_case.task_file << ")";
-}
+void PrintTo(const ParserSymbolIndexStabilityCase& test_case, std::ostream* os) { *os << test_case.name << " (" << test_case.task_file << ")"; }
 
 ParserSymbolIndexStabilityCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
@@ -54,8 +50,7 @@ ParserSymbolIndexStabilityCase parse_case(const boost::json::object& suite, cons
 
 std::vector<ParserSymbolIndexStabilityCase> load_cases()
 {
-    const auto suite =
-        ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/formalism/planning/parser_symbol_index_stability.json");
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/formalism/planning/parser_symbol_index_stability.json");
     const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<ParserSymbolIndexStabilityCase> {};
     for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))
@@ -63,10 +58,7 @@ std::vector<ParserSymbolIndexStabilityCase> load_cases()
     return result;
 }
 
-fp::PlanningTask parse_task(const ParserSymbolIndexStabilityCase& test_case)
-{
-    return fp::Parser(test_case.domain_file).parse_task(test_case.task_file);
-}
+fp::PlanningTask parse_task(const ParserSymbolIndexStabilityCase& test_case) { return fp::Parser(test_case.domain_file).parse_task(test_case.task_file); }
 
 template<std::ranges::random_access_range Range>
 void expect_same_index_names(const Range& first, const Range& second, std::string_view label)
@@ -86,6 +78,25 @@ void expect_same_index_names(const Range& first, const Range& second, std::strin
     }
 }
 
+template<std::ranges::random_access_range Range>
+void expect_same_relation_index_names_and_arities(const Range& first, const Range& second, std::string_view label)
+{
+    const auto size = std::ranges::distance(first);
+    ASSERT_EQ(size, std::ranges::distance(second)) << label;
+
+    const auto first_begin = std::ranges::begin(first);
+    const auto second_begin = std::ranges::begin(second);
+    for (std::ranges::range_difference_t<Range> i = 0; i < size; ++i)
+    {
+        const auto first_symbol = *(first_begin + i);
+        const auto second_symbol = *(second_begin + i);
+
+        EXPECT_EQ(first_symbol.get_index(), second_symbol.get_index()) << label << "[" << i << "]";
+        EXPECT_EQ(first_symbol.get_name(), second_symbol.get_name()) << label << "[" << i << "] index " << first_symbol.get_index().get_value();
+        EXPECT_EQ(first_symbol.get_arity(), second_symbol.get_arity()) << label << "[" << i << "] index " << first_symbol.get_index().get_value();
+    }
+}
+
 void expect_same_symbol_index_names(const fp::PlanningTask& first, const fp::PlanningTask& second)
 {
     const auto first_domain = first.get_domain().get_domain();
@@ -96,12 +107,18 @@ void expect_same_symbol_index_names(const fp::PlanningTask& first, const fp::Pla
     expect_same_index_names(first_domain.get_constants(), second_domain.get_constants(), "domain constants");
     expect_same_index_names(first_task.get_objects(), second_task.get_objects(), "task objects");
 
-    expect_same_index_names(first_domain.get_predicates<f::StaticTag>(), second_domain.get_predicates<f::StaticTag>(), "static predicates");
-    expect_same_index_names(first_domain.get_predicates<f::FluentTag>(), second_domain.get_predicates<f::FluentTag>(), "fluent predicates");
-    expect_same_index_names(first_domain.get_predicates<f::DerivedTag>(), second_domain.get_predicates<f::DerivedTag>(), "derived predicates");
+    expect_same_relation_index_names_and_arities(first_domain.get_predicates<f::StaticTag>(),
+                                                 second_domain.get_predicates<f::StaticTag>(),
+                                                 "static predicates");
+    expect_same_relation_index_names_and_arities(first_domain.get_predicates<f::FluentTag>(),
+                                                 second_domain.get_predicates<f::FluentTag>(),
+                                                 "fluent predicates");
+    expect_same_relation_index_names_and_arities(first_domain.get_predicates<f::DerivedTag>(),
+                                                 second_domain.get_predicates<f::DerivedTag>(),
+                                                 "derived predicates");
 
-    expect_same_index_names(first_domain.get_functions<f::StaticTag>(), second_domain.get_functions<f::StaticTag>(), "static functions");
-    expect_same_index_names(first_domain.get_functions<f::FluentTag>(), second_domain.get_functions<f::FluentTag>(), "fluent functions");
+    expect_same_relation_index_names_and_arities(first_domain.get_functions<f::StaticTag>(), second_domain.get_functions<f::StaticTag>(), "static functions");
+    expect_same_relation_index_names_and_arities(first_domain.get_functions<f::FluentTag>(), second_domain.get_functions<f::FluentTag>(), "fluent functions");
 }
 }
 

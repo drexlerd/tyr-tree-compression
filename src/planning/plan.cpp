@@ -53,13 +53,19 @@ const LabeledNodeList<Kind>& Plan<Kind>::get_labeled_succ_nodes() const noexcept
 template<TaskKind Kind>
 ygg::float_t Plan<Kind>::get_cost() const noexcept
 {
-    return get_length() > 0 ? m_labeled_succ_nodes.back().node.get_metric() : 0.;
+    return !empty() ? m_labeled_succ_nodes.back().node.get_metric() : 0.;
 }
 
 template<TaskKind Kind>
 size_t Plan<Kind>::get_length() const noexcept
 {
     return m_labeled_succ_nodes.size();
+}
+
+template<TaskKind Kind>
+bool Plan<Kind>::empty() const noexcept
+{
+    return m_labeled_succ_nodes.empty();
 }
 
 template class Plan<LiftedTag>;

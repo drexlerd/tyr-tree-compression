@@ -1,20 +1,260 @@
-from pytyr.formalism.planning import ParserOptions, Parser
-
 from pathlib import Path
+
+from pytyr.formalism.planning import Parser, ParserOptions
 
 ROOT_DIR = (Path(__file__).parent.parent.parent.parent.parent).absolute()
 BENCHMARK_DIR = ROOT_DIR / "data" / "planning-benchmarks"
 
 
-def test_pddl_parser():
-    """ Test parsing and translation of a PDDL domain and problem file.
-    """
+def _parse_gripper_task():
     domain_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl")
     problem_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl")
     parser_options = ParserOptions()
     parser = Parser(domain_filepath, parser_options)
 
-    domain = parser.get_domain()
-    task = parser.parse_task(problem_filepath, parser_options)
+    return parser, parser.parse_task(problem_filepath, parser_options)
 
-    assert(domain.get_domain() == task.get_domain().get_domain())
+
+def test_pddl_parser():
+    """Test parsing and translation of a PDDL domain and problem file."""
+    parser, task = _parse_gripper_task()
+    domain = parser.get_domain()
+
+    assert domain.get_domain() == task.get_domain().get_domain()
+
+
+def test_parser_view_accessors_keep_temporary_owners_alive():
+    import gc
+
+    parser_options = ParserOptions()
+    domain_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl")
+    problem_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl")
+
+    domain = Parser(domain_filepath, parser_options).get_domain().get_domain()
+    task = Parser(domain_filepath, parser_options).parse_task(problem_filepath, parser_options).get_task()
+
+    gc.collect()
+
+    assert domain.get_name() == "gripper-strips"
+    assert task.get_name() == "gripper-2"
+    assert [object_.get_name() for object_ in task.get_objects()] == ["ball1", "ball2", "left", "right"]
+
+
+def test_nested_task_view_accessors_keep_temporary_parent_views_alive():
+    import gc
+
+    parser_options = ParserOptions()
+    domain_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl")
+    problem_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl")
+
+    task = Parser(domain_filepath, parser_options).parse_task(problem_filepath, parser_options).get_task()
+    domain = task.get_domain()
+    goal = task.get_goal()
+    del task
+
+    gc.collect()
+
+    assert domain.get_name() == "gripper-strips"
+    positive_goal_facts = list(goal.get_positive_facts())
+    assert len(positive_goal_facts) == 1
+    assert positive_goal_facts[0].get_atom().get_predicate().get_name() == "at"
+
+
+def test_parsed_domain_exposes_symbol_metadata():
+    parser, _ = _parse_gripper_task()
+    domain = parser.get_domain().get_domain()
+
+    static_predicates = [
+        (int(predicate.get_index()), predicate.get_name(), predicate.get_arity())
+        for predicate in domain.get_static_predicates()
+    ]
+    fluent_predicates = [
+        (int(predicate.get_index()), predicate.get_name(), predicate.get_arity())
+        for predicate in domain.get_fluent_predicates()
+    ]
+
+    for _, _, arity in static_predicates + fluent_predicates:
+        assert isinstance(arity, int)
+    for predicate in [*domain.get_static_predicates(), *domain.get_fluent_predicates()]:
+        assert len(predicate) == predicate.get_arity()
+
+    assert static_predicates == [
+        (0, "ball", 1),
+        (1, "gripper", 1),
+        (2, "number", 1),
+        (3, "object", 1),
+        (4, "room", 1),
+    ]
+    assert fluent_predicates == [
+        (0, "at-robby", 1),
+        (1, "at", 2),
+        (2, "carry", 2),
+        (3, "free", 1),
+    ]
+
+
+def test_nested_action_view_accessors_keep_temporary_parent_views_alive():
+    import gc
+
+    parser, _ = _parse_gripper_task()
+    action = next(iter(parser.get_domain().get_domain().get_actions()))
+    condition = action.get_condition()
+    del action
+
+    gc.collect()
+
+    assert condition.get_arity() == 3
+    static_literals = list(condition.get_static_literals())
+    assert len(static_literals) == 6
+
+    literal = static_literals[0]
+    atom = literal.get_atom()
+    del literal
+    gc.collect()
+
+    predicate = atom.get_predicate()
+    del atom
+    gc.collect()
+
+    assert predicate.get_name() in {"ball", "gripper", "room"}
+
+
+def test_parsed_task_exposes_domain_action_and_goal_views():
+    parser, parsed_task = _parse_gripper_task()
+    domain = parser.get_domain().get_domain()
+    task = parsed_task.get_task()
+
+    assert domain.get_name() == "gripper-strips"
+    assert task.get_name() == "gripper-2"
+
+    assert [object_.get_name() for object_ in task.get_objects()] == [
+        "ball1",
+        "ball2",
+        "left",
+        "right",
+    ]
+    static_atoms = list(task.get_static_atoms())
+    fluent_atoms = list(task.get_fluent_atoms())
+
+    assert len(static_atoms) == 12
+    assert len(fluent_atoms) == 5
+    for atom in [*static_atoms, *fluent_atoms]:
+        assert len(atom) == len(list(atom.get_objects()))
+        assert len(atom) == atom.get_predicate().get_arity()
+    assert list(task.get_static_fterm_values()) == []
+    assert list(task.get_fluent_fterm_values()) == []
+    assert list(task.get_axioms()) == []
+
+    actions = {action.get_name(): action for action in domain.get_actions()}
+
+    assert sorted(actions) == ["drop", "move", "pick"]
+
+    expected_action_metadata = {
+        "drop": (3, 3, 6, 2),
+        "move": (2, 2, 4, 1),
+        "pick": (3, 3, 6, 3),
+    }
+
+    for action_name, (
+        original_arity,
+        arity,
+        num_static_literals,
+        num_fluent_literals,
+    ) in expected_action_metadata.items():
+        action = actions[action_name]
+        condition = action.get_condition()
+        static_literals = list(condition.get_static_literals())
+        fluent_literals = list(condition.get_fluent_literals())
+
+        assert action.get_original_arity() == original_arity
+        assert action.get_arity() == arity
+        assert len(action) == arity
+        assert len(list(action.get_variables())) == arity
+        assert len(list(action.get_effects())) == 1
+        assert condition.get_arity() == arity
+        assert len(condition) == arity
+        assert len(list(condition.get_variables())) == arity
+        assert len(static_literals) == num_static_literals
+        assert len(fluent_literals) == num_fluent_literals
+        for literal in [*static_literals, *fluent_literals]:
+            atom = literal.get_atom()
+            assert len(atom) == len(list(atom.get_terms()))
+            assert len(atom) == atom.get_predicate().get_arity()
+        assert list(condition.get_derived_literals()) == []
+        assert list(condition.get_numeric_constraints()) == []
+
+    goal = task.get_goal()
+
+    assert len(list(goal.get_positive_facts())) == 1
+    assert list(goal.get_negative_facts()) == []
+    assert list(goal.get_static_facts()) == []
+    assert list(goal.get_derived_facts()) == []
+    assert list(goal.get_numeric_constraints()) == []
+
+
+def test_fdr_context_exposes_variables_and_fact_metadata():
+    _, task = _parse_gripper_task()
+    fdr_context = task.get_fdr_context()
+    fluent_atoms = list(task.get_task().get_fluent_atoms())
+    variables = list(fdr_context.get_variables())
+
+    variable_atoms = [atom for variable in variables for atom in variable.get_atoms()]
+
+    assert variables
+    assert set(fluent_atoms) <= set(variable_atoms)
+    assert all(len(variable) == variable.get_domain_size() for variable in variables)
+    assert sum(variable.get_domain_size() - 1 for variable in variables) >= len(fluent_atoms)
+
+    for atom in fluent_atoms:
+        fact = fdr_context.get_fact(atom)
+
+        assert fact.has_value()
+        assert fact.get_atom() == atom
+        assert fact.get_variable() in variables
+
+
+def test_fdr_context_view_accessors_keep_temporary_owners_alive():
+    import gc
+
+    _, task = _parse_gripper_task()
+    fluent_atom = next(iter(task.get_task().get_fluent_atoms()))
+
+    variables = task.get_fdr_context().get_variables()
+    fact = task.get_fdr_context().get_fact(fluent_atom)
+
+    gc.collect()
+
+    variables = list(variables)
+    assert variables
+    assert fact.has_value()
+    assert fact.get_variable() in variables
+
+
+def test_public_package_reexports_native_bindings():
+    import pytyr.formalism.planning as public_module
+    import pytyr._pytyr.formalism.planning as native_module
+
+    public_names = {name for name in dir(public_module) if not name.startswith("_")}
+    native_names = {name for name in dir(native_module) if not name.startswith("_")}
+
+    assert native_names <= public_names
+    assert public_names - native_names == {"ParserOptions"}
+
+
+def test_views_from_independent_parsers_use_deterministic_factory_local_identity():
+    first_parser = Parser(
+        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"),
+        ParserOptions(),
+    )
+    second_parser = Parser(
+        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"),
+        ParserOptions(),
+    )
+
+    first_predicate = next(iter(first_parser.get_domain().get_domain().get_fluent_predicates()))
+    second_predicate = next(iter(second_parser.get_domain().get_domain().get_fluent_predicates()))
+
+    assert int(first_predicate.get_index()) == int(second_predicate.get_index())
+    assert first_predicate.get_name() == second_predicate.get_name()
+    assert first_predicate == second_predicate
+    assert hash(first_predicate) == hash(second_predicate)

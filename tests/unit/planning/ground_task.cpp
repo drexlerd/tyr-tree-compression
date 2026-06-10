@@ -15,14 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <string>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
+#include <vector>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace p = tyr::planning;
 namespace f = tyr::formalism;
@@ -71,6 +71,131 @@ std::vector<GroundTaskCase> load_cases()
 class GroundTaskTest : public ::testing::TestWithParam<GroundTaskCase>
 {
 };
+
+TEST_P(GroundTaskTest, StateViewsUseRepositoryContextForIdentity)
+{
+    const auto& param = GetParam();
+    auto execution_context = ygg::ExecutionContext(1);
+    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+
+    auto shared_execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::GroundTag>();
+    auto state_repository_factory = p::StateRepositoryFactory<p::GroundTag>();
+    auto successor_generator_factory = p::SuccessorGeneratorFactory<p::GroundTag>();
+
+    auto first_axiom_evaluator = axiom_evaluator_factory.create(ground_task, shared_execution_context);
+    auto second_axiom_evaluator = axiom_evaluator_factory.create(ground_task, shared_execution_context);
+
+    auto first_repository = state_repository_factory.create(ground_task, first_axiom_evaluator);
+    auto second_repository = state_repository_factory.create(ground_task, second_axiom_evaluator);
+
+    auto first_successor_generator = successor_generator_factory.create(ground_task, shared_execution_context, first_repository);
+    auto second_successor_generator = successor_generator_factory.create(ground_task, shared_execution_context, second_repository);
+
+    const auto first_state = first_repository->get_initial_state();
+    const auto second_state = second_repository->get_initial_state();
+
+    EXPECT_EQ(first_axiom_evaluator->get_index(), 0);
+    EXPECT_EQ(second_axiom_evaluator->get_index(), 1);
+    EXPECT_EQ(first_repository->get_index(), 0);
+    EXPECT_EQ(second_repository->get_index(), 1);
+    EXPECT_EQ(first_successor_generator->get_index(), 0);
+    EXPECT_EQ(second_successor_generator->get_index(), 1);
+    EXPECT_EQ(first_successor_generator->get_state_repository(), first_repository);
+    EXPECT_EQ(second_successor_generator->get_state_repository(), second_repository);
+    EXPECT_EQ(first_state.get_index(), second_state.get_index());
+    EXPECT_FALSE(ygg::EqualTo<p::StateView<p::GroundTag>> {}(first_state, second_state));
+    EXPECT_NE(ygg::Hash<p::StateView<p::GroundTag>> {}(first_state), ygg::Hash<p::StateView<p::GroundTag>> {}(second_state));
+}
+
+TEST_P(GroundTaskTest, StateViewsFromIndependentFactoriesUseDeterministicFactoryLocalIdentity)
+{
+    const auto& param = GetParam();
+    auto execution_context = ygg::ExecutionContext(1);
+    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+
+    auto shared_execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::GroundTag>();
+    auto first_state_repository_factory = p::StateRepositoryFactory<p::GroundTag>();
+    auto second_state_repository_factory = p::StateRepositoryFactory<p::GroundTag>();
+
+    auto first_axiom_evaluator = axiom_evaluator_factory.create(ground_task, shared_execution_context);
+    auto second_axiom_evaluator = axiom_evaluator_factory.create(ground_task, shared_execution_context);
+
+    auto first_repository = first_state_repository_factory.create(ground_task, first_axiom_evaluator);
+    auto second_repository = second_state_repository_factory.create(ground_task, second_axiom_evaluator);
+
+    const auto first_state = first_repository->get_initial_state();
+    const auto second_state = second_repository->get_initial_state();
+
+    EXPECT_EQ(first_repository->get_index(), 0);
+    EXPECT_EQ(second_repository->get_index(), 0);
+    EXPECT_EQ(first_state.get_index(), second_state.get_index());
+    EXPECT_TRUE(ygg::EqualTo<p::StateView<p::GroundTag>> {}(first_state, second_state));
+    EXPECT_EQ(ygg::Hash<p::StateView<p::GroundTag>> {}(first_state), ygg::Hash<p::StateView<p::GroundTag>> {}(second_state));
+}
+
+TEST_P(GroundTaskTest, CreateStateOverloadsCanonicalizeToSameRegisteredState)
+{
+    const auto& param = GetParam();
+    auto execution_context = ygg::ExecutionContext(1);
+    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+
+    auto shared_execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(ground_task, shared_execution_context);
+    auto state_repository = p::StateRepositoryFactory<p::GroundTag>().create(ground_task, axiom_evaluator);
+
+    const auto initial_state = state_repository->get_initial_state();
+
+    auto fluent_facts = std::vector<ygg::Data<fp::FDRFact<f::FluentTag>>> {};
+    for (const auto fact : initial_state.get_fluent_facts())
+        fluent_facts.push_back(fact);
+
+    auto fluent_fact_views = std::vector<fp::FDRFactView<f::FluentTag>> {};
+    for (const auto fact : initial_state.get_fluent_facts_view())
+        fluent_fact_views.push_back(fact);
+
+    auto fterm_values = std::vector<std::pair<ygg::Index<fp::GroundFunctionTerm<f::FluentTag>>, ygg::float_t>> {};
+    for (const auto value : initial_state.get_fluent_fterm_values())
+        fterm_values.push_back(value);
+
+    auto fterm_value_views = std::vector<fp::GroundFunctionTermViewValuePair<f::FluentTag>> {};
+    for (const auto value : initial_state.get_fluent_fterm_values_view())
+        fterm_value_views.push_back(value);
+
+    const auto data_state = state_repository->create_state(fluent_facts, fterm_values);
+    const auto view_state = state_repository->create_state(fluent_fact_views, fterm_value_views);
+
+    EXPECT_EQ(data_state.get_index(), initial_state.get_index());
+    EXPECT_EQ(view_state.get_index(), initial_state.get_index());
+    EXPECT_TRUE(ygg::EqualTo<p::StateView<p::GroundTag>> {}(data_state, initial_state));
+    EXPECT_TRUE(ygg::EqualTo<p::StateView<p::GroundTag>> {}(view_state, initial_state));
+    EXPECT_EQ(state_repository->num_states(), 1);
+}
+
+TEST_P(GroundTaskTest, LabeledSuccessorOutputBufferIsReplaced)
+{
+    const auto& param = GetParam();
+    auto execution_context = ygg::ExecutionContext(1);
+    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+
+    auto successor_execution_context = ygg::ExecutionContext::create(1);
+    auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(ground_task, successor_execution_context);
+    auto state_repository = p::StateRepositoryFactory<p::GroundTag>().create(ground_task, axiom_evaluator);
+    auto successor_generator = p::SuccessorGeneratorFactory<p::GroundTag>().create(ground_task, successor_execution_context, state_repository);
+    const auto initial_node = successor_generator->get_initial_node();
+
+    auto out_nodes = p::LabeledNodeList<p::GroundTag> {};
+    successor_generator->get_labeled_successor_nodes(initial_node, out_nodes);
+    ASSERT_EQ(out_nodes.size(), param.expected_successors);
+    ASSERT_FALSE(out_nodes.empty());
+
+    out_nodes.push_back(out_nodes.front());
+    ASSERT_EQ(out_nodes.size(), param.expected_successors + 1);
+
+    successor_generator->get_labeled_successor_nodes(initial_node, out_nodes);
+    EXPECT_EQ(out_nodes.size(), param.expected_successors);
+}
 
 TEST_P(GroundTaskTest, HasExpectedGroundTaskAndSuccessorCounts)
 {

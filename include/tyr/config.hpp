@@ -15,30 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_HEURISTICS_BLIND_HPP_
-#define TYR_PLANNING_HEURISTICS_BLIND_HPP_
+#ifndef TYR_CONFIG_HPP_
+#define TYR_CONFIG_HPP_
 
-#include "tyr/planning/declarations.hpp"
-#include "tyr/planning/heuristic.hpp"
-
-#include <memory>
-
-namespace tyr::planning
-{
-
-template<TaskKind Kind>
-class BlindHeuristic : public Heuristic<Kind>
-{
-public:
-    BlindHeuristic() = default;
-
-    static std::shared_ptr<BlindHeuristic> create() { return std::make_shared<BlindHeuristic>(); }
-
-    void set_goal([[maybe_unused]] ::tyr::formalism::planning::GroundConjunctiveConditionView goal) override {}
-
-    ygg::float_t evaluate([[maybe_unused]] const StateView<Kind>& state) override { return ygg::float_t { 0 }; }
-};
-
-}
+#ifndef TYR_ENABLE_FMT_FORMATTERS
+#define TYR_ENABLE_FMT_FORMATTERS 1
+#endif
 
 #endif

@@ -1,5 +1,5 @@
 """
-Parse and traverse planning formalism structures. 
+Parse and traverse planning formalism structures.
 
 This example demonstrates how to inspect the planning formalism and highlights
 some high-level design choices. The provided type hints make it easy to
@@ -19,10 +19,9 @@ import argparse
 from pathlib import Path
 
 from pytyr.formalism.planning import (
-    ParserOptions, 
+    ParserOptions,
     Parser
 )
-
 
 def main():
     arg_parser = argparse.ArgumentParser(description="Parse and traverse planning formalism structures.")
@@ -30,13 +29,13 @@ def main():
     arg_parser.add_argument("-p", "--task-filepath", type=Path, required=True, help="Path to PDDL task file.")
     args = arg_parser.parse_args()
 
-    domain_filepath : Path = args.domain_filepath
-    task_filepath : Path = args.task_filepath
+    domain_filepath: Path = args.domain_filepath
+    task_filepath: Path = args.task_filepath
 
     parser_options = ParserOptions()
-    parser = Parser(domain_filepath, parser_options)
-    
-    ### 1. Domain: a domain an be shared among arbitrarily many downstream tasks.
+    parser = Parser(str(domain_filepath), parser_options)
+
+    # 1. Domain: a domain can be shared among arbitrarily many downstream tasks.
 
     planning_domain = parser.get_domain()
     formalism_domain = planning_domain.get_domain()
@@ -67,13 +66,13 @@ def main():
     for object in formalism_domain.get_constants():
         print(object.get_name())
 
-    ### 2. Task: a task is expected to be defined over the previously parsed domain.
+    # 2. Task: a task is expected to be defined over the previously parsed domain.
 
-    planning_task = parser.parse_task(task_filepath, parser_options)
+    planning_task = parser.parse_task(str(task_filepath), parser_options)
     formalism_task = planning_task.get_task()
 
     # Ensure that the task is defined over the given input domain
-    assert(formalism_task.get_domain() == formalism_domain)
+    assert formalism_task.get_domain() == formalism_domain
 
     # The separation from above induces a parallel separation for atom, literal, ground atom, and ground literal.
     print("\nStatic initial ground atoms:")
@@ -83,7 +82,7 @@ def main():
     for ground_atom in formalism_task.get_fluent_atoms():
         print(ground_atom.get_predicate(), ground_atom.get_objects())
 
-    # The task may contain task-specific derived predicates, e.g., miconic-fulladl, 
+    # The task may contain task-specific derived predicates, e.g., miconic-fulladl,
     # resulting from the translation of complicated goal, i.e., non-conjunctions of literals.
     print("\nTask-specific derived predicates:")
     for predicate in formalism_task.get_derived_predicates():
@@ -92,7 +91,6 @@ def main():
     print("\nTask-specific axioms:")
     for axiom in formalism_task.get_axioms():
         print(axiom)
-
 
 if __name__ == "__main__":
     main()

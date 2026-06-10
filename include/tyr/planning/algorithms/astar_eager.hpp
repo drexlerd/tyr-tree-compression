@@ -21,9 +21,12 @@
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/declarations.hpp"
 
+#include <chrono>
+#include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
-#include <vector>
+#include <stdexcept>
 
 namespace tyr::planning::astar_eager
 {
@@ -59,7 +62,17 @@ struct Solver
     HeuristicPtr<Kind> heuristic;
     Options<Kind> options;
 
-    SearchResult<Kind> solve() { return find_solution(*task, *successor_generator, *heuristic, options); }
+    SearchResult<Kind> solve()
+    {
+        if (!task)
+            throw std::invalid_argument("astar_eager::Solver::solve(): task is required.");
+        if (!successor_generator)
+            throw std::invalid_argument("astar_eager::Solver::solve(): successor generator is required.");
+        if (!heuristic)
+            throw std::invalid_argument("astar_eager::Solver::solve(): heuristic is required.");
+
+        return find_solution(*task, *successor_generator, *heuristic, options);
+    }
 };
 
 }

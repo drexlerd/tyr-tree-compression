@@ -20,12 +20,12 @@
 #ifndef TYR_FORMALISM_DATALOG_CANONICALIZATION_HPP_
 #define TYR_FORMALISM_DATALOG_CANONICALIZATION_HPP_
 
-#include <yggdrasil/semantics/canonicalization.hpp>
-#include <yggdrasil/semantics/comparators.hpp>
 #include "tyr/formalism/canonicalization.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 
 #include <algorithm>
+#include <yggdrasil/semantics/canonicalization.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 
 namespace tyr::formalism::datalog
 {
@@ -180,7 +180,7 @@ void canonicalize(ygg::Data<UnaryOperator<Op, T>>& data)
 template<OpKind Op, typename T>
 void canonicalize(ygg::Data<BinaryOperator<Op, T>>& data)
 {
-    // Canonicalization for commutative operator in spezializations
+    // Canonicalization for commutative operator in specializations
 }
 
 template<typename T>
@@ -200,7 +200,7 @@ void canonicalize(ygg::Data<BinaryOperator<Mul, T>>& data)
 template<OpKind Op, typename T>
 void canonicalize(ygg::Data<MultiOperator<Op, T>>& data)
 {
-    // Canonicalization for commutative operator in spezializations
+    // Canonicalization for commutative operator in specializations
 }
 
 template<typename T>

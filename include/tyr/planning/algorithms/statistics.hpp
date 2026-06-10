@@ -19,9 +19,8 @@
 #define TYR_PLANNING_ALGORITHMS_STATISTICS_HPP_
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
-#include <map>
-#include <ostream>
 #include <vector>
 
 namespace tyr::planning
@@ -40,6 +39,16 @@ private:
 
 public:
     Statistics() : m_num_generated(0), m_num_expanded(0), m_num_deadends(0), m_num_pruned(0) {}
+
+    void clear() noexcept
+    {
+        m_num_generated = 0;
+        m_num_expanded = 0;
+        m_num_deadends = 0;
+        m_num_pruned = 0;
+        m_search_start_time_point = {};
+        m_search_end_time_point = {};
+    }
 
     /**
      * Setters
@@ -92,11 +101,16 @@ public:
         uint64_t get_num_pruned() const { return m_num_pruned; }
     };
 
-    void add_snap_shot(const Statistics& statistics)
+    void add_snapshot(const Statistics& statistics)
     {
         m_snapshots.push_back(
             Snapshot(statistics.get_num_generated(), statistics.get_num_expanded(), statistics.get_num_deadends(), statistics.get_num_pruned()));
     }
+
+    void add_snap_shot(const Statistics& statistics) { add_snapshot(statistics); }
+    void clear() noexcept { m_snapshots.clear(); }
+    bool empty() const noexcept { return m_snapshots.empty(); }
+    size_t size() const noexcept { return m_snapshots.size(); }
 
     const auto& get_snapshots() const { return m_snapshots; }
 

@@ -18,15 +18,14 @@
 #ifndef TYR_PLANNING_HEURISTIC_HPP_
 #define TYR_PLANNING_HEURISTIC_HPP_
 
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task/state_view.hpp"
 #include "tyr/planning/lifted_task/state_view.hpp"
+
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {
@@ -53,7 +52,7 @@ public:
         return actions;
     }
 
-    virtual void print_summary(size_t verbosity) const {}
+    virtual void print_summary([[maybe_unused]] size_t verbosity) const {}
 };
 
 }
