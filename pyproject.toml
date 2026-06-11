@@ -1,15 +1,15 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
-    "pyyggdrasil>=0.0.14,<0.1",
-    "pypddl>=1.0.9,<1.1",
+    "pyyggdrasil>=0.0.15,<0.1",
+    "pypddl>=1.0.10,<1.1",
 ]
 build-backend = "pytyr_build_backend"
 backend-path = ["python"]
 
 [project]
 name = "pytyr"
-version = "0.0.22"
+version = "0.0.23"
 description = "Tyr datalog/planning library"
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -18,8 +18,8 @@ authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
 ]
 dependencies = [
-    "pyyggdrasil>=0.0.14,<0.1",
-    "pypddl>=1.0.9,<1.1",
+    "pyyggdrasil>=0.0.15,<0.1",
+    "pypddl>=1.0.10,<1.1",
 ]
 
 [project.urls]
@@ -67,7 +67,7 @@ TYR_HEADER_INSTANTIATION = {env = "TYR_HEADER_INSTANTIATION", default = "OFF"}
 
 [tool.cibuildwheel]
 container-engine = "docker"
-before-build = "python -m pip install --no-cache-dir 'pyyggdrasil>=0.0.14,<0.1' 'pypddl>=1.0.9,<1.1'"
+before-build = "python -m pip install --no-cache-dir 'pyyggdrasil>=0.0.15,<0.1' 'pypddl>=1.0.10,<1.1'"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "LD_LIBRARY_PATH=$(python -c 'import os, pypddl, pyyggdrasil; prefixes = [pypddl.native_prefix(), pyyggdrasil.native_prefix()]; print(os.pathsep.join(str(path) for prefix in prefixes for path in sorted(prefix.glob(\"lib*\")) if path.is_dir()))') auditwheel repair -w {dest_dir} {wheel}"
