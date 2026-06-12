@@ -13,7 +13,7 @@ set(PYTYR_NATIVE_LIBDIR "${PYTYR_NATIVE_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(PYTYR_NATIVE_BINDIR "${PYTYR_NATIVE_DIR}/${CMAKE_INSTALL_BINDIR}")
 set(PYTYR_NATIVE_CMAKEDIR "${PYTYR_NATIVE_LIBDIR}/cmake")
 
-nanobind_add_module(_pytyr
+nanobind_add_module(_pytyr NB_SHARED
     module.cpp
     pytyr/module.cpp
     pytyr/formalism/module.cpp
@@ -43,15 +43,15 @@ target_link_libraries(_pytyr PRIVATE tyr::core TBB::tbb)
 target_include_directories(_pytyr PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(APPLE)
-    tyr_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "@loader_path" "../")
+    yggdrasil_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "@loader_path" "../")
     list(APPEND PYTYR_MODULE_RPATH "@loader_path/native/${CMAKE_INSTALL_LIBDIR}")
-    tyr_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "@loader_path" "../../../")
-    tyr_make_python_native_runtime_rpaths(PYTYR_INSTALL_NATIVE_LIBRARY_RPATHS "@loader_path" "../../../")
+    yggdrasil_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "@loader_path" "../../../")
+    yggdrasil_make_python_native_runtime_rpaths(PYTYR_INSTALL_NATIVE_LIBRARY_RPATHS "@loader_path" "../../../")
 elseif(UNIX)
-    tyr_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "$ORIGIN" "../")
+    yggdrasil_make_python_native_runtime_rpaths(PYTYR_MODULE_RPATH "$ORIGIN" "../")
     list(APPEND PYTYR_MODULE_RPATH "$ORIGIN/native/${CMAKE_INSTALL_LIBDIR}")
-    tyr_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "$ORIGIN" "../../../")
-    tyr_make_python_native_runtime_rpath_string(PYTYR_INSTALL_NATIVE_LIBRARY_RPATH "$ORIGIN" "../../../")
+    yggdrasil_make_python_native_runtime_rpaths(PYTYR_CORE_RPATH "$ORIGIN" "../../../")
+    yggdrasil_make_python_native_runtime_rpath_string(PYTYR_INSTALL_NATIVE_LIBRARY_RPATH "$ORIGIN" "../../../")
 endif()
 
 if(PYTYR_MODULE_RPATH)
@@ -63,7 +63,7 @@ endif()
 install(TARGETS _pytyr DESTINATION "pytyr" COMPONENT pytyr)
 set_property(TARGET core PROPERTY INTERFACE_INCLUDE_DIRECTORIES
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-    "$<BUILD_INTERFACE:${TYR_NATIVE_DEPENDENCY_INCLUDE_DIRECTORIES}>")
+    "$<BUILD_INTERFACE:${YGGDRASIL_NATIVE_DEPENDENCY_INCLUDE_DIRECTORIES}>")
 set_property(TARGET core PROPERTY INSTALL_RPATH "${PYTYR_CORE_RPATH}")
 install(TARGETS core
         EXPORT pytyrTyrcoreTargets

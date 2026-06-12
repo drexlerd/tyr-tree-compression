@@ -10,7 +10,7 @@ find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(nanobind CONFIG REQUIRED)
 find_package(tyr CONFIG REQUIRED COMPONENTS core)
 
-nanobind_add_module(_downstream_tyr src/downstream_tyr_user/_downstream_tyr.cpp)
+nanobind_add_module(_downstream_tyr NB_SHARED src/downstream_tyr_user/_downstream_tyr.cpp)
 target_link_libraries(_downstream_tyr PRIVATE tyr::core)
 
 if(DOWNSTREAM_RUNTIME_LIBRARY_DIRS)
