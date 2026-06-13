@@ -1,8 +1,8 @@
-find_package(Python 3.8 REQUIRED
+find_package(Python 3.9 REQUIRED
   COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
 
-find_package(nanobind CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH})
+find_package(nanobind CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 message(STATUS "Found nanobind: ${nanobind_DIR} (found version ${nanobind_VERSION})")
 
 yggdrasil_python_package_init(PYTYR pytyr)
@@ -83,6 +83,7 @@ yggdrasil_install_provider_env(PYTYR pytyr
 
 yggdrasil_install_python_stubs(PYTYR pytyr
     MODULE pytyr._pytyr
+    PRIVATE_MODULE _pytyr
     RENAME_PACKAGES pytyr pypddl pyyggdrasil)
 
 add_custom_target(pytyr_wheel DEPENDS _pytyr)

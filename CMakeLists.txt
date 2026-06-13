@@ -196,8 +196,8 @@ endif()
 yggdrasil_find_python_native_prefix(pypddl PYPDDL_NATIVE_PREFIX)
 yggdrasil_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
 yggdrasil_register_native_dependency_prefix("${PYPDDL_NATIVE_PREFIX}")
-yggdrasil_register_python_native_runtime_prefix("pypddl/native")
-yggdrasil_register_python_native_runtime_prefix("pyyggdrasil")
+yggdrasil_register_python_native_runtime_prefix("pypddl/native" "${PYPDDL_NATIVE_PREFIX}")
+yggdrasil_register_python_native_runtime_prefix("pyyggdrasil" "${YGGDRASIL_NATIVE_PREFIX}")
 
 # -----
 # argparse
