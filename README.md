@@ -111,12 +111,13 @@ auto labeled_successor_nodes = successor_generator->get_labeled_successor_nodes(
 
 Tyr consumes native dependencies from Python packages:
 
-- `pyyggdrasil >= 0.0.15, < 0.1` for shared third-party native dependencies.
-- `pypddl >= 1.0.10, < 1.1` for Loki's PDDL parser library, headers, and CMake package.
+- `pyyggdrasil >= 0.0.17, < 0.1` for shared third-party native dependencies.
+- `pypddl >= 1.0.11, < 1.1` for Loki's PDDL parser library, headers, and CMake package.
 
-The shared workspace layout and general Python/CMake integration pattern are
-documented in the
-[Planning and Learning build instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#local-development).
+The shared workspace layout, layered install order, and the common
+build-from-source and CMake-integration patterns are documented in the
+[Planning and Learning build instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#building-from-source);
+the sections below cover `tyr`/`pytyr`-specific details.
 
 ## Build C++
 
@@ -134,9 +135,10 @@ cmake --build build -j4
 ```
 
 CMake discovers the installed provider packages automatically through
-`cmake/find_python_native_packages.cmake` and links against the
-`yggdrasil::yggdrasil` and `loki::parsers` targets. To point at different
-prefixes explicitly:
+`cmake/bootstrap_pyyggdrasil.cmake` (which locates `pyyggdrasil` and adds its
+native prefix to `CMAKE_PREFIX_PATH`; `find_package(yggdrasil)` then resolves
+the rest of the chain) and links against the `yggdrasil::yggdrasil` and
+`loki::parsers` targets. To point at different prefixes explicitly:
 
 ```console
 cmake -S . -B build \
@@ -175,6 +177,10 @@ pytest python/tests
 ```
 
 ## CMake Integration
+
+This section covers `pytyr`-specific paths and targets; the general pattern for
+consuming the native prefixes from CMake is in the
+[common CMake integration instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#cmake-integration).
 
 The Python package `pytyr` installs Tyr's native headers, shared library, and
 CMake package config under `pytyr.native_prefix()`. Use `pytyr.cmake_prefix()`
