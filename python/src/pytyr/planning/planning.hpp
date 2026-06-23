@@ -76,7 +76,7 @@ private:
 };
 
 template<typename Value, typename Range>
-nb::object make_owning_iterator(nb::handle scope, const char* name, Range range)
+nb::typed<nb::iterator, Value> make_owning_iterator(nb::handle scope, const char* name, Range range)
 {
     using Iterator = OwningIterator<Range, Value>;
 
@@ -87,7 +87,7 @@ nb::object make_owning_iterator(nb::handle scope, const char* name, Range range)
             .def("__next__", &Iterator::next, nb::rv_policy::copy);
     }
 
-    return nb::cast(Iterator(std::move(range)));
+    return nb::borrow<nb::typed<nb::iterator, Value>>(nb::cast(Iterator(std::move(range))));
 }
 
 template<TaskKind Kind>
