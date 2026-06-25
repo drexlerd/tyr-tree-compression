@@ -18,15 +18,14 @@
 #ifndef TYR_PLANNING_DECLARATIONS_HPP_
 #define TYR_PLANNING_DECLARATIONS_HPP_
 
-#include <yggdrasil/execution/onetbb.hpp>
-#include <yggdrasil/containers/optional.hpp>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
-#include <yggdrasil/containers/variant.hpp>
-#include <yggdrasil/containers/vector.hpp>
-
 #include <concepts>
 #include <memory>
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <yggdrasil/execution/onetbb.hpp>
 
 namespace tyr
 {
@@ -36,7 +35,6 @@ struct Builder;
 
 namespace tyr::planning
 {
-
 
 struct GroundTag
 {
@@ -111,6 +109,10 @@ template<TaskKind Kind>
 class MaxRPGHeuristic;
 template<TaskKind Kind>
 using MaxRPGHeuristicPtr = std::shared_ptr<MaxRPGHeuristic<Kind>>;
+template<TaskKind Kind>
+class LMCutHeuristic;
+template<TaskKind Kind>
+using LMCutHeuristicPtr = std::shared_ptr<LMCutHeuristic<Kind>>;
 
 template<TaskKind Kind>
 class PruningStrategy;

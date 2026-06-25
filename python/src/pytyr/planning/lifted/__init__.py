@@ -29,6 +29,7 @@ from ..._pytyr.planning.lifted import (
     MaxRPGHeuristic,
     AddRPGHeuristic,
     FFRPGHeuristic,
+    LMCutHeuristic,
     GoalCountHeuristic,
 )
 

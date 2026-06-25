@@ -106,6 +106,7 @@ should not be used further.
     bind_rpg_max_heuristic<LiftedTag>(m, "MaxRPGHeuristic");
     bind_rpg_add_heuristic<LiftedTag>(m, "AddRPGHeuristic");
     bind_rpg_ff_heuristic<LiftedTag>(m, "FFRPGHeuristic");
+    bind_lmcut_heuristic<LiftedTag>(m, "LMCutHeuristic");
     bind_goal_count_heuristic<LiftedTag>(m, "GoalCountHeuristic");
 }
 

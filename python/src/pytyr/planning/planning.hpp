@@ -480,6 +480,18 @@ void bind_rpg_ff_heuristic(nb::module_& m, const std::string& name)
              "execution_context"_a);
 }
 
+template<TaskKind Kind>
+void bind_lmcut_heuristic(nb::module_& m, const std::string& name)
+{
+    using T = LMCutHeuristic<Kind>;
+
+    nb::class_<T, Heuristic<Kind>>(m, name.c_str())  //
+        .def(nb::new_([](TaskPtr<Kind> task, std::shared_ptr<ygg::ExecutionContext> execution_context)
+                      { return T::create(std::move(task), std::move(execution_context)); }),
+             "task"_a,
+             "execution_context"_a);
+}
+
 }  // namespace tyr::planning
 
 #endif

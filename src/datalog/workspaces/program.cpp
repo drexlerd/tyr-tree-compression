@@ -27,8 +27,13 @@ namespace fd = tyr::formalism::datalog;
 
 namespace tyr::datalog
 {
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-ProgramWorkspace<OrAP, AndAP, TP>::ProgramWorkspace(ProgramContext& context, const ConstProgramWorkspace& cws, OrAP or_ap, AndAP and_ap, TP tp) :
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+ProgramWorkspace<OrAP, AndAP, TP, CP>::ProgramWorkspace(ProgramContext& context,
+                                                        const ConstProgramWorkspace& cws,
+                                                        OrAP or_ap,
+                                                        AndAP and_ap,
+                                                        TP tp,
+                                                        CP cost_policy) :
     program_repository(context.get_program_repository()),
     workspace_repository(context.get_workspace_repository()),
     facts(context.get_program().get_predicates<::tyr::formalism::FluentTag>(),
@@ -44,6 +49,7 @@ ProgramWorkspace<OrAP, AndAP, TP>::ProgramWorkspace(ProgramContext& context, con
     numeric_and_annot(),
     numeric_support_selector(),
     tp(tp),
+    cost_policy(std::move(cost_policy)),
     rules(),
     planning_builder(),
     datalog_builder(),
@@ -56,9 +62,10 @@ ProgramWorkspace<OrAP, AndAP, TP>::ProgramWorkspace(ProgramContext& context, con
     statistics()
 {
     for (ygg::uint_t i = 0; i < context.get_program().get_rules().size(); ++i)
-        rules.emplace_back(cws.rules[i].has_value() ?
-                               std::make_unique<RuleWorkspace<AndAP>>(context.get_repository_factory(), program_repository, workspace_repository, *cws.rules[i], and_ap) :
-                               nullptr);
+        rules.emplace_back(
+            cws.rules[i].has_value() ?
+                std::make_unique<RuleWorkspace<AndAP>>(context.get_repository_factory(), program_repository, workspace_repository, *cws.rules[i], and_ap) :
+                nullptr);
 }
 
 template struct ProgramWorkspace<NoOrAnnotationPolicy, NoAndAnnotationPolicy, NoTerminationPolicy>;
@@ -66,6 +73,15 @@ template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<SumAggr
 template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<SumAggregation>, TerminationPolicy<SumAggregation>>;
 template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, NoTerminationPolicy>;
 template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, TerminationPolicy<MaxAggregation>>;
+template struct ProgramWorkspace<NoOrAnnotationPolicy, NoAndAnnotationPolicy, NoTerminationPolicy, RuleBindingCostOverridePolicy>;
+template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<SumAggregation>, NoTerminationPolicy, RuleBindingCostOverridePolicy>;
+template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<SumAggregation>, TerminationPolicy<SumAggregation>, RuleBindingCostOverridePolicy>;
+template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, NoTerminationPolicy, RuleBindingCostOverridePolicy>;
+template struct ProgramWorkspace<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, TerminationPolicy<MaxAggregation>, RuleBindingCostOverridePolicy>;
+template struct ProgramWorkspace<OrAnnotationPolicy,
+                                 AchieverAndAnnotationPolicy<MaxAggregation>,
+                                 TerminationPolicy<MaxAggregation>,
+                                 RuleBindingCostOverridePolicy>;
 
 ConstProgramWorkspace::ConstProgramWorkspace(ProgramContext& context) :
     facts(context.get_program().get_predicates<::tyr::formalism::StaticTag>(),

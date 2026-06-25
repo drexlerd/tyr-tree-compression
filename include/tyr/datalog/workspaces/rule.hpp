@@ -18,10 +18,6 @@
 #ifndef TYR_DATALOG_WORKSPACES_RULE_HPP_
 #define TYR_DATALOG_WORKSPACES_RULE_HPP_
 
-#include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/core/closed_interval.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/datalog/consistency_graph.hpp"
 #include "tyr/datalog/delta_kpkc.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
@@ -40,10 +36,14 @@
 #include <oneapi/tbb/enumerable_thread_specific.h>
 #include <oneapi/tbb/spin_mutex.h>
 #include <tuple>
-#include <utility>
 #include <type_traits>
+#include <utility>
 #include <variant>
 #include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::datalog
 {
@@ -65,7 +65,9 @@ struct FunctionHeadUpdate
     ygg::ClosedInterval<ygg::float_t> interval;
     Cost cost;
 
-    FunctionHeadUpdate(ygg::Index<::tyr::formalism::Row> row, ygg::ClosedInterval<ygg::float_t> interval, Cost cost) : row(row), interval(interval), cost(cost) {}
+    FunctionHeadUpdate(ygg::Index<::tyr::formalism::Row> row, ygg::ClosedInterval<ygg::float_t> interval, Cost cost) : row(row), interval(interval), cost(cost)
+    {
+    }
 
     auto identifying_members() const noexcept { return std::tie(row, interval, cost); }
 };
@@ -263,12 +265,8 @@ RuleWorkspace<AndAP>::Iteration::Iteration(::tyr::formalism::datalog::Repository
             }
             else
             {
-                return visit(
-                    [](auto&& effect) -> RuleHeadIteration
-                    {
-                        return FunctionHeadIteration(effect.get_fterm().get_function().get_index());
-                    },
-                    head.get_variant());
+                return visit([](auto&& effect) -> RuleHeadIteration { return FunctionHeadIteration(effect.get_fterm().get_function().get_index()); },
+                             head.get_variant());
             }
         },
         cws.get_rule().get_head())),
@@ -308,6 +306,7 @@ void RuleWorkspace<AndAP>::Solve::clear() noexcept
     seen_bindings_dbg.clear();
     pending_rule_bindings.clear();
     numeric_support_selector_workspace.clear();
+    and_ap.clear_achievers();
 }
 
 template<typename AndAP>
@@ -338,8 +337,8 @@ RuleWorkspace<AndAP>::RuleWorkspace(::tyr::formalism::datalog::RepositoryFactory
                                     const ConstRuleWorkspace& cws_,
                                     const AndAP& and_ap_) :
     common(program_repository_, workspace_repository_, cws_.get_static_consistency_graph()),
-    worker([this, program_repository = &program_repository_, workspace_repository = &workspace_repository_, factory = &factory_, cws = &cws_, and_ap = &and_ap_]
-           { return Worker(*factory, *program_repository, *workspace_repository, *cws, this->common, *and_ap); })
+    worker([this, program_repository = &program_repository_, workspace_repository = &workspace_repository_, factory = &factory_, cws = &cws_, and_ap = and_ap_]
+           { return Worker(*factory, *program_repository, *workspace_repository, *cws, this->common, and_ap); })
 {
 }
 

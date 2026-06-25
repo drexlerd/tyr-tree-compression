@@ -52,6 +52,7 @@
 #include "tyr/planning/heuristics/goal_count.hpp"
 #include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/lifted_task/axiom_evaluator.hpp"
+#include "tyr/planning/lifted_task/heuristics/lmcut.hpp"
 #include "tyr/planning/lifted_task/heuristics/rpg_add.hpp"
 #include "tyr/planning/lifted_task/heuristics/rpg_ff.hpp"
 #include "tyr/planning/lifted_task/heuristics/rpg_max.hpp"

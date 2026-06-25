@@ -18,22 +18,24 @@
 #ifndef TYR_DATALOG_CONTEXTS_PROGRAM_HPP_
 #define TYR_DATALOG_CONTEXTS_PROGRAM_HPP_
 
-#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/datalog/contexts/stratum.hpp"
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
+#include "tyr/datalog/policies/cost.hpp"
+#include "tyr/datalog/policies/cost_concept.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
 #include "tyr/datalog/workspaces/rule.hpp"
 
-#include <ranges>
 #include <cassert>
+#include <ranges>
+#include <yggdrasil/execution/onetbb.hpp>
 
 namespace tyr::datalog
 {
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP = LiftedRuleCostPolicy>
 struct ProgramExecutionContext
 {
     class In
@@ -51,7 +53,7 @@ struct ProgramExecutionContext
     class Out
     {
     public:
-        explicit Out(ProgramWorkspace<OrAP, AndAP, TP>& ws) : m_ws(ws) {}
+        explicit Out(ProgramWorkspace<OrAP, AndAP, TP, CP>& ws) : m_ws(ws) {}
 
         auto& facts() noexcept { return m_ws.facts; }
         const auto& facts() const noexcept { return m_ws.facts; }
@@ -72,6 +74,8 @@ struct ProgramExecutionContext
         }
         auto& tp() noexcept { return m_ws.tp; }
         const auto& tp() const noexcept { return m_ws.tp; }
+        auto& cost_policy() noexcept { return m_ws.cost_policy; }
+        const auto& cost_policy() const noexcept { return m_ws.cost_policy; }
         auto& rules() noexcept { return m_ws.rules; }
         const auto& rules() const noexcept { return m_ws.rules; }
         auto& datalog_builder() noexcept { return m_ws.datalog_builder; }
@@ -86,10 +90,10 @@ struct ProgramExecutionContext
         const auto& statistics() const noexcept { return m_ws.statistics; }
 
     private:
-        ProgramWorkspace<OrAP, AndAP, TP>& m_ws;
+        ProgramWorkspace<OrAP, AndAP, TP, CP>& m_ws;
     };
 
-    ProgramExecutionContext(ProgramWorkspace<OrAP, AndAP, TP>& ws, const ConstProgramWorkspace& cws) : m_in(cws), m_out(ws) {}
+    ProgramExecutionContext(ProgramWorkspace<OrAP, AndAP, TP, CP>& ws, const ConstProgramWorkspace& cws) : m_in(cws), m_out(ws) {}
 
     /**
      * Initialization
@@ -147,7 +151,7 @@ struct ProgramExecutionContext
     auto get_stratum_execution_contexts()
     {
         return out().schedulers().data
-               | std::views::transform([this](RuleSchedulerStratum& scheduler) { return StratumExecutionContext<OrAP, AndAP, TP> { scheduler, *this }; });
+               | std::views::transform([this](RuleSchedulerStratum& scheduler) { return StratumExecutionContext<OrAP, AndAP, TP, CP> { scheduler, *this }; });
     }
 
     const auto& in() const noexcept { return m_in; }

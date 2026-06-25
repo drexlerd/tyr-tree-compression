@@ -21,31 +21,33 @@
 #include "tyr/datalog/contexts/rule.hpp"
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
+#include "tyr/datalog/policies/cost.hpp"
+#include "tyr/datalog/policies/cost_concept.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 
 namespace tyr::datalog
 {
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
 struct ProgramExecutionContext;
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
 struct StratumExecutionContext
 {
     class In
     {
     public:
-        explicit In(const ProgramExecutionContext<OrAP, AndAP, TP>& ctx) : m_ctx(ctx) {}
+        explicit In(const ProgramExecutionContext<OrAP, AndAP, TP, CP>& ctx) : m_ctx(ctx) {}
 
         const auto& program() const noexcept { return m_ctx.in(); }
 
     private:
-        const ProgramExecutionContext<OrAP, AndAP, TP>& m_ctx;
+        const ProgramExecutionContext<OrAP, AndAP, TP, CP>& m_ctx;
     };
 
     class Out
     {
     public:
-        Out(RuleSchedulerStratum& scheduler, ProgramExecutionContext<OrAP, AndAP, TP>& ctx) : m_scheduler(scheduler), m_ctx(ctx) {}
+        Out(RuleSchedulerStratum& scheduler, ProgramExecutionContext<OrAP, AndAP, TP, CP>& ctx) : m_scheduler(scheduler), m_ctx(ctx) {}
 
         auto& scheduler() noexcept { return m_scheduler; }
         const auto& scheduler() const noexcept { return m_scheduler; }
@@ -54,14 +56,10 @@ struct StratumExecutionContext
 
     private:
         RuleSchedulerStratum& m_scheduler;
-        ProgramExecutionContext<OrAP, AndAP, TP>& m_ctx;
+        ProgramExecutionContext<OrAP, AndAP, TP, CP>& m_ctx;
     };
 
-    StratumExecutionContext(RuleSchedulerStratum& scheduler, ProgramExecutionContext<OrAP, AndAP, TP>& ctx) :
-        m_in(ctx),
-        m_out(scheduler, ctx)
-    {
-    }
+    StratumExecutionContext(RuleSchedulerStratum& scheduler, ProgramExecutionContext<OrAP, AndAP, TP, CP>& ctx) : m_in(ctx), m_out(scheduler, ctx) {}
 
     /**
      * Initialization
@@ -71,7 +69,7 @@ struct StratumExecutionContext
      * Subcontext
      */
 
-    auto get_rule_execution_context(ygg::Index<::tyr::formalism::datalog::Rule> rule) { return RuleExecutionContext<OrAP, AndAP, TP> { rule, *this }; }
+    auto get_rule_execution_context(ygg::Index<::tyr::formalism::datalog::Rule> rule) { return RuleExecutionContext<OrAP, AndAP, TP, CP> { rule, *this }; }
 
     const auto& in() const noexcept { return m_in; }
     auto& out() noexcept { return m_out; }

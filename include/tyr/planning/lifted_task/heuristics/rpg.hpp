@@ -18,25 +18,32 @@
 #ifndef TYR_PLANNING_LIFTED_TASK_HEURISTICS_RPG_HPP_
 #define TYR_PLANNING_LIFTED_TASK_HEURISTICS_RPG_HPP_
 
-#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/datalog/bottom_up.hpp"
 #include "tyr/datalog/contexts/program.hpp"
 #include "tyr/datalog/formatter.hpp"
+#include "tyr/datalog/policies/cost.hpp"
+#include "tyr/datalog/policies/cost_concept.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
+#include "tyr/formalism/datalog/grounder.hpp"
+#include "tyr/formalism/planning/grounder.hpp"
+#include "tyr/formalism/planning/merge_datalog.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/heuristic.hpp"
 #include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/lifted_task/state_data.hpp"
 #include "tyr/planning/lifted_task/state_view.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
 #include "tyr/planning/task_utils.hpp"
 
+#include <cassert>
 #include <fmt/ostream.h>
+#include <optional>
+#include <yggdrasil/execution/onetbb.hpp>
 
 namespace tyr::planning
 {
 
-template<typename Derived, typename OrAP, typename AndAP, typename TP>
+template<typename Derived, typename OrAP, typename AndAP, typename TP, datalog::CostPolicyConcept CP = datalog::LiftedRuleCostPolicy>
 class RPGBase : public Heuristic<LiftedTag>
 {
 private:
@@ -57,7 +64,8 @@ public:
     {
         auto merge_context = ::tyr::formalism::planning::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
         const auto& p2d = m_task->get_rpg_program().get_translation_context().p2d;
-        m_workspace.tp.set_goals(::tyr::formalism::planning::merge_p2d(goal, p2d.fluent_to_fluent_predicate, p2d.derived_to_fluent_predicate, merge_context).first);
+        m_workspace.tp.set_goals(
+            ::tyr::formalism::planning::merge_p2d(goal, p2d.fluent_to_fluent_predicate, p2d.derived_to_fluent_predicate, merge_context).first);
     }
 
     ygg::float_t evaluate(const StateView<LiftedTag>& state) override
@@ -86,6 +94,120 @@ public:
 
     const auto& get_workspace() const noexcept { return m_workspace; }
 
+protected:
+    void set_action_binding_cost(::tyr::formalism::planning::ActionBindingView action_binding, datalog::Cost cost)
+        requires datalog::MutableCostPolicyConcept<CP>
+    {
+        const auto action = action_binding.get_relation();
+        const auto objects = action_binding.get_data();
+        const auto& rule_to_action = m_task->get_rpg_program().get_rule_to_action_mapping();
+        for (const auto& [rule, mapped_action] : rule_to_action)
+        {
+            if (mapped_action.get_index() != action.get_index())
+                continue;
+
+            if constexpr (requires(CP& cost_policy,
+                                   ::tyr::formalism::datalog::RuleView rule_view,
+                                   std::span<const ygg::Index<::tyr::formalism::Object>> prefix_objects,
+                                   datalog::Cost prefix_cost) { cost_policy.set_prefix_cost(rule_view, prefix_objects, prefix_cost); })
+            {
+                m_workspace.binding.clear();
+                for (const auto object : objects)
+                    m_workspace.binding.push_back(object);
+                m_workspace.cost_policy.set_prefix_cost(
+                    rule,
+                    std::span<const ygg::Index<::tyr::formalism::Object>>(m_workspace.binding.data(), m_workspace.binding.size()),
+                    cost);
+            }
+            else
+            {
+                assert(rule.get_arity() == objects.size());
+
+                auto grounder_context =
+                    ::tyr::formalism::datalog::GrounderContext { m_workspace.datalog_builder, m_workspace.workspace_repository, m_workspace.binding };
+                m_workspace.binding.clear();
+                for (const auto object : objects)
+                    m_workspace.binding.push_back(object);
+                const auto rule_binding = ::tyr::formalism::datalog::ground_binding(rule, grounder_context).first;
+                m_workspace.cost_policy.set_cost(rule_binding, cost);
+            }
+        }
+    }
+
+    datalog::Cost get_binding_cost(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> binding) const noexcept
+    {
+        const auto* annotation = m_workspace.and_annot.find(binding);
+        return annotation ? datalog::get_cost(*annotation) : datalog::Cost(0);
+    }
+
+    datalog::Cost get_goal_cost() const noexcept
+    {
+        return m_workspace.tp.get_total_cost(
+            datalog::FactSets { m_task->get_rpg_program().get_const_program_workspace().facts.fact_sets, m_workspace.facts.fact_sets },
+            m_workspace.and_annot,
+            m_workspace.numeric_and_annot,
+            *m_workspace.numeric_support_selector);
+    }
+
+    std::optional<::tyr::formalism::planning::ActionBindingView> get_action_binding(const datalog::WitnessAnnotation& witness)
+    {
+        const auto rule_binding = witness.get_rule_row();
+        const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_program_context().get_program_repository());
+        const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
+        const auto it = mapping.find(rule);
+        if (it == mapping.end())
+            return std::nullopt;
+
+        auto grounder_context = ::tyr::formalism::planning::GrounderContext { m_workspace.planning_builder, *m_task->get_repository(), m_workspace.binding };
+        m_workspace.binding.clear();
+        for (const auto object : rule_binding.get_objects())
+            m_workspace.binding.push_back(object.get_index());
+        return ::tyr::formalism::planning::ground(it->second, grounder_context).first;
+    }
+
+    template<typename Callback>
+    void for_each_witness_precondition(const datalog::WitnessAnnotation& witness, Callback&& callback)
+    {
+        const auto rule_binding = witness.get_rule_row();
+        const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_program_context().get_program_repository());
+        const auto row = rule_binding.get_objects();
+        const auto& const_rule_workspace = *m_task->get_rpg_program().get_const_program_workspace().rules[ygg::uint_t(rule.get_index())];
+        const auto witness_condition = const_rule_workspace.get_witness_rule().get_body();
+        auto grounder_context =
+            ::tyr::formalism::datalog::GrounderContext { m_workspace.datalog_builder, m_workspace.workspace_repository, m_workspace.binding };
+
+        for (const auto literal : witness_condition.template get_literals<::tyr::formalism::FluentTag>())
+        {
+            if (!literal.get_polarity())
+                continue;
+
+            m_workspace.binding.clear();
+            for (const auto object : row)
+                m_workspace.binding.push_back(object.get_index());
+            const auto atom = ::tyr::formalism::datalog::ground(literal.get_atom(), grounder_context).first;
+            callback(atom.get_row());
+        }
+    }
+
+    template<typename Callback>
+    void for_each_achiever(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> binding, Callback&& callback)
+        requires requires(const AndAP& and_ap, ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> head) { and_ap.find_achievers(head); }
+    {
+        for (const auto& rule : m_workspace.rules)
+        {
+            for (const auto& worker : rule->worker)
+            {
+                const auto* achievers = worker.solve.and_ap.find_achievers(binding);
+                if (!achievers)
+                    continue;
+
+                for (const auto& achiever : *achievers)
+                    callback(achiever);
+            }
+        }
+    }
+
+public:
     void print_summary(size_t verbosity) const override
     {
         if (verbosity < 1)
@@ -108,7 +230,7 @@ protected:
     TaskPtr<LiftedTag> m_task;
     ygg::ExecutionContextPtr m_execution_context;
 
-    datalog::ProgramWorkspace<OrAP, AndAP, TP> m_workspace;
+    datalog::ProgramWorkspace<OrAP, AndAP, TP, CP> m_workspace;
 };
 
 }

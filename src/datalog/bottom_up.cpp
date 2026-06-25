@@ -17,14 +17,6 @@
 
 #include "tyr/datalog/bottom_up.hpp"
 
-#include <yggdrasil/core/chrono.hpp>
-#include <yggdrasil/semantics/comparators.hpp>
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/formatting/formatter.hpp>
-#include <yggdrasil/semantics/hash.hpp>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/applicability.hpp"
 #include "tyr/datalog/assignment_sets.hpp"
 #include "tyr/datalog/consistency_graph.hpp"
@@ -62,12 +54,24 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/chrono.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/formatting/formatter.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace f = tyr::formalism;
 namespace fd = tyr::formalism::datalog;
 
 namespace tyr::datalog
 {
+
+template<typename AndAP>
+constexpr bool records_propositional_achievers =
+    requires(const AndAP& and_ap, ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> head) { and_ap.find_achievers(head); };
 
 static void create_nullary_binding(ygg::IndexList<f::Object>& binding) { binding.clear(); }
 
@@ -86,93 +90,128 @@ static void create_general_binding(std::span<const kpkc::Vertex> clique, const S
     }
 }
 
-template<AndAnnotationPolicyConcept AndAP>
+template<AndAnnotationPolicyConcept AndAP, CostPolicyConcept CP>
+struct RuleUpdateInput
+{
+    fd::RuleView rule;
+    fd::ConjunctiveConditionView witness_condition;
+    const NumericSupportSelector& numeric_support_selector;
+    NumericSupportSelectorWorkspace& numeric_support_selector_workspace;
+    Cost current_cost;
+    const SelectedPredicateAnnotations& program_and_annot;
+    const SelectedFunctionAnnotations& program_numeric_and_annot;
+    const AndAP& and_ap;
+    const CP& cost_policy;
+    fd::GrounderContext& solve_context;
+    fd::GrounderContext& iteration_context;
+
+    AndAnnotationContext make_annotation_context(fd::RuleBindingView rule_binding, Cost rule_cost) const
+    {
+        return AndAnnotationContext { current_cost,
+                                      rule,
+                                      rule_binding,
+                                      rule_cost,
+                                      witness_condition,
+                                      numeric_support_selector,
+                                      numeric_support_selector_workspace,
+                                      program_and_annot,
+                                      program_numeric_and_annot,
+                                      solve_context,
+                                      iteration_context };
+    }
+};
+
+template<typename In, typename Out>
+static auto make_rule_update_input(const In& in, Out& out, const NumericSupportSelector& numeric_support_selector)
+{
+    return RuleUpdateInput<std::decay_t<decltype(in.and_ap())>, std::decay_t<decltype(in.cost_policy())>> {
+        in.cws_rule().get_rule(),
+        in.cws_rule().get_witness_rule().get_body(),
+        numeric_support_selector,
+        out.numeric_support_selector_workspace(),
+        in.cost_buckets().current_cost(),
+        in.and_annot(),
+        in.numeric_and_annot(),
+        in.and_ap(),
+        in.cost_policy(),
+        out.ground_context_solve(),
+        out.ground_context_iteration()
+    };
+}
+
+template<AndAnnotationPolicyConcept AndAP, CostPolicyConcept CP>
+static void record_propositional_achiever(fd::AtomView<f::FluentTag> head, const RuleUpdateInput<AndAP, CP>& input)
+    requires records_propositional_achievers<AndAP>
+{
+    const auto program_head = fd::ground_binding(head, input.iteration_context).first;
+    const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
+    const auto rule_cost = input.cost_policy.get_cost(input.rule, rule_binding);
+    const auto context = input.make_annotation_context(rule_binding, rule_cost);
+
+    input.and_ap.record_achiever(program_head, context);
+}
+
+template<AndAnnotationPolicyConcept AndAP, CostPolicyConcept CP>
+static void record_propositional_achiever(fd::AtomView<f::FluentTag> head, const RuleUpdateInput<AndAP, CP>& input) noexcept
+    requires(!records_propositional_achievers<AndAP>)
+{
+}
+
+template<AndAnnotationPolicyConcept AndAP, CostPolicyConcept CP>
 static void insert_propositional_update(fd::AtomView<f::FluentTag> head,
-                                        fd::RuleView rule,
-                                        fd::ConjunctiveConditionView witness_condition,
-                                        const NumericSupportSelector& numeric_support_selector,
-                                        NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
-                                        Cost current_cost,
-                                        const SelectedPredicateAnnotations& program_and_annot,
-                                        const SelectedFunctionAnnotations& program_numeric_and_annot,
-                                        const AndAP& and_ap,
-                                        fd::GrounderContext& solve_context,
-                                        fd::GrounderContext& iteration_context,
+                                        const RuleUpdateInput<AndAP, CP>& input,
                                         RuleHeadIteration& head_iteration,
                                         SelectedPredicateAnnotations& and_annot)
 {
-    const auto program_head = fd::ground_binding(head, iteration_context).first;
-    const auto worker_head = fd::ground_binding(head, solve_context).first;
+    const auto program_head = fd::ground_binding(head, input.iteration_context).first;
+    const auto worker_head = fd::ground_binding(head, input.solve_context).first;
+    const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
+    const auto rule_cost = input.cost_policy.get_cost(input.rule, rule_binding);
+    const auto context = input.make_annotation_context(rule_binding, rule_cost);
+
+    input.and_ap.record_achiever(program_head, context);
 
     std::get<PredicateHeadIteration>(head_iteration).rows.insert(worker_head.get_index().row);
 
-    and_ap.update_annotation(program_head,
-                             worker_head,
-                             current_cost,
-                             rule,
-                             witness_condition,
-                             numeric_support_selector,
-                             numeric_support_selector_workspace,
-                             program_and_annot,
-                             program_numeric_and_annot,
-                             and_annot,
-                             solve_context,
-                             iteration_context);
+    input.and_ap.update_annotation(program_head, worker_head, context, and_annot);
 }
 
-template<AndAnnotationPolicyConcept AndAP>
+template<AndAnnotationPolicyConcept AndAP, CostPolicyConcept CP>
 static void insert_numeric_update(fd::NumericEffectOperatorView<f::FluentTag> head,
-                                  fd::RuleView rule,
-                                  fd::ConjunctiveConditionView witness_condition,
                                   const FactSets& fact_sets,
-                                  const NumericSupportSelector& numeric_support_selector,
-                                  NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
-                                  Cost current_cost,
-                                  const SelectedPredicateAnnotations& program_and_annot,
-                                  const SelectedFunctionAnnotations& program_numeric_and_annot,
-                                  const AndAP& and_ap,
-                                  fd::GrounderContext& solve_context,
-                                  fd::GrounderContext& iteration_context,
+                                  const RuleUpdateInput<AndAP, CP>& input,
                                   RuleHeadIteration& head_iteration,
                                   SelectedFunctionAnnotations& numeric_and_annot)
 {
-    const auto interval = is_valid_binding(head, fact_sets, iteration_context);
+    const auto interval = is_valid_binding(head, fact_sets, input.iteration_context);
     if (empty(interval))
         return;
 
     visit(
         [&](auto&& effect)
         {
-            const auto program_head = fd::ground(effect.get_fterm(), iteration_context).first.get_row();
-            const auto worker_head = fd::ground(effect.get_fterm(), solve_context).first;
+            const auto program_head = fd::ground(effect.get_fterm(), input.iteration_context).first.get_row();
+            const auto worker_head = fd::ground(effect.get_fterm(), input.solve_context).first;
+            const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
+            const auto rule_cost = input.cost_policy.get_cost(input.rule, rule_binding);
+            const auto context = input.make_annotation_context(rule_binding, rule_cost);
 
-            and_ap.update_annotation(program_head,
-                                     worker_head.get_row(),
-                                     interval,
-                                     current_cost,
-                                     rule,
-                                     witness_condition,
-                                     numeric_support_selector,
-                                     numeric_support_selector_workspace,
-                                     program_and_annot,
-                                     program_numeric_and_annot,
-                                     numeric_and_annot,
-                                     solve_context,
-                                     iteration_context);
+            input.and_ap.update_annotation(program_head, worker_head.get_row(), interval, context, numeric_and_annot);
 
-            std::get<FunctionHeadIteration>(head_iteration).updates.emplace(worker_head.get_row().get_index().row, interval, current_cost + rule.get_cost());
+            std::get<FunctionHeadIteration>(head_iteration).updates.emplace(worker_head.get_row().get_index().row, interval, input.current_cost + rule_cost);
         },
         head.get_variant());
 }
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-void generate_nullary_case(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+void generate_nullary_case(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx)
 {
     auto wrctx = rctx.get_rule_worker_execution_context();
 
     const auto& in = wrctx.in();
     auto& out = wrctx.out();
     const auto& numeric_support_selector = in.numeric_support_selector();
+    const auto input = make_rule_update_input(in, out, numeric_support_selector);
     ++out.statistics().num_executions;
     ++out.statistics().num_generated_rules;
 
@@ -189,38 +228,13 @@ void generate_nullary_case(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
 
                 if constexpr (std::is_same_v<Head, fd::AtomView<f::FluentTag>>)
                 {
-                    insert_propositional_update(head,
-                                                in.cws_rule().get_rule(),
-                                                in.cws_rule().get_witness_rule().get_body(),
-                                                numeric_support_selector,
-                                                out.numeric_support_selector_workspace(),
-                                                in.cost_buckets().current_cost(),
-                                                in.and_annot(),
-                                                in.numeric_and_annot(),
-                                                in.and_ap(),
-                                                out.ground_context_solve(),
-                                                out.ground_context_iteration(),
-                                                out.head(),
-                                                out.and_annot());
+                    insert_propositional_update(head, input, out.head(), out.and_annot());
                 }
                 else
                 {
                     assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
 
-                    insert_numeric_update(head,
-                                          in.cws_rule().get_rule(),
-                                          in.cws_rule().get_witness_rule().get_body(),
-                                          in.fact_sets(),
-                                          numeric_support_selector,
-                                          out.numeric_support_selector_workspace(),
-                                          in.cost_buckets().current_cost(),
-                                          in.and_annot(),
-                                          in.numeric_and_annot(),
-                                          in.and_ap(),
-                                          out.ground_context_solve(),
-                                          out.ground_context_iteration(),
-                                          out.head(),
-                                          out.numeric_and_annot());
+                    insert_numeric_update(head, in.fact_sets(), input, out.head(), out.numeric_and_annot());
                 }
             },
             in.cws_rule().get_rule().get_head());
@@ -272,14 +286,15 @@ static bool is_dynamically_applicable(fd::GroundConjunctiveConditionView nullary
     return is_applicable(nullary_condition, fact_sets) && is_valid_binding(conflicting_condition, fact_sets, context);
 }
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-void process_clique(RuleWorkerExecutionContext<OrAP, AndAP, TP>& wrctx,
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+void process_clique(RuleWorkerExecutionContext<OrAP, AndAP, TP, CP>& wrctx,
                     const NumericSupportSelector& numeric_support_selector,
                     std::span<const kpkc::Vertex> clique,
                     bool require_novel_binding)
 {
     const auto& in = wrctx.in();
     auto& out = wrctx.out();
+    const auto input = make_rule_update_input(in, out, numeric_support_selector);
 
     create_general_binding(clique, in.cws_rule().get_static_consistency_graph(), out.ground_context_solve().binding);
 
@@ -304,7 +319,14 @@ void process_clique(RuleWorkerExecutionContext<OrAP, AndAP, TP>& wrctx,
             {
                 const auto program_head = fd::ground_binding(head, out.ground_context_iteration()).first;
                 if (in.fact_sets().template get<f::FluentTag>().predicate.contains(program_head))
+                {
+                    if constexpr (records_propositional_achievers<AndAP>)
+                    {
+                        if (dynamically_applicable)
+                            record_propositional_achiever(head, input);
+                    }
                     return;  ///< optimal cost proven
+                }
 
                 // IMPORTANT: A binding can fail the nullary part (e.g., arm-empty) even though the clique already exists.
                 // Later, nullary may become true without any new kPKC edges/vertices, so delta-kPKC will NOT re-enumerate this binding.
@@ -321,19 +343,7 @@ void process_clique(RuleWorkerExecutionContext<OrAP, AndAP, TP>& wrctx,
 
                 assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
 
-                insert_propositional_update(head,
-                                            in.cws_rule().get_rule(),
-                                            in.cws_rule().get_witness_rule().get_body(),
-                                            numeric_support_selector,
-                                            out.numeric_support_selector_workspace(),
-                                            in.cost_buckets().current_cost(),
-                                            in.and_annot(),
-                                            in.numeric_and_annot(),
-                                            in.and_ap(),
-                                            out.ground_context_solve(),
-                                            out.ground_context_iteration(),
-                                            out.head(),
-                                            out.and_annot());
+                insert_propositional_update(head, input, out.head(), out.and_annot());
             }
             else
             {
@@ -342,27 +352,14 @@ void process_clique(RuleWorkerExecutionContext<OrAP, AndAP, TP>& wrctx,
 
                 assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
 
-                insert_numeric_update(head,
-                                      in.cws_rule().get_rule(),
-                                      in.cws_rule().get_witness_rule().get_body(),
-                                      in.fact_sets(),
-                                      numeric_support_selector,
-                                      out.numeric_support_selector_workspace(),
-                                      in.cost_buckets().current_cost(),
-                                      in.and_annot(),
-                                      in.numeric_and_annot(),
-                                      in.and_ap(),
-                                      out.ground_context_solve(),
-                                      out.ground_context_iteration(),
-                                      out.head(),
-                                      out.numeric_and_annot());
+                insert_numeric_update(head, in.fact_sets(), input, out.head(), out.numeric_and_annot());
             }
         },
         in.cws_rule().get_rule().get_head());
 }
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-void generate_general_case(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+void generate_general_case(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx)
 {
     auto& rule_out = rctx.out();
     const auto& kpkc_algorithm = rule_out.kpkc();
@@ -464,8 +461,8 @@ void generate_general_case(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
 #endif
 }
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-void generate(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+void generate(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx)
 {
     const auto arity = rctx.in().cws_rule().get_rule().get_arity();
 
@@ -475,8 +472,8 @@ void generate(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
         generate_general_case(rctx);
 }
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx)
 {
     for (auto& worker : rctx.out().workers())
     {
@@ -485,6 +482,7 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
         const auto& in = wrctx.in();
         auto& out = wrctx.out();
         const auto& numeric_support_selector = in.numeric_support_selector();
+        const auto input = make_rule_update_input(in, out, numeric_support_selector);
 
         for (auto it = out.pending_rule_bindings().begin(); it != out.pending_rule_bindings().end();)
         {
@@ -505,7 +503,28 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
 
                         if (in.fact_sets().template get<f::FluentTag>().predicate.contains(program_head))  ///< optimal cost proven
                         {
-                            it = out.pending_rule_bindings().erase(it);
+                            if constexpr (records_propositional_achievers<AndAP>)
+                            {
+                                if (is_dynamically_applicable(in.cws_rule().get_nullary_condition(),
+                                                              in.cws_rule().get_conflicting_overapproximation_rule().get_body(),
+                                                              in.fact_sets(),
+                                                              out.ground_context_iteration()))
+                                {
+                                    assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
+
+                                    record_propositional_achiever(head, input);
+
+                                    it = out.pending_rule_bindings().erase(it);
+                                }
+                                else
+                                {
+                                    ++it;
+                                }
+                            }
+                            else
+                            {
+                                it = out.pending_rule_bindings().erase(it);
+                            }
                         }
                         else if (is_dynamically_applicable(in.cws_rule().get_nullary_condition(),
                                                            in.cws_rule().get_conflicting_overapproximation_rule().get_body(),
@@ -514,19 +533,7 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
                         {
                             assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
 
-                            insert_propositional_update(head,
-                                                        in.cws_rule().get_rule(),
-                                                        in.cws_rule().get_witness_rule().get_body(),
-                                                        numeric_support_selector,
-                                                        out.numeric_support_selector_workspace(),
-                                                        in.cost_buckets().current_cost(),
-                                                        in.and_annot(),
-                                                        in.numeric_and_annot(),
-                                                        in.and_ap(),
-                                                        out.ground_context_solve(),
-                                                        out.ground_context_iteration(),
-                                                        out.head(),
-                                                        out.and_annot());
+                            insert_propositional_update(head, input, out.head(), out.and_annot());
 
                             it = out.pending_rule_bindings().erase(it);
                         }
@@ -545,8 +552,8 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP>& rctx)
     }
 }
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
 {
     auto& out = ctx.out();
     auto& scheduler = out.scheduler();
@@ -637,9 +644,9 @@ void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
                             {
                                 for (const auto worker_head_index : head_iteration.rows)
                                 {
-                                    const auto worker_head =
-                                        ygg::make_view(ygg::Index<f::RelationBinding<f::Predicate<f::FluentTag>>> { head_iteration.relation, worker_head_index },
-                                                  worker.solve.program_overlay_repository);
+                                    const auto worker_head = ygg::make_view(
+                                        ygg::Index<f::RelationBinding<f::Predicate<f::FluentTag>>> { head_iteration.relation, worker_head_index },
+                                        worker.solve.program_overlay_repository);
 
                                     // Merge head from delta into the program
                                     const auto program_head = fd::merge_d2d(worker_head, merge_context).first;
@@ -657,7 +664,7 @@ void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
                                 {
                                     const auto worker_head =
                                         ygg::make_view(ygg::Index<f::RelationBinding<f::Function<f::FluentTag>>> { head_iteration.relation, update.row },
-                                                  worker.solve.program_overlay_repository);
+                                                       worker.solve.program_overlay_repository);
 
                                     const auto program_head = fd::merge_d2d(worker_head, merge_context).first;
                                     const auto* worker_annotation = worker.iteration.numeric_and_annot.find(worker_head, update.interval);
@@ -711,8 +718,8 @@ void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP>& ctx)
     }
 }
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
-void solve_bottom_up(ProgramExecutionContext<OrAP, AndAP, TP>& ctx)
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
+void solve_bottom_up(ProgramExecutionContext<OrAP, AndAP, TP, CP>& ctx)
 {
     auto& out = ctx.out();
     const auto program_stopwatch = ygg::StopwatchScope(out.statistics().total_time);
@@ -729,4 +736,16 @@ template void solve_bottom_up(ProgramExecutionContext<OrAnnotationPolicy, AndAnn
 template void solve_bottom_up(ProgramExecutionContext<OrAnnotationPolicy, AndAnnotationPolicy<SumAggregation>, TerminationPolicy<SumAggregation>>& ctx);
 template void solve_bottom_up(ProgramExecutionContext<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, NoTerminationPolicy>& ctx);
 template void solve_bottom_up(ProgramExecutionContext<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, TerminationPolicy<MaxAggregation>>& ctx);
+template void solve_bottom_up(ProgramExecutionContext<NoOrAnnotationPolicy, NoAndAnnotationPolicy, NoTerminationPolicy, RuleBindingCostOverridePolicy>& ctx);
+template void
+solve_bottom_up(ProgramExecutionContext<OrAnnotationPolicy, AndAnnotationPolicy<SumAggregation>, NoTerminationPolicy, RuleBindingCostOverridePolicy>& ctx);
+template void solve_bottom_up(
+    ProgramExecutionContext<OrAnnotationPolicy, AndAnnotationPolicy<SumAggregation>, TerminationPolicy<SumAggregation>, RuleBindingCostOverridePolicy>& ctx);
+template void
+solve_bottom_up(ProgramExecutionContext<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, NoTerminationPolicy, RuleBindingCostOverridePolicy>& ctx);
+template void solve_bottom_up(
+    ProgramExecutionContext<OrAnnotationPolicy, AndAnnotationPolicy<MaxAggregation>, TerminationPolicy<MaxAggregation>, RuleBindingCostOverridePolicy>& ctx);
+template void solve_bottom_up(
+    ProgramExecutionContext<OrAnnotationPolicy, AchieverAndAnnotationPolicy<MaxAggregation>, TerminationPolicy<MaxAggregation>, RuleBindingCostOverridePolicy>&
+        ctx);
 }

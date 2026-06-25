@@ -18,8 +18,6 @@
 #ifndef TYR_SOLVER_POLICIES_ANNOTATION_CONCEPT_HPP_
 #define TYR_SOLVER_POLICIES_ANNOTATION_CONCEPT_HPP_
 
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -32,12 +30,11 @@
 #include <optional>
 #include <tuple>
 #include <vector>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::datalog
 {
-
-class NumericSupportSelector;
-class NumericSupportSelectorWorkspace;
 
 // circle "or"-node
 template<typename T>
@@ -63,31 +60,10 @@ template<typename T>
 concept AndAnnotationPolicyConcept = requires(const T& p,
                                               ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
                                               ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                                              ygg::uint_t current_cost,
-                                              ::tyr::formalism::datalog::RuleView rule,
-                                              ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition,
-                                              const NumericSupportSelector& numeric_support_selector,
-                                              NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
-                                              const SelectedPredicateAnnotations& program_and_annot,
-                                              const SelectedFunctionAnnotations& program_numeric_and_annot,
-                                              SelectedPredicateAnnotations& delta_and_annot,
-                                              ::tyr::formalism::datalog::GrounderContext& delta_context,
-                                              ::tyr::formalism::datalog::GrounderContext& iteration_context) {
+                                              const AndAnnotationContext& context,
+                                              SelectedPredicateAnnotations& delta_and_annot) {
     /// Ground the witness and annotate the cost of it from the given annotations.
-    {
-        p.update_annotation(program_head,
-                            delta_head,
-                            current_cost,
-                            rule,
-                            witness_condition,
-                            numeric_support_selector,
-                            numeric_support_selector_workspace,
-                            program_and_annot,
-                            program_numeric_and_annot,
-                            delta_and_annot,
-                            delta_context,
-                            iteration_context)
-    } -> std::same_as<void>;
+    { p.update_annotation(program_head, delta_head, context, delta_and_annot) } -> std::same_as<void>;
 };
 
 }

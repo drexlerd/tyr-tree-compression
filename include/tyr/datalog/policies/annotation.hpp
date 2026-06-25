@@ -18,8 +18,6 @@
 #ifndef TYR_SOLVER_POLICIES_ANNOTATION_HPP_
 #define TYR_SOLVER_POLICIES_ANNOTATION_HPP_
 
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/policies/annotation_types.hpp"
@@ -33,6 +31,8 @@
 #include <optional>
 #include <tuple>
 #include <vector>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::datalog
 {
@@ -43,7 +43,10 @@ class NumericSupportSelectorWorkspace;
 class NoOrAnnotationPolicy
 {
 public:
-    void initialize_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> head, SelectedPredicateAnnotations& program_and_annot) const noexcept {}
+    void initialize_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> head,
+                               SelectedPredicateAnnotations& program_and_annot) const noexcept
+    {
+    }
     void initialize_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> head,
                                ygg::ClosedInterval<ygg::float_t> interval,
                                SelectedFunctionAnnotations& program_numeric_and_annot) const noexcept
@@ -62,34 +65,25 @@ public:
 class NoAndAnnotationPolicy
 {
 public:
+    void clear_achievers() noexcept {}
+
+    void record_achiever(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
+                         const AndAnnotationContext& context) const noexcept
+    {
+    }
+
     void update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
                            ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                           ygg::uint_t current_cost,
-                           ::tyr::formalism::datalog::RuleView rule,
-                           ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition,
-                           const NumericSupportSelector& numeric_support_selector,
-                           NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
-                           const SelectedPredicateAnnotations& program_and_annot,
-                           const SelectedFunctionAnnotations& program_numeric_and_annot,
-                           SelectedPredicateAnnotations& delta_and_annot,
-                           ::tyr::formalism::datalog::GrounderContext& delta_context,
-                           ::tyr::formalism::datalog::GrounderContext& iteration_context) const noexcept
+                           const AndAnnotationContext& context,
+                           SelectedPredicateAnnotations& delta_and_annot) const noexcept
     {
     }
 
     void update_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> program_head,
                            ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> delta_head,
                            ygg::ClosedInterval<ygg::float_t> interval,
-                           ygg::uint_t current_cost,
-                           ::tyr::formalism::datalog::RuleView rule,
-                           ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition,
-                           const NumericSupportSelector& numeric_support_selector,
-                           NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
-                           const SelectedPredicateAnnotations& program_and_annot,
-                           const SelectedFunctionAnnotations& program_numeric_and_annot,
-                           SelectedFunctionAnnotations& delta_numeric_and_annot,
-                           ::tyr::formalism::datalog::GrounderContext& delta_context,
-                           ::tyr::formalism::datalog::GrounderContext& iteration_context) const
+                           const AndAnnotationContext& context,
+                           SelectedFunctionAnnotations& delta_numeric_and_annot) const
     {
     }
 };
@@ -97,7 +91,8 @@ public:
 class OrAnnotationPolicy
 {
 public:
-    void initialize_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head, SelectedPredicateAnnotations& program_and_annot) const;
+    void initialize_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
+                               SelectedPredicateAnnotations& program_and_annot) const;
     void initialize_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> program_head,
                                ygg::ClosedInterval<ygg::float_t> interval,
                                SelectedFunctionAnnotations& program_numeric_and_annot) const;
@@ -114,32 +109,41 @@ class AndAnnotationPolicy
 public:
     static constexpr AggregationFunction agg = AggregationFunction {};
 
+    void clear_achievers() noexcept {}
+
+    void record_achiever(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
+                         const AndAnnotationContext& context) const noexcept
+    {
+    }
+
     void update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
                            ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                           ygg::uint_t current_cost,
-                           ::tyr::formalism::datalog::RuleView rule,
-                           ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition,
-                           const NumericSupportSelector& numeric_support_selector,
-                           NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
-                           const SelectedPredicateAnnotations& program_and_annot,
-                           const SelectedFunctionAnnotations& program_numeric_and_annot,
-                           SelectedPredicateAnnotations& delta_and_annot,
-                           ::tyr::formalism::datalog::GrounderContext& delta_context,
-                           ::tyr::formalism::datalog::GrounderContext& iteration_context) const;
+                           const AndAnnotationContext& context,
+                           SelectedPredicateAnnotations& delta_and_annot) const;
 
     void update_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> program_head,
                            ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> delta_head,
                            ygg::ClosedInterval<ygg::float_t> interval,
-                           ygg::uint_t current_cost,
-                           ::tyr::formalism::datalog::RuleView rule,
-                           ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition,
-                           const NumericSupportSelector& numeric_support_selector,
-                           NumericSupportSelectorWorkspace& numeric_support_selector_workspace,
-                           const SelectedPredicateAnnotations& program_and_annot,
-                           const SelectedFunctionAnnotations& program_numeric_and_annot,
-                           SelectedFunctionAnnotations& delta_numeric_and_annot,
-                           ::tyr::formalism::datalog::GrounderContext& delta_context,
-                           ::tyr::formalism::datalog::GrounderContext& iteration_context) const;
+                           const AndAnnotationContext& context,
+                           SelectedFunctionAnnotations& delta_numeric_and_annot) const;
+};
+
+template<typename AggregationFunction>
+class AchieverAndAnnotationPolicy : public AndAnnotationPolicy<AggregationFunction>
+{
+public:
+    using PredicateBinding = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
+    using PredicateBindingIndex = ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>>>;
+    using Achievers = std::vector<WitnessAnnotation>;
+
+    void clear_achievers() noexcept;
+
+    const Achievers* find_achievers(PredicateBinding program_head) const noexcept;
+
+    void record_achiever(PredicateBinding program_head, const AndAnnotationContext& context) const;
+
+private:
+    mutable ygg::UnorderedMap<PredicateBindingIndex, Achievers> m_achievers;
 };
 
 }

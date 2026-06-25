@@ -18,10 +18,9 @@
 #ifndef TYR_DATALOG_WORKSPACES_PROGRAM_HPP_
 #define TYR_DATALOG_WORKSPACES_PROGRAM_HPP_
 
-#include <yggdrasil/core/closed_interval.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/datalog/policies/annotation_concept.hpp"
+#include "tyr/datalog/policies/cost.hpp"
+#include "tyr/datalog/policies/cost_concept.hpp"
 #include "tyr/datalog/policies/numeric_support.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 #include "tyr/datalog/program_context.hpp"
@@ -38,6 +37,9 @@
 #include <optional>
 #include <tuple>
 #include <vector>
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::datalog
 {
@@ -167,7 +169,7 @@ private:
     size_t m_total_size = 0;
 };
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP>
+template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP = LiftedRuleCostPolicy>
 struct ProgramWorkspace
 {
     const ::tyr::formalism::datalog::Repository& program_repository;
@@ -181,6 +183,7 @@ struct ProgramWorkspace
     std::optional<NumericSupportSelector> numeric_support_selector;
 
     TP tp;
+    CP cost_policy;
 
     std::vector<std::unique_ptr<RuleWorkspace<AndAP>>> rules;
 
@@ -195,7 +198,13 @@ struct ProgramWorkspace
 
     ProgramStatistics statistics;
 
-    explicit ProgramWorkspace(ProgramContext& context, const ConstProgramWorkspace& cws, OrAP or_ap, AndAP and_ap, TP tp);
+    explicit ProgramWorkspace(ProgramContext& context, const ConstProgramWorkspace& cws, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy = CP());
+
+    void clear_costs()
+        requires MutableCostPolicyConcept<CP>
+    {
+        cost_policy.clear();
+    }
 };
 
 struct ConstProgramWorkspace

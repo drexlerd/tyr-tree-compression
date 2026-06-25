@@ -40,6 +40,9 @@
 
 namespace tyr::datalog
 {
+
+class NumericSupportSelector;
+class NumericSupportSelectorWorkspace;
 /**
  * Annotations
  */
@@ -224,6 +227,21 @@ private:
 };
 
 using SelectedFunctionAnnotations = NumericIntervalAnnotations;
+
+struct AndAnnotationContext
+{
+    ygg::uint_t current_cost;
+    ::tyr::formalism::datalog::RuleView rule;
+    ::tyr::formalism::datalog::RuleBindingView rule_binding;
+    Cost rule_cost;
+    ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition;
+    const NumericSupportSelector& numeric_support_selector;
+    NumericSupportSelectorWorkspace& numeric_support_selector_workspace;
+    const SelectedPredicateAnnotations& program_and_annot;
+    const SelectedFunctionAnnotations& program_numeric_and_annot;
+    ::tyr::formalism::datalog::GrounderContext& delta_context;
+    ::tyr::formalism::datalog::GrounderContext& iteration_context;
+};
 
 struct CostUpdate
 {

@@ -15,28 +15,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_SOLVER_BOTTOM_UP_HPP_
-#define TYR_SOLVER_BOTTOM_UP_HPP_
+#ifndef TYR_DATALOG_POLICIES_COST_CONCEPT_HPP_
+#define TYR_DATALOG_POLICIES_COST_CONCEPT_HPP_
 
-#include "tyr/datalog/contexts/program.hpp"
-#include "tyr/datalog/declarations.hpp"
-#include "tyr/datalog/policies/annotation_concept.hpp"
-#include "tyr/datalog/policies/cost.hpp"
-#include "tyr/datalog/policies/cost_concept.hpp"
-#include "tyr/datalog/policies/termination_concept.hpp"
-#include "tyr/formalism/datalog/declarations.hpp"
-#include "tyr/formalism/datalog/ground_atom_index.hpp"
+#include "tyr/datalog/policies/annotation_types.hpp"
+#include "tyr/formalism/datalog/repository.hpp"
 
 #include <concepts>
-#include <vector>
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/core/types.hpp>
 
 namespace tyr::datalog
 {
 
-template<OrAnnotationPolicyConcept OrAP, AndAnnotationPolicyConcept AndAP, TerminationPolicyConcept TP, CostPolicyConcept CP>
-void solve_bottom_up(ProgramExecutionContext<OrAP, AndAP, TP, CP>& ctx);
+template<typename T>
+concept CostPolicyConcept = requires(const T& p, ::tyr::formalism::datalog::RuleView rule, ::tyr::formalism::datalog::RuleBindingView rule_binding) {
+    { p.get_cost(rule, rule_binding) } -> std::same_as<Cost>;
+};
+
+template<typename T>
+concept MutableCostPolicyConcept = CostPolicyConcept<T> && requires(T& p, ::tyr::formalism::datalog::RuleBindingView rule_binding, Cost cost) {
+    { p.clear() } -> std::same_as<void>;
+    { p.set_cost(rule_binding, cost) } -> std::same_as<void>;
+};
 
 }
 
