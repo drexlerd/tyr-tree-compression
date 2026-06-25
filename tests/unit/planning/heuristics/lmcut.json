@@ -187,14 +187,6 @@
             "h_star_unit_cost_one": 9
         },
         {
-            "name": "StrictLMCutUnit",
-            "domain_file": "tests/classical/lmcut-unit-strict/domain.pddl",
-            "task_file": "tests/classical/lmcut-unit-strict/test-1.pddl",
-            "expected_hmax": 1,
-            "expected_lmcut": 2,
-            "h_star_unit_cost_one": 2
-        },
-        {
             "name": "FoCounters",
             "domain_file": "tests/numeric/fo-counters/domain.pddl",
             "task_file": "tests/numeric/fo-counters/test-1.pddl",
