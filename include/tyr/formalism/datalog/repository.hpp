@@ -172,9 +172,9 @@ using GroundRuleView = ygg::View<ygg::Index<GroundRule>, Repository>;
 
 using GroundRuleListView = ygg::View<ygg::IndexList<GroundRule>, Repository>;
 
-using GroundProgramView = ygg::View<ygg::Index<GroundProgram>, Repository>;
+using GroundProgramView = ygg::View<ygg::Index<ProgramTag<::tyr::GroundTag>>, Repository>;
 
-using GroundProgramListView = ygg::View<ygg::IndexList<GroundProgram>, Repository>;
+using GroundProgramListView = ygg::View<ygg::IndexList<ProgramTag<::tyr::GroundTag>>, Repository>;
 
 template<::tyr::formalism::FactKind T>
 using LiteralView = ygg::View<ygg::Index<Literal<T>>, Repository>;
@@ -212,9 +212,11 @@ using PredicateView = ygg::View<ygg::Index<Predicate<T>>, Repository>;
 template<FactKind T>
 using PredicateListView = ygg::View<ygg::IndexList<Predicate<T>>, Repository>;
 
-using ProgramView = ygg::View<ygg::Index<Program>, Repository>;
+template<::tyr::TaskKind Kind>
+using ProgramView = ygg::View<ygg::Index<ProgramTag<Kind>>, Repository>;
 
-using ProgramListView = ygg::View<ygg::IndexList<Program>, Repository>;
+template<::tyr::TaskKind Kind>
+using ProgramListView = ygg::View<ygg::IndexList<ProgramTag<Kind>>, Repository>;
 
 using RuleView = ygg::View<ygg::Index<Rule>, Repository>;
 

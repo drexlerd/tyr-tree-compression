@@ -37,7 +37,7 @@ struct TerminationPolicyConceptImpl<GroundTag, T>
     static constexpr bool value = requires(T& p,
                                            const T& cp,
                                            ::tyr::formalism::datalog::GroundConjunctiveConditionView goals,
-                                           ::tyr::formalism::datalog::GroundProgramView program,
+                                           ::tyr::formalism::datalog::ProgramView<GroundTag> program,
                                            const FactsWorkspace<GroundTag>& facts,
                                            const GroundSelectedPredicateAnnotations& and_annot) {
         { p.set_goals(goals) } -> std::same_as<void>;

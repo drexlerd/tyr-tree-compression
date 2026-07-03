@@ -18,6 +18,7 @@
 #ifndef TYR_FORMALISM_DATALOG_DECLARATIONS_HPP_
 #define TYR_FORMALISM_DATALOG_DECLARATIONS_HPP_
 
+#include "tyr/declarations.hpp"
 #include "tyr/formalism/declarations.hpp"
 
 #include <yggdrasil/core/config.hpp>
@@ -131,13 +132,13 @@ struct GroundRule
 {
 };
 
-struct Program
+template<::tyr::TaskKind Kind>
+struct ProgramTag
 {
 };
 
-struct GroundProgram
-{
-};
+using Program = ProgramTag<::tyr::LiftedTag>;
+using GroundProgram = ProgramTag<::tyr::GroundTag>;
 
 using CoreTypes = ygg::TypeList<Variable, Object>;
 using PredicateTypes = ygg::MapTypeListT<Predicate, StaticFluentTags>;

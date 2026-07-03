@@ -36,6 +36,7 @@ class RuleCostPolicy<LiftedTag>
 public:
     Cost get_cost(::tyr::formalism::datalog::RuleView rule, ::tyr::formalism::datalog::RuleBindingView) const noexcept { return rule.get_cost(); }
     void clear() noexcept {}
+    void set_cost(::tyr::formalism::datalog::RuleBindingView, Cost) noexcept {}
 };
 
 template<>
@@ -138,6 +139,7 @@ private:
 
 static_assert(RuleCostPolicyConcept<RuleCostPolicy<LiftedTag>, LiftedTag>);
 static_assert(RuleCostPolicyConcept<RuleCostOverridePolicy<LiftedTag>, LiftedTag>);
+static_assert(MutableRuleCostPolicyConcept<RuleCostPolicy<LiftedTag>, LiftedTag>);
 static_assert(MutableRuleCostPolicyConcept<RuleCostOverridePolicy<LiftedTag>, LiftedTag>);
 
 }

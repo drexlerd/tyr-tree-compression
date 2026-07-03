@@ -33,7 +33,7 @@ template<>
 class Program<LiftedTag>
 {
 public:
-    Program(::tyr::formalism::datalog::ProgramView program,
+    Program(::tyr::formalism::datalog::ProgramView<LiftedTag> program,
             ::tyr::formalism::datalog::RepositoryPtr program_repository,
             ::tyr::formalism::datalog::RepositoryFactoryPtr repository_factory,
             analysis::ProgramVariableDomains domains,
@@ -51,7 +51,7 @@ public:
     const auto& get_const_program_workspace() const noexcept { return m_const_program_workspace; }
 
 private:
-    ::tyr::formalism::datalog::ProgramView m_program;
+    ::tyr::formalism::datalog::ProgramView<LiftedTag> m_program;
     ::tyr::formalism::datalog::RepositoryPtr m_program_repository;
     ::tyr::formalism::datalog::RepositoryFactoryPtr m_repository_factory;
     ::tyr::formalism::datalog::RepositoryPtr m_workspace_repository;

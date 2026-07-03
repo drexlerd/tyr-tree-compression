@@ -33,6 +33,7 @@ class RuleCostPolicy<GroundTag>
 public:
     Cost get_cost(::tyr::formalism::datalog::GroundRuleView rule) const noexcept { return rule.get_rule().get_cost(); }
     void clear() noexcept {}
+    void set_cost(::tyr::formalism::datalog::GroundRuleView, Cost) noexcept {}
 };
 
 template<>
@@ -64,6 +65,7 @@ private:
 
 static_assert(RuleCostPolicyConcept<RuleCostPolicy<GroundTag>, GroundTag>);
 static_assert(RuleCostPolicyConcept<RuleCostOverridePolicy<GroundTag>, GroundTag>);
+static_assert(MutableRuleCostPolicyConcept<RuleCostPolicy<GroundTag>, GroundTag>);
 static_assert(MutableRuleCostPolicyConcept<RuleCostOverridePolicy<GroundTag>, GroundTag>);
 
 }

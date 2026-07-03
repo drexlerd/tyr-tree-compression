@@ -18,12 +18,12 @@
 #ifndef TYR_ANALYSIS_STRATIFICATION_HPP_
 #define TYR_ANALYSIS_STRATIFICATION_HPP_
 
-#include <yggdrasil/formatting/cista_formatters.hpp>
-#include <yggdrasil/core/types.hpp>                    // for ygg::IndexList
 #include "tyr/formalism/datalog/declarations.hpp"  // for Program (ptr only), Rule
 #include "tyr/formalism/datalog/repository.hpp"
 
-#include <vector>  // for vector
+#include <vector>                    // for vector
+#include <yggdrasil/core/types.hpp>  // for ygg::IndexList
+#include <yggdrasil/formatting/cista_formatters.hpp>
 
 namespace tyr::analysis
 {
@@ -35,7 +35,7 @@ struct RuleStrata
     std::vector<RuleStratum> data;
 };
 
-extern RuleStrata compute_rule_stratification(::tyr::formalism::datalog::ProgramView program);
+extern RuleStrata compute_rule_stratification(::tyr::formalism::datalog::ProgramView<LiftedTag> program);
 }
 
 #endif

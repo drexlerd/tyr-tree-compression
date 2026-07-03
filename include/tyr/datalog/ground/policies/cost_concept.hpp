@@ -36,18 +36,17 @@ struct MutableRuleCostPolicyConceptImpl;
 template<typename T>
 struct RuleCostPolicyConceptImpl<GroundTag, T>
 {
-    static constexpr bool value = requires(T& p, const T& cp, ::tyr::formalism::datalog::GroundRuleView rule) {
+    static constexpr bool value = requires(T& p, const T& cp, ::tyr::formalism::datalog::GroundRuleView rule, Cost cost) {
         { cp.get_cost(rule) } -> std::same_as<Cost>;
         { p.clear() } -> std::same_as<void>;
+        { p.set_cost(rule, cost) } -> std::same_as<void>;
     };
 };
 
 template<typename T>
 struct MutableRuleCostPolicyConceptImpl<GroundTag, T>
 {
-    static constexpr bool value = RuleCostPolicyConceptImpl<GroundTag, T>::value && requires(T& p, ::tyr::formalism::datalog::GroundRuleView rule, Cost cost) {
-        { p.set_cost(rule, cost) } -> std::same_as<void>;
-    };
+    static constexpr bool value = RuleCostPolicyConceptImpl<GroundTag, T>::value;
 };
 
 }

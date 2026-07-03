@@ -43,7 +43,7 @@ struct RuleWorkspace<GroundTag>
     std::vector<bool> fired_rules;
     std::vector<GroundQueueEntry> queue_storage;
 
-    explicit RuleWorkspace(::tyr::formalism::datalog::GroundProgramView program) { queue_storage.reserve(program.get_ground_rules().size()); }
+    explicit RuleWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag> program) { queue_storage.reserve(program.get_ground_rules().size()); }
 
     void clear()
     {

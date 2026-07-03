@@ -42,19 +42,17 @@ template<typename T>
 struct RuleCostPolicyConceptImpl<LiftedTag, T>
 {
     static constexpr bool value =
-        requires(T& p, const T& cp, ::tyr::formalism::datalog::RuleView rule, ::tyr::formalism::datalog::RuleBindingView rule_binding) {
+        requires(T& p, const T& cp, ::tyr::formalism::datalog::RuleView rule, ::tyr::formalism::datalog::RuleBindingView rule_binding, Cost cost) {
             { cp.get_cost(rule, rule_binding) } -> std::same_as<Cost>;
             { p.clear() } -> std::same_as<void>;
+            { p.set_cost(rule_binding, cost) } -> std::same_as<void>;
         };
 };
 
 template<typename T>
 struct MutableRuleCostPolicyConceptImpl<LiftedTag, T>
 {
-    static constexpr bool value =
-        RuleCostPolicyConceptImpl<LiftedTag, T>::value && requires(T& p, ::tyr::formalism::datalog::RuleBindingView rule_binding, Cost cost) {
-            { p.set_cost(rule_binding, cost) } -> std::same_as<void>;
-        };
+    static constexpr bool value = RuleCostPolicyConceptImpl<LiftedTag, T>::value;
 };
 
 }

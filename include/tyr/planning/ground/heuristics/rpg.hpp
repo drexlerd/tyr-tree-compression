@@ -61,8 +61,7 @@ public:
     const auto& get_workspace() const noexcept { return m_workspace; }
 
 protected:
-    void set_action_binding_cost(::tyr::formalism::planning::ActionBindingView action_binding, datalog::Cost cost)
-        requires datalog::MutableRuleCostPolicyConcept<CP, GroundTag>;
+    void set_action_binding_cost(::tyr::formalism::planning::ActionBindingView action_binding, datalog::Cost cost);
 
     datalog::Cost get_atom_cost(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> atom) const noexcept;
 
@@ -154,7 +153,6 @@ template<typename Derived,
          datalog::TerminationPolicyConcept<GroundTag> TP,
          datalog::RuleCostPolicyConcept<GroundTag> CP>
 void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::set_action_binding_cost(::tyr::formalism::planning::ActionBindingView action_binding, datalog::Cost cost)
-    requires datalog::MutableRuleCostPolicyConcept<CP, GroundTag>
 {
     if (const auto action = m_task->find_ground_action(action_binding))
     {

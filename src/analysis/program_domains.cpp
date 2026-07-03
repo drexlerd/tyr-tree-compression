@@ -456,7 +456,7 @@ void apply_policy(fd::NumericEffectOperatorView<T> element, Policy& policy)
 
 }  // namespace
 
-ProgramVariableDomains compute_variable_domains(fd::ProgramView program)
+ProgramVariableDomains compute_variable_domains(fd::ProgramView<LiftedTag> program)
 {
     auto universe = ygg::UnorderedSet<ygg::Index<f::Object>> {};
     for (const auto object : program.get_objects())

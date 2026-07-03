@@ -20,7 +20,7 @@
 namespace tyr::datalog
 {
 
-Program<GroundTag>::Program(::tyr::formalism::datalog::GroundProgramView program,
+Program<GroundTag>::Program(::tyr::formalism::datalog::ProgramView<GroundTag> program,
                             ::tyr::formalism::datalog::RepositoryPtr program_repository,
                             ::tyr::formalism::datalog::RepositoryFactoryPtr repository_factory) :
     m_program(program),

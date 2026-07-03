@@ -185,7 +185,7 @@ fd::GroundRuleView create_applicability_rule(fp::GroundActionView action,
     return create_ground_atom_rule(create_delete_free_condition(action.get_condition(), translation_context, context), applicability_atom, context, d::Cost(1));
 }
 
-fd::GroundProgramView finish_program(GroundProgramBuildContext& context)
+fd::ProgramView<GroundTag> finish_program(GroundProgramBuildContext& context)
 {
     canonicalize(context.program);
     return context.merge_context.destination.get_or_create(context.program).first;
@@ -217,10 +217,10 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
     }
 }
 
-fd::GroundProgramView create_rpg_ground_program(fp::FDRTaskView task,
-                                                TranslationContext<GroundTag>& translation_context,
-                                                RPGProgram<GroundTag>::RuleToActionMapping& mapping,
-                                                fd::Repository& repository)
+fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
+                                                     TranslationContext<GroundTag>& translation_context,
+                                                     RPGProgram<GroundTag>::RuleToActionMapping& mapping,
+                                                     fd::Repository& repository)
 {
     auto context = GroundProgramBuildContext(repository);
     auto& program = context.program;
@@ -296,7 +296,7 @@ const TranslationContext<GroundTag>& RPGProgram<GroundTag>::get_translation_cont
 
 const RPGProgram<GroundTag>::RuleToActionMapping& RPGProgram<GroundTag>::get_rule_to_action_mapping() const noexcept { return m_rule_to_action; }
 
-fd::GroundProgramView RPGProgram<GroundTag>::get_program() const noexcept { return m_datalog_program.get_program(); }
+fd::ProgramView<GroundTag> RPGProgram<GroundTag>::get_program() const noexcept { return m_datalog_program.get_program(); }
 
 datalog::Program<GroundTag>& RPGProgram<GroundTag>::get_datalog_program() noexcept { return m_datalog_program; }
 

@@ -51,12 +51,12 @@ struct GroundQueueStatistics
 template<>
 struct ConstProgramWorkspace<GroundTag>
 {
-    ::tyr::formalism::datalog::GroundProgramView program;
+    ::tyr::formalism::datalog::ProgramView<GroundTag> program;
 
     ygg::UnorderedMap<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, std::vector<::tyr::formalism::datalog::GroundRuleView>>
         fluent_precondition_to_rules;
 
-    explicit ConstProgramWorkspace(::tyr::formalism::datalog::GroundProgramView program);
+    explicit ConstProgramWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag> program);
 };
 
 template<>

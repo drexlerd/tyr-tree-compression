@@ -103,7 +103,6 @@ public:
 
 protected:
     void set_action_binding_cost(::tyr::formalism::planning::ActionBindingView action_binding, datalog::Cost cost)
-        requires datalog::MutableRuleCostPolicyConcept<CP, LiftedTag>
     {
         const auto action = action_binding.get_relation();
         const auto objects = action_binding.get_data();

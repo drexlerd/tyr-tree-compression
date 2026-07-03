@@ -221,7 +221,7 @@ bool fire_rule(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule)
     return stop;
 }
 
-void validate_supported_program(fd::GroundProgramView program)
+void validate_supported_program(fd::ProgramView<GroundTag> program)
 {
     if (!program.template get_fterm_values<f::StaticTag>().empty() || !program.template get_fterm_values<f::FluentTag>().empty())
         throw std::invalid_argument("ground queue solver does not support function facts");

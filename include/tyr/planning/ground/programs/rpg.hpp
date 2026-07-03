@@ -41,7 +41,7 @@ public:
 
     const TranslationContext<GroundTag>& get_translation_context() const noexcept;
     const RuleToActionMapping& get_rule_to_action_mapping() const noexcept;
-    ::tyr::formalism::datalog::GroundProgramView get_program() const noexcept;
+    ::tyr::formalism::datalog::ProgramView<GroundTag> get_program() const noexcept;
     datalog::Program<GroundTag>& get_datalog_program() noexcept;
     const datalog::Program<GroundTag>& get_datalog_program() const noexcept;
     ::tyr::formalism::datalog::GroundConjunctiveConditionView get_goal() const noexcept;

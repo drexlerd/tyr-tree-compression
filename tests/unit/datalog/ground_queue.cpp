@@ -116,7 +116,7 @@ struct GroundQueueFixture
         return ground_rule;
     }
 
-    fd::GroundProgramView program()
+    fd::ProgramView<GroundTag> program()
     {
         auto program_builder = ygg::Data<fd::GroundProgram>();
         program_builder.fluent_atoms.insert(program_builder.fluent_atoms.end(), initial_fluent_atoms.begin(), initial_fluent_atoms.end());

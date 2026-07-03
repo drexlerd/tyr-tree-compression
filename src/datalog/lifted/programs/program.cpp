@@ -20,7 +20,7 @@
 namespace tyr::datalog
 {
 
-Program<LiftedTag>::Program(::tyr::formalism::datalog::ProgramView program,
+Program<LiftedTag>::Program(::tyr::formalism::datalog::ProgramView<LiftedTag> program,
                             ::tyr::formalism::datalog::RepositoryPtr program_repository,
                             ::tyr::formalism::datalog::RepositoryFactoryPtr repository_factory,
                             analysis::ProgramVariableDomains domains,

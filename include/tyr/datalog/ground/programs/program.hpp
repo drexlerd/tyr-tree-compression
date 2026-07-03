@@ -29,7 +29,7 @@ template<>
 class Program<GroundTag>
 {
 public:
-    Program(::tyr::formalism::datalog::GroundProgramView program,
+    Program(::tyr::formalism::datalog::ProgramView<GroundTag> program,
             ::tyr::formalism::datalog::RepositoryPtr program_repository,
             ::tyr::formalism::datalog::RepositoryFactoryPtr repository_factory);
 
@@ -40,7 +40,7 @@ public:
     const auto& get_const_program_workspace() const noexcept { return m_const_program_workspace; }
 
 private:
-    ::tyr::formalism::datalog::GroundProgramView m_program;
+    ::tyr::formalism::datalog::ProgramView<GroundTag> m_program;
     ::tyr::formalism::datalog::RepositoryPtr m_program_repository;
     ::tyr::formalism::datalog::RepositoryFactoryPtr m_repository_factory;
     ConstProgramWorkspace<GroundTag> m_const_program_workspace;

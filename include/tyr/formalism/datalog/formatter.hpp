@@ -707,11 +707,11 @@ struct formatter<ygg::Data<tyr::formalism::datalog::Program>, char>
 };
 
 template<>
-struct formatter<tyr::formalism::datalog::ProgramView, char>
+struct formatter<tyr::formalism::datalog::ProgramView<tyr::LiftedTag>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
     template<typename FormatContext>
-    auto format(const tyr::formalism::datalog::ProgramView& value, FormatContext& ctx) const
+    auto format(const tyr::formalism::datalog::ProgramView<tyr::LiftedTag>& value, FormatContext& ctx) const
     {
         auto os = std::stringstream {};
         os << "Program(\n";
@@ -789,11 +789,11 @@ struct formatter<ygg::Data<tyr::formalism::datalog::GroundProgram>, char>
 };
 
 template<>
-struct formatter<tyr::formalism::datalog::GroundProgramView, char>
+struct formatter<tyr::formalism::datalog::ProgramView<tyr::GroundTag>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
     template<typename FormatContext>
-    auto format(const tyr::formalism::datalog::GroundProgramView& value, FormatContext& ctx) const
+    auto format(const tyr::formalism::datalog::ProgramView<tyr::GroundTag>& value, FormatContext& ctx) const
     {
         auto os = std::stringstream {};
         os << "GroundProgram(\n";

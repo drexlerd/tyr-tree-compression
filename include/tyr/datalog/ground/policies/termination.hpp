@@ -34,7 +34,7 @@ public:
     NoTerminationPolicy() = default;
 
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView) {}
-    bool check(::tyr::formalism::datalog::GroundProgramView, const FactsWorkspace<GroundTag>&) const noexcept { return false; }
+    bool check(::tyr::formalism::datalog::ProgramView<GroundTag>, const FactsWorkspace<GroundTag>&) const noexcept { return false; }
     Cost get_total_cost(const FactsWorkspace<GroundTag>&, const GroundSelectedPredicateAnnotations&) const noexcept { return Cost(0); }
     void reset() noexcept {}
     void clear() noexcept {}
@@ -46,7 +46,7 @@ class TerminationPolicy<GroundTag, AggregationFunction>
 public:
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_) { goals = goals_; }
 
-    bool check(::tyr::formalism::datalog::GroundProgramView program, const FactsWorkspace<GroundTag>& facts) const noexcept
+    bool check(::tyr::formalism::datalog::ProgramView<GroundTag> program, const FactsWorkspace<GroundTag>& facts) const noexcept
     {
         if (!goals.has_value())
             return false;
@@ -84,7 +84,7 @@ public:
     void clear() noexcept { goals.reset(); }
 
 private:
-    static bool is_static_fact_true(::tyr::formalism::datalog::GroundProgramView program,
+    static bool is_static_fact_true(::tyr::formalism::datalog::ProgramView<GroundTag> program,
                                     ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::StaticTag> fact) noexcept
     {
         for (const auto atom : program.template get_atoms<::tyr::formalism::StaticTag>())

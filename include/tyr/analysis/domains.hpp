@@ -19,19 +19,19 @@
 #define TYR_ANALYSIS_DOMAINS_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 
 #include <utility>
 #include <vector>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::analysis
 {
-ProgramVariableDomains compute_variable_domains(::tyr::formalism::datalog::ProgramView program);
+ProgramVariableDomains compute_variable_domains(::tyr::formalism::datalog::ProgramView<LiftedTag> program);
 
 TaskVariableDomains compute_variable_domains(::tyr::formalism::planning::TaskView task);
 

@@ -22,7 +22,7 @@ namespace fd = tyr::formalism::datalog;
 
 namespace tyr::datalog
 {
-ConstProgramWorkspace<GroundTag>::ConstProgramWorkspace(fd::GroundProgramView program_) : program(program_), fluent_precondition_to_rules()
+ConstProgramWorkspace<GroundTag>::ConstProgramWorkspace(fd::ProgramView<GroundTag> program_) : program(program_), fluent_precondition_to_rules()
 {
     for (const auto rule : program.get_ground_rules())
     {
