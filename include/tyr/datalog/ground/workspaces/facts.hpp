@@ -22,6 +22,8 @@
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::datalog
 {
@@ -30,6 +32,8 @@ template<>
 struct FactsWorkspace<GroundTag>
 {
     ygg::UnorderedSet<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>> fluent_atoms;
+    ygg::UnorderedMap<::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::StaticTag>, ygg::ClosedInterval<ygg::float_t>> static_fterm_intervals;
+    ygg::UnorderedMap<::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>, ygg::ClosedInterval<ygg::float_t>> fluent_fterm_intervals;
 };
 
 }

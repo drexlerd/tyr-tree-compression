@@ -36,6 +36,8 @@ FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::Executio
                                                                             datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>(),
                                                                             datalog::TerminationPolicy<GroundTag, datalog::SumAggregation>()),
     m_markings(1),
+    m_function_markings(),
+    m_numeric_support_selector_workspace(),
     m_effect_families(),
     m_relaxed_plan(),
     m_preferred_actions(),
@@ -55,6 +57,8 @@ ygg::float_t FFRPGHeuristic<GroundTag>::extract_cost_and_set_preferred_actions_i
     m_preferred_action_views_dirty = true;
     m_relaxed_plan.clear();
     m_preferred_actions.clear();
+    m_function_markings.clear();
+    m_numeric_support_selector_workspace.clear();
     for (auto& bitset : m_markings)
         bitset.reset();
 
@@ -64,6 +68,9 @@ ygg::float_t FFRPGHeuristic<GroundTag>::extract_cost_and_set_preferred_actions_i
         for (const auto literal : goal->get_literals<f::FluentTag>())
             if (literal.get_polarity())
                 extract_relaxed_plan_and_preferred_actions(literal.get_atom(), state_context);
+
+        for (const auto constraint : goal->get_numeric_constraints())
+            extract_numeric_constraint_support(constraint, state_context);
     }
 
     return m_relaxed_plan.size();
@@ -98,6 +105,8 @@ bool FFRPGHeuristic<GroundTag>::mark_atom(fd::GroundAtomView<f::FluentTag> atom)
     return false;
 }
 
+bool FFRPGHeuristic<GroundTag>::mark_function(fd::GroundFunctionTermView<f::FluentTag> term) { return !m_function_markings.insert(term).second; }
+
 void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(fd::GroundAtomView<f::FluentTag> atom, const StateContext<GroundTag>& state_context)
 {
     if (mark_atom(atom))
@@ -112,6 +121,40 @@ void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(fd::G
         return;
 
     extract_relaxed_plan_and_preferred_actions(*witness, state_context);
+}
+
+void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(fd::GroundFunctionTermView<f::FluentTag> term,
+                                                                           const StateContext<GroundTag>& state_context)
+{
+    const auto* annotation = this->m_workspace.numeric_and_annot.find(term);
+    if (!annotation)
+        return;
+
+    extract_relaxed_plan_and_preferred_actions(term, *annotation, state_context);
+}
+
+void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(fd::GroundFunctionTermView<f::FluentTag> term,
+                                                                           const datalog::GroundAnnotation& annotation,
+                                                                           const StateContext<GroundTag>& state_context)
+{
+    if (mark_function(term))
+        return;
+
+    const auto* witness = std::get_if<datalog::GroundWitnessAnnotation>(&annotation);
+    if (!witness)
+        return;
+
+    extract_relaxed_plan_and_preferred_actions(*witness, state_context);
+}
+
+void FFRPGHeuristic<GroundTag>::extract_numeric_constraint_support(fd::GroundBooleanOperatorView constraint, const StateContext<GroundTag>& state_context)
+{
+    const auto numeric_support_selector = datalog::GroundNumericSupportSelector(this->m_workspace.facts, this->m_workspace.numeric_and_annot);
+    numeric_support_selector.for_each_constraint_support(constraint,
+                                                         m_numeric_support_selector_workspace,
+                                                         datalog::SumAggregation {},
+                                                         [&](const auto term, const auto, const auto& annotation)
+                                                         { extract_relaxed_plan_and_preferred_actions(term, annotation, state_context); });
 }
 
 void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(const datalog::GroundWitnessAnnotation& witness,
@@ -133,6 +176,9 @@ void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(const
         if (literal.get_polarity())
             extract_relaxed_plan_and_preferred_actions(literal.get_atom(), state_context);
     }
+
+    for (const auto constraint : rule.get_body().get_numeric_constraints())
+        extract_numeric_constraint_support(constraint, state_context);
 }
 
 }

@@ -34,6 +34,12 @@ class NoOrAnnotationPolicy<GroundTag>
 public:
     void initialize_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, GroundSelectedPredicateAnnotations&) const noexcept {}
 
+    void initialize_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
+                               ygg::ClosedInterval<ygg::float_t>,
+                               GroundSelectedFunctionAnnotations&) const noexcept
+    {
+    }
+
     GroundCostUpdate update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
                                        const GroundAnnotation&,
                                        GroundSelectedPredicateAnnotations&) const noexcept
@@ -55,6 +61,13 @@ public:
                            GroundSelectedPredicateAnnotations&) const noexcept
     {
     }
+
+    void update_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
+                           ygg::ClosedInterval<ygg::float_t>,
+                           const GroundAndAnnotationContext&,
+                           GroundSelectedFunctionAnnotations&) const noexcept
+    {
+    }
 };
 
 template<>
@@ -65,6 +78,13 @@ public:
                                GroundSelectedPredicateAnnotations& program_and_annot) const
     {
         program_and_annot.insert_or_assign(program_head, GroundBaseAnnotation(Cost(0)));
+    }
+
+    void initialize_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> program_head,
+                               ygg::ClosedInterval<ygg::float_t> interval,
+                               GroundSelectedFunctionAnnotations& program_numeric_and_annot) const
+    {
+        program_numeric_and_annot.insert(program_head, interval, GroundBaseAnnotation(Cost(0)));
     }
 
     GroundCostUpdate update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
@@ -103,6 +123,14 @@ public:
                            GroundSelectedPredicateAnnotations& delta_and_annot) const
     {
         delta_and_annot.insert_or_assign(program_head, GroundWitnessAnnotation(context.rule, context.current_cost + context.rule_cost));
+    }
+
+    void update_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> program_head,
+                           ygg::ClosedInterval<ygg::float_t> interval,
+                           const GroundAndAnnotationContext& context,
+                           GroundSelectedFunctionAnnotations& delta_numeric_and_annot) const
+    {
+        delta_numeric_and_annot.insert(program_head, interval, GroundWitnessAnnotation(context.rule, context.current_cost + context.rule_cost));
     }
 };
 

@@ -40,10 +40,16 @@ struct D2PTranslationContext<GroundTag>
                                                         ::tyr::formalism::planning::GroundAtomView<::tyr::formalism::FluentTag>>;
     using FluentToDerivedAtomMapping = ygg::UnorderedMap<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
                                                          ::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag>>;
+    using StaticToStaticFunctionTermMapping = ygg::UnorderedMap<::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::StaticTag>,
+                                                                ::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::StaticTag>>;
+    using FluentToFluentFunctionTermMapping = ygg::UnorderedMap<::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
+                                                                ::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag>>;
 
     StaticToStaticAtomMapping static_to_static_atom;
     FluentToFluentAtomMapping fluent_to_fluent_atom;
     FluentToDerivedAtomMapping fluent_to_derived_atom;
+    StaticToStaticFunctionTermMapping static_to_static_fterm;
+    FluentToFluentFunctionTermMapping fluent_to_fluent_fterm;
 };
 
 template<>
@@ -55,10 +61,16 @@ struct P2DTranslationContext<GroundTag>
                                                         ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>>;
     using DerivedToFluentAtomMapping = ygg::UnorderedMap<::tyr::formalism::planning::GroundAtomView<::tyr::formalism::DerivedTag>,
                                                          ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>>;
+    using StaticToStaticFunctionTermMapping = ygg::UnorderedMap<::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::StaticTag>,
+                                                                ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::StaticTag>>;
+    using FluentToFluentFunctionTermMapping = ygg::UnorderedMap<::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag>,
+                                                                ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>>;
 
     StaticToStaticAtomMapping static_to_static_atom;
     FluentToFluentAtomMapping fluent_to_fluent_atom;
     DerivedToFluentAtomMapping derived_to_fluent_atom;
+    StaticToStaticFunctionTermMapping static_to_static_fterm;
+    FluentToFluentFunctionTermMapping fluent_to_fluent_fterm;
 };
 
 }

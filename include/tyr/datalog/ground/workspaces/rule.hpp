@@ -21,6 +21,7 @@
 #include "tyr/datalog/workspaces/rule.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
+#include <optional>
 #include <vector>
 #include <yggdrasil/core/types.hpp>
 
@@ -32,12 +33,16 @@ struct RuleWorkspace<GroundTag>
 {
     std::vector<ygg::uint_t> unsatisfied_counts;
     std::vector<bool> fired_rules;
+    std::vector<std::optional<Cost>> queued_costs;
+    std::vector<std::vector<bool>> numeric_constraint_satisfied_by_rule;
     explicit RuleWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag>) {}
 
     void clear()
     {
         unsatisfied_counts.clear();
         fired_rules.clear();
+        queued_costs.clear();
+        numeric_constraint_satisfied_by_rule.clear();
     }
 };
 

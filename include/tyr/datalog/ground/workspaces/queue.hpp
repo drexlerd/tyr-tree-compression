@@ -32,9 +32,10 @@ namespace tyr::datalog
 struct GroundQueueEntry
 {
     Cost cost;
+    ygg::uint_t sequence;
     ::tyr::formalism::datalog::GroundRuleView rule;
 
-    auto identifying_members() const noexcept { return std::make_tuple(cost, rule.get_index()); }
+    auto identifying_members() const noexcept { return std::make_tuple(cost, sequence); }
 };
 
 struct GroundQueueStatistics
@@ -52,6 +53,7 @@ struct QueueWorkspace<GroundTag>
 {
     std::vector<GroundQueueEntry> storage;
     GroundQueueStatistics statistics;
+    ygg::uint_t next_sequence = 0;
 
     explicit QueueWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag> program) { storage.reserve(program.get_ground_rules().size()); }
 
@@ -59,6 +61,7 @@ struct QueueWorkspace<GroundTag>
     {
         storage.clear();
         statistics = GroundQueueStatistics {};
+        next_sequence = 0;
     }
 };
 

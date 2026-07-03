@@ -162,6 +162,138 @@
             "domain_file": "tests/classical/visitall/domain.pddl",
             "task_file": "tests/classical/visitall/test-1.pddl",
             "h_star_unit_cost_one": 8
+        },
+        {
+            "name": "FoCounters",
+            "domain_file": "tests/numeric/fo-counters/domain.pddl",
+            "task_file": "tests/numeric/fo-counters/test-1.pddl",
+            "h_star_unit_cost_one": 5
+        },
+        {
+            "name": "Refuel",
+            "domain_file": "tests/numeric/refuel/domain.pddl",
+            "task_file": "tests/numeric/refuel/test-1.pddl",
+            "h_star_unit_cost_one": 5
+        },
+        {
+            "name": "RefuelAdl",
+            "domain_file": "tests/numeric/refuel-adl/domain.pddl",
+            "task_file": "tests/numeric/refuel-adl/test-1.pddl",
+            "h_star_unit_cost_one": 10
+        },
+        {
+            "name": "Tpp",
+            "domain_file": "tests/numeric/tpp/domain.pddl",
+            "task_file": "tests/numeric/tpp/test-1.pddl",
+            "h_star_unit_cost_one": 7
+        },
+        {
+            "name": "Zenotravel",
+            "domain_file": "tests/numeric/zenotravel/domain.pddl",
+            "task_file": "tests/numeric/zenotravel/test-1.pddl",
+            "h_star_unit_cost_one": 9
+        },
+        {
+            "name": "BlockGrouping",
+            "domain_file": "tests/numeric/block-grouping/domain.pddl",
+            "task_file": "tests/numeric/block-grouping/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "Counters",
+            "domain_file": "tests/numeric/counters/domain.pddl",
+            "task_file": "tests/numeric/counters/test-1.pddl",
+            "h_star_unit_cost_one": 12
+        },
+        {
+            "name": "NumericDelivery",
+            "domain_file": "tests/numeric/delivery/domain.pddl",
+            "task_file": "tests/numeric/delivery/test-1.pddl",
+            "h_star_unit_cost_one": 3
+        },
+        {
+            "name": "Drone",
+            "domain_file": "tests/numeric/drone/domain.pddl",
+            "task_file": "tests/numeric/drone/test-1.pddl",
+            "h_star_unit_cost_one": 4
+        },
+        {
+            "name": "Expedition",
+            "domain_file": "tests/numeric/expedition/domain.pddl",
+            "task_file": "tests/numeric/expedition/test-1.pddl",
+            "h_star_unit_cost_one": 1
+        },
+        {
+            "name": "ExtPlantWatering",
+            "domain_file": "tests/numeric/ext-plant-watering/domain.pddl",
+            "task_file": "tests/numeric/ext-plant-watering/test-1.pddl",
+            "h_star_unit_cost_one": 8
+        },
+        {
+            "name": "Farmland",
+            "domain_file": "tests/numeric/farmland/domain.pddl",
+            "task_file": "tests/numeric/farmland/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "FoFarmland",
+            "domain_file": "tests/numeric/fo-farmland/domain.pddl",
+            "task_file": "tests/numeric/fo-farmland/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "FoSailing",
+            "domain_file": "tests/numeric/fo-sailing/domain.pddl",
+            "task_file": "tests/numeric/fo-sailing/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "Hydropower",
+            "domain_file": "tests/numeric/hydropower/domain.pddl",
+            "task_file": "tests/numeric/hydropower/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "Markettrader",
+            "domain_file": "tests/numeric/markettrader/domain.pddl",
+            "task_file": "tests/numeric/markettrader/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "Mprime",
+            "domain_file": "tests/numeric/mprime/domain.pddl",
+            "task_file": "tests/numeric/mprime/test-1.pddl",
+            "h_star_unit_cost_one": 4
+        },
+        {
+            "name": "Pathwaysmetric",
+            "domain_file": "tests/numeric/pathwaysmetric/domain.pddl",
+            "task_file": "tests/numeric/pathwaysmetric/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "Rover",
+            "domain_file": "tests/numeric/rover/domain.pddl",
+            "task_file": "tests/numeric/rover/test-1.pddl",
+            "h_star_unit_cost_one": 5
+        },
+        {
+            "name": "Sailing",
+            "domain_file": "tests/numeric/sailing/domain.pddl",
+            "task_file": "tests/numeric/sailing/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "Settersnumeric",
+            "domain_file": "tests/numeric/settersnumeric/domain.pddl",
+            "task_file": "tests/numeric/settersnumeric/test-1.pddl",
+            "h_star_unit_cost_one": 2
+        },
+        {
+            "name": "Sugar",
+            "domain_file": "tests/numeric/sugar/domain.pddl",
+            "task_file": "tests/numeric/sugar/test-1.pddl",
+            "h_star_unit_cost_one": 3
         }
     ]
 }

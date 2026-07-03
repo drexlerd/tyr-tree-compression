@@ -20,6 +20,7 @@
 
 #include "tyr/datalog/ground/contexts/program.hpp"
 #include "tyr/datalog/ground/policies/cost.hpp"
+#include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/ground/queue.hpp"
 #include "tyr/datalog/ground/workspaces/program.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
@@ -36,6 +37,8 @@
 #include "tyr/planning/heuristics/rpg.hpp"
 
 #include <limits>
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {
@@ -102,6 +105,7 @@ void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::set_goal(::tyr::formalism
     namespace fd = ::tyr::formalism::datalog;
     auto builder = fd::Builder();
     auto& repository = m_task->get_rpg_program().get_datalog_program().get_program_repository();
+    auto merge_context = ::tyr::formalism::planning::MergeDatalogContext(builder, repository);
     auto condition_ptr = builder.get_builder<fd::GroundConjunctiveCondition>();
     auto& condition = *condition_ptr;
     condition.clear();
@@ -121,6 +125,9 @@ void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::set_goal(::tyr::formalism
         }
     }
 
+    for (const auto numeric_constraint : goal.get_numeric_constraints())
+        condition.numeric_constraints.push_back(::tyr::formalism::planning::merge_p2d(numeric_constraint, merge_context));
+
     fd::canonicalize(condition);
     m_workspace.tp.set_goals(repository.get_or_create(condition).first);
 }
@@ -133,10 +140,14 @@ template<typename Derived,
 ygg::float_t RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::evaluate(const StateView<GroundTag>& state)
 {
     m_workspace.facts.fluent_atoms.clear();
-    const auto& p2d = m_task->get_rpg_program().get_translation_context().p2d.fluent_to_fluent_atom;
+    m_workspace.facts.fluent_fterm_intervals.clear();
+    const auto& p2d = m_task->get_rpg_program().get_translation_context().p2d;
     for (const auto fact : state.get_fluent_facts_view())
         if (const auto atom = fact.get_atom())
-            m_workspace.facts.fluent_atoms.insert(p2d.at(*atom));
+            m_workspace.facts.fluent_atoms.insert(p2d.fluent_to_fluent_atom.at(*atom));
+
+    for (const auto& [fterm, value] : state.get_fluent_fterm_values_view())
+        m_workspace.facts.fluent_fterm_intervals.insert_or_assign(p2d.fluent_to_fluent_fterm.at(fterm), ygg::ClosedInterval<ygg::float_t>(value, value));
 
     auto ctx = datalog::ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>(m_workspace,
                                                                                 m_queue_workspace,
@@ -185,7 +196,8 @@ template<typename Derived,
          datalog::RuleCostPolicyConcept<GroundTag> CP>
 datalog::Cost RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::get_goal_cost() const noexcept
 {
-    return m_workspace.tp.get_total_cost(m_workspace.facts, m_workspace.and_annot);
+    const auto numeric_support_selector = datalog::GroundNumericSupportSelector(m_workspace.facts, m_workspace.numeric_and_annot);
+    return m_workspace.tp.get_total_cost(m_workspace.facts, m_workspace.and_annot, m_workspace.numeric_and_annot, numeric_support_selector);
 }
 
 }

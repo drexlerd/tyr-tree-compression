@@ -127,6 +127,19 @@ fd::GroundLiteralView<f::FluentTag> create_positive_literal(fd::GroundAtomView<f
     return context.merge_context.destination.get_or_create(literal).first;
 }
 
+void fill_delete_free_condition(fp::GroundConjunctiveConditionView condition,
+                                TranslationContext<GroundTag>& translation_context,
+                                GroundProgramBuildContext& context,
+                                ygg::Data<fd::GroundConjunctiveCondition>& result)
+{
+    for (const auto fact : condition.template get_facts<f::PositiveTag>())
+        if (const auto literal = fp::merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context))
+            result.fluent_literals.push_back(literal->get_index());
+
+    for (const auto numeric_constraint : condition.get_numeric_constraints())
+        result.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context.merge_context));
+}
+
 fd::GroundConjunctiveConditionView create_delete_free_condition(fp::GroundConjunctiveConditionView condition,
                                                                 TranslationContext<GroundTag>& translation_context,
                                                                 GroundProgramBuildContext& context)
@@ -134,13 +147,7 @@ fd::GroundConjunctiveConditionView create_delete_free_condition(fp::GroundConjun
     auto condition_ptr = context.builder.get_builder<fd::GroundConjunctiveCondition>();
     auto& result = *condition_ptr;
     result.clear();
-
-    for (const auto fact : condition.template get_facts<f::PositiveTag>())
-        if (const auto literal = fp::merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context))
-            result.fluent_literals.push_back(literal->get_index());
-
-    for (const auto numeric_constraint : condition.get_numeric_constraints())
-        result.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context.merge_context));
+    fill_delete_free_condition(condition, translation_context, context, result);
 
     canonicalize(result);
     return context.merge_context.destination.get_or_create(result).first;
@@ -153,16 +160,17 @@ create_delete_free_goal(fp::GroundConjunctiveConditionView goal, TranslationCont
 }
 
 fd::GroundConjunctiveConditionView create_delete_free_effect_condition(fd::GroundAtomView<f::FluentTag> applicability_atom,
-                                                                       fp::GroundConjunctiveConditionView condition,
+                                                                       fp::GroundConjunctiveConditionView action_condition,
+                                                                       fp::GroundConjunctiveConditionView effect_condition,
                                                                        TranslationContext<GroundTag>& translation_context,
                                                                        GroundProgramBuildContext& context)
 {
-    auto merged_condition = create_delete_free_condition(condition, translation_context, context);
     auto condition_ptr = context.builder.get_builder<fd::GroundConjunctiveCondition>();
     auto& result = *condition_ptr;
     result.clear();
-    result.fluent_literals = merged_condition.get_literals<f::FluentTag>().get_data();
-    result.numeric_constraints = merged_condition.get_numeric_constraints().get_data();
+    fill_delete_free_condition(effect_condition, translation_context, context, result);
+    for (const auto numeric_constraint : action_condition.get_numeric_constraints())
+        result.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context.merge_context));
     result.fluent_literals.push_back(create_positive_literal(applicability_atom, context).get_index());
     canonicalize(result);
     return context.merge_context.destination.get_or_create(result).first;
@@ -222,7 +230,8 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
 
     for (const auto cond_eff : action.get_effects())
     {
-        const auto body = create_delete_free_effect_condition(applicability_atom, cond_eff.get_condition(), translation_context, context);
+        const auto body =
+            create_delete_free_effect_condition(applicability_atom, action.get_condition(), cond_eff.get_condition(), translation_context, context);
 
         for (const auto fact : cond_eff.get_effect().get_facts<f::PositiveTag>())
         {
@@ -300,9 +309,19 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
     }
 
     for (const auto fterm_value : task.get_fterm_values<f::StaticTag>())
-        program.static_fterm_values.push_back(fp::merge_p2d(fterm_value, merge_context).first.get_index());
+    {
+        const auto new_fterm_value = fp::merge_p2d(fterm_value, merge_context).first;
+        translation_context.p2d.static_to_static_fterm.emplace(fterm_value.get_fterm(), new_fterm_value.get_fterm());
+        translation_context.d2p.static_to_static_fterm.emplace(new_fterm_value.get_fterm(), fterm_value.get_fterm());
+        program.static_fterm_values.push_back(new_fterm_value.get_index());
+    }
     for (const auto fterm_value : task.get_fterm_values<f::FluentTag>())
-        program.fluent_fterm_values.push_back(fp::merge_p2d(fterm_value, merge_context).first.get_index());
+    {
+        const auto new_fterm_value = fp::merge_p2d(fterm_value, merge_context).first;
+        translation_context.p2d.fluent_to_fluent_fterm.emplace(fterm_value.get_fterm(), new_fterm_value.get_fterm());
+        translation_context.d2p.fluent_to_fluent_fterm.emplace(new_fterm_value.get_fterm(), fterm_value.get_fterm());
+        program.fluent_fterm_values.push_back(new_fterm_value.get_index());
+    }
 
     context.program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).get_index();
 

@@ -19,6 +19,7 @@
 #define TYR_DATALOG_GROUND_POLICIES_TERMINATION_CONCEPT_HPP_
 
 #include "tyr/datalog/ground/policies/annotation_types.hpp"
+#include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/ground/workspaces/facts.hpp"
 #include "tyr/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -39,10 +40,12 @@ struct TerminationPolicyConceptImpl<GroundTag, T>
                                            ::tyr::formalism::datalog::GroundConjunctiveConditionView goals,
                                            ::tyr::formalism::datalog::ProgramView<GroundTag> program,
                                            const FactsWorkspace<GroundTag>& facts,
-                                           const GroundSelectedPredicateAnnotations& and_annot) {
+                                           const GroundSelectedPredicateAnnotations& and_annot,
+                                           const GroundSelectedFunctionAnnotations& numeric_and_annot,
+                                           const GroundNumericSupportSelector& numeric_support_selector) {
         { p.set_goals(goals) } -> std::same_as<void>;
         { cp.check(program, facts) } -> std::same_as<bool>;
-        { cp.get_total_cost(facts, and_annot) } -> std::same_as<Cost>;
+        { cp.get_total_cost(facts, and_annot, numeric_and_annot, numeric_support_selector) } -> std::same_as<Cost>;
         { p.reset() } -> std::same_as<void>;
         { p.clear() } -> std::same_as<void>;
     };

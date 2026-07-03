@@ -19,6 +19,7 @@
 #define TYR_PLANNING_GROUND_HEURISTICS_RPG_FF_HPP_
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
+#include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/ground/policies/termination.hpp"
 #include "tyr/planning/ground/heuristics/rpg.hpp"
 #include "tyr/planning/heuristics/rpg_ff.hpp"
@@ -50,14 +51,23 @@ public:
     const ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView>& get_preferred_action_views() override;
 
     bool mark_atom(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> atom);
+    bool mark_function(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term);
 
 private:
     void extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> atom,
                                                     const StateContext<GroundTag>& state_context);
+    void extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
+                                                    const StateContext<GroundTag>& state_context);
+    void extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
+                                                    const datalog::GroundAnnotation& annotation,
+                                                    const StateContext<GroundTag>& state_context);
+    void extract_numeric_constraint_support(::tyr::formalism::datalog::GroundBooleanOperatorView constraint, const StateContext<GroundTag>& state_context);
     void extract_relaxed_plan_and_preferred_actions(const datalog::GroundWitnessAnnotation& witness, const StateContext<GroundTag>& state_context);
 
 private:
     std::vector<boost::dynamic_bitset<>> m_markings;
+    ygg::UnorderedSet<::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>> m_function_markings;
+    datalog::GroundNumericSupportSelectorWorkspace m_numeric_support_selector_workspace;
     ::tyr::formalism::planning::EffectFamilyList m_effect_families;
     ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_relaxed_plan;
     ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_preferred_actions;

@@ -45,6 +45,8 @@ struct ConstProgramWorkspace<GroundTag>
 
     ygg::UnorderedMap<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, std::vector<::tyr::formalism::datalog::GroundRuleView>>
         fluent_precondition_to_rules;
+    ygg::UnorderedMap<::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>, std::vector<::tyr::formalism::datalog::GroundRuleView>>
+        fluent_function_term_to_rules;
 
     explicit ConstProgramWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag> program);
 };
@@ -62,6 +64,7 @@ struct ProgramWorkspace<GroundTag>
         OrAP or_ap;
         AndAP and_ap;
         GroundSelectedPredicateAnnotations and_annot;
+        GroundSelectedFunctionAnnotations numeric_and_annot;
         TP tp;
         CP cost_policy;
         RuleWorkspace<GroundTag> rules;
@@ -71,6 +74,7 @@ struct ProgramWorkspace<GroundTag>
             or_ap(std::move(or_ap_)),
             and_ap(std::move(and_ap_)),
             and_annot(),
+            numeric_and_annot(),
             tp(std::move(tp_)),
             cost_policy(std::move(cost_policy_)),
             rules(cws.program)

@@ -50,6 +50,10 @@ LMCutHeuristicPtr<GroundTag> LMCutHeuristic<GroundTag>::create(TaskPtr<GroundTag
 
 ygg::float_t LMCutHeuristic<GroundTag>::evaluate(const StateView<GroundTag>& state)
 {
+    const auto& program = m_task->get_rpg_program().get_datalog_program().get_program();
+    if (!program.get_functions<::tyr::formalism::FluentTag>().empty())
+        return Base::evaluate(state);
+
     auto value = datalog::Cost(0);
     m_residual_costs.clear();
 
