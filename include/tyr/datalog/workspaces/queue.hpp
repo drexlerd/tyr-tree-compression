@@ -15,31 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_GROUND_WORKSPACES_RULE_HPP_
-#define TYR_DATALOG_GROUND_WORKSPACES_RULE_HPP_
+#ifndef TYR_DATALOG_WORKSPACES_QUEUE_HPP_
+#define TYR_DATALOG_WORKSPACES_QUEUE_HPP_
 
-#include "tyr/datalog/workspaces/rule.hpp"
-#include "tyr/formalism/datalog/repository.hpp"
-
-#include <vector>
-#include <yggdrasil/core/types.hpp>
+#include "tyr/datalog/declarations.hpp"
 
 namespace tyr::datalog
 {
 
-template<>
-struct RuleWorkspace<GroundTag>
-{
-    std::vector<ygg::uint_t> unsatisfied_counts;
-    std::vector<bool> fired_rules;
-    explicit RuleWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag>) {}
-
-    void clear()
-    {
-        unsatisfied_counts.clear();
-        fired_rules.clear();
-    }
-};
+template<TaskKind Kind>
+struct QueueWorkspace;
 
 }
 

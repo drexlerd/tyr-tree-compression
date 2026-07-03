@@ -23,6 +23,7 @@
 #include "tyr/datalog/ground/policies/cost.hpp"
 #include "tyr/datalog/ground/policies/termination.hpp"
 #include "tyr/datalog/ground/workspaces/program.hpp"
+#include "tyr/datalog/ground/workspaces/queue.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/policies/cost_concept.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
@@ -58,7 +59,7 @@ struct ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>
     class Out
     {
     public:
-        explicit Out(ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& ws) : m_ws(ws) {}
+        explicit Out(ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& ws, QueueWorkspace<GroundTag>& queue_ws) : m_ws(ws), m_queue_ws(queue_ws) {}
 
         auto& facts() noexcept { return m_ws.facts; }
         const auto& facts() const noexcept { return m_ws.facts; }
@@ -78,18 +79,25 @@ struct ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>
         const auto& unsatisfied_counts() const noexcept { return m_ws.rules.unsatisfied_counts; }
         auto& fired_rules() noexcept { return m_ws.rules.fired_rules; }
         const auto& fired_rules() const noexcept { return m_ws.rules.fired_rules; }
-        auto& queue_storage() noexcept { return m_ws.rules.queue_storage; }
-        const auto& queue_storage() const noexcept { return m_ws.rules.queue_storage; }
+        auto& queue_storage() noexcept { return m_queue_ws.storage; }
+        const auto& queue_storage() const noexcept { return m_queue_ws.storage; }
         auto& fluent_atoms() noexcept { return m_ws.facts.fluent_atoms; }
         const auto& fluent_atoms() const noexcept { return m_ws.facts.fluent_atoms; }
-        auto& statistics() noexcept { return m_ws.statistics; }
-        const auto& statistics() const noexcept { return m_ws.statistics; }
+        auto& statistics() noexcept { return m_queue_ws.statistics; }
+        const auto& statistics() const noexcept { return m_queue_ws.statistics; }
+        auto& queue() noexcept { return m_queue_ws; }
+        const auto& queue() const noexcept { return m_queue_ws; }
 
     private:
         ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& m_ws;
+        QueueWorkspace<GroundTag>& m_queue_ws;
     };
 
-    ProgramExecutionContext(ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& ws, const ConstProgramWorkspace<GroundTag>& cws) : m_in(cws), m_out(ws)
+    ProgramExecutionContext(ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& ws,
+                            QueueWorkspace<GroundTag>& queue_ws,
+                            const ConstProgramWorkspace<GroundTag>& cws) :
+        m_in(cws),
+        m_out(ws, queue_ws)
     {
     }
 
@@ -147,6 +155,7 @@ private:
     {
         initialize_annotations();
         m_out.rules().clear();
+        m_out.queue().clear();
         for (const auto rule : m_in.program().get_ground_rules())
         {
             const auto rule_index = rule.get_index();
@@ -163,7 +172,6 @@ private:
             at(m_out.unsatisfied_counts(), rule_index) = unsatisfied_count;
             at(m_out.fired_rules(), rule_index) = false;
         }
-        m_out.statistics() = GroundQueueStatistics {};
     }
 
     In m_in;

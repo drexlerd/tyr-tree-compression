@@ -71,6 +71,7 @@ protected:
     TaskPtr<GroundTag> m_task;
     ygg::ExecutionContextPtr m_execution_context;
     datalog::ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP> m_workspace;
+    datalog::QueueWorkspace<GroundTag> m_queue_workspace;
 };
 
 template<typename Derived,
@@ -85,7 +86,8 @@ RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::RPGBase(TaskPtr<GroundTag> tas
                                                           const TP& tp) :
     m_task(std::move(task)),
     m_execution_context(std::move(execution_context)),
-    m_workspace(m_task->get_rpg_program().get_datalog_program().get_const_program_workspace(), or_ap, and_ap, tp)
+    m_workspace(m_task->get_rpg_program().get_datalog_program().get_const_program_workspace(), or_ap, and_ap, tp),
+    m_queue_workspace(m_task->get_rpg_program().get_datalog_program().get_program())
 {
     m_workspace.tp.set_goals(m_task->get_rpg_program().get_goal());
 }
@@ -137,6 +139,7 @@ ygg::float_t RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::evaluate(const St
             m_workspace.facts.fluent_atoms.insert(p2d.at(*atom));
 
     auto ctx = datalog::ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>(m_workspace,
+                                                                                m_queue_workspace,
                                                                                 m_task->get_rpg_program().get_datalog_program().get_const_program_workspace());
     ctx.initialize();
 

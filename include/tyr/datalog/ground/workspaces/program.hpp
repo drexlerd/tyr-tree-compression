@@ -38,16 +38,6 @@
 namespace tyr::datalog
 {
 
-struct GroundQueueStatistics
-{
-    ygg::uint_t num_queue_pushes = 0;
-    ygg::uint_t num_queue_pops = 0;
-    ygg::uint_t num_stale_queue_pops = 0;
-    ygg::uint_t num_rules_fired = 0;
-    ygg::uint_t num_facts_derived = 0;
-    ygg::uint_t max_queue_size = 0;
-};
-
 template<>
 struct ConstProgramWorkspace<GroundTag>
 {
@@ -75,7 +65,6 @@ struct ProgramWorkspace<GroundTag>
         TP tp;
         CP cost_policy;
         RuleWorkspace<GroundTag> rules;
-        GroundQueueStatistics statistics;
 
         explicit Instance(const ConstProgramWorkspace<GroundTag>& cws, OrAP or_ap_ = OrAP(), AndAP and_ap_ = AndAP(), TP tp_ = TP(), CP cost_policy_ = CP()) :
             facts(),
@@ -84,8 +73,7 @@ struct ProgramWorkspace<GroundTag>
             and_annot(),
             tp(std::move(tp_)),
             cost_policy(std::move(cost_policy_)),
-            rules(cws.program),
-            statistics()
+            rules(cws.program)
         {
             facts.fluent_atoms.reserve(cws.program.template get_atoms<::tyr::formalism::FluentTag>().size());
         }
