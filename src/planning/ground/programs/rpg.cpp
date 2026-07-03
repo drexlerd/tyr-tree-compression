@@ -139,6 +139,9 @@ fd::GroundConjunctiveConditionView create_delete_free_condition(fp::GroundConjun
         if (const auto literal = fp::merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context))
             result.fluent_literals.push_back(literal->get_index());
 
+    for (const auto numeric_constraint : condition.get_numeric_constraints())
+        result.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context.merge_context));
+
     canonicalize(result);
     return context.merge_context.destination.get_or_create(result).first;
 }
@@ -159,6 +162,7 @@ fd::GroundConjunctiveConditionView create_delete_free_effect_condition(fd::Groun
     auto& result = *condition_ptr;
     result.clear();
     result.fluent_literals = merged_condition.get_literals<f::FluentTag>().get_data();
+    result.numeric_constraints = merged_condition.get_numeric_constraints().get_data();
     result.fluent_literals.push_back(create_positive_literal(applicability_atom, context).get_index());
     canonicalize(result);
     return context.merge_context.destination.get_or_create(result).first;
@@ -173,6 +177,21 @@ create_ground_atom_rule(fd::GroundConjunctiveConditionView body, fd::GroundAtomV
     rule.binding = create_rule_binding(context, cost).get_index();
     rule.body = body.get_index();
     rule.head = head.get_index();
+    canonicalize(rule);
+    return context.merge_context.destination.get_or_create(rule).first;
+}
+
+fd::GroundRuleView create_ground_numeric_effect_rule(fd::GroundConjunctiveConditionView body,
+                                                     fp::GroundNumericEffectOperatorView<f::FluentTag> head,
+                                                     GroundProgramBuildContext& context,
+                                                     d::Cost cost)
+{
+    auto rule_ptr = context.builder.get_builder<fd::GroundRule>();
+    auto& rule = *rule_ptr;
+    rule.clear();
+    rule.binding = create_rule_binding(context, cost).get_index();
+    rule.body = body.get_index();
+    rule.head = fp::merge_p2d(head, context.merge_context);
     canonicalize(rule);
     return context.merge_context.destination.get_or_create(rule).first;
 }
@@ -214,6 +233,13 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
                 rule_to_action.emplace(rule, action);
             }
         }
+
+        for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
+        {
+            const auto rule = create_ground_numeric_effect_rule(body, numeric_effect, context, d::Cost(1));
+            program.ground_rules.push_back(rule.get_index());
+            rule_to_action.emplace(rule, action);
+        }
     }
 }
 
@@ -238,6 +264,12 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
         context.fluent_predicates.emplace(predicate, new_predicate);
         program.fluent_predicates.push_back(new_predicate.get_index());
     }
+
+    for (const auto function : task.get_domain().get_functions<f::StaticTag>())
+        program.static_functions.push_back(fp::merge_p2d(function, merge_context).first.get_index());
+    for (const auto function : task.get_domain().get_functions<f::FluentTag>())
+        program.fluent_functions.push_back(fp::merge_p2d(function, merge_context).first.get_index());
+
     for (const auto object : task.get_domain().get_constants())
         program.objects.push_back(fp::merge_p2d(object, merge_context).first.get_index());
     for (const auto object : task.get_objects())
@@ -266,6 +298,12 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
                 program.fluent_atoms.push_back(new_atom.get_index());
         }
     }
+
+    for (const auto fterm_value : task.get_fterm_values<f::StaticTag>())
+        program.static_fterm_values.push_back(fp::merge_p2d(fterm_value, merge_context).first.get_index());
+    for (const auto fterm_value : task.get_fterm_values<f::FluentTag>())
+        program.fluent_fterm_values.push_back(fp::merge_p2d(fterm_value, merge_context).first.get_index());
+
     context.program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).get_index();
 
     for (const auto action : task.get_ground_actions())

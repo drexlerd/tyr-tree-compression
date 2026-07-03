@@ -60,8 +60,8 @@ bool TerminationPolicy<LiftedTag, AggregationFunction>::check(const FactSets& fa
 
 template<typename AggregationFunction>
 Cost TerminationPolicy<LiftedTag, AggregationFunction>::get_total_cost(const FactSets& fact_sets,
-                                                                       const SelectedPredicateAnnotations& and_annot,
-                                                                       const SelectedFunctionAnnotations& numeric_and_annot,
+                                                                       const SelectedPredicateAnnotations<LiftedTag>& and_annot,
+                                                                       const SelectedFunctionAnnotations<LiftedTag>& numeric_and_annot,
                                                                        const NumericSupportSelector& numeric_support_selector) const noexcept
 {
     auto cost = AggregationFunction::identity();

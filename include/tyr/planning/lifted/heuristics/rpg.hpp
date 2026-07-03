@@ -155,7 +155,7 @@ protected:
             *m_workspace.numeric_support_selector);
     }
 
-    std::optional<::tyr::formalism::planning::ActionBindingView> get_action_binding(const datalog::WitnessAnnotation& witness)
+    std::optional<::tyr::formalism::planning::ActionBindingView> get_action_binding(const datalog::WitnessAnnotation<LiftedTag>& witness)
     {
         const auto rule_binding = witness.get_rule_row();
         const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_datalog_program().get_program_repository());
@@ -172,7 +172,7 @@ protected:
     }
 
     template<typename Callback>
-    void for_each_witness_precondition(const datalog::WitnessAnnotation& witness, Callback&& callback)
+    void for_each_witness_precondition(const datalog::WitnessAnnotation<LiftedTag>& witness, Callback&& callback)
     {
         const auto rule_binding = witness.get_rule_row();
         const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_datalog_program().get_program_repository());

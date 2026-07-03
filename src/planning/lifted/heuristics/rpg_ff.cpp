@@ -150,7 +150,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(::tyr
     if (!annotation)
         return;
 
-    const auto* witness = std::get_if<datalog::WitnessAnnotation>(annotation);
+    const auto* witness = std::get_if<datalog::WitnessAnnotation<LiftedTag>>(annotation);
     if (!witness)
         return;
 
@@ -169,7 +169,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(::tyr
 }
 
 void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
-                                                                           const datalog::Annotation& annotation,
+                                                                           const datalog::Annotation<LiftedTag>& annotation,
                                                                            const StateContext<LiftedTag>& state_context,
                                                                            ::tyr::formalism::planning::GrounderContext& grounder_context)
 {
@@ -178,7 +178,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(::tyr
         return;
 
     // Base case 2: function binding is initially assigned, i.e., has no witness => do not recurse again
-    const auto* witness = std::get_if<datalog::WitnessAnnotation>(&annotation);
+    const auto* witness = std::get_if<datalog::WitnessAnnotation<LiftedTag>>(&annotation);
     if (!witness)
         return;
 
@@ -197,7 +197,7 @@ void FFRPGHeuristic<LiftedTag>::extract_numeric_constraint_support(::tyr::formal
         { extract_relaxed_plan_and_preferred_actions(binding, annotation, state_context, grounder_context); });
 }
 
-void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const datalog::WitnessAnnotation& witness,
+void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const datalog::WitnessAnnotation<LiftedTag>& witness,
                                                                            const StateContext<LiftedTag>& state_context,
                                                                            ::tyr::formalism::planning::GrounderContext& grounder_context)
 {

@@ -15,41 +15,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_SOLVER_POLICIES_ANNOTATION_TYPES_HPP_
-#define TYR_SOLVER_POLICIES_ANNOTATION_TYPES_HPP_
+#ifndef TYR_DATALOG_LIFTED_POLICIES_ANNOTATION_TYPES_HPP_
+#define TYR_DATALOG_LIFTED_POLICIES_ANNOTATION_TYPES_HPP_
 
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
-#include "tyr/formalism/datalog/declarations.hpp"
+#include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <algorithm>
-#include <cassert>
-#include <concepts>
-#include <limits>
-#include <optional>
-#include <span>
 #include <tuple>
 #include <utility>
-#include <variant>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/core/config.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::datalog
 {
 
-class NumericSupportSelector;
-class NumericSupportSelectorWorkspace;
-/**
- * Annotations
- */
-
-/// @brief `WitnessAnnotation` is the rule and binding in the rule delta repository whose ground rule is the witness for its ground atom in the head.
-/// The witness lives in the rule delta repository.
-struct WitnessAnnotation
+template<>
+struct WitnessAnnotation<LiftedTag>
 {
 public:
     WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Cost cost) : m_rule_row(rule_row), m_cost(cost) {}
@@ -64,31 +48,14 @@ private:
     Cost m_cost;
 };
 
-struct BaseAnnotation
-{
-public:
-    explicit BaseAnnotation(Cost cost = Cost(0)) : m_cost(cost) {}
-
-    auto get_cost() const noexcept { return m_cost; }
-
-private:
-    Cost m_cost;
-};
-
-using Annotation = std::variant<BaseAnnotation, WitnessAnnotation>;
-
-inline Cost get_cost(const Annotation& annotation) noexcept
-{
-    return std::visit([](const auto& value) { return value.get_cost(); }, annotation);
-}
-
-class AnnotationMap
+template<>
+class PredicateAnnotationMap<LiftedTag>
 {
 public:
     using Binding = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
     using Relation = ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>;
     using Row = ygg::Index<::tyr::formalism::Row>;
-    using Inner = ygg::UnorderedMap<Row, Annotation>;
+    using Inner = ygg::UnorderedMap<Row, Annotation<LiftedTag>>;
     using Outer = ygg::UnorderedMap<Relation, Inner>;
 
     void clear() noexcept
@@ -97,12 +64,12 @@ public:
             annotations.clear();
     }
 
-    void insert_or_assign(Binding binding, Annotation annotation)
+    void insert_or_assign(Binding binding, Annotation<LiftedTag> annotation)
     {
         m_annotations[binding.get_relation()].insert_or_assign(binding.get_index().row, std::move(annotation));
     }
 
-    const Annotation* find(Binding binding) const noexcept
+    const Annotation<LiftedTag>* find(Binding binding) const noexcept
     {
         const auto relation_it = m_annotations.find(binding.get_relation());
         if (relation_it == m_annotations.end())
@@ -112,7 +79,7 @@ public:
         return annotation_it == relation_it->second.end() ? nullptr : &annotation_it->second;
     }
 
-    Annotation* find(Binding binding) noexcept
+    Annotation<LiftedTag>* find(Binding binding) noexcept
     {
         const auto relation_it = m_annotations.find(binding.get_relation());
         if (relation_it == m_annotations.end())
@@ -126,21 +93,14 @@ private:
     Outer m_annotations;
 };
 
-using SelectedPredicateAnnotations = AnnotationMap;
-
-struct NumericIntervalAnnotation
-{
-    ygg::ClosedInterval<ygg::float_t> interval;
-    Annotation annotation;
-};
-
-class NumericIntervalAnnotations
+template<>
+class NumericIntervalAnnotations<LiftedTag>
 {
 public:
     using Binding = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
     using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
     using Row = ygg::Index<::tyr::formalism::Row>;
-    using Entry = NumericIntervalAnnotation;
+    using Entry = NumericIntervalAnnotation<LiftedTag>;
     using Entries = std::vector<Entry>;
     using RowPartitions = ygg::UnorderedMap<Row, Entries>;
     using Partitions = ygg::UnorderedMap<Relation, RowPartitions>;
@@ -157,19 +117,19 @@ public:
 
     const Partitions& partitions() const noexcept { return m_partitions; }
 
-    const Annotation* find(Binding binding) const noexcept
+    const Annotation<LiftedTag>* find(Binding binding) const noexcept
     {
         const auto* entries = find_entries(binding);
         return (!entries || entries->empty()) ? nullptr : &entries->back().annotation;
     }
 
-    Annotation* find(Binding binding) noexcept
+    Annotation<LiftedTag>* find(Binding binding) noexcept
     {
         auto* entries = find_entries(binding);
         return (!entries || entries->empty()) ? nullptr : &entries->back().annotation;
     }
 
-    const Annotation* find(Binding binding, ygg::ClosedInterval<ygg::float_t> interval) const noexcept
+    const Annotation<LiftedTag>* find(Binding binding, ygg::ClosedInterval<ygg::float_t> interval) const noexcept
     {
         const auto* entries = find_entries(binding);
         if (!entries)
@@ -182,16 +142,12 @@ public:
         return nullptr;
     }
 
-    void insert(Binding binding, ygg::ClosedInterval<ygg::float_t> interval, Annotation annotation)
+    void insert(Binding binding, ygg::ClosedInterval<ygg::float_t> interval, Annotation<LiftedTag> annotation)
     {
         if (empty(interval))
             return;
 
         auto& entries = m_partitions[binding.get_relation()][binding.get_index().row];
-        // Numeric effects can expand a function's relaxed envelope in either direction, so intervals for the same binding need not be nested.
-        // Keep individual interval witnesses and insert them sorted by cost. The support selector relies on this order to compute the
-        // cheapest cost threshold that covers the current relaxed envelope with a single linear running-hull scan. Use upper_bound so
-        // equal-cost witnesses keep insertion order and are not deduplicated.
         const auto cost = get_cost(annotation);
         entries.insert(std::upper_bound(entries.begin(), entries.end(), cost, [](Cost lhs, const Entry& rhs) { return lhs < get_cost(rhs.annotation); }),
                        Entry { interval, std::move(annotation) });
@@ -223,9 +179,8 @@ private:
     size_t m_size = 0;
 };
 
-using SelectedFunctionAnnotations = NumericIntervalAnnotations;
-
-struct AndAnnotationContext
+template<>
+struct AndAnnotationContext<LiftedTag>
 {
     ygg::uint_t current_cost;
     ::tyr::formalism::datalog::RuleView rule;
@@ -234,28 +189,19 @@ struct AndAnnotationContext
     ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition;
     const NumericSupportSelector& numeric_support_selector;
     NumericSupportSelectorWorkspace& numeric_support_selector_workspace;
-    const SelectedPredicateAnnotations& program_and_annot;
-    const SelectedFunctionAnnotations& program_numeric_and_annot;
+    const SelectedPredicateAnnotations<LiftedTag>& program_and_annot;
+    const SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot;
     ::tyr::formalism::datalog::GrounderContext& delta_context;
     ::tyr::formalism::datalog::GrounderContext& iteration_context;
 };
 
-struct CostUpdate
-{
-    std::optional<Cost> old_cost;
-    Cost new_cost;
-
-    CostUpdate() noexcept : old_cost(std::nullopt), new_cost(Cost(0)) { assert(is_monoton()); }
-    CostUpdate(std::optional<Cost> old_cost, Cost new_cost) noexcept : old_cost(old_cost), new_cost(new_cost) { assert(is_monoton()); }
-    CostUpdate(Cost old_cost, Cost new_cost) noexcept :
-        old_cost(old_cost == std::numeric_limits<Cost>::max() ? std::nullopt : std::optional<Cost>(old_cost)),
-        new_cost(new_cost)
-    {
-        assert(is_monoton());
-    }
-
-    bool is_monoton() const noexcept { return !old_cost || new_cost <= old_cost.value(); }
-};
+using LiftedWitnessAnnotation = WitnessAnnotation<LiftedTag>;
+using LiftedBaseAnnotation = BaseAnnotation<LiftedTag>;
+using LiftedAnnotation = Annotation<LiftedTag>;
+using LiftedSelectedPredicateAnnotations = SelectedPredicateAnnotations<LiftedTag>;
+using LiftedSelectedFunctionAnnotations = SelectedFunctionAnnotations<LiftedTag>;
+using LiftedAndAnnotationContext = AndAnnotationContext<LiftedTag>;
+using LiftedCostUpdate = CostUpdate<LiftedTag>;
 
 }
 

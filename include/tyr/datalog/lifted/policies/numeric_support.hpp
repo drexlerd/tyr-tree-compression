@@ -23,7 +23,7 @@ public:
     {
         ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding;
         ygg::ClosedInterval<ygg::float_t> interval;
-        const NumericIntervalAnnotation* annotation;
+        const NumericIntervalAnnotation<LiftedTag>* annotation;
         Cost cost;
 
         bool operator<(const SelectionEntry& other) const noexcept { return cost < other.cost; }
@@ -37,7 +37,7 @@ public:
 class NumericSupportSelector
 {
 public:
-    NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations& annotations);
+    NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations<LiftedTag>& annotations);
 
     ygg::ClosedInterval<ygg::float_t> select_fluent_interval(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                                              std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
@@ -93,7 +93,7 @@ private:
         if (!is_supported(selection))
             return std::numeric_limits<Cost>::max();
 
-        // Refine cheaper function supports first. Annotation entries for each binding are already sorted by cost.
+        // Refine cheaper function supports first. Annotation<LiftedTag> entries for each binding are already sorted by cost.
         std::sort(selection.begin(), selection.end());
 
         for (size_t pos = 0; pos < selection.size(); ++pos)
@@ -141,7 +141,7 @@ private:
     bool is_supported(::tyr::formalism::datalog::GroundBooleanOperatorView element,
                       std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
 
-    const NumericIntervalAnnotations::Entries* find_entries(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
+    const NumericIntervalAnnotations<LiftedTag>::Entries* find_entries(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
     ygg::ClosedInterval<ygg::float_t> current_interval(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
     Cost get_current_interval_cost(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                    ygg::ClosedInterval<ygg::float_t> current) const;
@@ -150,7 +150,7 @@ private:
                                                                           std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
 
     FactSets m_fact_sets;
-    const NumericIntervalAnnotations& m_annotations;
+    const NumericIntervalAnnotations<LiftedTag>& m_annotations;
     ygg::EqualTo<::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>> m_binding_equal;
 };
 }

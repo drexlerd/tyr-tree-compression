@@ -62,7 +62,7 @@ private:
     datalog::Cost get_residual_cost(ActionBinding action_binding) const;
     void set_residual_cost(ActionBinding action_binding, datalog::Cost cost);
     void apply_residual_costs();
-    const std::vector<PredicateBinding>& get_witness_max_preconditions(const datalog::WitnessAnnotation& witness);
+    const std::vector<PredicateBinding>& get_witness_max_preconditions(const datalog::WitnessAnnotation<LiftedTag>& witness);
     void release_witness_max_preconditions();
     void mark_goal_zone(PredicateBinding binding);
     bool is_before_goal_zone(PredicateBinding binding);

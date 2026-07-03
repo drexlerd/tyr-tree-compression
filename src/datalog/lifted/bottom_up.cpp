@@ -99,16 +99,16 @@ struct RuleUpdateInput
     const NumericSupportSelector& numeric_support_selector;
     NumericSupportSelectorWorkspace& numeric_support_selector_workspace;
     Cost current_cost;
-    const SelectedPredicateAnnotations& program_and_annot;
-    const SelectedFunctionAnnotations& program_numeric_and_annot;
+    const SelectedPredicateAnnotations<LiftedTag>& program_and_annot;
+    const SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot;
     const AndAP& and_ap;
     const CP& cost_policy;
     fd::GrounderContext& solve_context;
     fd::GrounderContext& iteration_context;
 
-    AndAnnotationContext make_annotation_context(fd::RuleBindingView rule_binding, Cost rule_cost) const
+    AndAnnotationContext<LiftedTag> make_annotation_context(fd::RuleBindingView rule_binding, Cost rule_cost) const
     {
-        return AndAnnotationContext { current_cost,
+        return AndAnnotationContext<LiftedTag> { current_cost,
                                       rule,
                                       rule_binding,
                                       rule_cost,
@@ -160,7 +160,7 @@ template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<Lift
 static void insert_propositional_update(fd::AtomView<f::FluentTag> head,
                                         const RuleUpdateInput<AndAP, CP>& input,
                                         RuleHeadIteration& head_iteration,
-                                        SelectedPredicateAnnotations& and_annot)
+                                        SelectedPredicateAnnotations<LiftedTag>& and_annot)
 {
     const auto program_head = fd::ground_binding(head, input.iteration_context).first;
     const auto worker_head = fd::ground_binding(head, input.solve_context).first;
@@ -180,7 +180,7 @@ static void insert_numeric_update(fd::NumericEffectOperatorView<f::FluentTag> he
                                   const FactSets& fact_sets,
                                   const RuleUpdateInput<AndAP, CP>& input,
                                   RuleHeadIteration& head_iteration,
-                                  SelectedFunctionAnnotations& numeric_and_annot)
+                                  SelectedFunctionAnnotations<LiftedTag>& numeric_and_annot)
 {
     const auto interval = is_valid_binding(head, fact_sets, input.iteration_context);
     if (empty(interval))

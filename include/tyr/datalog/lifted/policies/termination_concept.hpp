@@ -49,8 +49,8 @@ struct TerminationPolicyConceptImpl<LiftedTag, T>
                                            const T& cp,
                                            ::tyr::formalism::datalog::GroundConjunctiveConditionView goals,
                                            const FactSets& fact_sets,
-                                           const SelectedPredicateAnnotations& and_annot,
-                                           const SelectedFunctionAnnotations& numeric_and_annot,
+                                           const SelectedPredicateAnnotations<LiftedTag>& and_annot,
+                                           const SelectedFunctionAnnotations<LiftedTag>& numeric_and_annot,
                                            const NumericSupportSelector& numeric_support_selector) {
         { p.set_goals(goals) } -> std::same_as<void>;
         { cp.check(fact_sets) } -> std::same_as<bool>;

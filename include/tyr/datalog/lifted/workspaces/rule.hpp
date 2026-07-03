@@ -129,9 +129,9 @@ struct RuleWorkspace<LiftedTag>
             /// Heads
             RuleHeadIteration head;
 
-            // Annotations stored in program_overlay_repository
-            SelectedPredicateAnnotations and_annot;
-            SelectedFunctionAnnotations numeric_and_annot;
+            // Annotation<LiftedTag>s stored in program_overlay_repository
+            SelectedPredicateAnnotations<LiftedTag> and_annot;
+            SelectedFunctionAnnotations<LiftedTag> numeric_and_annot;
 
             /// KPKC
             kpkc::Workspace kpkc_workspace;

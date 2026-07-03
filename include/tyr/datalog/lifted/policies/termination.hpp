@@ -44,8 +44,8 @@ public:
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals) {}
     bool check(const FactSets& fact_sets) const noexcept { return false; }
     Cost get_total_cost(const FactSets& fact_sets,
-                        const SelectedPredicateAnnotations& and_annot,
-                        const SelectedFunctionAnnotations& numeric_and_annot,
+                        const SelectedPredicateAnnotations<LiftedTag>& and_annot,
+                        const SelectedFunctionAnnotations<LiftedTag>& numeric_and_annot,
                         const NumericSupportSelector& numeric_support_selector) const noexcept
     {
         return Cost(0);
@@ -66,8 +66,8 @@ public:
     bool check(const FactSets& fact_sets) const noexcept;
 
     Cost get_total_cost(const FactSets& fact_sets,
-                        const SelectedPredicateAnnotations& and_annot,
-                        const SelectedFunctionAnnotations& numeric_and_annot,
+                        const SelectedPredicateAnnotations<LiftedTag>& and_annot,
+                        const SelectedFunctionAnnotations<LiftedTag>& numeric_and_annot,
                         const NumericSupportSelector& numeric_support_selector) const noexcept;
 
     const auto& get_goal() const noexcept { return goal; }

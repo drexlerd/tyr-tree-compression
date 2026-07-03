@@ -126,7 +126,7 @@ public:
         return erased;
     }
 
-    void update(const CostUpdate& update, PredicateViewType a)
+    void update(const CostUpdate<LiftedTag>& update, PredicateViewType a)
     {
         if (update.old_cost.has_value())
             erase(*update.old_cost, a);
@@ -185,8 +185,8 @@ struct ProgramWorkspace<LiftedTag>
         FactsWorkspace<LiftedTag> facts;
 
         OrAP or_ap;
-        SelectedPredicateAnnotations and_annot;
-        SelectedFunctionAnnotations numeric_and_annot;
+        SelectedPredicateAnnotations<LiftedTag> and_annot;
+        SelectedFunctionAnnotations<LiftedTag> numeric_and_annot;
         std::optional<NumericSupportSelector> numeric_support_selector;
 
         TP tp;

@@ -604,6 +604,59 @@ inline ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<FluentTag>> me
     return visit([&](auto&& arg) { return OperatorData(typename OperatorData::Variant(merge_p2d(arg, context).first.get_index())); }, element.get_variant());
 }
 
+template<::tyr::formalism::NumericEffectOpKind DOp, NumericEffectOpKind Op>
+std::pair<::tyr::formalism::datalog::GroundNumericEffectView<DOp, FluentTag>, bool>
+merge_ground_numeric_effect_as(GroundNumericEffectView<Op, FluentTag> element, MergeDatalogContext& context)
+{
+    auto numeric_effect_ptr = context.builder.template get_builder<::tyr::formalism::datalog::GroundNumericEffect<DOp, FluentTag>>();
+    auto& numeric_effect = *numeric_effect_ptr;
+    numeric_effect.clear();
+
+    numeric_effect.fterm = merge_p2d(element.get_fterm(), context).first.get_index();
+    numeric_effect.fexpr = merge_p2d(element.get_fexpr(), context);
+
+    canonicalize(numeric_effect);
+    return context.destination.get_or_create(numeric_effect);
+}
+
+inline std::pair<::tyr::formalism::datalog::GroundNumericEffectView<::tyr::formalism::Assign, FluentTag>, bool>
+merge_p2d(GroundNumericEffectView<Assign, FluentTag> element, MergeDatalogContext& context)
+{
+    return merge_ground_numeric_effect_as<::tyr::formalism::Assign>(element, context);
+}
+
+inline std::pair<::tyr::formalism::datalog::GroundNumericEffectView<::tyr::formalism::Increase, FluentTag>, bool>
+merge_p2d(GroundNumericEffectView<Increase, FluentTag> element, MergeDatalogContext& context)
+{
+    return merge_ground_numeric_effect_as<::tyr::formalism::Increase>(element, context);
+}
+
+inline std::pair<::tyr::formalism::datalog::GroundNumericEffectView<::tyr::formalism::Decrease, FluentTag>, bool>
+merge_p2d(GroundNumericEffectView<Decrease, FluentTag> element, MergeDatalogContext& context)
+{
+    return merge_ground_numeric_effect_as<::tyr::formalism::Decrease>(element, context);
+}
+
+inline std::pair<::tyr::formalism::datalog::GroundNumericEffectView<::tyr::formalism::ScaleUp, FluentTag>, bool>
+merge_p2d(GroundNumericEffectView<ScaleUp, FluentTag> element, MergeDatalogContext& context)
+{
+    return merge_ground_numeric_effect_as<::tyr::formalism::ScaleUp>(element, context);
+}
+
+inline std::pair<::tyr::formalism::datalog::GroundNumericEffectView<::tyr::formalism::ScaleDown, FluentTag>, bool>
+merge_p2d(GroundNumericEffectView<ScaleDown, FluentTag> element, MergeDatalogContext& context)
+{
+    return merge_ground_numeric_effect_as<::tyr::formalism::ScaleDown>(element, context);
+}
+
+inline ygg::Data<::tyr::formalism::datalog::GroundNumericEffectOperator<FluentTag>> merge_p2d(GroundNumericEffectOperatorView<FluentTag> element,
+                                                                                               MergeDatalogContext& context)
+{
+    using OperatorData = ygg::Data<::tyr::formalism::datalog::GroundNumericEffectOperator<FluentTag>>;
+
+    return visit([&](auto&& arg) { return OperatorData(typename OperatorData::Variant(merge_p2d(arg, context).first.get_index())); }, element.get_variant());
+}
+
 inline ygg::Data<::tyr::formalism::datalog::FunctionExpression> merge_p2d(FunctionExpressionView element, MergeDatalogContext& context)
 {
     return visit(

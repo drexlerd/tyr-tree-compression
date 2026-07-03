@@ -66,13 +66,13 @@ private:
                                                     const StateContext<LiftedTag>& state_context,
                                                     ::tyr::formalism::planning::GrounderContext& grounder_context);
     void extract_relaxed_plan_and_preferred_actions(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> function,
-                                                    const datalog::Annotation& annotation,
+                                                    const datalog::Annotation<LiftedTag>& annotation,
                                                     const StateContext<LiftedTag>& state_context,
                                                     ::tyr::formalism::planning::GrounderContext& grounder_context);
     void extract_numeric_constraint_support(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
                                             const StateContext<LiftedTag>& state_context,
                                             ::tyr::formalism::planning::GrounderContext& grounder_context);
-    void extract_relaxed_plan_and_preferred_actions(const datalog::WitnessAnnotation& witness,
+    void extract_relaxed_plan_and_preferred_actions(const datalog::WitnessAnnotation<LiftedTag>& witness,
                                                     const StateContext<LiftedTag>& state_context,
                                                     ::tyr::formalism::planning::GrounderContext& grounder_context);
 

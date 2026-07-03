@@ -99,7 +99,7 @@ void LMCutHeuristic<LiftedTag>::apply_residual_costs()
 }
 
 const std::vector<LMCutHeuristic<LiftedTag>::PredicateBinding>&
-LMCutHeuristic<LiftedTag>::get_witness_max_preconditions(const datalog::WitnessAnnotation& witness)
+LMCutHeuristic<LiftedTag>::get_witness_max_preconditions(const datalog::WitnessAnnotation<LiftedTag>& witness)
 {
     if (m_max_precondition_depth == m_max_precondition_buffers.size())
         m_max_precondition_buffers.emplace_back();

@@ -115,7 +115,7 @@ bool evaluate(fd::GroundBooleanOperatorView element,
 
 void NumericSupportSelectorWorkspace::clear() noexcept { selection.clear(); }
 
-NumericSupportSelector::NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations& annotations) :
+NumericSupportSelector::NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations<LiftedTag>& annotations) :
     m_fact_sets(fact_sets),
     m_annotations(annotations)
 {
@@ -144,7 +144,7 @@ ygg::ClosedInterval<ygg::float_t> NumericSupportSelector::select_fluent_interval
     return current;
 }
 
-const NumericIntervalAnnotations::Entries* NumericSupportSelector::find_entries(fd::FunctionBindingView<f::FluentTag> binding) const
+const NumericIntervalAnnotations<LiftedTag>::Entries* NumericSupportSelector::find_entries(fd::FunctionBindingView<f::FluentTag> binding) const
 {
     const auto relation_it = m_annotations.partitions().find(binding.get_relation());
     if (relation_it == m_annotations.partitions().end())
