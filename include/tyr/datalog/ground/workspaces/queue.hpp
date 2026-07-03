@@ -18,6 +18,7 @@
 #ifndef TYR_DATALOG_GROUND_WORKSPACES_QUEUE_HPP_
 #define TYR_DATALOG_GROUND_WORKSPACES_QUEUE_HPP_
 
+#include "tyr/datalog/lifted/policies/aggregation.hpp"
 #include "tyr/datalog/workspaces/queue.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
@@ -30,10 +31,10 @@ namespace tyr::datalog
 
 struct GroundQueueEntry
 {
-    ygg::uint_t unsatisfied_count;
+    Cost cost;
     ::tyr::formalism::datalog::GroundRuleView rule;
 
-    auto identifying_members() const noexcept { return std::make_tuple(unsatisfied_count, rule.get_index()); }
+    auto identifying_members() const noexcept { return std::make_tuple(cost, rule.get_index()); }
 };
 
 struct GroundQueueStatistics

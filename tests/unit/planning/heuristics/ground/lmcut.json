@@ -53,7 +53,7 @@
             "name": "Ferry",
             "domain_file": "tests/classical/ferry/domain.pddl",
             "task_file": "tests/classical/ferry/test-1.pddl",
-            "expected_hmax": 1,
+            "expected_hmax": 2,
             "expected_lmcut": 4,
             "h_star_unit_cost_one": 7
         },

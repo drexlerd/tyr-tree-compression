@@ -20,8 +20,8 @@
 #include <fmt/ostream.h>
 #include <fstream>
 #include <queue>
-#include <yggdrasil/core/memory.hpp>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/core/memory.hpp>
 
 using namespace tyr;
 
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         .default_value(false)
         .implicit_value(true)
         .help("Disable invariant synthesis during ground task instantiation.");
-    program.add_argument("-H", "--heuristic-type").default_value("blind").choices("blind", "goal_count", "rpg_max", "rpg_add", "rpg_ff");
+    program.add_argument("-H", "--heuristic-type").default_value("blind").choices("blind", "goal_count", "rpg_max", "rpg_add", "rpg_ff", "lmcut");
     program.add_argument("-V", "--verbosity")
         .default_value(size_t(0))
         .scan<'u', size_t>()
@@ -120,6 +120,8 @@ int main(int argc, char** argv)
                 heuristic = planning::MaxRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context);
             else if (heuristic_type == "rpg_ff")
                 heuristic = planning::FFRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context);
+            else if (heuristic_type == "lmcut")
+                heuristic = planning::LMCutHeuristic<planning::LiftedTag>::create(lifted_task, execution_context);
             else
                 throw std::invalid_argument("The heuristic is not implemented.");
 
@@ -143,10 +145,10 @@ int main(int argc, char** argv)
                 successor_generator->get_state_repository()->get_axiom_evaluator()->print_summary(1);
             heuristic->print_summary(1);
 
-            std::cout << "[Total] Number of fluent atoms: " << lifted_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::FluentTag>>()
-                      << std::endl;
-            std::cout << "[Total] Number of derived atoms: " << lifted_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::DerivedTag>>()
-                      << std::endl;
+            std::cout << "[Total] Number of fluent atoms: "
+                      << lifted_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::FluentTag>>() << std::endl;
+            std::cout << "[Total] Number of derived atoms: "
+                      << lifted_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::DerivedTag>>() << std::endl;
             std::cout << "[Total] Number of fluent fterms: "
                       << lifted_task->get_repository()->template size<formalism::planning::GroundFunctionTerm<formalism::FluentTag>>() << std::endl;
             std::cout << "[Total] States memory usage: " << successor_generator->get_state_repository()->memory_usage() << " bytes" << std::endl;
@@ -181,6 +183,14 @@ int main(int argc, char** argv)
                     heuristic = planning::BlindHeuristic<planning::GroundTag>::create();
                 else if (heuristic_type == "goal_count")
                     heuristic = planning::GoalCountHeuristic<planning::GroundTag>::create(ground_task);
+                else if (heuristic_type == "rpg_add")
+                    heuristic = planning::AddRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context);
+                else if (heuristic_type == "rpg_max")
+                    heuristic = planning::MaxRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context);
+                else if (heuristic_type == "rpg_ff")
+                    heuristic = planning::FFRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context);
+                else if (heuristic_type == "lmcut")
+                    heuristic = planning::LMCutHeuristic<planning::GroundTag>::create(ground_task, execution_context);
                 else
                     throw std::invalid_argument("The heuristic is not implemented.");
 
@@ -199,8 +209,8 @@ int main(int argc, char** argv)
                     plan_file.close();
                 }
 
-                std::cout << "[Total] Number of fluent atoms: " << ground_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::FluentTag>>()
-                          << std::endl;
+                std::cout << "[Total] Number of fluent atoms: "
+                          << ground_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::FluentTag>>() << std::endl;
                 std::cout << "[Total] Number of derived atoms: "
                           << ground_task->get_repository()->template size<formalism::planning::GroundAtom<formalism::DerivedTag>>() << std::endl;
                 std::cout << "[Total] Number of fluent fterms: "

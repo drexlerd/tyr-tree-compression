@@ -18,6 +18,7 @@
 #include "tyr/datalog/ground/queue.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <optional>
 #include <stdexcept>
 #include <type_traits>
@@ -57,6 +58,37 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          RuleCostPolicyConcept<GroundTag> CP>
 using GroundCtx = ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>;
 
+template<AndAnnotationPolicyConcept<GroundTag> AndAP>
+Cost aggregate_body_cost(fd::GroundRuleView rule, const GroundSelectedPredicateAnnotations& annotations) noexcept
+{
+    if constexpr (requires { AndAP::agg; })
+    {
+        auto cost = std::decay_t<decltype(AndAP::agg)>::identity();
+        for (const auto literal : rule.get_body().template get_literals<f::FluentTag>())
+        {
+            if (!literal.get_polarity())
+                continue;
+            const auto* annotation = annotations.find(literal.get_atom());
+            assert(annotation && "enabled ground rule has a positive fluent body atom without a cost annotation");
+            cost = AndAP::agg(cost, get_cost(*annotation));
+        }
+        return cost;
+    }
+    else
+    {
+        return Cost(0);
+    }
+}
+
+template<AndAnnotationPolicyConcept<GroundTag> AndAP, RuleCostPolicyConcept<GroundTag> CP>
+Cost aggregate_rule_cost(fd::GroundRuleView rule, const GroundSelectedPredicateAnnotations& annotations, const CP& cost_policy) noexcept
+{
+    if constexpr (requires { AndAP::agg; })
+        return aggregate_body_cost<AndAP>(rule, annotations) + cost_policy.get_cost(rule);
+    else
+        return Cost(0);
+}
+
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          AndAnnotationPolicyConcept<GroundTag> AndAP,
          TerminationPolicyConcept<GroundTag> TP,
@@ -64,7 +96,10 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
 void push_rule(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule)
 {
     auto& out = ctx.out();
-    out.queue_storage().push_back(GroundQueueEntry { at(out.unsatisfied_counts(), rule.get_index()), rule });
+    if (at(out.unsatisfied_counts(), rule.get_index()) != 0 || at(out.fired_rules(), rule.get_index()))
+        return;
+
+    out.queue_storage().push_back(GroundQueueEntry { aggregate_rule_cost<AndAP>(rule, out.and_annot(), out.cost_policy()), rule });
     std::push_heap(out.queue_storage().begin(), out.queue_storage().end(), ygg::Greater<GroundQueueEntry> {});
 
     ++out.statistics().num_queue_pushes;
@@ -106,35 +141,15 @@ bool is_stale_entry(const GroundCtx<OrAP, AndAP, TP, CP>& ctx, const GroundQueue
 {
     const auto& out = ctx.out();
     const auto rule_index = entry.rule.get_index();
-    return at(out.fired_rules(), rule_index) || entry.unsatisfied_count != at(out.unsatisfied_counts(), rule_index);
-}
-
-template<AndAnnotationPolicyConcept<GroundTag> AndAP>
-Cost aggregate_body_cost(fd::GroundRuleView rule, const GroundSelectedPredicateAnnotations& annotations) noexcept
-{
-    if constexpr (requires { AndAP::agg; })
-    {
-        auto cost = std::decay_t<decltype(AndAP::agg)>::identity();
-        for (const auto literal : rule.get_body().template get_literals<f::FluentTag>())
-        {
-            if (!literal.get_polarity())
-                continue;
-            if (const auto* annotation = annotations.find(literal.get_atom()))
-                cost = AndAP::agg(cost, get_cost(*annotation));
-        }
-        return cost;
-    }
-    else
-    {
-        return Cost(0);
-    }
+    return at(out.fired_rules(), rule_index) || at(out.unsatisfied_counts(), rule_index) != 0
+           || entry.cost != aggregate_rule_cost<AndAP>(entry.rule, out.and_annot(), out.cost_policy());
 }
 
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          AndAnnotationPolicyConcept<GroundTag> AndAP,
          TerminationPolicyConcept<GroundTag> TP,
          RuleCostPolicyConcept<GroundTag> CP>
-void notify_rules_waiting_on(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundAtomView<f::FluentTag> fact)
+void notify_fact_inserted(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundAtomView<f::FluentTag> fact)
 {
     auto& out = ctx.out();
     const auto& dependencies = ctx.in().fluent_precondition_to_rules();
@@ -144,12 +159,30 @@ void notify_rules_waiting_on(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundAtom
 
     for (const auto dependent_rule : dependency_it->second)
     {
-        if (at(out.fired_rules(), dependent_rule.get_index()) || at(out.unsatisfied_counts(), dependent_rule.get_index()) == 0)
+        auto& unsatisfied_count = at(out.unsatisfied_counts(), dependent_rule.get_index());
+        if (unsatisfied_count == 0)
             continue;
 
-        --at(out.unsatisfied_counts(), dependent_rule.get_index());
+        --unsatisfied_count;
         push_rule(ctx, dependent_rule);
     }
+}
+
+template<OrAnnotationPolicyConcept<GroundTag> OrAP,
+         AndAnnotationPolicyConcept<GroundTag> AndAP,
+         TerminationPolicyConcept<GroundTag> TP,
+         RuleCostPolicyConcept<GroundTag> CP>
+void notify_fact_annotation_improved(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundAtomView<f::FluentTag> fact)
+{
+    auto& out = ctx.out();
+    const auto& dependencies = ctx.in().fluent_precondition_to_rules();
+    const auto dependency_it = dependencies.find(fact);
+    if (dependency_it == dependencies.end())
+        return;
+
+    for (const auto dependent_rule : dependency_it->second)
+        if (at(out.unsatisfied_counts(), dependent_rule.get_index()) == 0)
+            push_rule(ctx, dependent_rule);
 }
 
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
@@ -160,19 +193,16 @@ bool derive_fact(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundAtomView<f::Flue
 {
     auto& out = ctx.out();
     const auto inserted = out.fluent_atoms().insert(fact).second;
-    if (!inserted)
-        return false;
-
-    ++out.statistics().num_facts_derived;
-    notify_rules_waiting_on(ctx, fact);
-    return true;
+    if (inserted)
+        ++out.statistics().num_facts_derived;
+    return inserted;
 }
 
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          AndAnnotationPolicyConcept<GroundTag> AndAP,
          TerminationPolicyConcept<GroundTag> TP,
          RuleCostPolicyConcept<GroundTag> CP>
-void update_fact_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule, fd::GroundAtomView<f::FluentTag> fact)
+std::optional<GroundCostUpdate> update_fact_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule, fd::GroundAtomView<f::FluentTag> fact)
 {
     auto& out = ctx.out();
     auto delta_annotation = GroundSelectedPredicateAnnotations {};
@@ -183,16 +213,14 @@ void update_fact_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleV
     out.and_ap().update_annotation(fact, context, delta_annotation);
 
     if (const auto* annotation = delta_annotation.find(fact))
-        out.or_ap().update_annotation(fact, *annotation, out.and_annot());
+        return out.or_ap().update_annotation(fact, *annotation, out.and_annot());
+
+    return std::nullopt;
 }
 
-template<OrAnnotationPolicyConcept<GroundTag> OrAP,
-         AndAnnotationPolicyConcept<GroundTag> AndAP,
-         TerminationPolicyConcept<GroundTag> TP,
-         RuleCostPolicyConcept<GroundTag> CP>
-bool should_stop(const GroundCtx<OrAP, AndAP, TP, CP>& ctx) noexcept
+bool is_annotation_improvement(const std::optional<GroundCostUpdate>& update) noexcept
 {
-    return ctx.out().tp().check(ctx.in().program(), ctx.out().facts());
+    return update && (!update->old_cost || update->new_cost < *update->old_cost);
 }
 
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
@@ -212,9 +240,13 @@ bool fire_rule(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule)
             using Head = std::decay_t<decltype(head)>;
             if constexpr (std::is_same_v<Head, fd::GroundAtomView<f::FluentTag>>)
             {
-                update_fact_annotation(ctx, rule, head);
-                derive_fact(ctx, head);
-                stop = should_stop(ctx);
+                const auto update = update_fact_annotation(ctx, rule, head);
+                const auto inserted = derive_fact(ctx, head);
+                if (inserted)
+                    notify_fact_inserted(ctx, head);
+                if (is_annotation_improvement(update))
+                    notify_fact_annotation_improved(ctx, head);
+                stop = ctx.out().tp().check(ctx.in().program(), ctx.out().facts());
             }
         },
         rule.get_head());
@@ -261,9 +293,6 @@ void solve_ground_queue(ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>&
             ++out.statistics().num_stale_queue_pops;
             continue;
         }
-
-        if (entry->unsatisfied_count != 0)
-            break;
 
         if (fire_rule(ctx, entry->rule))
             break;
@@ -330,5 +359,4 @@ template void solve_ground_queue(ProgramExecutionContext<GroundTag,
                                                          AchieverAndAnnotationPolicy<GroundTag, MaxAggregation>,
                                                          TerminationPolicy<GroundTag, MaxAggregation>,
                                                          RuleCostOverridePolicy<GroundTag>>& ctx);
-
 }

@@ -9,7 +9,7 @@ backend-path = ["python"]
 
 [project]
 name = "pytyr"
-version = "0.0.26"
+version = "0.0.27"
 description = "Tyr datalog/planning library"
 readme = "README.md"
 license = "GPL-3.0-or-later"

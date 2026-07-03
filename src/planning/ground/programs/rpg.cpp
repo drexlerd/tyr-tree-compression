@@ -182,7 +182,7 @@ fd::GroundRuleView create_applicability_rule(fp::GroundActionView action,
                                              TranslationContext<GroundTag>& translation_context,
                                              GroundProgramBuildContext& context)
 {
-    return create_ground_atom_rule(create_delete_free_condition(action.get_condition(), translation_context, context), applicability_atom, context, d::Cost(1));
+    return create_ground_atom_rule(create_delete_free_condition(action.get_condition(), translation_context, context), applicability_atom, context, d::Cost(0));
 }
 
 fd::ProgramView<GroundTag> finish_program(GroundProgramBuildContext& context)
@@ -200,7 +200,6 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
     const auto applicability_atom = create_applicability_atom(action, context);
     const auto applicability_rule = create_applicability_rule(action, applicability_atom, translation_context, context);
     program.ground_rules.push_back(applicability_rule.get_index());
-    rule_to_action.emplace(applicability_rule, action);
 
     for (const auto cond_eff : action.get_effects())
     {
@@ -210,8 +209,9 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
         {
             if (const auto literal = fp::merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context))
             {
-                const auto rule = create_ground_atom_rule(body, literal->get_atom(), context, d::Cost(0));
+                const auto rule = create_ground_atom_rule(body, literal->get_atom(), context, d::Cost(1));
                 program.ground_rules.push_back(rule.get_index());
+                rule_to_action.emplace(rule, action);
             }
         }
     }

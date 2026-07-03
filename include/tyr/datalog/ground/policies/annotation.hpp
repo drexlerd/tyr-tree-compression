@@ -102,7 +102,7 @@ public:
                            const GroundAndAnnotationContext& context,
                            GroundSelectedPredicateAnnotations& delta_and_annot) const
     {
-        delta_and_annot.insert_or_assign(program_head, GroundWitnessAnnotation(context.rule, agg(context.current_cost, context.rule_cost)));
+        delta_and_annot.insert_or_assign(program_head, GroundWitnessAnnotation(context.rule, context.current_cost + context.rule_cost));
     }
 };
 
@@ -124,8 +124,7 @@ public:
 
     void record_achiever(Atom program_head, const GroundAndAnnotationContext& context) const
     {
-        achievers[program_head.get_index()].emplace_back(context.rule,
-                                                         AndAnnotationPolicy<GroundTag, AggregationFunction>::agg(context.current_cost, context.rule_cost));
+        achievers[program_head.get_index()].emplace_back(context.rule, context.current_cost + context.rule_cost);
     }
 
 private:

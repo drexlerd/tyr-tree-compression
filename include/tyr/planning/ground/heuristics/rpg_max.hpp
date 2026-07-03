@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_GROUND_HEURISTICS_MAX_HPP_
-#define TYR_PLANNING_GROUND_HEURISTICS_MAX_HPP_
+#ifndef TYR_PLANNING_GROUND_HEURISTICS_RPG_MAX_HPP_
+#define TYR_PLANNING_GROUND_HEURISTICS_RPG_MAX_HPP_
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
 #include "tyr/datalog/ground/policies/termination.hpp"

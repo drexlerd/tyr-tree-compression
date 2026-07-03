@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_LIFTED_HEURISTICS_FF_HPP_
-#define TYR_PLANNING_LIFTED_HEURISTICS_FF_HPP_
+#ifndef TYR_PLANNING_LIFTED_HEURISTICS_RPG_FF_HPP_
+#define TYR_PLANNING_LIFTED_HEURISTICS_RPG_FF_HPP_
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
