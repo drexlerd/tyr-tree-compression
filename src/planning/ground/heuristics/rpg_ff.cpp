@@ -118,7 +118,7 @@ void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(const
                                                                            const StateContext<GroundTag>& state_context)
 {
     const auto rule = witness.get_rule();
-    const auto& mapping = this->m_task->get_rpg_program().get_ground_rule_to_action_mapping();
+    const auto& mapping = this->m_task->get_rpg_program().get_rule_to_action_mapping();
     if (const auto it = mapping.find(rule); it != mapping.end())
     {
         const auto action = it->second;

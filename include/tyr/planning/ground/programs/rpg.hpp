@@ -35,20 +35,20 @@ template<>
 class RPGProgram<GroundTag>
 {
 public:
-    using GroundRuleToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::GroundRuleView, ::tyr::formalism::planning::GroundActionView>;
+    using RuleToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::GroundRuleView, ::tyr::formalism::planning::GroundActionView>;
 
     explicit RPGProgram(::tyr::formalism::planning::FDRTaskView task);
 
     const TranslationContext<GroundTag>& get_translation_context() const noexcept;
-    const GroundRuleToActionMapping& get_ground_rule_to_action_mapping() const noexcept;
-    ::tyr::formalism::datalog::GroundProgramView get_ground_program() const noexcept;
+    const RuleToActionMapping& get_rule_to_action_mapping() const noexcept;
+    ::tyr::formalism::datalog::GroundProgramView get_program() const noexcept;
     datalog::Program<GroundTag>& get_datalog_program() noexcept;
     const datalog::Program<GroundTag>& get_datalog_program() const noexcept;
     ::tyr::formalism::datalog::GroundConjunctiveConditionView get_goal() const noexcept;
 
 private:
     TranslationContext<GroundTag> m_translation_context;
-    GroundRuleToActionMapping m_ground_rule_to_action;
+    RuleToActionMapping m_rule_to_action;
     datalog::Program<GroundTag> m_datalog_program;
 };
 

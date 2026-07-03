@@ -158,7 +158,7 @@ void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::set_action_binding_cost(:
 {
     if (const auto action = m_task->find_ground_action(action_binding))
     {
-        const auto& mapping = m_task->get_rpg_program().get_ground_rule_to_action_mapping();
+        const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
         for (const auto& [rule, mapped_action] : mapping)
             if (mapped_action.get_index() == action->get_index())
                 m_workspace.cost_policy.set_cost(rule, cost);

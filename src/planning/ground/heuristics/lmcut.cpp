@@ -93,7 +93,7 @@ void LMCutHeuristic<GroundTag>::set_residual_cost(Action action, datalog::Cost c
 void LMCutHeuristic<GroundTag>::apply_residual_costs()
 {
     m_workspace.clear_costs();
-    const auto& mapping = m_task->get_rpg_program().get_ground_rule_to_action_mapping();
+    const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
     for (const auto& [rule, action] : mapping)
         m_workspace.cost_policy.set_cost(rule, get_residual_cost(action));
 }
@@ -107,7 +107,7 @@ const std::vector<LMCutHeuristic<GroundTag>::Atom>& LMCutHeuristic<GroundTag>::g
     result.clear();
 
     const auto rule = witness.get_rule();
-    const auto& mapping = m_task->get_rpg_program().get_ground_rule_to_action_mapping();
+    const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
     const auto it = mapping.find(rule);
     const auto rule_cost = it == mapping.end() ? datalog::Cost(0) : get_residual_cost(it->second);
     if (witness.get_cost() < rule_cost)
@@ -139,7 +139,7 @@ void LMCutHeuristic<GroundTag>::mark_goal_zone(Atom atom)
             if (witness.get_cost() != atom_cost)
                 continue;
 
-            const auto& mapping = m_task->get_rpg_program().get_ground_rule_to_action_mapping();
+            const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
             const auto action_it = mapping.find(witness.get_rule());
             if (action_it != mapping.end() && get_residual_cost(action_it->second) > 0)
                 continue;
@@ -213,7 +213,7 @@ void LMCutHeuristic<GroundTag>::extract_cut()
         }
     }
 
-    const auto& mapping = m_task->get_rpg_program().get_ground_rule_to_action_mapping();
+    const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
     for (const auto atom : m_goal_zone)
     {
         const auto atom_cost = get_atom_cost(atom);

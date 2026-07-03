@@ -195,7 +195,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
                                            ygg::Data<fd::GroundProgram>& program,
                                            TranslationContext<GroundTag>& translation_context,
                                            GroundProgramBuildContext& context,
-                                           RPGProgram<GroundTag>::GroundRuleToActionMapping& rule_to_action)
+                                           RPGProgram<GroundTag>::RuleToActionMapping& rule_to_action)
 {
     const auto applicability_atom = create_applicability_atom(action, context);
     const auto applicability_rule = create_applicability_rule(action, applicability_atom, translation_context, context);
@@ -219,7 +219,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
 
 fd::GroundProgramView create_rpg_ground_program(fp::FDRTaskView task,
                                                 TranslationContext<GroundTag>& translation_context,
-                                                RPGProgram<GroundTag>::GroundRuleToActionMapping& mapping,
+                                                RPGProgram<GroundTag>::RuleToActionMapping& mapping,
                                                 fd::Repository& repository)
 {
     auto context = GroundProgramBuildContext(repository);
@@ -275,7 +275,7 @@ fd::GroundProgramView create_rpg_ground_program(fp::FDRTaskView task,
 }
 
 d::Program<GroundTag>
-create_rpg_datalog_program(fp::FDRTaskView task, TranslationContext<GroundTag>& translation_context, RPGProgram<GroundTag>::GroundRuleToActionMapping& mapping)
+create_rpg_datalog_program(fp::FDRTaskView task, TranslationContext<GroundTag>& translation_context, RPGProgram<GroundTag>::RuleToActionMapping& mapping)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
     auto repository = factory->create_shared();
@@ -287,19 +287,16 @@ create_rpg_datalog_program(fp::FDRTaskView task, TranslationContext<GroundTag>& 
 
 RPGProgram<GroundTag>::RPGProgram(fp::FDRTaskView task) :
     m_translation_context(),
-    m_ground_rule_to_action(),
-    m_datalog_program(create_rpg_datalog_program(task, m_translation_context, m_ground_rule_to_action))
+    m_rule_to_action(),
+    m_datalog_program(create_rpg_datalog_program(task, m_translation_context, m_rule_to_action))
 {
 }
 
 const TranslationContext<GroundTag>& RPGProgram<GroundTag>::get_translation_context() const noexcept { return m_translation_context; }
 
-const RPGProgram<GroundTag>::GroundRuleToActionMapping& RPGProgram<GroundTag>::get_ground_rule_to_action_mapping() const noexcept
-{
-    return m_ground_rule_to_action;
-}
+const RPGProgram<GroundTag>::RuleToActionMapping& RPGProgram<GroundTag>::get_rule_to_action_mapping() const noexcept { return m_rule_to_action; }
 
-fd::GroundProgramView RPGProgram<GroundTag>::get_ground_program() const noexcept { return m_datalog_program.get_program(); }
+fd::GroundProgramView RPGProgram<GroundTag>::get_program() const noexcept { return m_datalog_program.get_program(); }
 
 datalog::Program<GroundTag>& RPGProgram<GroundTag>::get_datalog_program() noexcept { return m_datalog_program; }
 
