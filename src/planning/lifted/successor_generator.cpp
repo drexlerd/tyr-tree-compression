@@ -50,7 +50,8 @@ namespace
 {
 template<typename Callback>
 void for_each_action_binding(
-    const d::ProgramWorkspace<LiftedTag, d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>& workspace,
+    const d::ProgramWorkspace<LiftedTag>::Instance<d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>&
+        workspace,
     const ApplicableActionProgram<LiftedTag>& program,
     ygg::IndexList<f::Object>& binding_scratch,
     Callback&& callback)

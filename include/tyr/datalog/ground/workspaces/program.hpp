@@ -59,39 +59,39 @@ struct ConstProgramWorkspace<GroundTag>
     explicit ConstProgramWorkspace(::tyr::formalism::datalog::GroundProgramView program);
 };
 
-template<OrAnnotationPolicyConcept<GroundTag> OrAP,
-         AndAnnotationPolicyConcept<GroundTag> AndAP,
-         TerminationPolicyConcept<GroundTag> TP,
-         RuleCostPolicyConcept<GroundTag> CP>
-struct ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP>
+template<>
+struct ProgramWorkspace<GroundTag>
 {
-    GroundFactsWorkspace facts;
-    OrAP or_ap;
-    AndAP and_ap;
-    GroundSelectedPredicateAnnotations and_annot;
-    TP tp;
-    CP cost_policy;
-    GroundRuleWorkspace rules;
-    GroundQueueStatistics statistics;
-
-    explicit ProgramWorkspace(const ConstProgramWorkspace<GroundTag>& cws,
-                              OrAP or_ap_ = OrAP(),
-                              AndAP and_ap_ = AndAP(),
-                              TP tp_ = TP(),
-                              CP cost_policy_ = CP()) :
-        facts(),
-        or_ap(std::move(or_ap_)),
-        and_ap(std::move(and_ap_)),
-        and_annot(),
-        tp(std::move(tp_)),
-        cost_policy(std::move(cost_policy_)),
-        rules(cws.program),
-        statistics()
+    template<OrAnnotationPolicyConcept<GroundTag> OrAP = NoOrAnnotationPolicy<GroundTag>,
+             AndAnnotationPolicyConcept<GroundTag> AndAP = NoAndAnnotationPolicy<GroundTag>,
+             TerminationPolicyConcept<GroundTag> TP = NoTerminationPolicy<GroundTag>,
+             RuleCostPolicyConcept<GroundTag> CP = RuleCostPolicy<GroundTag>>
+    struct Instance
     {
-        facts.fluent_atoms.reserve(cws.program.template get_atoms<::tyr::formalism::FluentTag>().size());
-    }
+        FactsWorkspace<GroundTag> facts;
+        OrAP or_ap;
+        AndAP and_ap;
+        GroundSelectedPredicateAnnotations and_annot;
+        TP tp;
+        CP cost_policy;
+        RuleWorkspace<GroundTag> rules;
+        GroundQueueStatistics statistics;
 
-    void clear_costs() { cost_policy.clear(); }
+        explicit Instance(const ConstProgramWorkspace<GroundTag>& cws, OrAP or_ap_ = OrAP(), AndAP and_ap_ = AndAP(), TP tp_ = TP(), CP cost_policy_ = CP()) :
+            facts(),
+            or_ap(std::move(or_ap_)),
+            and_ap(std::move(and_ap_)),
+            and_annot(),
+            tp(std::move(tp_)),
+            cost_policy(std::move(cost_policy_)),
+            rules(cws.program),
+            statistics()
+        {
+            facts.fluent_atoms.reserve(cws.program.template get_atoms<::tyr::formalism::FluentTag>().size());
+        }
+
+        void clear_costs() { cost_policy.clear(); }
+    };
 };
 
 }

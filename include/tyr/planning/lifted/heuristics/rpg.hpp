@@ -239,7 +239,7 @@ protected:
     TaskPtr<LiftedTag> m_task;
     ygg::ExecutionContextPtr m_execution_context;
 
-    datalog::ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP> m_workspace;
+    datalog::ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP> m_workspace;
 };
 
 }

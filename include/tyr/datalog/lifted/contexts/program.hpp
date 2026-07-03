@@ -56,7 +56,7 @@ struct ProgramExecutionContext<LiftedTag, OrAP, AndAP, TP, CP>
     class Out
     {
     public:
-        explicit Out(ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>& ws) : m_ws(ws) {}
+        explicit Out(ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP>& ws) : m_ws(ws) {}
 
         auto& facts() noexcept { return m_ws.facts; }
         const auto& facts() const noexcept { return m_ws.facts; }
@@ -93,10 +93,12 @@ struct ProgramExecutionContext<LiftedTag, OrAP, AndAP, TP, CP>
         const auto& statistics() const noexcept { return m_ws.statistics; }
 
     private:
-        ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>& m_ws;
+        ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP>& m_ws;
     };
 
-    ProgramExecutionContext(ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>& ws, const ConstProgramWorkspace<LiftedTag>& cws) : m_in(cws), m_out(ws) {}
+    ProgramExecutionContext(ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP>& ws, const ConstProgramWorkspace<LiftedTag>& cws) : m_in(cws), m_out(ws)
+    {
+    }
 
     void clear() noexcept
     {

@@ -26,7 +26,7 @@
 #include <yggdrasil/containers/variant.hpp>
 #include <yggdrasil/semantics/comparators.hpp>
 
-namespace tyr::datalog::experimental
+namespace tyr::datalog
 {
 namespace
 {

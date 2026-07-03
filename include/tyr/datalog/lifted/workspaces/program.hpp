@@ -170,49 +170,53 @@ private:
     size_t m_total_size = 0;
 };
 
-template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
-         AndAnnotationPolicyConcept<LiftedTag> AndAP,
-         TerminationPolicyConcept<LiftedTag> TP,
-         RuleCostPolicyConcept<LiftedTag> CP>
-struct ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>
+template<>
+struct ProgramWorkspace<LiftedTag>
 {
-    const ::tyr::formalism::datalog::Repository& program_repository;
-    ::tyr::formalism::datalog::Repository& workspace_repository;
+    template<OrAnnotationPolicyConcept<LiftedTag> OrAP = NoOrAnnotationPolicy<LiftedTag>,
+             AndAnnotationPolicyConcept<LiftedTag> AndAP = NoAndAnnotationPolicy<LiftedTag>,
+             TerminationPolicyConcept<LiftedTag> TP = NoTerminationPolicy<LiftedTag>,
+             RuleCostPolicyConcept<LiftedTag> CP = RuleCostPolicy<LiftedTag>>
+    struct Instance
+    {
+        const ::tyr::formalism::datalog::Repository& program_repository;
+        ::tyr::formalism::datalog::Repository& workspace_repository;
 
-    FactsWorkspace facts;
+        FactsWorkspace<LiftedTag> facts;
 
-    OrAP or_ap;
-    SelectedPredicateAnnotations and_annot;
-    SelectedFunctionAnnotations numeric_and_annot;
-    std::optional<NumericSupportSelector> numeric_support_selector;
+        OrAP or_ap;
+        SelectedPredicateAnnotations and_annot;
+        SelectedFunctionAnnotations numeric_and_annot;
+        std::optional<NumericSupportSelector> numeric_support_selector;
 
-    TP tp;
-    CP cost_policy;
+        TP tp;
+        CP cost_policy;
 
-    std::vector<std::unique_ptr<RuleWorkspace<AndAP>>> rules;
+        std::vector<std::unique_ptr<RuleWorkspace<LiftedTag>::Instance<AndAP>>> rules;
 
-    ::tyr::formalism::planning::Builder planning_builder;
-    ::tyr::formalism::datalog::Builder datalog_builder;
+        ::tyr::formalism::planning::Builder planning_builder;
+        ::tyr::formalism::datalog::Builder datalog_builder;
 
-    ygg::IndexList<::tyr::formalism::Object> binding;
+        ygg::IndexList<::tyr::formalism::Object> binding;
 
-    RuleSchedulerStrata schedulers;
+        RuleSchedulerStrata schedulers;
 
-    CostBuckets cost_buckets;
+        CostBuckets cost_buckets;
 
-    ProgramStatistics statistics;
+        ProgramStatistics statistics;
 
-    explicit ProgramWorkspace(Program<LiftedTag>& program, const ConstProgramWorkspace<LiftedTag>& cws, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy = CP());
+        explicit Instance(Program<LiftedTag>& program, const ConstProgramWorkspace<LiftedTag>& cws, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy = CP());
 
-    void clear_costs() { cost_policy.clear(); }
+        void clear_costs() { cost_policy.clear(); }
+    };
 };
 
 template<>
 struct ConstProgramWorkspace<LiftedTag>
 {
-    ConstFactsWorkspace facts;
+    ConstFactsWorkspace<LiftedTag> facts;
 
-    std::vector<std::optional<ConstRuleWorkspace>> rules;
+    std::vector<std::optional<ConstRuleWorkspace<LiftedTag>>> rules;
 
     explicit ConstProgramWorkspace(Program<LiftedTag>& program);
 };

@@ -113,6 +113,34 @@ auto create_cond_effect_rule(fp::ActionView action,
     return context.destination.get_or_create(rule);
 }
 
+auto create_cond_numeric_effect_rule(fp::ActionView action,
+                                     fp::ConditionalEffectView cond_eff,
+                                     fp::NumericEffectOperatorView<::tyr::formalism::FluentTag> effect,
+                                     TranslationContext<LiftedTag>& translation_context,
+                                     ::tyr::formalism::planning::MergeDatalogContext& context)
+{
+    auto rule_ptr = context.builder.get_builder<::tyr::formalism::datalog::Rule>();
+    auto& rule = *rule_ptr;
+    rule.clear();
+
+    auto conj_cond_ptr = context.builder.get_builder<::tyr::formalism::datalog::ConjunctiveCondition>();
+    auto& conj_cond = *conj_cond_ptr;
+    conj_cond.clear();
+
+    fill_delete_free_condition(action, cond_eff, translation_context, context, conj_cond);
+
+    canonicalize(conj_cond);
+    const auto new_conj_cond = context.destination.get_or_create(conj_cond).first;
+
+    rule.variables = new_conj_cond.get_variables().get_data();
+    rule.body = new_conj_cond.get_index();
+    rule.head = merge_p2d(effect, context);
+    rule.cost = 1;
+
+    canonicalize(rule);
+    return context.destination.get_or_create(rule);
+}
+
 void translate_action_to_delete_free_rules(fp::ActionView action,
                                            ygg::Data<fd::Program>& program,
                                            TranslationContext<LiftedTag>& translation_context,
@@ -127,6 +155,14 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
                 continue;  /// ignore delete effects
 
             const auto rule = create_cond_effect_rule(action, cond_eff, literal.get_atom(), translation_context, context).first;
+
+            program.rules.push_back(rule.get_index());
+            rule_to_action.emplace(rule, action);
+        }
+
+        for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
+        {
+            const auto rule = create_cond_numeric_effect_rule(action, cond_eff, numeric_effect, translation_context, context).first;
 
             program.rules.push_back(rule.get_index());
             rule_to_action.emplace(rule, action);

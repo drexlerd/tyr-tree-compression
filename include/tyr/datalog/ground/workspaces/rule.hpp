@@ -18,6 +18,7 @@
 #ifndef TYR_DATALOG_GROUND_WORKSPACES_RULE_HPP_
 #define TYR_DATALOG_GROUND_WORKSPACES_RULE_HPP_
 
+#include "tyr/datalog/workspaces/rule.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <tuple>
@@ -27,13 +28,6 @@
 namespace tyr::datalog
 {
 
-struct GroundConstRuleWorkspace
-{
-    ::tyr::formalism::datalog::GroundRuleView rule;
-
-    explicit GroundConstRuleWorkspace(::tyr::formalism::datalog::GroundRuleView rule_) : rule(rule_) {}
-};
-
 struct GroundQueueEntry
 {
     ygg::uint_t unsatisfied_count;
@@ -42,13 +36,21 @@ struct GroundQueueEntry
     auto identifying_members() const noexcept { return std::make_tuple(unsatisfied_count, rule.get_index()); }
 };
 
-struct GroundRuleWorkspace
+template<>
+struct RuleWorkspace<GroundTag>
 {
     std::vector<ygg::uint_t> unsatisfied_counts;
     std::vector<bool> fired_rules;
     std::vector<GroundQueueEntry> queue_storage;
 
-    explicit GroundRuleWorkspace(::tyr::formalism::datalog::GroundProgramView program) { queue_storage.reserve(program.get_ground_rules().size()); }
+    explicit RuleWorkspace(::tyr::formalism::datalog::GroundProgramView program) { queue_storage.reserve(program.get_ground_rules().size()); }
+
+    void clear()
+    {
+        unsatisfied_counts.clear();
+        fired_rules.clear();
+        queue_storage.clear();
+    }
 };
 
 }

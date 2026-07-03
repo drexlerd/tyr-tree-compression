@@ -58,7 +58,7 @@ struct ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>
     class Out
     {
     public:
-        explicit Out(ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP>& ws) : m_ws(ws) {}
+        explicit Out(ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& ws) : m_ws(ws) {}
 
         auto& facts() noexcept { return m_ws.facts; }
         const auto& facts() const noexcept { return m_ws.facts; }
@@ -86,26 +86,24 @@ struct ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>
         const auto& statistics() const noexcept { return m_ws.statistics; }
 
     private:
-        ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP>& m_ws;
+        ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& m_ws;
     };
 
-    ProgramExecutionContext(ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP>& ws, const ConstProgramWorkspace<GroundTag>& cws) : m_in(cws), m_out(ws)
+    ProgramExecutionContext(ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP>& ws, const ConstProgramWorkspace<GroundTag>& cws) : m_in(cws), m_out(ws)
     {
-        clear();
     }
 
-    void clear()
+    void clear() { initialize_from_current_fluent_atoms(); }
+
+    void initialize() { initialize_from_current_fluent_atoms(); }
+
+    template<typename Range>
+    void initialize(const Range& fluent_atoms)
     {
         m_out.fluent_atoms().clear();
-        for (const auto fact : m_in.program().template get_atoms<::tyr::formalism::FluentTag>())
-            m_out.fluent_atoms().insert(fact);
-        initialize_from_current_fluent_atoms();
-    }
-
-    void initialize(ygg::UnorderedSet<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>> fluent_atoms)
-    {
-        m_out.fluent_atoms() = std::move(fluent_atoms);
-        initialize_from_current_fluent_atoms();
+        for (const auto atom : fluent_atoms)
+            m_out.fluent_atoms().insert(atom);
+        initialize();
     }
 
     const auto& in() const noexcept { return m_in; }
@@ -131,14 +129,6 @@ private:
         return vector[position(index)];
     }
 
-    bool is_static_fact_true(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::StaticTag> fact) const noexcept
-    {
-        for (const auto atom : m_in.program().template get_atoms<::tyr::formalism::StaticTag>())
-            if (atom.get_index() == fact.get_index())
-                return true;
-        return false;
-    }
-
     bool is_fluent_fact_true(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> fact) const noexcept
     {
         return m_out.fluent_atoms().contains(fact);
@@ -156,8 +146,7 @@ private:
     void initialize_from_current_fluent_atoms()
     {
         initialize_annotations();
-        m_out.unsatisfied_counts().clear();
-        m_out.fired_rules().clear();
+        m_out.rules().clear();
         for (const auto rule : m_in.program().get_ground_rules())
         {
             const auto rule_index = rule.get_index();
@@ -168,16 +157,12 @@ private:
             }
 
             auto unsatisfied_count = ygg::uint_t(0);
-            for (const auto literal : rule.get_body().template get_literals<::tyr::formalism::StaticTag>())
-                if (literal.get_polarity() && !is_static_fact_true(literal.get_atom()))
-                    ++unsatisfied_count;
             for (const auto literal : rule.get_body().template get_literals<::tyr::formalism::FluentTag>())
                 if (!is_fluent_fact_true(literal.get_atom()))
                     ++unsatisfied_count;
             at(m_out.unsatisfied_counts(), rule_index) = unsatisfied_count;
             at(m_out.fired_rules(), rule_index) = false;
         }
-        m_out.queue_storage().clear();
         m_out.statistics() = GroundQueueStatistics {};
     }
 

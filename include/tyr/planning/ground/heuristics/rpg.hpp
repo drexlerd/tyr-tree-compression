@@ -71,7 +71,7 @@ protected:
 protected:
     TaskPtr<GroundTag> m_task;
     ygg::ExecutionContextPtr m_execution_context;
-    datalog::ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP> m_workspace;
+    datalog::ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP> m_workspace;
 };
 
 template<typename Derived,
@@ -131,21 +131,17 @@ template<typename Derived,
          datalog::RuleCostPolicyConcept<GroundTag> CP>
 ygg::float_t RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::evaluate(const StateView<GroundTag>& state)
 {
-    auto fluent_atoms = ygg::UnorderedSet<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>> {};
+    m_workspace.facts.fluent_atoms.clear();
     const auto& p2d = m_task->get_rpg_program().get_translation_context().p2d.fluent_to_fluent_atom;
     for (const auto fact : state.get_fluent_facts_view())
-    {
         if (const auto atom = fact.get_atom())
-        {
-            fluent_atoms.insert(p2d.at(*atom));
-        }
-    }
+            m_workspace.facts.fluent_atoms.insert(p2d.at(*atom));
 
     auto ctx = datalog::ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>(m_workspace,
                                                                                 m_task->get_rpg_program().get_datalog_program().get_const_program_workspace());
-    ctx.initialize(std::move(fluent_atoms));
+    ctx.initialize();
 
-    m_execution_context->arena().execute([&] { datalog::experimental::solve_ground_queue(ctx); });
+    m_execution_context->arena().execute([&] { datalog::solve_ground_queue(ctx); });
 
     return m_workspace.tp.check(m_task->get_rpg_program().get_datalog_program().get_program(), m_workspace.facts) ?
                self().extract_cost_and_set_preferred_actions_impl(state) :

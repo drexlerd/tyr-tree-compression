@@ -15,22 +15,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_GROUND_WORKSPACES_FACTS_HPP_
-#define TYR_DATALOG_GROUND_WORKSPACES_FACTS_HPP_
+#ifndef TYR_DATALOG_WORKSPACES_RULE_HPP_
+#define TYR_DATALOG_WORKSPACES_RULE_HPP_
 
-#include "tyr/datalog/workspaces/facts.hpp"
-#include "tyr/formalism/datalog/repository.hpp"
-
-#include <yggdrasil/containers/associative_containers.hpp>
+#include "tyr/datalog/declarations.hpp"
 
 namespace tyr::datalog
 {
 
-template<>
-struct FactsWorkspace<GroundTag>
-{
-    ygg::UnorderedSet<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>> fluent_atoms;
-};
+template<TaskKind Kind>
+struct RuleWorkspace;
+
+template<TaskKind Kind>
+struct ConstRuleWorkspace;
 
 }
 

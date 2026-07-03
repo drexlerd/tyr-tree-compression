@@ -54,10 +54,8 @@ private:
     TaskPtr<LiftedTag> m_task;
     ygg::ExecutionContextPtr m_execution_context;
 
-    datalog::ProgramWorkspace<LiftedTag,
-                              datalog::NoOrAnnotationPolicy<LiftedTag>,
-                              datalog::NoAndAnnotationPolicy<LiftedTag>,
-                              datalog::NoTerminationPolicy<LiftedTag>>
+    datalog::ProgramWorkspace<
+        LiftedTag>::Instance<datalog::NoOrAnnotationPolicy<LiftedTag>, datalog::NoAndAnnotationPolicy<LiftedTag>, datalog::NoTerminationPolicy<LiftedTag>>
         m_workspace;
 };
 

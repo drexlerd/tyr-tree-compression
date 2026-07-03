@@ -37,7 +37,7 @@ namespace tyr::datalog
 {
 
 /**
- * ConstRuleWorkspace
+ * ConstRuleWorkspace<LiftedTag>
  */
 
 namespace
@@ -86,12 +86,12 @@ auto create_witness_rule(fd::RuleView element, fd::Repository& context)
 }
 }
 
-ConstRuleWorkspace::ConstRuleWorkspace(fd::RuleView rule,
-                                       fd::Repository& repository,
-                                       const analysis::VariableDomainList& parameter_domains,
-                                       size_t num_objects,
-                                       size_t num_fluent_predicates,
-                                       const TaggedAssignmentSets<::tyr::formalism::StaticTag>& static_assignment_sets) :
+ConstRuleWorkspace<LiftedTag>::ConstRuleWorkspace(fd::RuleView rule,
+                                                  fd::Repository& repository,
+                                                  const analysis::VariableDomainList& parameter_domains,
+                                                  size_t num_objects,
+                                                  size_t num_fluent_predicates,
+                                                  const TaggedAssignmentSets<::tyr::formalism::StaticTag>& static_assignment_sets) :
     rule(rule),
     witness_rule(create_witness_rule(get_rule(), repository).first),
     nullary_condition(create_ground_nullary_conjunctive_condition(get_rule().get_body(), repository).first),

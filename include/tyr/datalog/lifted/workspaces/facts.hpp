@@ -15,17 +15,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_WORKSPACES_FACTS_HPP_
-#define TYR_DATALOG_WORKSPACES_FACTS_HPP_
+#ifndef TYR_DATALOG_LIFTED_WORKSPACES_FACTS_HPP_
+#define TYR_DATALOG_LIFTED_WORKSPACES_FACTS_HPP_
 
 #include "tyr/datalog/lifted/assignment_sets.hpp"
 #include "tyr/datalog/lifted/fact_sets.hpp"
+#include "tyr/datalog/workspaces/facts.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/declarations.hpp"
 
 namespace tyr::datalog
 {
-struct FactsWorkspace
+template<>
+struct FactsWorkspace<LiftedTag>
 {
     TaggedFactSets<::tyr::formalism::FluentTag> fact_sets;
     TaggedAssignmentSets<::tyr::formalism::FluentTag> assignment_sets;
@@ -42,7 +44,8 @@ struct FactsWorkspace
     void reset();
 };
 
-struct ConstFactsWorkspace
+template<>
+struct ConstFactsWorkspace<LiftedTag>
 {
     const TaggedFactSets<::tyr::formalism::StaticTag> fact_sets;
     const TaggedAssignmentSets<::tyr::formalism::StaticTag> assignment_sets;

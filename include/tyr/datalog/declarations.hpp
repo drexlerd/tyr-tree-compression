@@ -70,11 +70,16 @@ template<TaskKind Kind>
 class RuleCostOverridePolicy;
 
 struct D2PWorkspace;
+template<TaskKind Kind>
 struct FactsWorkspace;
+template<TaskKind Kind>
 struct ConstFactsWorkspace;
 struct P2DWorkspace;
 template<TaskKind Kind>
 struct ConstProgramWorkspace;
+template<TaskKind Kind>
+struct RuleWorkspace;
+template<TaskKind Kind>
 struct ConstRuleWorkspace;
 
 class RuleSchedulerStratum;

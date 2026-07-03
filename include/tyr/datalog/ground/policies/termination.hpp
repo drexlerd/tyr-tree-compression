@@ -34,8 +34,8 @@ public:
     NoTerminationPolicy() = default;
 
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView) {}
-    bool check(::tyr::formalism::datalog::GroundProgramView, const GroundFactsWorkspace&) const noexcept { return false; }
-    Cost get_total_cost(const GroundFactsWorkspace&, const GroundSelectedPredicateAnnotations&) const noexcept { return Cost(0); }
+    bool check(::tyr::formalism::datalog::GroundProgramView, const FactsWorkspace<GroundTag>&) const noexcept { return false; }
+    Cost get_total_cost(const FactsWorkspace<GroundTag>&, const GroundSelectedPredicateAnnotations&) const noexcept { return Cost(0); }
     void reset() noexcept {}
     void clear() noexcept {}
 };
@@ -46,7 +46,7 @@ class TerminationPolicy<GroundTag, AggregationFunction>
 public:
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_) { goals = goals_; }
 
-    bool check(::tyr::formalism::datalog::GroundProgramView program, const GroundFactsWorkspace& facts) const noexcept
+    bool check(::tyr::formalism::datalog::GroundProgramView program, const FactsWorkspace<GroundTag>& facts) const noexcept
     {
         if (!goals.has_value())
             return false;
@@ -62,7 +62,7 @@ public:
         return true;
     }
 
-    Cost get_total_cost(const GroundFactsWorkspace&, const GroundSelectedPredicateAnnotations& and_annot) const noexcept
+    Cost get_total_cost(const FactsWorkspace<GroundTag>&, const GroundSelectedPredicateAnnotations& and_annot) const noexcept
     {
         if (!goals.has_value())
             return Cost(0);

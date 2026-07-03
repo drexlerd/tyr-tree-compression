@@ -27,7 +27,7 @@
 
 #include <vector>
 
-namespace tyr::datalog::experimental
+namespace tyr::datalog
 {
 
 struct GroundQueueResult

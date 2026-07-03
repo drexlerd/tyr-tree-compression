@@ -15,14 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_WORKSPACES_RULE_HPP_
-#define TYR_DATALOG_WORKSPACES_RULE_HPP_
+#ifndef TYR_DATALOG_LIFTED_WORKSPACES_RULE_HPP_
+#define TYR_DATALOG_LIFTED_WORKSPACES_RULE_HPP_
 
 #include "tyr/datalog/lifted/consistency_graph.hpp"
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/statistics/rule.hpp"
+#include "tyr/datalog/workspaces/rule.hpp"
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/builder.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
@@ -85,115 +86,120 @@ struct FunctionHeadIteration
 
 using RuleHeadIteration = std::variant<PredicateHeadIteration, FunctionHeadIteration>;
 
-template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-struct RuleWorkspace
+template<>
+struct RuleWorkspace<LiftedTag>
 {
-    struct Common
+    template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
+    struct Instance
     {
-        explicit Common(const ::tyr::formalism::datalog::Repository& program_repository,
-                        const ::tyr::formalism::datalog::Repository& workspace_repository,
-                        const StaticConsistencyGraph& static_consistency_graph);
+        struct Common
+        {
+            explicit Common(const ::tyr::formalism::datalog::Repository& program_repository,
+                            const ::tyr::formalism::datalog::Repository& workspace_repository,
+                            const StaticConsistencyGraph& static_consistency_graph);
 
-        void initialize_iteration(const StaticConsistencyGraph& static_consistency_graph, const AssignmentSets& assignment_sets);
+            void initialize_iteration(const StaticConsistencyGraph& static_consistency_graph, const AssignmentSets& assignment_sets);
+
+            void clear() noexcept;
+
+            /// Program repository to ground witnesses for which ground entities must already exist and we can simply call find.
+            const ::tyr::formalism::datalog::Repository& program_repository;
+            const ::tyr::formalism::datalog::Repository& workspace_repository;
+
+            /// KPKC
+            kpkc::DeltaKPKC kpkc;
+
+            /// Statistics
+            RuleStatistics statistics;
+        };
+
+        /// @brief Each iteration consists of
+        /// - generate all k-cliques
+        /// - ground witnesses
+        /// - annotate witnesses
+        struct Iteration
+        {
+            explicit Iteration(::tyr::formalism::datalog::RepositoryFactory& factory, const ConstRuleWorkspace<LiftedTag>& cws, const Common& common);
+
+            void clear() noexcept;
+
+            /// Merge stage into rule execution context
+            ::tyr::formalism::datalog::Repository workspace_overlay_repository;
+
+            /// Heads
+            RuleHeadIteration head;
+
+            // Annotations stored in program_overlay_repository
+            SelectedPredicateAnnotations and_annot;
+            SelectedFunctionAnnotations numeric_and_annot;
+
+            /// KPKC
+            kpkc::Workspace kpkc_workspace;
+        };
+
+        struct Solve
+        {
+            explicit Solve(::tyr::formalism::datalog::RepositoryFactory& factory,
+                           const ::tyr::formalism::datalog::Repository& program_repository,
+                           const ::tyr::formalism::datalog::Repository& workspace_repository,
+                           const AndAP& and_ap);
+
+            void clear() noexcept;
+
+            AndAP and_ap;
+
+            /// Persistent memory
+            ::tyr::formalism::datalog::Repository program_overlay_repository;
+
+            /// In debug mode, we accumulate all bindings to verify the correctness of delta-kpkc
+            ygg::UnorderedSet<ygg::IndexList<::tyr::formalism::Object>> seen_bindings_dbg;
+
+            ygg::UnorderedSet<::tyr::formalism::datalog::RuleBindingView> pending_rule_bindings;
+
+            NumericSupportSelectorWorkspace numeric_support_selector_workspace;
+
+            /// Statistics
+            RuleWorkerStatistics statistics;
+        };
+
+        struct Worker
+        {
+            explicit Worker(::tyr::formalism::datalog::RepositoryFactory& factory,
+                            const ::tyr::formalism::datalog::Repository& program_repository,
+                            const ::tyr::formalism::datalog::Repository& workspace_repository,
+                            const ConstRuleWorkspace<LiftedTag>& cws,
+                            const Common& common,
+                            const AndAP& and_ap);
+
+            void clear() noexcept;
+
+            ::tyr::formalism::datalog::Builder builder;
+            ygg::IndexList<::tyr::formalism::Object> binding;
+
+            Iteration iteration;
+            Solve solve;
+        };
+
+        Instance(::tyr::formalism::datalog::RepositoryFactory& factory,
+                 const ::tyr::formalism::datalog::Repository& program_repository,
+                 const ::tyr::formalism::datalog::Repository& workspace_repository,
+                 const ConstRuleWorkspace<LiftedTag>& cws,
+                 const AndAP& and_ap);
+        Instance(const Instance& other) = delete;
+        Instance& operator=(const Instance& other) = delete;
+        Instance(Instance&& other) = delete;
+        Instance& operator=(Instance&& other) = delete;
 
         void clear() noexcept;
 
-        /// Program repository to ground witnesses for which ground entities must already exist and we can simply call find.
-        const ::tyr::formalism::datalog::Repository& program_repository;
-        const ::tyr::formalism::datalog::Repository& workspace_repository;
+        Common common;
 
-        /// KPKC
-        kpkc::DeltaKPKC kpkc;
-
-        /// Statistics
-        RuleStatistics statistics;
+        oneapi::tbb::enumerable_thread_specific<Worker> worker;
     };
-
-    /// @brief Each iteration consists of
-    /// - generate all k-cliques
-    /// - ground witnesses
-    /// - annotate witnesses
-    struct Iteration
-    {
-        explicit Iteration(::tyr::formalism::datalog::RepositoryFactory& factory, const ConstRuleWorkspace& cws, const Common& common);
-
-        void clear() noexcept;
-
-        /// Merge stage into rule execution context
-        ::tyr::formalism::datalog::Repository workspace_overlay_repository;
-
-        /// Heads
-        RuleHeadIteration head;
-
-        // Annotations stored in program_overlay_repository
-        SelectedPredicateAnnotations and_annot;
-        SelectedFunctionAnnotations numeric_and_annot;
-
-        /// KPKC
-        kpkc::Workspace kpkc_workspace;
-    };
-
-    struct Solve
-    {
-        explicit Solve(::tyr::formalism::datalog::RepositoryFactory& factory,
-                       const ::tyr::formalism::datalog::Repository& program_repository,
-                       const ::tyr::formalism::datalog::Repository& workspace_repository,
-                       const AndAP& and_ap);
-
-        void clear() noexcept;
-
-        AndAP and_ap;
-
-        /// Persistent memory
-        ::tyr::formalism::datalog::Repository program_overlay_repository;
-
-        /// In debug mode, we accumulate all bindings to verify the correctness of delta-kpkc
-        ygg::UnorderedSet<ygg::IndexList<::tyr::formalism::Object>> seen_bindings_dbg;
-
-        ygg::UnorderedSet<::tyr::formalism::datalog::RuleBindingView> pending_rule_bindings;
-
-        NumericSupportSelectorWorkspace numeric_support_selector_workspace;
-
-        /// Statistics
-        RuleWorkerStatistics statistics;
-    };
-
-    struct Worker
-    {
-        explicit Worker(::tyr::formalism::datalog::RepositoryFactory& factory,
-                        const ::tyr::formalism::datalog::Repository& program_repository,
-                        const ::tyr::formalism::datalog::Repository& workspace_repository,
-                        const ConstRuleWorkspace& cws,
-                        const Common& common,
-                        const AndAP& and_ap);
-
-        void clear() noexcept;
-
-        ::tyr::formalism::datalog::Builder builder;
-        ygg::IndexList<::tyr::formalism::Object> binding;
-
-        Iteration iteration;
-        Solve solve;
-    };
-
-    RuleWorkspace(::tyr::formalism::datalog::RepositoryFactory& factory,
-                  const ::tyr::formalism::datalog::Repository& program_repository,
-                  const ::tyr::formalism::datalog::Repository& workspace_repository,
-                  const ConstRuleWorkspace& cws,
-                  const AndAP& and_ap);
-    RuleWorkspace(const RuleWorkspace& other) = delete;
-    RuleWorkspace& operator=(const RuleWorkspace& other) = delete;
-    RuleWorkspace(RuleWorkspace&& other) = delete;
-    RuleWorkspace& operator=(RuleWorkspace&& other) = delete;
-
-    void clear() noexcept;
-
-    Common common;
-
-    oneapi::tbb::enumerable_thread_specific<Worker> worker;
 };
 
-struct ConstRuleWorkspace
+template<>
+struct ConstRuleWorkspace<LiftedTag>
 {
 public:
     auto get_rule() const noexcept { return rule; }
@@ -229,9 +235,9 @@ private:
  */
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-RuleWorkspace<AndAP>::Common::Common(const ::tyr::formalism::datalog::Repository& program_repository,
-                                     const ::tyr::formalism::datalog::Repository& workspace_repository,
-                                     const StaticConsistencyGraph& static_consistency_graph) :
+RuleWorkspace<LiftedTag>::Instance<AndAP>::Common::Common(const ::tyr::formalism::datalog::Repository& program_repository,
+                                                          const ::tyr::formalism::datalog::Repository& workspace_repository,
+                                                          const StaticConsistencyGraph& static_consistency_graph) :
     program_repository(program_repository),
     workspace_repository(workspace_repository),
     kpkc(static_consistency_graph),
@@ -240,19 +246,22 @@ RuleWorkspace<AndAP>::Common::Common(const ::tyr::formalism::datalog::Repository
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-void RuleWorkspace<AndAP>::Common::clear() noexcept
+void RuleWorkspace<LiftedTag>::Instance<AndAP>::Common::clear() noexcept
 {
     kpkc.reset();
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-void RuleWorkspace<AndAP>::Common::initialize_iteration(const StaticConsistencyGraph& static_consistency_graph, const AssignmentSets& assignment_sets)
+void RuleWorkspace<LiftedTag>::Instance<AndAP>::Common::initialize_iteration(const StaticConsistencyGraph& static_consistency_graph,
+                                                                             const AssignmentSets& assignment_sets)
 {
     kpkc.set_next_assignment_sets(static_consistency_graph, assignment_sets);
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-RuleWorkspace<AndAP>::Iteration::Iteration(::tyr::formalism::datalog::RepositoryFactory& factory, const ConstRuleWorkspace& cws, const Common& common) :
+RuleWorkspace<LiftedTag>::Instance<AndAP>::Iteration::Iteration(::tyr::formalism::datalog::RepositoryFactory& factory,
+                                                                const ConstRuleWorkspace<LiftedTag>& cws,
+                                                                const Common& common) :
     workspace_overlay_repository(factory.create(&common.workspace_repository)),
     head(visit(
         [](auto&& head) -> RuleHeadIteration
@@ -277,7 +286,7 @@ RuleWorkspace<AndAP>::Iteration::Iteration(::tyr::formalism::datalog::Repository
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-void RuleWorkspace<AndAP>::Iteration::clear() noexcept
+void RuleWorkspace<LiftedTag>::Instance<AndAP>::Iteration::clear() noexcept
 {
     workspace_overlay_repository.clear();
     std::visit([](auto& arg) { arg.clear(); }, head);
@@ -286,10 +295,10 @@ void RuleWorkspace<AndAP>::Iteration::clear() noexcept
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-RuleWorkspace<AndAP>::Solve::Solve(::tyr::formalism::datalog::RepositoryFactory& factory,
-                                   const ::tyr::formalism::datalog::Repository& program_repository,
-                                   const ::tyr::formalism::datalog::Repository& workspace_repository,
-                                   const AndAP& and_ap) :
+RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::Solve(::tyr::formalism::datalog::RepositoryFactory& factory,
+                                                        const ::tyr::formalism::datalog::Repository& program_repository,
+                                                        const ::tyr::formalism::datalog::Repository& workspace_repository,
+                                                        const AndAP& and_ap) :
     and_ap(and_ap),
     program_overlay_repository(factory.create(&program_repository)),
     seen_bindings_dbg(),
@@ -300,7 +309,7 @@ RuleWorkspace<AndAP>::Solve::Solve(::tyr::formalism::datalog::RepositoryFactory&
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-void RuleWorkspace<AndAP>::Solve::clear() noexcept
+void RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::clear() noexcept
 {
     program_overlay_repository.clear();
     seen_bindings_dbg.clear();
@@ -310,12 +319,12 @@ void RuleWorkspace<AndAP>::Solve::clear() noexcept
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-RuleWorkspace<AndAP>::Worker::Worker(::tyr::formalism::datalog::RepositoryFactory& factory,
-                                     const ::tyr::formalism::datalog::Repository& program_repository,
-                                     const ::tyr::formalism::datalog::Repository& workspace_repository,
-                                     const ConstRuleWorkspace& cws,
-                                     const Common& common,
-                                     const AndAP& and_ap) :
+RuleWorkspace<LiftedTag>::Instance<AndAP>::Worker::Worker(::tyr::formalism::datalog::RepositoryFactory& factory,
+                                                          const ::tyr::formalism::datalog::Repository& program_repository,
+                                                          const ::tyr::formalism::datalog::Repository& workspace_repository,
+                                                          const ConstRuleWorkspace<LiftedTag>& cws,
+                                                          const Common& common,
+                                                          const AndAP& and_ap) :
     builder(),
     binding(),
     iteration(factory, cws, common),
@@ -324,18 +333,18 @@ RuleWorkspace<AndAP>::Worker::Worker(::tyr::formalism::datalog::RepositoryFactor
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-void RuleWorkspace<AndAP>::Worker::clear() noexcept
+void RuleWorkspace<LiftedTag>::Instance<AndAP>::Worker::clear() noexcept
 {
     iteration.clear();
     solve.clear();
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-RuleWorkspace<AndAP>::RuleWorkspace(::tyr::formalism::datalog::RepositoryFactory& factory_,
-                                    const ::tyr::formalism::datalog::Repository& program_repository_,
-                                    const ::tyr::formalism::datalog::Repository& workspace_repository_,
-                                    const ConstRuleWorkspace& cws_,
-                                    const AndAP& and_ap_) :
+RuleWorkspace<LiftedTag>::Instance<AndAP>::Instance(::tyr::formalism::datalog::RepositoryFactory& factory_,
+                                                    const ::tyr::formalism::datalog::Repository& program_repository_,
+                                                    const ::tyr::formalism::datalog::Repository& workspace_repository_,
+                                                    const ConstRuleWorkspace<LiftedTag>& cws_,
+                                                    const AndAP& and_ap_) :
     common(program_repository_, workspace_repository_, cws_.get_static_consistency_graph()),
     worker([this, program_repository = &program_repository_, workspace_repository = &workspace_repository_, factory = &factory_, cws = &cws_, and_ap = and_ap_]
            { return Worker(*factory, *program_repository, *workspace_repository, *cws, this->common, and_ap); })
@@ -343,7 +352,7 @@ RuleWorkspace<AndAP>::RuleWorkspace(::tyr::formalism::datalog::RepositoryFactory
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
-void RuleWorkspace<AndAP>::clear() noexcept
+void RuleWorkspace<LiftedTag>::Instance<AndAP>::clear() noexcept
 {
     common.clear();
     for (auto& w : worker)

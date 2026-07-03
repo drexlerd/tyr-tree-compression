@@ -37,8 +37,8 @@
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/lifted/programs/ground.hpp"
+#include "tyr/planning/lifted_task.hpp"
 #include "tyr/planning/task_utils.hpp"
 
 #include <algorithm>
@@ -141,6 +141,7 @@ std::optional<fp::GroundConjunctiveConditionView>
 create_ground_fdr_conjunctive_condition(fp::GroundConjunctiveConditionView element,
                                         const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
                                         const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                        const boost::dynamic_bitset<>& static_atoms_bitset,
                                         fp::FDRContext& fdr_context,
                                         fp::MergeContext& context)
 {
@@ -149,7 +150,11 @@ create_ground_fdr_conjunctive_condition(fp::GroundConjunctiveConditionView eleme
     fdr_conj_cond.clear();
 
     for (const auto literal : element.get_literals<f::StaticTag>())
-        fdr_conj_cond.static_literals.push_back(merge_p2p(literal, context).first.get_index());
+    {
+        const auto new_literal = merge_p2p(literal, context).first;
+        if (!is_statically_applicable(new_literal, static_atoms_bitset))
+            return std::nullopt;
+    }
 
     for (const auto literal : element.get_literals<f::DerivedTag>())
     {
@@ -200,6 +205,7 @@ create_ground_fdr_conjunctive_condition(fp::GroundConjunctiveConditionView eleme
 std::optional<fp::GroundConjunctiveConditionView> ground_pruned(fp::ConjunctiveConditionView element,
                                                                 const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
                                                                 const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                                const boost::dynamic_bitset<>& static_atoms_bitset,
                                                                 fp::GrounderContext& context,
                                                                 fp::FDRContext& fdr_context)
 {
@@ -208,7 +214,11 @@ std::optional<fp::GroundConjunctiveConditionView> ground_pruned(fp::ConjunctiveC
     conj_cond.clear();
 
     for (const auto literal : element.template get_literals<f::StaticTag>())
-        conj_cond.static_literals.push_back(ground(literal, context).first.get_index());
+    {
+        const auto new_literal = ground(literal, context).first;
+        if (!is_statically_applicable(new_literal, static_atoms_bitset))
+            return std::nullopt;
+    }
 
     for (const auto literal : element.template get_literals<f::FluentTag>())
     {
@@ -284,6 +294,7 @@ std::optional<fp::GroundConjunctiveEffectView> ground_pruned(fp::ConjunctiveEffe
 std::optional<fp::GroundConditionalEffectView> ground_pruned(fp::ConditionalEffectView element,
                                                              const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
                                                              const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                             const boost::dynamic_bitset<>& static_atoms_bitset,
                                                              fp::GrounderContext& context,
                                                              fp::FDRContext& fdr_context)
 {
@@ -293,7 +304,7 @@ std::optional<fp::GroundConditionalEffectView> ground_pruned(fp::ConditionalEffe
     cond_effect.clear();
 
     // Fill data
-    const auto new_condition_or_nullopt = ground_pruned(element.get_condition(), fluent_atoms, derived_atoms, context, fdr_context);
+    const auto new_condition_or_nullopt = ground_pruned(element.get_condition(), fluent_atoms, derived_atoms, static_atoms_bitset, context, fdr_context);
     if (!new_condition_or_nullopt)
         return std::nullopt;
 
@@ -314,6 +325,7 @@ std::optional<fp::GroundActionView> ground_pruned(fp::ActionView element,
                                                   const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
                                                   const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
                                                   const analysis::ActionDomain& action_domains,
+                                                  const boost::dynamic_bitset<>& static_atoms_bitset,
                                                   ygg::itertools::cartesian_set::Workspace<ygg::Index<f::Object>>& iter_workspace,
                                                   fp::GrounderContext& context,
                                                   fp::FDRContext& fdr_context)
@@ -326,7 +338,7 @@ std::optional<fp::GroundActionView> ground_pruned(fp::ActionView element,
     // Fill data
     action.binding = ground(element, context).first.get_index();
 
-    const auto new_condition_or_nullopt = ground_pruned(element.get_condition(), fluent_atoms, derived_atoms, context, fdr_context);
+    const auto new_condition_or_nullopt = ground_pruned(element.get_condition(), fluent_atoms, derived_atoms, static_atoms_bitset, context, fdr_context);
     if (!new_condition_or_nullopt)
         return std::nullopt;
 
@@ -341,20 +353,20 @@ std::optional<fp::GroundActionView> ground_pruned(fp::ActionView element,
 
         assert(std::distance(parameter_domains.begin(), parameter_domains.end()) == static_cast<int>(element.get_arity() + cond_effect.get_arity()));
 
-        ygg::itertools::cartesian_set::for_each_element(parameter_domains.begin() + element.get_arity(),
-                                                        parameter_domains.end(),
-                                                        iter_workspace,
-                                                        [&](auto&& binding_cond)
-                                                        {
-                                                            // push the additional parameters to the end
-                                                            context.binding.resize(binding_size);
-                                                            context.binding.insert(context.binding.end(), binding_cond.begin(), binding_cond.end());
+        ygg::itertools::cartesian_set::for_each_element(
+            parameter_domains.begin() + element.get_arity(),
+            parameter_domains.end(),
+            iter_workspace,
+            [&](auto&& binding_cond)
+            {
+                // push the additional parameters to the end
+                context.binding.resize(binding_size);
+                context.binding.insert(context.binding.end(), binding_cond.begin(), binding_cond.end());
 
-                                                            const auto ground_cond_effect_or_nullopt =
-                                                                ground_pruned(cond_effect, fluent_atoms, derived_atoms, context, fdr_context);
-                                                            if (ground_cond_effect_or_nullopt.has_value())
-                                                                action.effects.push_back(ground_cond_effect_or_nullopt->get_index());
-                                                        });
+                const auto ground_cond_effect_or_nullopt = ground_pruned(cond_effect, fluent_atoms, derived_atoms, static_atoms_bitset, context, fdr_context);
+                if (ground_cond_effect_or_nullopt.has_value())
+                    action.effects.push_back(ground_cond_effect_or_nullopt->get_index());
+            });
     }
     context.binding.resize(binding_size);  ///< important to restore the binding in case of grounding other actions
 
@@ -369,6 +381,7 @@ std::optional<fp::GroundActionView> ground_pruned(fp::ActionView element,
 std::optional<fp::GroundAxiomView> ground_pruned(fp::AxiomView element,
                                                  const ygg::UnorderedSet<fp::GroundAtomView<f::FluentTag>>& fluent_atoms,
                                                  const ygg::UnorderedSet<fp::GroundAtomView<f::DerivedTag>>& derived_atoms,
+                                                 const boost::dynamic_bitset<>& static_atoms_bitset,
                                                  fp::GrounderContext& context,
                                                  fp::FDRContext& fdr_context)
 {
@@ -380,7 +393,7 @@ std::optional<fp::GroundAxiomView> ground_pruned(fp::AxiomView element,
     // Fill data
     axiom.binding = ground(element, context).first.get_index();
 
-    const auto new_body_or_nullopt = ground_pruned(element.get_body(), fluent_atoms, derived_atoms, context, fdr_context);
+    const auto new_body_or_nullopt = ground_pruned(element.get_body(), fluent_atoms, derived_atoms, static_atoms_bitset, context, fdr_context);
     if (!new_body_or_nullopt.has_value())
         return std::nullopt;  // body is false in all reachable states -> axiom is irrelevant
 
@@ -422,12 +435,13 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
 
     auto ground_program = GroundTaskProgram(lifted_task.get_task());
     const auto& const_workspace = ground_program.get_const_program_workspace();
-    auto workspace = d::ProgramWorkspace<LiftedTag, d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
-        ground_program.get_datalog_program(),
-        const_workspace,
-        d::NoOrAnnotationPolicy<LiftedTag>(),
-        d::NoAndAnnotationPolicy<LiftedTag>(),
-        d::NoTerminationPolicy<LiftedTag>());
+    auto workspace =
+        d::ProgramWorkspace<LiftedTag>::Instance<d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
+            ground_program.get_datalog_program(),
+            const_workspace,
+            d::NoOrAnnotationPolicy<LiftedTag>(),
+            d::NoAndAnnotationPolicy<LiftedTag>(),
+            d::NoTerminationPolicy<LiftedTag>());
     auto ctx =
         d::ProgramExecutionContext<LiftedTag, d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
             workspace,
@@ -563,8 +577,13 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
     for (const auto atom : task.get_atoms<f::FluentTag>())
         fdr_task.fluent_facts.push_back(fdr_context->get_fact(merge_p2p(atom, merge_context).first.get_index()));
 
+    auto static_atoms_bitset = boost::dynamic_bitset<>();
+    for (const auto atom : task.get_atoms<f::StaticTag>())
+        ygg::set(ygg::uint_t(atom.get_index()), true, static_atoms_bitset);
+
     /// --- Create FDR goal
-    const auto goal_or_nullopt = create_ground_fdr_conjunctive_condition(task.get_goal(), fluent_atoms_set, derived_atoms_set, *fdr_context, merge_context);
+    const auto goal_or_nullopt =
+        create_ground_fdr_conjunctive_condition(task.get_goal(), fluent_atoms_set, derived_atoms_set, static_atoms_bitset, *fdr_context, merge_context);
     if (goal_or_nullopt.has_value())
         fdr_task.goal = goal_or_nullopt->get_index();
     else
@@ -575,10 +594,6 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
     auto fluent_assign = ygg::UnorderedMap<ygg::Index<fp::FDRVariable<f::FluentTag>>, fp::FDRValue> {};
     auto derived_assign = ygg::UnorderedMap<ygg::Index<fp::GroundAtom<f::DerivedTag>>, bool> {};
     auto iter_workspace = ygg::itertools::cartesian_set::Workspace<ygg::Index<f::Object>> {};
-
-    auto static_atoms_bitset = boost::dynamic_bitset<>();
-    for (const auto atom : task.get_atoms<f::StaticTag>())
-        ygg::set(ygg::uint_t(atom.get_index()), true, static_atoms_bitset);
 
     for (const auto binding : predicate_bindings)
     {
@@ -598,6 +613,7 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
                                                                 fluent_atoms_set,
                                                                 derived_atoms_set,
                                                                 lifted_task.get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
+                                                                static_atoms_bitset,
                                                                 iter_workspace,
                                                                 grounder_context,
                                                                 *fdr_context);
@@ -634,7 +650,8 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
 
             for (const auto axiom : it->second)
             {
-                const auto ground_axiom_or_nullopt = ground_pruned(axiom, fluent_atoms_set, derived_atoms_set, grounder_context, *fdr_context);
+                const auto ground_axiom_or_nullopt =
+                    ground_pruned(axiom, fluent_atoms_set, derived_atoms_set, static_atoms_bitset, grounder_context, *fdr_context);
 
                 if (!ground_axiom_or_nullopt.has_value())
                     continue;

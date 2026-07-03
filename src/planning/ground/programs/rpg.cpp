@@ -130,18 +130,37 @@ fd::GroundLiteralView<f::FluentTag> create_positive_literal(fd::GroundAtomView<f
     return context.merge_context.destination.get_or_create(literal).first;
 }
 
-fd::GroundConjunctiveConditionView
-merge_condition(fp::GroundConjunctiveConditionView condition, TranslationContext<GroundTag>& translation_context, GroundProgramBuildContext& context)
+fd::GroundConjunctiveConditionView create_delete_free_condition(fp::GroundConjunctiveConditionView condition,
+                                                                TranslationContext<GroundTag>& translation_context,
+                                                                GroundProgramBuildContext& context)
 {
-    return fp::merge_p2d(condition, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context).first;
+    auto condition_ptr = context.builder.get_builder<fd::GroundConjunctiveCondition>();
+    auto& result = *condition_ptr;
+    result.clear();
+
+    for (const auto fact : condition.template get_facts<f::PositiveTag>())
+        if (const auto literal = fp::merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context))
+            result.fluent_literals.push_back(literal->get_index());
+
+    for (const auto numeric_constraint : condition.get_numeric_constraints())
+        result.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context.merge_context));
+
+    canonicalize(result);
+    return context.merge_context.destination.get_or_create(result).first;
 }
 
-fd::GroundConjunctiveConditionView merge_applicability_and_condition(fd::GroundAtomView<f::FluentTag> applicability_atom,
-                                                                     fp::GroundConjunctiveConditionView condition,
-                                                                     TranslationContext<GroundTag>& translation_context,
-                                                                     GroundProgramBuildContext& context)
+fd::GroundConjunctiveConditionView
+create_delete_free_goal(fp::GroundConjunctiveConditionView goal, TranslationContext<GroundTag>& translation_context, GroundProgramBuildContext& context)
 {
-    auto merged_condition = merge_condition(condition, translation_context, context);
+    return create_delete_free_condition(goal, translation_context, context);
+}
+
+fd::GroundConjunctiveConditionView create_delete_free_effect_condition(fd::GroundAtomView<f::FluentTag> applicability_atom,
+                                                                       fp::GroundConjunctiveConditionView condition,
+                                                                       TranslationContext<GroundTag>& translation_context,
+                                                                       GroundProgramBuildContext& context)
+{
+    auto merged_condition = create_delete_free_condition(condition, translation_context, context);
     auto condition_ptr = context.builder.get_builder<fd::GroundConjunctiveCondition>();
     auto& result = *condition_ptr;
     result.clear();
@@ -170,7 +189,7 @@ fd::GroundRuleView create_applicability_rule(fp::GroundActionView action,
                                              TranslationContext<GroundTag>& translation_context,
                                              GroundProgramBuildContext& context)
 {
-    return create_ground_atom_rule(merge_condition(action.get_condition(), translation_context, context), applicability_atom, context, d::Cost(1));
+    return create_ground_atom_rule(create_delete_free_condition(action.get_condition(), translation_context, context), applicability_atom, context, d::Cost(1));
 }
 
 fd::GroundProgramView finish_program(GroundProgramBuildContext& context)
@@ -192,7 +211,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
 
     for (const auto cond_eff : action.get_effects())
     {
-        const auto body = merge_applicability_and_condition(applicability_atom, cond_eff.get_condition(), translation_context, context);
+        const auto body = create_delete_free_effect_condition(applicability_atom, cond_eff.get_condition(), translation_context, context);
 
         for (const auto fact : cond_eff.get_effect().get_facts<f::PositiveTag>())
         {
@@ -285,7 +304,7 @@ fd::GroundProgramView create_rpg_ground_program(fp::FDRTaskView task,
     for (const auto fterm_value : task.get_fterm_values<f::FluentTag>())
         program.fluent_fterm_values.push_back(fp::merge_p2d(fterm_value, merge_context).first.get_index());
 
-    context.program.goal = merge_condition(task.get_goal(), translation_context, context).get_index();
+    context.program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).get_index();
 
     for (const auto action : task.get_ground_actions())
         translate_action_to_delete_free_rules(action, program, translation_context, context, mapping);

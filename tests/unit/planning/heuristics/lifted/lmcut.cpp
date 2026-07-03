@@ -68,7 +68,7 @@ LMCutCase parse_case(const boost::json::object& suite, const boost::json::object
 
 std::vector<LMCutCase> load_cases()
 {
-    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/heuristics/lmcut.json");
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/heuristics/lifted/lmcut.json");
     const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<LMCutCase> {};
     for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))

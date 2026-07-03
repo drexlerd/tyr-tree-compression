@@ -57,7 +57,7 @@ public:
     class In
     {
     public:
-        explicit In(const RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx, const RuleWorkspace<AndAP>::Worker& ws_worker) :
+        explicit In(const RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx, const RuleWorkspace<LiftedTag>::Instance<AndAP>::Worker& ws_worker) :
             m_rctx(rctx),
             m_and_ap(ws_worker.solve.and_ap),
             m_ws_rule(rctx.out().ws_rule()),
@@ -92,8 +92,8 @@ public:
         const RuleExecutionContext<OrAP, AndAP, TP, CP>& m_rctx;
 
         const AndAP& m_and_ap;
-        const RuleWorkspace<AndAP>& m_ws_rule;
-        const ConstRuleWorkspace& m_cws_rule;
+        const RuleWorkspace<LiftedTag>::Instance<AndAP>& m_ws_rule;
+        const ConstRuleWorkspace<LiftedTag>& m_cws_rule;
 
         const FactSets m_fact_sets;
     };
@@ -101,7 +101,7 @@ public:
     class Out
     {
     public:
-        Out(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx, RuleWorkspace<AndAP>::Worker& ws_worker) :
+        Out(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx, RuleWorkspace<LiftedTag>::Instance<AndAP>::Worker& ws_worker) :
             m_ws_worker(ws_worker),
             m_ground_context_solve(ws_worker.builder, ws_worker.solve.program_overlay_repository, ws_worker.binding),
             m_ground_context_iteration(ws_worker.builder, ws_worker.iteration.workspace_overlay_repository, ws_worker.binding)
@@ -122,13 +122,13 @@ public:
         auto& ground_context_iteration() noexcept { return m_ground_context_iteration; }
 
     private:
-        RuleWorkspace<AndAP>::Worker& m_ws_worker;
+        RuleWorkspace<LiftedTag>::Instance<AndAP>::Worker& m_ws_worker;
 
         ::tyr::formalism::datalog::GrounderContext m_ground_context_solve;
         ::tyr::formalism::datalog::GrounderContext m_ground_context_iteration;
     };
 
-    RuleWorkerExecutionContext(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx, RuleWorkspace<AndAP>::Worker& ws_worker) :
+    RuleWorkerExecutionContext(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx, RuleWorkspace<LiftedTag>::Instance<AndAP>::Worker& ws_worker) :
         m_rctx(rctx),
         m_ws_worker(ws_worker),
         m_in(rctx, ws_worker),
@@ -160,7 +160,7 @@ public:
 
 private:
     RuleExecutionContext<OrAP, AndAP, TP, CP>& m_rctx;
-    RuleWorkspace<AndAP>::Worker& m_ws_worker;
+    RuleWorkspace<LiftedTag>::Instance<AndAP>::Worker& m_ws_worker;
 
     In m_in;
     Out m_out;
@@ -175,20 +175,20 @@ struct RuleExecutionContext
     class In
     {
     public:
-        In(ygg::Index<::tyr::formalism::datalog::Rule> rule, const ConstRuleWorkspace& cws_rule) : m_rule(rule), m_cws_rule(cws_rule) {}
+        In(ygg::Index<::tyr::formalism::datalog::Rule> rule, const ConstRuleWorkspace<LiftedTag>& cws_rule) : m_rule(rule), m_cws_rule(cws_rule) {}
 
         auto rule() const noexcept { return m_rule; }
         const auto& cws_rule() const noexcept { return m_cws_rule; }
 
     private:
         ygg::Index<::tyr::formalism::datalog::Rule> m_rule;
-        const ConstRuleWorkspace& m_cws_rule;
+        const ConstRuleWorkspace<LiftedTag>& m_cws_rule;
     };
 
     class Out
     {
     public:
-        explicit Out(RuleWorkspace<AndAP>& ws_rule) : m_ws_rule(ws_rule) {}
+        explicit Out(RuleWorkspace<LiftedTag>::Instance<AndAP>& ws_rule) : m_ws_rule(ws_rule) {}
 
         auto& ws_rule() noexcept { return m_ws_rule; }
         const auto& ws_rule() const noexcept { return m_ws_rule; }
@@ -202,7 +202,7 @@ struct RuleExecutionContext
         const auto& workers() const noexcept { return m_ws_rule.worker; }
 
     private:
-        RuleWorkspace<AndAP>& m_ws_rule;
+        RuleWorkspace<LiftedTag>::Instance<AndAP>& m_ws_rule;
     };
 
     RuleExecutionContext(ygg::Index<::tyr::formalism::datalog::Rule> rule, StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx) :

@@ -38,7 +38,7 @@ struct TerminationPolicyConceptImpl<GroundTag, T>
                                            const T& cp,
                                            ::tyr::formalism::datalog::GroundConjunctiveConditionView goals,
                                            ::tyr::formalism::datalog::GroundProgramView program,
-                                           const GroundFactsWorkspace& facts,
+                                           const FactsWorkspace<GroundTag>& facts,
                                            const GroundSelectedPredicateAnnotations& and_annot) {
         { p.set_goals(goals) } -> std::same_as<void>;
         { cp.check(program, facts) } -> std::same_as<bool>;

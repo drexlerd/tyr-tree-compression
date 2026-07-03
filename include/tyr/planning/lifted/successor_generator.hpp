@@ -105,10 +105,8 @@ private:
     ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>> m_cartesian_workspace;
     ygg::Data<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>> m_scratch_action_binding;
 
-    datalog::ProgramWorkspace<LiftedTag,
-                              datalog::NoOrAnnotationPolicy<LiftedTag>,
-                              datalog::NoAndAnnotationPolicy<LiftedTag>,
-                              datalog::NoTerminationPolicy<LiftedTag>>
+    datalog::ProgramWorkspace<
+        LiftedTag>::Instance<datalog::NoOrAnnotationPolicy<LiftedTag>, datalog::NoAndAnnotationPolicy<LiftedTag>, datalog::NoTerminationPolicy<LiftedTag>>
         m_workspace;
 
     StateRepositoryPtr<LiftedTag> m_state_repository;
