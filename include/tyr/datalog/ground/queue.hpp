@@ -25,24 +25,16 @@
 #include "tyr/datalog/policies/termination_concept.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
-#include <vector>
-
 namespace tyr::datalog
 {
-
-struct GroundQueueResult
-{
-    std::vector<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>> fluent_atoms;
-    GroundQueueStatistics statistics;
-};
 
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          AndAnnotationPolicyConcept<GroundTag> AndAP,
          TerminationPolicyConcept<GroundTag> TP,
          RuleCostPolicyConcept<GroundTag> CP>
-GroundQueueResult solve_ground_queue(ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>& ctx);
+void solve_ground_queue(ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>& ctx);
 
-GroundQueueResult solve_ground_queue(ProgramExecutionContext<GroundTag>& ctx);
+void solve_ground_queue(ProgramExecutionContext<GroundTag>& ctx);
 
 }
 

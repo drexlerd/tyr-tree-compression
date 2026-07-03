@@ -126,10 +126,10 @@ struct GroundQueueFixture
     }
 };
 
-std::vector<ygg::uint_t> atom_indices(const dq::GroundQueueResult& result)
+std::vector<ygg::uint_t> atom_indices(const ygg::UnorderedSet<fd::GroundAtomView<f::FluentTag>>& atoms)
 {
     auto indices = std::vector<ygg::uint_t> {};
-    for (const auto atom : result.fluent_atoms)
+    for (const auto atom : atoms)
         indices.push_back(ygg::uint_t(atom.get_index()));
     std::sort(indices.begin(), indices.end());
     return indices;
@@ -160,14 +160,21 @@ ygg::UnorderedSet<fd::GroundAtomView<f::FluentTag>> initial_fluent_atoms(GroundQ
     return result;
 }
 
-dq::GroundQueueResult solve_default_state(GroundQueueFixture& fixture)
+struct SolvedGroundQueue
+{
+    std::vector<ygg::uint_t> atom_indices;
+    datalog::GroundQueueStatistics statistics;
+};
+
+SolvedGroundQueue solve_default_state(GroundQueueFixture& fixture)
 {
     const auto program = fixture.program();
     const auto const_workspace = datalog::ConstProgramWorkspace<GroundTag>(program);
     auto workspace = datalog::ProgramWorkspace<GroundTag>::Instance<>(const_workspace);
     auto ctx = datalog::ProgramExecutionContext<GroundTag>(workspace, const_workspace);
     ctx.initialize(initial_fluent_atoms(fixture));
-    return dq::solve_ground_queue(ctx);
+    dq::solve_ground_queue(ctx);
+    return { atom_indices(ctx.out().fluent_atoms()), ctx.out().statistics() };
 }
 }
 
@@ -192,7 +199,7 @@ TEST(TyrDatalogGroundQueueTest, EmptyBodyRuleFires)
 
     const auto result = solve_default_state(fixture);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ atom }));
+    EXPECT_EQ(result.atom_indices, expected_indices({ atom }));
     EXPECT_EQ(result.statistics.num_rules_fired, 1);
     EXPECT_EQ(result.statistics.num_facts_derived, 1);
 }
@@ -209,7 +216,7 @@ TEST(TyrDatalogGroundQueueTest, ChainedRulesDeriveFixpoint)
 
     const auto result = solve_default_state(fixture);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ a, b, c }));
+    EXPECT_EQ(result.atom_indices, expected_indices({ a, b, c }));
     EXPECT_EQ(result.statistics.num_facts_derived, 3);
 }
 
@@ -227,15 +234,17 @@ TEST(TyrDatalogGroundQueueTest, ReusesGroundProgramExecutionContext)
     auto ctx = datalog::ProgramExecutionContext<GroundTag>(workspace, const_workspace);
 
     ctx.initialize(initial_fluent_atoms(fixture));
-    const auto first = dq::solve_ground_queue(ctx);
-    EXPECT_EQ(atom_indices(first), expected_indices({ a, b }));
-    EXPECT_EQ(first.statistics.num_facts_derived, 2);
+    dq::solve_ground_queue(ctx);
+    const auto first_statistics = ctx.out().statistics();
+    EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a, b }));
+    EXPECT_EQ(first_statistics.num_facts_derived, 2);
 
     ctx.initialize(initial_fluent_atoms(fixture));
-    const auto second = dq::solve_ground_queue(ctx);
-    EXPECT_EQ(atom_indices(second), expected_indices({ a, b }));
-    EXPECT_EQ(second.statistics.num_facts_derived, 2);
-    EXPECT_EQ(second.statistics.num_rules_fired, first.statistics.num_rules_fired);
+    dq::solve_ground_queue(ctx);
+    const auto second_statistics = ctx.out().statistics();
+    EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a, b }));
+    EXPECT_EQ(second_statistics.num_facts_derived, 2);
+    EXPECT_EQ(second_statistics.num_rules_fired, first_statistics.num_rules_fired);
 }
 
 TEST(TyrDatalogGroundQueueTest, MultiPreconditionRuleWaitsForAllFacts)
@@ -250,7 +259,7 @@ TEST(TyrDatalogGroundQueueTest, MultiPreconditionRuleWaitsForAllFacts)
 
     const auto result = solve_default_state(fixture);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ a, b, c }));
+    EXPECT_EQ(result.atom_indices, expected_indices({ a, b, c }));
     EXPECT_EQ(result.statistics.num_facts_derived, 2);
 }
 
@@ -331,9 +340,9 @@ TEST(TyrDatalogGroundQueueTest, DerivedFactOnlyDecrementsRulesWaitingOnThatFact)
     auto ctx = datalog::ProgramExecutionContext<GroundTag>(workspace, const_workspace);
 
     ctx.initialize(initial_fluent_atoms(fixture));
-    const auto result = dq::solve_ground_queue(ctx);
+    dq::solve_ground_queue(ctx);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ a, b }));
+    EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a, b }));
     EXPECT_EQ(ctx.out().unsatisfied_counts()[fixture.ground_rules[1].get_value()], 0);
     EXPECT_EQ(ctx.out().unsatisfied_counts()[fixture.ground_rules[2].get_value()], 1);
 }
@@ -347,7 +356,7 @@ TEST(TyrDatalogGroundQueueTest, DuplicateHeadsDeriveFactOnce)
 
     const auto result = solve_default_state(fixture);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ a }));
+    EXPECT_EQ(result.atom_indices, expected_indices({ a }));
     EXPECT_EQ(result.statistics.num_rules_fired, 2);
     EXPECT_EQ(result.statistics.num_facts_derived, 1);
 }
@@ -380,9 +389,9 @@ TEST(TyrDatalogGroundQueueTest, GroundCostOverrideAnnotatesDerivedFact)
                                                 datalog::RuleCostOverridePolicy<GroundTag>>(workspace, const_workspace);
 
     ctx.initialize(initial_fluent_atoms(fixture));
-    const auto result = dq::solve_ground_queue(ctx);
+    dq::solve_ground_queue(ctx);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ a, b }));
+    EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a, b }));
     const auto* annotation = ctx.out().and_annot().find(a);
     ASSERT_NE(annotation, nullptr);
     EXPECT_EQ(datalog::get_cost(*annotation), 7);
@@ -417,10 +426,10 @@ TEST(TyrDatalogGroundQueueTest, GroundTerminationStopsAfterGoalDerived)
                                                 datalog::RuleCostPolicy<GroundTag>>(workspace, const_workspace);
 
     ctx.initialize(initial_fluent_atoms(fixture));
-    const auto result = dq::solve_ground_queue(ctx);
+    dq::solve_ground_queue(ctx);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ a }));
-    EXPECT_EQ(result.statistics.num_rules_fired, 1);
+    EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a }));
+    EXPECT_EQ(ctx.out().statistics().num_rules_fired, 1);
     EXPECT_TRUE(ctx.out().tp().check(program, ctx.out().facts()));
 }
 
@@ -450,9 +459,9 @@ TEST(TyrDatalogGroundQueueTest, AchieverPolicyGroundRecordsFiredRule)
                                                 datalog::RuleCostPolicy<GroundTag>>(workspace, const_workspace);
 
     ctx.initialize(initial_fluent_atoms(fixture));
-    const auto result = dq::solve_ground_queue(ctx);
+    dq::solve_ground_queue(ctx);
 
-    EXPECT_EQ(atom_indices(result), expected_indices({ a, b }));
+    EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a, b }));
     const auto* achievers = ctx.out().and_ap().find_achievers(b);
     ASSERT_NE(achievers, nullptr);
     ASSERT_EQ(achievers->size(), 1);
@@ -468,7 +477,7 @@ TEST(TyrDatalogGroundQueueTest, UnfilteredNegativeFluentLiteralDoesNotFire)
 
     const auto result = solve_default_state(fixture);
 
-    EXPECT_TRUE(atom_indices(result).empty());
+    EXPECT_TRUE(result.atom_indices.empty());
 }
 
 }
