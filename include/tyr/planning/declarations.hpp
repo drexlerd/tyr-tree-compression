@@ -18,6 +18,8 @@
 #ifndef TYR_PLANNING_DECLARATIONS_HPP_
 #define TYR_PLANNING_DECLARATIONS_HPP_
 
+#include "tyr/declarations.hpp"
+
 #include <concepts>
 #include <memory>
 #include <yggdrasil/containers/optional.hpp>
@@ -36,15 +38,9 @@ struct Builder;
 namespace tyr::planning
 {
 
-struct GroundTag
-{
-};
-struct LiftedTag
-{
-};
-
-template<typename Tag>
-concept TaskKind = std::same_as<Tag, GroundTag> || std::same_as<Tag, LiftedTag>;
+using ::tyr::GroundTag;
+using ::tyr::LiftedTag;
+using ::tyr::TaskKind;
 
 template<TaskKind Kind>
 class Task;

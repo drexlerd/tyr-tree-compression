@@ -18,6 +18,7 @@
 #ifndef TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 #define TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 
+#include "tyr/config.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/variable_dependency_graph.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -30,8 +31,6 @@
 #include <sstream>
 #include <yggdrasil/formatting/cista_formatters.hpp>
 #include <yggdrasil/io/iostream.hpp>
-
-#include "tyr/config.hpp"
 
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
@@ -742,6 +741,88 @@ struct formatter<tyr::formalism::datalog::ProgramView, char>
             fmt::print(os, "{}{}\n", "goal = ", value.get_goal());
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "rules = ", value.get_rules());
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<ygg::Data<tyr::formalism::datalog::GroundProgram>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const ygg::Data<tyr::formalism::datalog::GroundProgram>& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "GroundProgram(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.index);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static predicates =", value.static_predicates);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent predicates = ", value.fluent_predicates);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static functions = ", value.static_functions);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent functions = ", value.fluent_functions);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "objects = ", value.objects);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static atoms = ", value.static_atoms);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent atoms = ", value.fluent_atoms);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static fterms = ", value.static_fterm_values);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent fterms = ", value.fluent_fterm_values);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "goal = ", value.goal);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "ground rules = ", value.ground_rules);
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<tyr::formalism::datalog::GroundProgramView, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::formalism::datalog::GroundProgramView& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "GroundProgram(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.get_index());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static predicates =", value.template get_predicates<tyr::formalism::StaticTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent predicates = ", value.template get_predicates<tyr::formalism::FluentTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static functions = ", value.template get_functions<tyr::formalism::StaticTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent functions = ", value.template get_functions<tyr::formalism::FluentTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "objects = ", value.get_objects());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static atoms = ", value.template get_atoms<tyr::formalism::StaticTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent atoms = ", value.template get_atoms<tyr::formalism::FluentTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "static fterms = ", value.template get_fterm_values<tyr::formalism::StaticTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "fluent fterms = ", value.template get_fterm_values<tyr::formalism::FluentTag>());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "goal = ", value.get_goal());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "ground rules = ", value.get_ground_rules());
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());

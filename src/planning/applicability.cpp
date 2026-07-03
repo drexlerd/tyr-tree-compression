@@ -17,10 +17,10 @@
 
 #include "tyr/planning/applicability.hpp"
 
+#include "tyr/planning/ground/state_builder.hpp"
 #include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/ground_task/state_builder.hpp"
+#include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
 
 #ifndef TYR_HEADER_INSTANTIATION
 
@@ -66,8 +66,10 @@ template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionTermVie
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> element, const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> element, const StateContext<GroundTag>& context);
 
-template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::AuxiliaryTag> element, const StateContext<LiftedTag>& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::AuxiliaryTag> element, const StateContext<GroundTag>& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::AuxiliaryTag> element,
+                               const StateContext<LiftedTag>& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::AuxiliaryTag> element,
+                               const StateContext<GroundTag>& context);
 
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionExpressionView element, const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundFunctionExpressionView element, const StateContext<GroundTag>& context);
@@ -82,34 +84,38 @@ template bool evaluate(::tyr::formalism::planning::GroundBooleanOperatorView ele
 template bool evaluate(::tyr::formalism::planning::GroundBooleanOperatorView element, const StateContext<GroundTag>& context);
 
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Assign, ::tyr::formalism::FluentTag> element,
-                          const StateContext<LiftedTag>& context);
+                               const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::FluentTag> element,
-                          const StateContext<LiftedTag>& context);
+                               const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag> element,
-                          const StateContext<LiftedTag>& context);
+                               const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag> element,
-                          const StateContext<LiftedTag>& context);
+                               const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag> element,
-                          const StateContext<LiftedTag>& context);
+                               const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::AuxiliaryTag> element,
-                          const StateContext<LiftedTag>& context);
+                               const StateContext<LiftedTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Assign, ::tyr::formalism::FluentTag> element,
-                          const StateContext<GroundTag>& context);
+                               const StateContext<GroundTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::FluentTag> element,
-                          const StateContext<GroundTag>& context);
+                               const StateContext<GroundTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag> element,
-                          const StateContext<GroundTag>& context);
+                               const StateContext<GroundTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag> element,
-                          const StateContext<GroundTag>& context);
+                               const StateContext<GroundTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag> element,
-                          const StateContext<GroundTag>& context);
+                               const StateContext<GroundTag>& context);
 template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::AuxiliaryTag> element,
-                          const StateContext<GroundTag>& context);
+                               const StateContext<GroundTag>& context);
 
-template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::FluentTag> element, const StateContext<LiftedTag>& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element, const StateContext<LiftedTag>& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::FluentTag> element, const StateContext<GroundTag>& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element, const StateContext<GroundTag>& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::FluentTag> element,
+                               const StateContext<LiftedTag>& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element,
+                               const StateContext<LiftedTag>& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::FluentTag> element,
+                               const StateContext<GroundTag>& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element,
+                               const StateContext<GroundTag>& context);
 
 /**
  * is_applicable_if_fires
@@ -144,19 +150,23 @@ template bool is_applicable(::tyr::formalism::planning::GroundLiteralListView<::
 template bool is_applicable(::tyr::formalism::planning::GroundLiteralListView<::tyr::formalism::StaticTag> elements, const StateContext<GroundTag>& context);
 template bool is_applicable(::tyr::formalism::planning::GroundLiteralListView<::tyr::formalism::DerivedTag> elements, const StateContext<GroundTag>& context);
 
-template bool is_applicable<::tyr::formalism::PositiveTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element, const StateContext<LiftedTag>& context);
-template bool is_applicable<::tyr::formalism::NegativeTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element, const StateContext<LiftedTag>& context);
-template bool is_applicable<::tyr::formalism::PositiveTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element, const StateContext<GroundTag>& context);
-template bool is_applicable<::tyr::formalism::NegativeTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element, const StateContext<GroundTag>& context);
+template bool is_applicable<::tyr::formalism::PositiveTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element,
+                                                           const StateContext<LiftedTag>& context);
+template bool is_applicable<::tyr::formalism::NegativeTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element,
+                                                           const StateContext<LiftedTag>& context);
+template bool is_applicable<::tyr::formalism::PositiveTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element,
+                                                           const StateContext<GroundTag>& context);
+template bool is_applicable<::tyr::formalism::NegativeTag>(::tyr::formalism::planning::FDRFactView<::tyr::formalism::FluentTag> element,
+                                                           const StateContext<GroundTag>& context);
 
 template bool is_applicable<::tyr::formalism::PositiveTag>(::tyr::formalism::planning::FDRFactListView<::tyr::formalism::FluentTag> elements,
-                                                    const StateContext<LiftedTag>& context);
+                                                           const StateContext<LiftedTag>& context);
 template bool is_applicable<::tyr::formalism::NegativeTag>(::tyr::formalism::planning::FDRFactListView<::tyr::formalism::FluentTag> elements,
-                                                    const StateContext<LiftedTag>& context);
+                                                           const StateContext<LiftedTag>& context);
 template bool is_applicable<::tyr::formalism::PositiveTag>(::tyr::formalism::planning::FDRFactListView<::tyr::formalism::FluentTag> elements,
-                                                    const StateContext<GroundTag>& context);
+                                                           const StateContext<GroundTag>& context);
 template bool is_applicable<::tyr::formalism::NegativeTag>(::tyr::formalism::planning::FDRFactListView<::tyr::formalism::FluentTag> elements,
-                                                    const StateContext<GroundTag>& context);
+                                                           const StateContext<GroundTag>& context);
 
 template bool is_applicable(::tyr::formalism::planning::GroundBooleanOperatorListView elements, const StateContext<LiftedTag>& context);
 template bool is_applicable(::tyr::formalism::planning::GroundBooleanOperatorListView elements, const StateContext<GroundTag>& context);
@@ -211,8 +221,10 @@ template bool is_applicable(::tyr::formalism::planning::GroundNumericEffectView<
 template bool is_applicable(::tyr::formalism::planning::GroundNumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::AuxiliaryTag> element,
                             const StateContext<GroundTag>& context);
 
-template bool is_applicable(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element, const StateContext<LiftedTag>& context);
-template bool is_applicable(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element, const StateContext<GroundTag>& context);
+template bool is_applicable(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element,
+                            const StateContext<LiftedTag>& context);
+template bool is_applicable(::tyr::formalism::planning::GroundNumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element,
+                            const StateContext<GroundTag>& context);
 
 // GroundConjunctiveCondition
 

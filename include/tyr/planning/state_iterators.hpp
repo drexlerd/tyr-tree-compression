@@ -18,7 +18,6 @@
 #ifndef TYR_PLANNING_STATE_ITERATORS_HPP_
 #define TYR_PLANNING_STATE_ITERATORS_HPP_
 
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/indices.hpp"
 
@@ -28,6 +27,7 @@
 #include <iterator>
 #include <utility>
 #include <vector>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning
 {

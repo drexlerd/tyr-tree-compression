@@ -18,7 +18,6 @@
 #ifndef TYR_PLANNING_NODE_HPP_
 #define TYR_PLANNING_NODE_HPP_
 
-#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -29,6 +28,7 @@
 #include <concepts>
 #include <ranges>
 #include <vector>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {

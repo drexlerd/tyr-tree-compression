@@ -15,11 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/planning/programs/rpg.hpp"
+#include "tyr/planning/lifted/programs/rpg.hpp"
 
 #include "common.hpp"
 #include "tyr/analysis/domains.hpp"
-#include <yggdrasil/containers/unordered_set.hpp>
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -27,6 +26,8 @@
 #include "tyr/formalism/planning/merge_datalog.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
+
+#include <yggdrasil/containers/unordered_set.hpp>
 
 namespace f = tyr::formalism;
 namespace d = tyr::datalog;
@@ -144,7 +145,7 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
                                            ygg::Data<fd::Program>& program,
                                            TranslationContext& translation_context,
                                            fp::MergeDatalogContext& context,
-                                           RPGProgram::RuleToActionMapping& rule_to_action)
+                                           RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
 {
     for (const auto cond_eff : action.get_effects())
     {
@@ -169,7 +170,10 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
     }
 }
 
-auto create_program(fp::TaskView task, TranslationContext& translation_context, RPGProgram::RuleToActionMapping& rule_to_action, fd::Repository& destination)
+auto create_program(fp::TaskView task,
+                    TranslationContext& translation_context,
+                    RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action,
+                    fd::Repository& destination)
 {
     auto builder = fd::Builder();
     auto context = fp::MergeDatalogContext(builder, destination);
@@ -221,7 +225,7 @@ auto create_program(fp::TaskView task, TranslationContext& translation_context, 
     return destination.get_or_create(program).first;
 }
 
-auto create_program_context(fp::TaskView task, TranslationContext& translation_context, RPGProgram::RuleToActionMapping& rule_to_action)
+auto create_program_context(fp::TaskView task, TranslationContext& translation_context, RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
     auto repository = factory->create_shared();
@@ -235,7 +239,7 @@ auto create_program_context(fp::TaskView task, TranslationContext& translation_c
 
 }
 
-RPGProgram::RPGProgram(fp::TaskView task) :
+RPGProgram<LiftedTag>::RPGProgram(fp::TaskView task) :
     m_translation_context(),
     m_rule_to_action(),
     m_program_context(create_program_context(task, m_translation_context, m_rule_to_action)),
@@ -244,16 +248,19 @@ RPGProgram::RPGProgram(fp::TaskView task) :
     // std::cout << m_program_context.get_program() << std::endl;
 }
 
-const TranslationContext& RPGProgram::get_translation_context() const noexcept { return m_translation_context; }
+const TranslationContext& RPGProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
 
-const RPGProgram::RuleToActionMapping& RPGProgram::get_rule_to_action_mapping() const noexcept { return m_rule_to_action; }
+const RPGProgram<LiftedTag>::RuleToActionMapping& RPGProgram<LiftedTag>::get_rule_to_action_mapping() const noexcept { return m_rule_to_action; }
 
-datalog::ProgramContext& RPGProgram::get_program_context() noexcept { return m_program_context; }
+datalog::ProgramContext& RPGProgram<LiftedTag>::get_program_context() noexcept { return m_program_context; }
 
-const datalog::ProgramContext& RPGProgram::get_program_context() const noexcept { return m_program_context; }
+const datalog::ProgramContext& RPGProgram<LiftedTag>::get_program_context() const noexcept { return m_program_context; }
 
-const datalog::ConstProgramWorkspace& RPGProgram::get_const_program_workspace() const noexcept { return m_program_workspace; }
+const datalog::ConstProgramWorkspace<LiftedTag>& RPGProgram<LiftedTag>::get_const_program_workspace() const noexcept { return m_program_workspace; }
 
-::tyr::formalism::datalog::GroundConjunctiveConditionView RPGProgram::get_goal() const noexcept { return m_program_context.get_program().get_goal().value(); }
+::tyr::formalism::datalog::GroundConjunctiveConditionView RPGProgram<LiftedTag>::get_goal() const noexcept
+{
+    return m_program_context.get_program().get_goal().value();
+}
 
 }

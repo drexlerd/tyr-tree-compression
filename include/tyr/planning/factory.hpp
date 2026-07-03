@@ -19,12 +19,12 @@
 #define TYR_PLANNING_FACTORY_HPP_
 
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/ground_task/axiom_evaluator.hpp"
-#include "tyr/planning/ground_task/state_repository.hpp"
-#include "tyr/planning/ground_task/successor_generator.hpp"
-#include "tyr/planning/lifted_task/axiom_evaluator.hpp"
-#include "tyr/planning/lifted_task/state_repository.hpp"
-#include "tyr/planning/lifted_task/successor_generator.hpp"
+#include "tyr/planning/ground/axiom_evaluator.hpp"
+#include "tyr/planning/ground/state_repository.hpp"
+#include "tyr/planning/ground/successor_generator.hpp"
+#include "tyr/planning/lifted/axiom_evaluator.hpp"
+#include "tyr/planning/lifted/state_repository.hpp"
+#include "tyr/planning/lifted/successor_generator.hpp"
 
 #include <memory>
 #include <utility>

@@ -1,0 +1,49 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef TYR_DATALOG_GROUND_QUEUE_HPP_
+#define TYR_DATALOG_GROUND_QUEUE_HPP_
+
+#include "tyr/datalog/ground/contexts/program.hpp"
+#include "tyr/datalog/ground/workspaces/program.hpp"
+#include "tyr/datalog/policies/annotation_concept.hpp"
+#include "tyr/datalog/policies/cost_concept.hpp"
+#include "tyr/datalog/policies/termination_concept.hpp"
+#include "tyr/formalism/datalog/repository.hpp"
+
+#include <vector>
+
+namespace tyr::datalog::experimental
+{
+
+struct GroundQueueResult
+{
+    std::vector<::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>> fluent_atoms;
+    GroundQueueStatistics statistics;
+};
+
+template<OrAnnotationPolicyConcept<GroundTag> OrAP,
+         AndAnnotationPolicyConcept<GroundTag> AndAP,
+         TerminationPolicyConcept<GroundTag> TP,
+         RuleCostPolicyConcept<GroundTag> CP>
+GroundQueueResult solve_ground_queue(ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>& ctx);
+
+GroundQueueResult solve_ground_queue(ProgramExecutionContext<GroundTag>& ctx);
+
+}
+
+#endif

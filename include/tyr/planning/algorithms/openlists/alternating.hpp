@@ -18,7 +18,6 @@
 #ifndef TYR_PLANNING_ALGORITHMS_OPENLISTS_ALTERNATING_HPP_
 #define TYR_PLANNING_ALGORITHMS_OPENLISTS_ALTERNATING_HPP_
 
-#include <yggdrasil/containers/tuple.hpp>
 #include "tyr/planning/algorithms/openlists/interface.hpp"
 #include "tyr/planning/algorithms/openlists/priority_queue.hpp"
 
@@ -26,6 +25,7 @@
 #include <cassert>
 #include <iostream>
 #include <queue>
+#include <yggdrasil/containers/tuple.hpp>
 
 namespace tyr::planning
 {

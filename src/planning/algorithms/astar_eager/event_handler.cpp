@@ -17,17 +17,17 @@
 
 #include "tyr/planning/algorithms/astar_eager/event_handler.hpp"
 
-#include <yggdrasil/core/chrono.hpp>
 #include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/planning/formatter.hpp"
+#include "tyr/planning/ground/node.hpp"
 #include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/ground_task/node.hpp"
+#include "tyr/planning/lifted/node.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/node.hpp"
 #include "tyr/planning/plan.hpp"
 
 #include <fmt/ostream.h>
 #include <iostream>
+#include <yggdrasil/core/chrono.hpp>
 
 namespace tyr::planning::astar_eager
 {

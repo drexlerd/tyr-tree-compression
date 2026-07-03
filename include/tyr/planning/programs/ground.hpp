@@ -18,11 +18,8 @@
 #ifndef TYR_PLANNING_PROGRAMS_GROUND_TASK_HPP_
 #define TYR_PLANNING_PROGRAMS_GROUND_TASK_HPP_
 
-#include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/datalog/program_context.hpp"
-#include "tyr/datalog/workspaces/program.hpp"
+#include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
 #include "tyr/formalism/planning/repository.hpp"
@@ -31,6 +28,9 @@
 #include "tyr/planning/programs/translation_context.hpp"
 
 #include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::planning
 {
@@ -38,7 +38,8 @@ namespace tyr::planning
 class GroundTaskProgram
 {
 public:
-    using AppPredicateToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::ActionView>;
+    using AppPredicateToActionMapping =
+        ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::ActionView>;
     using AppPredicateToAxiomMapping =
         ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, std::vector<::tyr::formalism::planning::AxiomView>>;
 
@@ -49,7 +50,7 @@ public:
     const AppPredicateToAxiomMapping& get_predicate_to_axiom_mapping() const noexcept;
     datalog::ProgramContext& get_program_context() noexcept;
     const datalog::ProgramContext& get_program_context() const noexcept;
-    const datalog::ConstProgramWorkspace& get_const_program_workspace() const noexcept;
+    const datalog::ConstProgramWorkspace<LiftedTag>& get_const_program_workspace() const noexcept;
 
 private:
     TranslationContext m_translation_context;
@@ -58,7 +59,7 @@ private:
 
     datalog::ProgramContext m_program_context;
 
-    datalog::ConstProgramWorkspace m_program_workspace;
+    datalog::ConstProgramWorkspace<LiftedTag> m_program_workspace;
 };
 
 }

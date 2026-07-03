@@ -19,31 +19,34 @@
 #define TYR_PLANNING_TASK_UTILS_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include <yggdrasil/core/config.hpp>
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/planning/merge_datalog_decl.hpp"
 #include "tyr/formalism/planning/repository.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
+#include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/programs/translation_context.hpp"
 #include "tyr/planning/task.hpp"
+
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {
 
-extern void insert_fluent_atoms_to_fact_set(const UnpackedState<LiftedTag>& state,
-                                            const ::tyr::formalism::planning::Repository& repository,
-                                            const ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::FluentTag>,
-                                                               ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>& fluent_to_fluent_predicate,
-                                            ::tyr::formalism::planning::MergeDatalogContext& merge_context,
-                                            datalog::TaggedFactSets<::tyr::formalism::FluentTag>& fact_sets);
+extern void
+insert_fluent_atoms_to_fact_set(const UnpackedState<LiftedTag>& state,
+                                const ::tyr::formalism::planning::Repository& repository,
+                                const ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::FluentTag>,
+                                                        ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>& fluent_to_fluent_predicate,
+                                ::tyr::formalism::planning::MergeDatalogContext& merge_context,
+                                datalog::TaggedFactSets<::tyr::formalism::FluentTag>& fact_sets);
 
-void insert_derived_atoms_to_fact_set(const UnpackedState<LiftedTag>& state,
-                                      const ::tyr::formalism::planning::Repository& repository,
-                                      const ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::DerivedTag>,
-                                                         ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>& derived_to_fluent_predicate,
-                                      ::tyr::formalism::planning::MergeDatalogContext& merge_context,
-                                      datalog::TaggedFactSets<::tyr::formalism::FluentTag>& fact_sets);
+void insert_derived_atoms_to_fact_set(
+    const UnpackedState<LiftedTag>& state,
+    const ::tyr::formalism::planning::Repository& repository,
+    const ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::DerivedTag>,
+                            ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>& derived_to_fluent_predicate,
+    ::tyr::formalism::planning::MergeDatalogContext& merge_context,
+    datalog::TaggedFactSets<::tyr::formalism::FluentTag>& fact_sets);
 
 void insert_numeric_variables_to_fact_set(const UnpackedState<LiftedTag>& state,
                                           const ::tyr::formalism::planning::Repository& repository,

@@ -18,15 +18,15 @@
 #ifndef TYR_PLANNING_SUCCESSOR_GENERATOR_HPP_
 #define TYR_PLANNING_SUCCESSOR_GENERATOR_HPP_
 
-#include <yggdrasil/core/concepts.hpp>
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/node.hpp"
 #include "tyr/planning/state_index.hpp"
 
 #include <concepts>
 #include <vector>
+#include <yggdrasil/core/concepts.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/execution/onetbb.hpp>
 
 namespace tyr::planning
 {

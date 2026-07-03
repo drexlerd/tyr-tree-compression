@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/datalog/policies/cost.hpp"
+#include "tyr/datalog/lifted/policies/cost.hpp"
 #include "tyr/formalism/datalog/canonicalization.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -74,41 +74,41 @@ RuleBindingFixture make_nullary_rule_binding(fd::Repository& repository, d::Cost
 }
 }
 
-TEST(TyrDatalogCostPolicyTest, LiftedRuleCostPolicyUsesRuleCost)
+TEST(TyrDatalogCostPolicyTest, RuleCostPolicyLiftedUsesRuleCost)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
     const auto fixture = make_nullary_rule_binding(repository, 7);
 
-    const auto policy = d::LiftedRuleCostPolicy();
+    const auto policy = d::RuleCostPolicy<LiftedTag>();
 
     EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 7);
 }
 
-TEST(TyrDatalogCostPolicyTest, RuleBindingCostOverridePolicyFallsBackToRuleCost)
+TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedFallsBackToRuleCost)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
     const auto fixture = make_nullary_rule_binding(repository, 7);
 
-    const auto policy = d::RuleBindingCostOverridePolicy();
+    const auto policy = d::RuleCostOverridePolicy<LiftedTag>();
 
     EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 7);
 }
 
-TEST(TyrDatalogCostPolicyTest, RuleBindingCostOverridePolicyUsesExactOverride)
+TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesExactOverride)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
     const auto fixture = make_nullary_rule_binding(repository, 7);
 
-    auto policy = d::RuleBindingCostOverridePolicy();
+    auto policy = d::RuleCostOverridePolicy<LiftedTag>();
     policy.set_cost(fixture.binding, 3);
 
     EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 3);
 }
 
-TEST(TyrDatalogCostPolicyTest, RuleBindingCostOverridePolicyUsesEquivalentOverride)
+TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesEquivalentOverride)
 {
     auto factory = fd::RepositoryFactory();
     auto first_repository = factory.create();
@@ -116,7 +116,7 @@ TEST(TyrDatalogCostPolicyTest, RuleBindingCostOverridePolicyUsesEquivalentOverri
     const auto first_fixture = make_nullary_rule_binding(first_repository, 7);
     const auto second_fixture = make_nullary_rule_binding(second_repository, 7);
 
-    auto policy = d::RuleBindingCostOverridePolicy();
+    auto policy = d::RuleCostOverridePolicy<LiftedTag>();
     policy.set_cost(first_fixture.binding, 3);
 
     EXPECT_EQ(policy.get_cost(second_fixture.rule, second_fixture.binding), 3);

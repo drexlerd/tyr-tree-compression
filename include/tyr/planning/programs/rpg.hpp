@@ -18,42 +18,13 @@
 #ifndef TYR_PLANNING_PROGRAMS_RPG_HPP_
 #define TYR_PLANNING_PROGRAMS_RPG_HPP_
 
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
-#include "tyr/datalog/program_context.hpp"
-#include "tyr/datalog/workspaces/program.hpp"
-#include "tyr/formalism/datalog/repository.hpp"
-#include "tyr/formalism/datalog/views.hpp"
-#include "tyr/formalism/planning/repository.hpp"
-#include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/programs/translation_context.hpp"
 
 namespace tyr::planning
 {
 
-class RPGProgram
-{
-public:
-    using RuleToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::RuleView, ::tyr::formalism::planning::ActionView>;
-
-    explicit RPGProgram(::tyr::formalism::planning::TaskView task);
-
-    const TranslationContext& get_translation_context() const noexcept;
-    const RuleToActionMapping& get_rule_to_action_mapping() const noexcept;
-    datalog::ProgramContext& get_program_context() noexcept;
-    const datalog::ProgramContext& get_program_context() const noexcept;
-    const datalog::ConstProgramWorkspace& get_const_program_workspace() const noexcept;
-    ::tyr::formalism::datalog::GroundConjunctiveConditionView get_goal() const noexcept;
-
-private:
-    TranslationContext m_translation_context;
-    RuleToActionMapping m_rule_to_action;
-
-    datalog::ProgramContext m_program_context;
-
-    datalog::ConstProgramWorkspace m_program_workspace;
-};
+template<TaskKind Kind>
+class RPGProgram;
 
 }
 

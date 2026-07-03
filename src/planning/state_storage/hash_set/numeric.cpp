@@ -17,8 +17,8 @@
 
 #include "tyr/planning/state_storage/hash_set/numeric.hpp"
 
-#include "tyr/planning/ground_task/state_storage/hash_set/context.hpp"
-#include "tyr/planning/lifted_task/state_storage/hash_set/context.hpp"
+#include "tyr/planning/ground/state_storage/hash_set/context.hpp"
+#include "tyr/planning/lifted/state_storage/hash_set/context.hpp"
 #include "tyr/planning/task.hpp"
 
 namespace tyr::planning

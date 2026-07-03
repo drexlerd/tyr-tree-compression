@@ -33,6 +33,7 @@
 #include "tyr/formalism/datalog/ground_literal_view.hpp"
 #include "tyr/formalism/datalog/ground_numeric_effect_operator_view.hpp"
 #include "tyr/formalism/datalog/ground_numeric_effect_view.hpp"
+#include "tyr/formalism/datalog/ground_program_view.hpp"
 #include "tyr/formalism/datalog/ground_rule_view.hpp"
 #include "tyr/formalism/datalog/literal_view.hpp"
 #include "tyr/formalism/datalog/multi_operator_view.hpp"

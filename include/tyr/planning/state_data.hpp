@@ -18,14 +18,14 @@
 #ifndef TYR_PLANNING_STATE_DATA_HPP_
 #define TYR_PLANNING_STATE_DATA_HPP_
 
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/core/concepts.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_index.hpp"
 
 #include <concepts>
+#include <yggdrasil/core/concepts.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace ygg
 {

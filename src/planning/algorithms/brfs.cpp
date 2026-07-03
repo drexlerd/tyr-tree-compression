@@ -17,8 +17,6 @@
 
 #include "tyr/planning/algorithms/brfs.hpp"
 
-#include <yggdrasil/core/chrono.hpp>
-#include <yggdrasil/containers/segmented_vector.hpp>
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/algorithms/brfs/event_handler.hpp"
@@ -27,18 +25,18 @@
 #include "tyr/planning/algorithms/strategies/pruning.hpp"
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/applicability.hpp"
+#include "tyr/planning/ground/node.hpp"
+#include "tyr/planning/ground/state_builder.hpp"
+#include "tyr/planning/ground/state_repository.hpp"
+#include "tyr/planning/ground/state_view.hpp"
+#include "tyr/planning/ground/successor_generator.hpp"
 #include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/ground_task/node.hpp"
-#include "tyr/planning/ground_task/state_builder.hpp"
-#include "tyr/planning/ground_task/state_repository.hpp"
-#include "tyr/planning/ground_task/state_view.hpp"
-#include "tyr/planning/ground_task/successor_generator.hpp"
+#include "tyr/planning/lifted/node.hpp"
+#include "tyr/planning/lifted/state_builder.hpp"
+#include "tyr/planning/lifted/state_repository.hpp"
+#include "tyr/planning/lifted/state_view.hpp"
+#include "tyr/planning/lifted/successor_generator.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/node.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
-#include "tyr/planning/lifted_task/state_repository.hpp"
-#include "tyr/planning/lifted_task/state_view.hpp"
-#include "tyr/planning/lifted_task/successor_generator.hpp"
 #include "tyr/planning/search_node.hpp"
 #include "tyr/planning/search_space.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -46,6 +44,8 @@
 #include <algorithm>
 #include <deque>
 #include <random>
+#include <yggdrasil/containers/segmented_vector.hpp>
+#include <yggdrasil/core/chrono.hpp>
 
 namespace tyr::planning::brfs
 {
@@ -252,13 +252,11 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
     return result;
 }
 
-template SearchResult<LiftedTag> find_solution<LiftedTag>(Task<LiftedTag>& task,
-                                                          SuccessorGenerator<LiftedTag>& successor_generator,
-                                                          const Options<LiftedTag>& options);
+template SearchResult<LiftedTag>
+find_solution<LiftedTag>(Task<LiftedTag>& task, SuccessorGenerator<LiftedTag>& successor_generator, const Options<LiftedTag>& options);
 
-template SearchResult<GroundTag> find_solution<GroundTag>(Task<GroundTag>& task,
-                                                          SuccessorGenerator<GroundTag>& successor_generator,
-                                                          const Options<GroundTag>& options);
+template SearchResult<GroundTag>
+find_solution<GroundTag>(Task<GroundTag>& task, SuccessorGenerator<GroundTag>& successor_generator, const Options<GroundTag>& options);
 
 static_assert(SolverConcept<Solver<LiftedTag>, LiftedTag>);
 static_assert(SolverConcept<Solver<GroundTag>, GroundTag>);

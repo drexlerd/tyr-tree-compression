@@ -18,14 +18,15 @@
 #ifndef TYR_SRC_PLANNING_PROGRAMS_COMMON_HPP_
 #define TYR_SRC_PLANNING_PROGRAMS_COMMON_HPP_
 
-#include <cista/containers/string.h>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/declarations.hpp"
+
+#include <cista/containers/string.h>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning
 {

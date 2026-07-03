@@ -18,9 +18,10 @@
 #ifndef TYR_FORMALISM_DATALOG_DECLARATIONS_HPP_
 #define TYR_FORMALISM_DATALOG_DECLARATIONS_HPP_
 
+#include "tyr/formalism/declarations.hpp"
+
 #include <yggdrasil/core/config.hpp>
 #include <yggdrasil/core/types.hpp>
-#include "tyr/formalism/declarations.hpp"
 
 namespace tyr::formalism::datalog
 {
@@ -134,6 +135,10 @@ struct Program
 {
 };
 
+struct GroundProgram
+{
+};
+
 using CoreTypes = ygg::TypeList<Variable, Object>;
 using PredicateTypes = ygg::MapTypeListT<Predicate, StaticFluentTags>;
 using AtomTypes = ygg::MapTypeListT<Atom, StaticFluentTags>;
@@ -172,35 +177,35 @@ template<typename Op>
 using GroundMultiOperatorType = MultiOperator<Op, ygg::Data<GroundFunctionExpression>>;
 
 using LiftedArithmeticExpressionTypes = ygg::ConcatTypeListsT<ygg::MapTypeListT<LiftedUnaryOperatorType, UnaryArithmeticOpKinds>,
-                                                         ygg::MapTypeListT<LiftedBinaryOperatorType, BinaryArithmeticOpKinds>,
-                                                         ygg::MapTypeListT<LiftedMultiOperatorType, MultiArithmeticOpKinds>>;
+                                                              ygg::MapTypeListT<LiftedBinaryOperatorType, BinaryArithmeticOpKinds>,
+                                                              ygg::MapTypeListT<LiftedMultiOperatorType, MultiArithmeticOpKinds>>;
 
 using LiftedBooleanExpressionTypes = ygg::MapTypeListT<LiftedBinaryOperatorType, BooleanOpKinds>;
 
 using GroundArithmeticExpressionTypes = ygg::ConcatTypeListsT<ygg::MapTypeListT<GroundUnaryOperatorType, UnaryArithmeticOpKinds>,
-                                                         ygg::MapTypeListT<GroundBinaryOperatorType, BinaryArithmeticOpKinds>,
-                                                         ygg::MapTypeListT<GroundMultiOperatorType, MultiArithmeticOpKinds>>;
+                                                              ygg::MapTypeListT<GroundBinaryOperatorType, BinaryArithmeticOpKinds>,
+                                                              ygg::MapTypeListT<GroundMultiOperatorType, MultiArithmeticOpKinds>>;
 
 using GroundBooleanExpressionTypes = ygg::MapTypeListT<GroundBinaryOperatorType, BooleanOpKinds>;
 
 using ExpressionTypes =
     ygg::ConcatTypeListsT<LiftedArithmeticExpressionTypes, LiftedBooleanExpressionTypes, GroundArithmeticExpressionTypes, GroundBooleanExpressionTypes>;
 using EffectTypes = ygg::ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes>;
-using CompoundTypes = ygg::TypeList<ConjunctiveCondition, Rule, GroundConjunctiveCondition, GroundRule, Program>;
+using CompoundTypes = ygg::TypeList<ConjunctiveCondition, Rule, GroundConjunctiveCondition, GroundRule, Program, GroundProgram>;
 
 using SymbolRepositoryTypes = ygg::ConcatTypeListsT<CoreTypes,
-                                               PredicateTypes,
-                                               AtomTypes,
-                                               GroundAtomTypes,
-                                               LiteralTypes,
-                                               GroundLiteralTypes,
-                                               FunctionTypes,
-                                               FunctionTermTypes,
-                                               GroundFunctionTermTypes,
-                                               GroundFunctionTermValueTypes,
-                                               ExpressionTypes,
-                                               EffectTypes,
-                                               CompoundTypes>;
+                                                    PredicateTypes,
+                                                    AtomTypes,
+                                                    GroundAtomTypes,
+                                                    LiteralTypes,
+                                                    GroundLiteralTypes,
+                                                    FunctionTypes,
+                                                    FunctionTermTypes,
+                                                    GroundFunctionTermTypes,
+                                                    GroundFunctionTermValueTypes,
+                                                    ExpressionTypes,
+                                                    EffectTypes,
+                                                    CompoundTypes>;
 
 using RelationRepositoryTypes = ygg::ConcatTypeListsT<PredicateTypes, FunctionTypes, ygg::TypeList<Rule>>;
 using BuilderTypes = ygg::ConcatTypeListsT<SymbolRepositoryTypes, ygg::MapTypeListT<RelationBinding, RelationRepositoryTypes>>;

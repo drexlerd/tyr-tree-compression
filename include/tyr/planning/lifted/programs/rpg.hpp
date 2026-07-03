@@ -1,0 +1,59 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef TYR_PLANNING_LIFTED_PROGRAMS_RPG_HPP_
+#define TYR_PLANNING_LIFTED_PROGRAMS_RPG_HPP_
+
+#include "tyr/datalog/program_context.hpp"
+#include "tyr/datalog/lifted/workspaces/program.hpp"
+#include "tyr/formalism/datalog/views.hpp"
+#include "tyr/formalism/planning/views.hpp"
+#include "tyr/planning/programs/rpg.hpp"
+#include "tyr/planning/programs/translation_context.hpp"
+
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
+
+namespace tyr::planning
+{
+
+template<>
+class RPGProgram<LiftedTag>
+{
+public:
+    using RuleToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::RuleView, ::tyr::formalism::planning::ActionView>;
+
+    explicit RPGProgram(::tyr::formalism::planning::TaskView task);
+
+    const TranslationContext& get_translation_context() const noexcept;
+    const RuleToActionMapping& get_rule_to_action_mapping() const noexcept;
+    datalog::ProgramContext& get_program_context() noexcept;
+    const datalog::ProgramContext& get_program_context() const noexcept;
+    const datalog::ConstProgramWorkspace<LiftedTag>& get_const_program_workspace() const noexcept;
+    ::tyr::formalism::datalog::GroundConjunctiveConditionView get_goal() const noexcept;
+
+private:
+    TranslationContext m_translation_context;
+    RuleToActionMapping m_rule_to_action;
+    datalog::ProgramContext m_program_context;
+    datalog::ConstProgramWorkspace<LiftedTag> m_program_workspace;
+};
+
+}
+
+#endif

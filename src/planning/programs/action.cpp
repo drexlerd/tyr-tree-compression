@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/planning/programs/action.hpp"
+#include "tyr/planning/lifted/programs/action.hpp"
 
 #include "common.hpp"
 #include "tyr/analysis/domains.hpp"
@@ -68,7 +68,7 @@ auto create_applicability_atom(fp::ActionView action, fp::MergeDatalogContext& c
 
 auto create_program(fp::TaskView task,
                     TranslationContext& translation_context,
-                    ApplicableActionProgram::AppPredicateToActionMapping& predicate_to_actions,
+                    ApplicableActionProgram<LiftedTag>::AppPredicateToActionMapping& predicate_to_actions,
                     fd::Repository& repository)
 {
     auto builder = fd::Builder();
@@ -181,7 +181,9 @@ auto create_program(fp::TaskView task,
     return repository.get_or_create(program).first;
 }
 
-auto create_program_context(fp::TaskView task, TranslationContext& translation_context, ApplicableActionProgram::AppPredicateToActionMapping& mapping)
+auto create_program_context(fp::TaskView task,
+                            TranslationContext& translation_context,
+                            ApplicableActionProgram<LiftedTag>::AppPredicateToActionMapping& mapping)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
     auto repository = factory->create_shared();
@@ -194,7 +196,7 @@ auto create_program_context(fp::TaskView task, TranslationContext& translation_c
 }
 }
 
-ApplicableActionProgram::ApplicableActionProgram(fp::TaskView task) :
+ApplicableActionProgram<LiftedTag>::ApplicableActionProgram(fp::TaskView task) :
     m_translation_context(),
     m_predicate_to_actions(),
     m_program_context(create_program_context(task, m_translation_context, m_predicate_to_actions)),
@@ -203,16 +205,19 @@ ApplicableActionProgram::ApplicableActionProgram(fp::TaskView task) :
     // std::cout << m_program_context.get_program() << std::endl;
 }
 
-const TranslationContext& ApplicableActionProgram::get_translation_context() const noexcept { return m_translation_context; }
+const TranslationContext& ApplicableActionProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
 
-const ApplicableActionProgram::AppPredicateToActionMapping& ApplicableActionProgram::get_predicate_to_action_mapping() const noexcept
+const ApplicableActionProgram<LiftedTag>::AppPredicateToActionMapping& ApplicableActionProgram<LiftedTag>::get_predicate_to_action_mapping() const noexcept
 {
     return m_predicate_to_actions;
 }
 
-datalog::ProgramContext& ApplicableActionProgram::get_program_context() noexcept { return m_program_context; }
+datalog::ProgramContext& ApplicableActionProgram<LiftedTag>::get_program_context() noexcept { return m_program_context; }
 
-const datalog::ProgramContext& ApplicableActionProgram::get_program_context() const noexcept { return m_program_context; }
+const datalog::ProgramContext& ApplicableActionProgram<LiftedTag>::get_program_context() const noexcept { return m_program_context; }
 
-const datalog::ConstProgramWorkspace& ApplicableActionProgram::get_const_program_workspace() const noexcept { return m_program_workspace; }
+const datalog::ConstProgramWorkspace<LiftedTag>& ApplicableActionProgram<LiftedTag>::get_const_program_workspace() const noexcept
+{
+    return m_program_workspace;
+}
 }

@@ -18,11 +18,10 @@
 #ifndef TYR_PLANNING_ALGORITHMS_IW_NOVELTY_TABLE_HPP_
 #define TYR_PLANNING_ALGORITHMS_IW_NOVELTY_TABLE_HPP_
 
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/fdr_fact_view.hpp"
 #include "tyr/planning/algorithms/iw/utils.hpp"
-#include "tyr/planning/ground_task/state_view.hpp"
-#include "tyr/planning/lifted_task/state_view.hpp"
+#include "tyr/planning/ground/state_view.hpp"
+#include "tyr/planning/lifted/state_view.hpp"
 #include "tyr/planning/state_view.hpp"
 
 #include <algorithm>
@@ -33,6 +32,7 @@
 #include <span>
 #include <stdexcept>
 #include <vector>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning::iw
 {
@@ -111,7 +111,12 @@ inline TupleIndex rank_tuple(std::span<const ygg::uint_t> tuple)
 }
 
 template<size_t Arity, typename Callback>
-void for_each_tuple(const AtomIndexList& atoms, size_t tuple_size, size_t atom_pos, size_t tuple_pos, std::array<ygg::uint_t, Arity>& tuple, Callback&& callback)
+void for_each_tuple(const AtomIndexList& atoms,
+                    size_t tuple_size,
+                    size_t atom_pos,
+                    size_t tuple_pos,
+                    std::array<ygg::uint_t, Arity>& tuple,
+                    Callback&& callback)
     requires(Arity > 0)
 {
     if (tuple_pos == tuple_size)

@@ -1,1 +1,1 @@
-add_subdirectory(lifted_task)
+add_subdirectory(lifted)

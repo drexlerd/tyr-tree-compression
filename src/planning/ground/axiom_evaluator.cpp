@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "tyr/planning/ground/axiom_evaluator.hpp"
+
+#include "tyr/formalism/planning/repository.hpp"
+#include "tyr/formalism/planning/views.hpp"
+#include "tyr/planning/applicability.hpp"
+#include "tyr/planning/ground/match_tree/match_tree.hpp"
+#include "tyr/planning/ground/state_builder.hpp"
+#include "tyr/planning/ground_task.hpp"
+
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
+
+namespace tyr::planning
+{
+
+AxiomEvaluator<GroundTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<GroundTag> task, ygg::ExecutionContextPtr) :
+    m_index(index),
+    m_task(task),
+    m_applicable_axioms()
+{
+}
+
+void AxiomEvaluator<GroundTag>::compute_extended_state(UnpackedState<GroundTag>& unpacked_state)
+{
+    auto state_context = StateContext<GroundTag> { *m_task, unpacked_state, ygg::float_t(0) };
+
+    for (const auto& match_tree : m_task->get_axiom_match_tree_strata())
+    {
+        while (true)
+        {
+            auto discovered_new_atom = bool { false };
+
+            m_applicable_axioms.clear();
+            match_tree->generate(state_context, m_applicable_axioms);
+
+            for (const auto axiom : m_applicable_axioms)
+            {
+                const auto atom = ygg::make_view(axiom, *m_task->get_repository()).get_head().get_index();
+
+                if (!unpacked_state.test(atom))
+                    discovered_new_atom = true;
+
+                unpacked_state.set(atom);
+            }
+
+            if (!discovered_new_atom)
+                break;
+        }
+    }
+}
+
+static_assert(AxiomEvaluatorConcept<AxiomEvaluator<GroundTag>, GroundTag>);
+
+}

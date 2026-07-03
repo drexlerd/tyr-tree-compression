@@ -18,16 +18,6 @@
 #ifndef TYR_FORMALISM_DATALOG_REPOSITORY_HPP_
 #define TYR_FORMALISM_DATALOG_REPOSITORY_HPP_
 
-#include <yggdrasil/buffer/declarations.hpp>
-#include <yggdrasil/buffer/indexed_hash_set.hpp>
-#include <yggdrasil/buffer/segmented_buffer.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
-#include <yggdrasil/containers/tuple.hpp>
-#include <yggdrasil/formalism/relation_repository.hpp>
-#include <yggdrasil/formalism/repository.hpp>
-#include <yggdrasil/formalism/repository_factory.hpp>
-#include <yggdrasil/formalism/symbol_repository.hpp>
 #include "tyr/formalism/datalog/canonicalization.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -41,6 +31,16 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <yggdrasil/buffer/declarations.hpp>
+#include <yggdrasil/buffer/indexed_hash_set.hpp>
+#include <yggdrasil/buffer/segmented_buffer.hpp>
+#include <yggdrasil/containers/tuple.hpp>
+#include <yggdrasil/formalism/relation_repository.hpp>
+#include <yggdrasil/formalism/repository.hpp>
+#include <yggdrasil/formalism/repository_factory.hpp>
+#include <yggdrasil/formalism/symbol_repository.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::formalism::datalog
 {
@@ -172,6 +172,10 @@ using GroundRuleView = ygg::View<ygg::Index<GroundRule>, Repository>;
 
 using GroundRuleListView = ygg::View<ygg::IndexList<GroundRule>, Repository>;
 
+using GroundProgramView = ygg::View<ygg::Index<GroundProgram>, Repository>;
+
+using GroundProgramListView = ygg::View<ygg::IndexList<GroundProgram>, Repository>;
+
 template<::tyr::formalism::FactKind T>
 using LiteralView = ygg::View<ygg::Index<Literal<T>>, Repository>;
 
@@ -239,6 +243,5 @@ using VariableView = ygg::View<ygg::Index<Variable>, Repository>;
 using VariableListView = ygg::View<ygg::IndexList<Variable>, Repository>;
 
 }
-
 
 #endif

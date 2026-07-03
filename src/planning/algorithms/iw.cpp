@@ -21,12 +21,12 @@
 #include "tyr/planning/algorithms/concepts.hpp"
 #include "tyr/planning/algorithms/iw/pruning_strategy.hpp"
 #include "tyr/planning/algorithms/strategies/pruning.hpp"
+#include "tyr/planning/ground/node.hpp"
+#include "tyr/planning/ground/successor_generator.hpp"
 #include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/ground_task/node.hpp"
-#include "tyr/planning/ground_task/successor_generator.hpp"
+#include "tyr/planning/lifted/node.hpp"
+#include "tyr/planning/lifted/successor_generator.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/node.hpp"
-#include "tyr/planning/lifted_task/successor_generator.hpp"
 
 #include <memory>
 #include <stdexcept>

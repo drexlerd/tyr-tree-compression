@@ -17,17 +17,17 @@
 
 #include "tyr/planning/ground_task.hpp"
 
-#include <yggdrasil/semantics/comparators.hpp>                         // for operat...
-#include <yggdrasil/containers/dynamic_bitset.hpp>                      // for set
-#include <yggdrasil/containers/vector.hpp>                              // for ygg::View, set
-#include "tyr/formalism/planning/fdr_context.hpp"             // for Genera...
-#include "tyr/formalism/planning/repository.hpp"              // for Reposi...
-#include "tyr/formalism/planning/views.hpp"                   // for ygg::Index
-#include "tyr/planning/ground_task/axiom_stratification.hpp"  // for compute...
+#include "tyr/formalism/planning/fdr_context.hpp"        // for Genera...
+#include "tyr/formalism/planning/repository.hpp"         // for Reposi...
+#include "tyr/formalism/planning/views.hpp"              // for ygg::Index
+#include "tyr/planning/ground/axiom_stratification.hpp"  // for compute...
 
-#include <cassert>  // for assert
-#include <tuple>    // for operat...
-#include <utility>  // for move
+#include <cassert>                                  // for assert
+#include <tuple>                                    // for operat...
+#include <utility>                                  // for move
+#include <yggdrasil/containers/dynamic_bitset.hpp>  // for set
+#include <yggdrasil/containers/vector.hpp>          // for ygg::View, set
+#include <yggdrasil/semantics/comparators.hpp>      // for operat...
 
 namespace f = tyr::formalism;
 namespace fp = tyr::formalism::planning;
@@ -41,7 +41,10 @@ Task<GroundTag>::Task(::tyr::formalism::planning::PlanningFDRTask task) :
     m_static_numeric_variables(),
     m_action_match_tree(match_tree::MatchTree<fp::GroundAction>::create(get_task().get_ground_actions().get_data(), get_task().get_context())),
     m_action_binding_to_ground_action(),
-    m_axiom_match_tree_strata()
+    m_axiom_match_tree_strata(),
+    m_axiom_program(get_task()),
+    m_action_program(get_task()),
+    m_rpg_program(get_task())
 {
     for (const auto action : get_task().get_ground_actions())
         m_action_binding_to_ground_action.emplace(action.get_row(), action);
@@ -50,7 +53,10 @@ Task<GroundTag>::Task(::tyr::formalism::planning::PlanningFDRTask task) :
         ygg::set(ygg::uint_t(atom.get_index()), true, m_static_atoms_bitset);
 
     for (const auto fterm_value : get_task().template get_fterm_values<f::StaticTag>())
-        ygg::set(ygg::uint_t(fterm_value.get_fterm().get_index()), fterm_value.get_value(), m_static_numeric_variables, std::numeric_limits<ygg::float_t>::quiet_NaN());
+        ygg::set(ygg::uint_t(fterm_value.get_fterm().get_index()),
+                 fterm_value.get_value(),
+                 m_static_numeric_variables,
+                 std::numeric_limits<ygg::float_t>::quiet_NaN());
 
     auto axiom_strata = compute_ground_axiom_stratification(get_task());
 

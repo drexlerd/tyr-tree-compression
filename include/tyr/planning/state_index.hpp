@@ -18,9 +18,10 @@
 #ifndef TYR_PLANNING_STATE_INDEX_HPP_
 #define TYR_PLANNING_STATE_INDEX_HPP_
 
-#include <yggdrasil/ids/index_mixins.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/declarations.hpp"
+
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/ids/index_mixins.hpp>
 
 namespace ygg
 {

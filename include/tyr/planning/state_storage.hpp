@@ -18,11 +18,11 @@
 #ifndef TYR_PLANNING_STATE_STORAGE_HPP_
 #define TYR_PLANNING_STATE_STORAGE_HPP_
 
-#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/task.hpp"
 
 #include <concepts>
 #include <vector>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {

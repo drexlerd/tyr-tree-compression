@@ -28,6 +28,7 @@ add_gtest(formalism_index                                "formalism/index.cpp")
 add_gtest(formalism_unification                          "formalism/unification.cpp")
 
 add_gtest(datalog_cost_policy                           "datalog/cost_policy.cpp")
+add_gtest(datalog_ground_queue                         "datalog/ground_queue.cpp")
 
 add_gtest(planning_rpg_costs                         "planning/heuristics/rpg_costs.cpp")
 add_gtest(planning_lmcut                             "planning/heuristics/lmcut.cpp")

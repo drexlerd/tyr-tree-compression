@@ -18,14 +18,11 @@
 #ifndef TYR_DATALOG_FORMATTER_HPP_
 #define TYR_DATALOG_FORMATTER_HPP_
 
-#include <yggdrasil/core/chrono.hpp>
-#include <yggdrasil/formatting/cista_formatters.hpp>
-#include <yggdrasil/formatting/dynamic_bitset_formatters.hpp>
-#include <yggdrasil/io/iostream.hpp>
-#include "tyr/datalog/assignment.hpp"
-#include "tyr/datalog/consistency_graph.hpp"
-#include "tyr/datalog/delta_kpkc.hpp"
-#include "tyr/datalog/delta_kpkc_graph.hpp"
+#include "tyr/config.hpp"
+#include "tyr/datalog/lifted/assignment.hpp"
+#include "tyr/datalog/lifted/consistency_graph.hpp"
+#include "tyr/datalog/lifted/delta_kpkc.hpp"
+#include "tyr/datalog/lifted/delta_kpkc_graph.hpp"
 #include "tyr/datalog/statistics/program.hpp"
 #include "tyr/datalog/statistics/rule.hpp"
 
@@ -37,8 +34,10 @@
 #include <ranges>
 #include <sstream>
 #include <string>
-
-#include "tyr/config.hpp"
+#include <yggdrasil/core/chrono.hpp>
+#include <yggdrasil/formatting/cista_formatters.hpp>
+#include <yggdrasil/formatting/dynamic_bitset_formatters.hpp>
+#include <yggdrasil/io/iostream.hpp>
 
 #if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
@@ -473,7 +472,6 @@ struct formatter<tyr::datalog::AggregatedRuleWorkerStatistics, char>
                               overapproximation_ratio);
     }
 };
-
 
 }  // namespace fmt
 #endif

@@ -17,11 +17,12 @@
 
 #include "tyr/planning/plan.hpp"
 
-#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/planning/ground_action_index.hpp"
-#include "tyr/planning/ground_task/node.hpp"
-#include "tyr/planning/lifted_task/node.hpp"
+#include "tyr/planning/ground/node.hpp"
+#include "tyr/planning/lifted/node.hpp"
 #include "tyr/planning/node.hpp"
+
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {

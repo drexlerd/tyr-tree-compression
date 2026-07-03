@@ -15,38 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_SOLVER_POLICIES_TERMINATION_CONCEPT_HPP_
-#define TYR_SOLVER_POLICIES_TERMINATION_CONCEPT_HPP_
+#ifndef TYR_DATALOG_POLICIES_TERMINATION_CONCEPT_HPP_
+#define TYR_DATALOG_POLICIES_TERMINATION_CONCEPT_HPP_
 
-#include <yggdrasil/core/config.hpp>
-#include "tyr/datalog/fact_sets.hpp"
-#include "tyr/datalog/policies/aggregation.hpp"
-#include "tyr/datalog/policies/annotation_types.hpp"
-#include "tyr/formalism/datalog/declarations.hpp"
-#include "tyr/formalism/datalog/repository.hpp"
-#include "tyr/formalism/datalog/views.hpp"
-
-#include <concepts>
+#include "tyr/datalog/ground/policies/termination_concept.hpp"
+#include "tyr/datalog/lifted/policies/termination_concept.hpp"
+#include "tyr/declarations.hpp"
 
 namespace tyr::datalog
 {
 
-class NumericSupportSelector;
-
-template<typename T>
-concept TerminationPolicyConcept = requires(T& p,
-                                            const T& cp,
-                                            ::tyr::formalism::datalog::GroundConjunctiveConditionView goals,
-                                            const FactSets& fact_sets,
-                                            const SelectedPredicateAnnotations& and_annot,
-                                            const SelectedFunctionAnnotations& numeric_and_annot,
-                                            const NumericSupportSelector& numeric_support_selector) {
-    { p.set_goals(goals) } -> std::same_as<void>;
-    { cp.check(fact_sets) } -> std::same_as<bool>;
-    { cp.get_total_cost(fact_sets, and_annot, numeric_and_annot, numeric_support_selector) } -> std::same_as<Cost>;
-    { p.reset() } -> std::same_as<void>;
-    { p.clear() } -> std::same_as<void>;
-};
+template<typename T, typename Kind>
+concept TerminationPolicyConcept = TaskKind<Kind> && details::TerminationPolicyConceptImpl<Kind, T>::value;
 
 }
 

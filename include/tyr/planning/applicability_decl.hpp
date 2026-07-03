@@ -18,8 +18,9 @@
 #ifndef TYR_PLANNING_APPLICABILITY_DECL_HPP_
 #define TYR_PLANNING_APPLICABILITY_DECL_HPP_
 
-#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/declarations.hpp"
+
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {

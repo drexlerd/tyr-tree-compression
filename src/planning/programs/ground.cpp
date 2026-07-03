@@ -428,6 +428,6 @@ datalog::ProgramContext& GroundTaskProgram::get_program_context() noexcept { ret
 
 const datalog::ProgramContext& GroundTaskProgram::get_program_context() const noexcept { return m_program_context; }
 
-const datalog::ConstProgramWorkspace& GroundTaskProgram::get_const_program_workspace() const noexcept { return m_program_workspace; }
+const datalog::ConstProgramWorkspace<LiftedTag>& GroundTaskProgram::get_const_program_workspace() const noexcept { return m_program_workspace; }
 
 }

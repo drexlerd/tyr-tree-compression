@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/planning/programs/axiom.hpp"
+#include "tyr/planning/lifted/programs/axiom.hpp"
 
 #include "common.hpp"
 #include "tyr/analysis/domains.hpp"
@@ -163,7 +163,7 @@ auto create_program_context(fp::TaskView task, TranslationContext& translation_c
 }
 }
 
-AxiomEvaluatorProgram::AxiomEvaluatorProgram(fp::TaskView task) :
+AxiomEvaluatorProgram<LiftedTag>::AxiomEvaluatorProgram(fp::TaskView task) :
     m_translation_context(),
     m_program_context(create_program_context(task, m_translation_context)),
     m_program_workspace(m_program_context)
@@ -171,11 +171,11 @@ AxiomEvaluatorProgram::AxiomEvaluatorProgram(fp::TaskView task) :
     // std::cout << m_program_context.get_program() << std::endl;
 }
 
-const TranslationContext& AxiomEvaluatorProgram::get_translation_context() const noexcept { return m_translation_context; }
+const TranslationContext& AxiomEvaluatorProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
 
-datalog::ProgramContext& AxiomEvaluatorProgram::get_program_context() noexcept { return m_program_context; }
+datalog::ProgramContext& AxiomEvaluatorProgram<LiftedTag>::get_program_context() noexcept { return m_program_context; }
 
-const datalog::ProgramContext& AxiomEvaluatorProgram::get_program_context() const noexcept { return m_program_context; }
+const datalog::ProgramContext& AxiomEvaluatorProgram<LiftedTag>::get_program_context() const noexcept { return m_program_context; }
 
-const datalog::ConstProgramWorkspace& AxiomEvaluatorProgram::get_const_program_workspace() const noexcept { return m_program_workspace; }
+const datalog::ConstProgramWorkspace<LiftedTag>& AxiomEvaluatorProgram<LiftedTag>::get_const_program_workspace() const noexcept { return m_program_workspace; }
 }

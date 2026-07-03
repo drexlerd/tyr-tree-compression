@@ -18,16 +18,16 @@
 #ifndef TYR_PLANNING_STATE_VIEW_HPP_
 #define TYR_PLANNING_STATE_VIEW_HPP_
 
-#include <yggdrasil/containers/shared_object_pool.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/declarations.hpp"
+#include "tyr/planning/state_builder.hpp"
 #include "tyr/planning/state_index.hpp"
 #include "tyr/planning/task.hpp"
-#include "tyr/planning/state_builder.hpp"
 
 #include <concepts>
 #include <ranges>
+#include <yggdrasil/containers/shared_object_pool.hpp>
 
 namespace ygg
 {
@@ -58,9 +58,9 @@ concept FactRangeConcept =
     std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ygg::Data<::tyr::formalism::planning::FDRFact<Tag>>>;
 
 template<class R, class Tag>
-concept FunctionTermValueRangeConcept =
-    std::ranges::input_range<R>
-    && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, std::pair<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<Tag>>, ygg::float_t>>;
+concept FunctionTermValueRangeConcept = std::ranges::input_range<R>
+                                        && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>,
+                                                        std::pair<ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<Tag>>, ygg::float_t>>;
 
 template<typename T>
 concept IterableStateConcept = requires(const T& cs) {
@@ -85,7 +85,8 @@ concept FactViewRangeConcept =
 
 template<class R, class Tag>
 concept FunctionTermViewValueRangeConcept =
-    std::ranges::input_range<R> && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ::tyr::formalism::planning::GroundFunctionTermViewValuePair<Tag>>;
+    std::ranges::input_range<R>
+    && std::same_as<std::remove_cvref_t<std::ranges::range_value_t<R>>, ::tyr::formalism::planning::GroundFunctionTermViewValuePair<Tag>>;
 
 template<typename T>
 concept IterableViewStateConcept = requires(const T& cs) {

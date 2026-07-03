@@ -18,10 +18,10 @@
 #ifndef TYR_PLANNING_ALGORITHMS_IW_STATISTICS_HPP_
 #define TYR_PLANNING_ALGORITHMS_IW_STATISTICS_HPP_
 
-#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/declarations.hpp"
 
 #include <optional>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning::iw
 {

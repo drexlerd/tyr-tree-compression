@@ -18,12 +18,13 @@
 #ifndef TYR_PLANNING_ACTION_EXECUTOR_HPP_
 #define TYR_PLANNING_ACTION_EXECUTOR_HPP_
 
-#include <yggdrasil/core/itertools.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/applicability_lifted_decl.hpp"
 #include "tyr/planning/declarations.hpp"
+
+#include <yggdrasil/core/itertools.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning
 {
@@ -39,7 +40,8 @@ public:
     bool is_applicable(::tyr::formalism::planning::GroundActionView action, const StateContext<Kind>& state);
 
     template<TaskKind Kind>
-    Node<Kind> apply_action(const StateContext<Kind>& state_context, ::tyr::formalism::planning::GroundActionView action, StateRepository<Kind>& state_repository);
+    Node<Kind>
+    apply_action(const StateContext<Kind>& state_context, ::tyr::formalism::planning::GroundActionView action, StateRepository<Kind>& state_repository);
 
     // Lifted action API
 

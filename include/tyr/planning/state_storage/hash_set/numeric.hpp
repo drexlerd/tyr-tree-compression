@@ -18,12 +18,12 @@
 #ifndef TYR_PLANNING_STATE_STORAGE_HASH_SET_NUMERIC_HPP_
 #define TYR_PLANNING_STATE_STORAGE_HASH_SET_NUMERIC_HPP_
 
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/containers/raw_vector_set.hpp>
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
 
 #include <limits>
+#include <yggdrasil/containers/raw_vector_set.hpp>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {

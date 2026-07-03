@@ -56,7 +56,8 @@ SearchResult<Kind> find_solution(iw::Solver<Kind>& iw_solver, const Options<Kind
     auto serialized_options = serialized::Options<Kind, iw::Solver<Kind>> {};
     serialized_options.start_node = options.start_node;
     serialized_options.event_handler = options.event_handler ? options.event_handler : DefaultEventHandler<Kind>::create();
-    serialized_options.subgoal_strategy = options.subgoal_strategy ? options.subgoal_strategy : SerializedGoalStrategy<Kind>::create(*iw_solver.brfs_solver.task);
+    serialized_options.subgoal_strategy =
+        options.subgoal_strategy ? options.subgoal_strategy : SerializedGoalStrategy<Kind>::create(*iw_solver.brfs_solver.task);
     serialized_options.goal_strategy = options.goal_strategy ? options.goal_strategy : ConjunctiveGoalStrategy<Kind>::create(*iw_solver.brfs_solver.task);
     serialized_options.max_num_subsearches = options.max_num_subsearches;
 

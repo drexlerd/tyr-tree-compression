@@ -18,12 +18,13 @@
 #ifndef TYR_PLANNING_SEARCH_SPACE_HPP_
 #define TYR_PLANNING_SEARCH_SPACE_HPP_
 
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/containers/segmented_vector.hpp>
 #include "tyr/planning/algorithms/utils.hpp"
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/node.hpp"
 #include "tyr/planning/search_node.hpp"
+
+#include <yggdrasil/containers/segmented_vector.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
 
 namespace tyr::planning
 {
@@ -72,8 +73,7 @@ LabeledNodeList<Kind> extract_labeled_node_trajectory(const NodeList<Kind>& node
 
         for (const auto& labeled_succ_node : labeled_succ_nodes)
         {
-            const auto successor_g_value =
-                compute_successor_g_value(cur_node.get_metric(), labeled_succ_node.node.get_metric(), action_cost_mode);
+            const auto successor_g_value = compute_successor_g_value(cur_node.get_metric(), labeled_succ_node.node.get_metric(), action_cost_mode);
             const auto normalized_succ_node = Node<Kind>(labeled_succ_node.node.get_state(), successor_g_value);
 
             if (ygg::EqualTo<Node<Kind>> {}(normalized_succ_node, node_trajectory[i]))

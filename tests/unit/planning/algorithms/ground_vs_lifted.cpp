@@ -15,14 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <string>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace p = tyr::planning;
 namespace f = tyr::formalism;
@@ -42,10 +41,7 @@ struct SearchSummary
     p::SearchStatus status;
     ygg::float_t plan_cost;
 
-    bool operator==(const SearchSummary& other) const
-    {
-        return status == other.status && f::apply(f::Eq {}, plan_cost, other.plan_cost);
-    }
+    bool operator==(const SearchSummary& other) const { return status == other.status && f::apply(f::Eq {}, plan_cost, other.plan_cost); }
 };
 
 struct GroundVsLiftedCase

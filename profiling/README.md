@@ -80,9 +80,9 @@ Use the runner as the main entry point for a profiling experiment:
 
 ```bash
 profiling/runner.py \
-  --executable build/profiling/planning/lifted_task/successor_generator \
-  --output-dir profiling-results/planning/lifted_task/successor_generator \
-  --suite-json profiling/planning/lifted_task/successor_generator.json \
+  --executable build/profiling/planning/lifted/successor_generator \
+  --output-dir profiling-results/planning/lifted/successor_generator \
+  --suite-json profiling/planning/lifted/successor_generator.json \
   --benchmark-min-time 0.1s \
   --benchmark-timeout 60
 ```
@@ -90,9 +90,9 @@ profiling/runner.py \
 This writes:
 
 ```text
-profiling-results/planning/lifted_task/successor_generator/benchmark.log
-profiling-results/planning/lifted_task/successor_generator/summary.json
-profiling-results/planning/lifted_task/successor_generator/benchmark-results/<run_name>.json
+profiling-results/planning/lifted/successor_generator/benchmark.log
+profiling-results/planning/lifted/successor_generator/summary.json
+profiling-results/planning/lifted/successor_generator/benchmark-results/<run_name>.json
 ```
 
 The runner runs one benchmark subprocess per case. If a subprocess exceeds
@@ -118,9 +118,9 @@ runner:
 
 ```bash
 profiling/runner.py \
-  --executable build/profiling/planning/lifted_task/successor_generator \
-  --output-dir profiling-results/planning/lifted_task/successor_generator \
-  --suite-json profiling/planning/lifted_task/successor_generator.json \
+  --executable build/profiling/planning/lifted/successor_generator \
+  --output-dir profiling-results/planning/lifted/successor_generator \
+  --suite-json profiling/planning/lifted/successor_generator.json \
   --benchmark-min-time 0.1s \
   --benchmark-timeout 60 \
   --benchmark-repetitions 5 \
@@ -132,8 +132,8 @@ profiling/runner.py \
 Use Google Benchmark directly when debugging registration or a single case:
 
 ```bash
-build/profiling/planning/lifted_task/successor_generator --benchmark_list_tests
-build/profiling/planning/lifted_task/successor_generator \
+build/profiling/planning/lifted/successor_generator --benchmark_list_tests
+build/profiling/planning/lifted/successor_generator \
   --benchmark_filter='^blocksworld-large-simple/profiling-1/.*'
 ```
 
@@ -141,7 +141,7 @@ Compare two completed profiling runs:
 
 ```bash
 profiling/compare.py \
-  old-results/planning/lifted_task/successor_generator/summary.json \
-  profiling-results/planning/lifted_task/successor_generator/summary.json \
-  --output profiling-results/planning/lifted_task/successor_generator/compare.json
+  old-results/planning/lifted/successor_generator/summary.json \
+  profiling-results/planning/lifted/successor_generator/summary.json \
+  --output profiling-results/planning/lifted/successor_generator/compare.json
 ```

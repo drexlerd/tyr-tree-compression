@@ -18,8 +18,8 @@
 #ifndef TYR_PLANNING_ALGORITHMS_UTILS_HPP_
 #define TYR_PLANNING_ALGORITHMS_UTILS_HPP_
 
-#include "tyr/planning/ground_task/node.hpp"
-#include "tyr/planning/lifted_task/node.hpp"
+#include "tyr/planning/ground/node.hpp"
+#include "tyr/planning/lifted/node.hpp"
 #include "tyr/planning/plan.hpp"
 
 #include <cstddef>

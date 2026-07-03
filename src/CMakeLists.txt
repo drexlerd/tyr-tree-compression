@@ -22,20 +22,20 @@ list(APPEND TYR_PUBLIC_HEADER_FILES "../include/tyr/tyr.hpp")
 if("${TYR_STATE_STORAGE_POLICY}" STREQUAL "Hashset")
     set(TYR_STATE_STORAGE_SRC_FILES
         planning/state_storage/hash_set/numeric.cpp
-        planning/ground_task/state_storage/hash_set/atom.cpp
-        planning/ground_task/state_storage/hash_set/fact.cpp
-        planning/ground_task/state_storage/hash_set/context.cpp
-        planning/lifted_task/state_storage/hash_set/atom.cpp
-        planning/lifted_task/state_storage/hash_set/fact.cpp
+        planning/ground/state_storage/hash_set/atom.cpp
+        planning/ground/state_storage/hash_set/fact.cpp
+        planning/ground/state_storage/hash_set/context.cpp
+        planning/lifted/state_storage/hash_set/atom.cpp
+        planning/lifted/state_storage/hash_set/fact.cpp
     )
 elseif("${TYR_STATE_STORAGE_POLICY}" STREQUAL "Tree")
     set(TYR_STATE_STORAGE_SRC_FILES
         planning/state_storage/tree_compression/numeric.cpp
-        planning/ground_task/state_storage/tree_compression/atom.cpp
-        planning/ground_task/state_storage/tree_compression/fact.cpp
-        planning/ground_task/state_storage/tree_compression/context.cpp
-        planning/lifted_task/state_storage/tree_compression/atom.cpp
-        planning/lifted_task/state_storage/tree_compression/fact.cpp
+        planning/ground/state_storage/tree_compression/atom.cpp
+        planning/ground/state_storage/tree_compression/fact.cpp
+        planning/ground/state_storage/tree_compression/context.cpp
+        planning/lifted/state_storage/tree_compression/atom.cpp
+        planning/lifted/state_storage/tree_compression/fact.cpp
     )
 endif()
 
@@ -74,49 +74,52 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     formalism/planning/parser.cpp
     formalism/planning/planning_task.cpp
 
-    datalog/policies/annotation.cpp
-    datalog/policies/numeric_support.cpp
-    datalog/policies/termination.cpp
-    datalog/workspaces/facts.cpp
-    datalog/workspaces/program.cpp
-    datalog/workspaces/rule.cpp
-    datalog/applicability.cpp
-    datalog/assignment_sets.cpp
-    datalog/bottom_up.cpp
-    datalog/consistency_graph.cpp
-    datalog/delta_kpkc_graph.cpp
-    datalog/delta_kpkc.cpp
-    datalog/fact_set.cpp
-    datalog/rule_scheduler.cpp
+    datalog/lifted/policies/annotation.cpp
+    datalog/lifted/policies/numeric_support.cpp
+    datalog/lifted/policies/termination.cpp
+    datalog/lifted/workspaces/facts.cpp
+    datalog/lifted/workspaces/program.cpp
+    datalog/lifted/workspaces/rule.cpp
+    datalog/lifted/applicability.cpp
+    datalog/lifted/assignment_sets.cpp
+    datalog/lifted/bottom_up.cpp
+    datalog/lifted/consistency_graph.cpp
+    datalog/lifted/delta_kpkc_graph.cpp
+    datalog/lifted/delta_kpkc.cpp
+    datalog/lifted/fact_set.cpp
+    datalog/ground/workspaces/program.cpp
+    datalog/ground/queue.cpp
+    datalog/lifted/rule_scheduler.cpp
 
     ${TYR_STATE_STORAGE_SRC_FILES}
 
     planning/heuristics/goal_count.cpp
 
-    planning/ground_task/axiom_evaluator.cpp
-    planning/ground_task/axiom_stratification.cpp
-    planning/ground_task/match_tree.cpp
-    planning/ground_task/node.cpp
-    planning/ground_task/state_repository.cpp
-    planning/ground_task/state.cpp
-    planning/ground_task/successor_generator.cpp
+    planning/ground/axiom_evaluator.cpp
+    planning/ground/axiom_stratification.cpp
+    planning/ground/match_tree.cpp
+    planning/ground/node.cpp
+    planning/ground/state_repository.cpp
+    planning/ground/state.cpp
+    planning/ground/successor_generator.cpp
 
-    planning/lifted_task/heuristics/rpg_add.cpp
-    planning/lifted_task/heuristics/rpg_max.cpp
-    planning/lifted_task/heuristics/rpg_ff.cpp
-    planning/lifted_task/heuristics/lmcut.cpp
-    planning/lifted_task/axiom_evaluator.cpp
-    planning/lifted_task/node.cpp
-    planning/lifted_task/state_repository.cpp
-    planning/lifted_task/state.cpp
-    planning/lifted_task/successor_generator.cpp
-    planning/lifted_task/task_grounder.cpp
+    planning/lifted/heuristics/rpg_add.cpp
+    planning/lifted/heuristics/rpg_max.cpp
+    planning/lifted/heuristics/rpg_ff.cpp
+    planning/lifted/heuristics/lmcut.cpp
+    planning/lifted/axiom_evaluator.cpp
+    planning/lifted/node.cpp
+    planning/lifted/state_repository.cpp
+    planning/lifted/state.cpp
+    planning/lifted/successor_generator.cpp
+    planning/lifted/task_grounder.cpp
 
     planning/programs/action.cpp
     planning/programs/axiom.cpp
     planning/programs/common.cpp
     planning/programs/rpg.cpp
     planning/programs/ground.cpp
+    planning/programs/ground_specializations.cpp
 
     planning/algorithms/astar_eager.cpp
     planning/algorithms/astar_eager/event_handler.cpp

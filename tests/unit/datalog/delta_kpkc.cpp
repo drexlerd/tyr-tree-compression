@@ -15,13 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/datalog/delta_kpkc.hpp"
+#include "tyr/datalog/lifted/delta_kpkc.hpp"
 
-#include <yggdrasil/formatting/formatter.hpp>
 #include "tyr/formalism/formalism.hpp"
 #include "tyr/planning/planning.hpp"
 
 #include <gtest/gtest.h>
+#include <yggdrasil/formatting/formatter.hpp>
 
 namespace d = tyr::datalog;
 namespace p = tyr::planning;

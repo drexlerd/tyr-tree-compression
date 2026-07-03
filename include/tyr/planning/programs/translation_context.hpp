@@ -18,25 +18,26 @@
 #ifndef TYR_PLANNING_PROGRAMS_TRANSLATION_CONTEXT_HPP_
 #define TYR_PLANNING_PROGRAMS_TRANSLATION_CONTEXT_HPP_
 
-#include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
+
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::planning
 {
 
 struct D2PTranslationContext
 {
-    using StaticToStaticPredicateMapping =
-        ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::StaticTag>, ::tyr::formalism::planning::PredicateView<::tyr::formalism::StaticTag>>;
-    using FluentToFluentPredicateMapping =
-        ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::PredicateView<::tyr::formalism::FluentTag>>;
-    using FluentToDerivedPredicateMapping =
-        ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::planning::PredicateView<::tyr::formalism::DerivedTag>>;
+    using StaticToStaticPredicateMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::StaticTag>,
+                                                             ::tyr::formalism::planning::PredicateView<::tyr::formalism::StaticTag>>;
+    using FluentToFluentPredicateMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>,
+                                                             ::tyr::formalism::planning::PredicateView<::tyr::formalism::FluentTag>>;
+    using FluentToDerivedPredicateMapping = ygg::UnorderedMap<::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>,
+                                                              ::tyr::formalism::planning::PredicateView<::tyr::formalism::DerivedTag>>;
 
     StaticToStaticPredicateMapping static_to_static_predicate;
     FluentToFluentPredicateMapping fluent_to_fluent_predicate;
@@ -45,12 +46,12 @@ struct D2PTranslationContext
 
 struct P2DTranslationContext
 {
-    using StaticToStaticPredicateMapping =
-        ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::StaticTag>, ::tyr::formalism::datalog::PredicateView<::tyr::formalism::StaticTag>>;
-    using FluentToFluentPredicateMapping =
-        ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::FluentTag>, ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>;
-    using DerivedToFluentPredicateMapping =
-        ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::DerivedTag>, ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>;
+    using StaticToStaticPredicateMapping = ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::StaticTag>,
+                                                             ::tyr::formalism::datalog::PredicateView<::tyr::formalism::StaticTag>>;
+    using FluentToFluentPredicateMapping = ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::FluentTag>,
+                                                             ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>;
+    using DerivedToFluentPredicateMapping = ygg::UnorderedMap<::tyr::formalism::planning::PredicateView<::tyr::formalism::DerivedTag>,
+                                                              ::tyr::formalism::datalog::PredicateView<::tyr::formalism::FluentTag>>;
 
     StaticToStaticPredicateMapping static_to_static_predicate;
     FluentToFluentPredicateMapping fluent_to_fluent_predicate;

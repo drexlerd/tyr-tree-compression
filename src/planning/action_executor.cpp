@@ -19,7 +19,6 @@
 #include "tyr/formalism/planning/views.hpp"
 //
 
-#include <yggdrasil/core/types.hpp>
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/grounder.hpp"
@@ -27,16 +26,18 @@
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/applicability_lifted.hpp"
 #include "tyr/planning/declarations.hpp"
+#include "tyr/planning/ground/node.hpp"
+#include "tyr/planning/ground/state_builder.hpp"
+#include "tyr/planning/ground/state_repository.hpp"
+#include "tyr/planning/ground/state_view.hpp"
 #include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/ground_task/node.hpp"
-#include "tyr/planning/ground_task/state_repository.hpp"
-#include "tyr/planning/ground_task/state_view.hpp"
-#include "tyr/planning/ground_task/state_builder.hpp"
+#include "tyr/planning/lifted/node.hpp"
+#include "tyr/planning/lifted/state_builder.hpp"
+#include "tyr/planning/lifted/state_repository.hpp"
+#include "tyr/planning/lifted/state_view.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/node.hpp"
-#include "tyr/planning/lifted_task/state_repository.hpp"
-#include "tyr/planning/lifted_task/state_view.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
+
+#include <yggdrasil/core/types.hpp>
 
 namespace f = tyr::formalism;
 namespace fp = tyr::formalism::planning;
@@ -171,8 +172,7 @@ Node<Kind> apply_action_impl(const StateContext<Kind>& state_context,
 template<TaskKind Kind>
 bool ActionExecutor::is_applicable(fp::GroundActionView action, const StateContext<Kind>& state)
 {
-    return tyr::planning::is_applicable(action.get_condition(), state)
-           && tyr::planning::is_applicable_if_fires(action.get_effects(), state, m_effect_families);
+    return tyr::planning::is_applicable(action.get_condition(), state) && tyr::planning::is_applicable_if_fires(action.get_effects(), state, m_effect_families);
 }
 
 template bool ActionExecutor::is_applicable(fp::GroundActionView action, const StateContext<LiftedTag>& state);

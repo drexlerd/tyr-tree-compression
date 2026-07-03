@@ -18,25 +18,26 @@
 #ifndef TYR_SRC_PLANNING_METRIC_HPP_
 #define TYR_SRC_PLANNING_METRIC_HPP_
 
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/containers/optional.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/planning/applicability.hpp"
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/ground_task/state_builder.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
+#include "tyr/planning/ground/state_builder.hpp"
+#include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/task.hpp"
+
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning
 {
 
 template<TaskKind Kind>
 ygg::float_t evaluate_metric(ygg::View<::cista::optional<ygg::Index<::tyr::formalism::planning::Metric>>, ::tyr::formalism::planning::Repository> metric,
-                        ygg::View<::cista::optional<ygg::Index<::tyr::formalism::planning::GroundFunctionTermValue<::tyr::formalism::AuxiliaryTag>>>, ::tyr::formalism::planning::Repository>
-                            auxiliary_fterm_value,
-                        const StateContext<Kind>& state_context)
+                             ygg::View<::cista::optional<ygg::Index<::tyr::formalism::planning::GroundFunctionTermValue<::tyr::formalism::AuxiliaryTag>>>,
+                                       ::tyr::formalism::planning::Repository> auxiliary_fterm_value,
+                             const StateContext<Kind>& state_context)
 {
     if (auxiliary_fterm_value)
         return auxiliary_fterm_value.value().get_value();

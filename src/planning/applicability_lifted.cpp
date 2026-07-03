@@ -17,8 +17,8 @@
 
 #include "tyr/planning/applicability_lifted.hpp"
 
+#include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/lifted_task/state_builder.hpp"
 
 #ifndef TYR_HEADER_INSTANTIATION
 
@@ -56,18 +56,25 @@ template ygg::float_t evaluate(::tyr::formalism::planning::LiftedMultiOperatorVi
 
 // NumericEffectView
 
-template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Assign, ::tyr::formalism::FluentTag> element, const ApplicabilityContext& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::FluentTag> element, const ApplicabilityContext& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag> element, const ApplicabilityContext& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag> element, const ApplicabilityContext& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag> element, const ApplicabilityContext& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Assign, ::tyr::formalism::FluentTag> element,
+                               const ApplicabilityContext& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::FluentTag> element,
+                               const ApplicabilityContext& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag> element,
+                               const ApplicabilityContext& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag> element,
+                               const ApplicabilityContext& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag> element,
+                               const ApplicabilityContext& context);
 
-template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::AuxiliaryTag> element, const ApplicabilityContext& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<::tyr::formalism::Increase, ::tyr::formalism::AuxiliaryTag> element,
+                               const ApplicabilityContext& context);
 
 // NumericEffectOperatorView
 
 template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectOperatorView<::tyr::formalism::FluentTag> element, const ApplicabilityContext& context);
-template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element, const ApplicabilityContext& context);
+template ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectOperatorView<::tyr::formalism::AuxiliaryTag> element,
+                               const ApplicabilityContext& context);
 
 /**
  * is_applicable

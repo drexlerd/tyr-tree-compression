@@ -1,0 +1,168 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef TYR_PLANNING_GROUND_MATCH_TREE_REPOSITORY_HPP_
+#define TYR_PLANNING_GROUND_MATCH_TREE_REPOSITORY_HPP_
+
+#include "tyr/formalism/planning/declarations.hpp"
+#include "tyr/formalism/planning/ground_action_index.hpp"
+#include "tyr/formalism/planning/ground_axiom_index.hpp"
+#include "tyr/formalism/planning/repository.hpp"
+#include "tyr/planning/ground/match_tree/declarations.hpp"
+#include "tyr/planning/ground/match_tree/nodes/atom_data.hpp"
+#include "tyr/planning/ground/match_tree/nodes/atom_index.hpp"
+#include "tyr/planning/ground/match_tree/nodes/atom_view.hpp"
+#include "tyr/planning/ground/match_tree/nodes/constraint_data.hpp"
+#include "tyr/planning/ground/match_tree/nodes/constraint_index.hpp"
+#include "tyr/planning/ground/match_tree/nodes/constraint_view.hpp"
+#include "tyr/planning/ground/match_tree/nodes/generator_data.hpp"
+#include "tyr/planning/ground/match_tree/nodes/generator_index.hpp"
+#include "tyr/planning/ground/match_tree/nodes/generator_view.hpp"
+#include "tyr/planning/ground/match_tree/nodes/negative_fact_data.hpp"
+#include "tyr/planning/ground/match_tree/nodes/negative_fact_index.hpp"
+#include "tyr/planning/ground/match_tree/nodes/negative_fact_view.hpp"
+#include "tyr/planning/ground/match_tree/nodes/node_data.hpp"
+#include "tyr/planning/ground/match_tree/nodes/node_view.hpp"
+#include "tyr/planning/ground/match_tree/nodes/variable_data.hpp"
+#include "tyr/planning/ground/match_tree/nodes/variable_index.hpp"
+#include "tyr/planning/ground/match_tree/nodes/variable_view.hpp"
+
+#include <cassert>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <yggdrasil/buffer/declarations.hpp>
+#include <yggdrasil/buffer/indexed_hash_set.hpp>
+#include <yggdrasil/buffer/segmented_buffer.hpp>
+#include <yggdrasil/containers/tuple.hpp>
+#include <yggdrasil/core/types.hpp>
+
+namespace tyr::planning::match_tree
+{
+
+template<typename Tag>
+class Repository
+{
+private:
+    template<typename T>
+    struct Entry
+    {
+        using value_type = T;
+        using container_type = ygg::buffer::IndexedHashSet<T>;
+
+        container_type container;
+
+        Entry(ygg::buffer::Buffer& buffer, ygg::buffer::SegmentedBuffer& arena) : container(buffer, arena) {}
+    };
+
+    using RepositoryStorage = ygg::TypeListToTupleT<ygg::MapTypeListT<Entry, RepositoryTypes<Tag>>>;
+
+    const ::tyr::formalism::planning::Repository& m_formalism_repository;
+    ygg::buffer::SegmentedBuffer m_arena;
+    ygg::buffer::Buffer m_buffer;
+    RepositoryStorage m_repository;
+    ygg::uint_t m_index;
+
+    template<typename... Ts>
+    static RepositoryStorage make_repository_storage(ygg::TypeList<Ts...>, ygg::buffer::Buffer& buffer, ygg::buffer::SegmentedBuffer& arena)
+    {
+        return RepositoryStorage(Entry<Ts>(buffer, arena)...);
+    }
+
+public:
+    explicit Repository(ygg::uint_t index, const ::tyr::formalism::planning::Repository& formalism_repository) :
+        m_formalism_repository(formalism_repository),
+        m_arena(),
+        m_buffer(),
+        m_repository(make_repository_storage(RepositoryTypes<Tag> {}, m_buffer, m_arena)),
+        m_index(index)
+    {
+    }
+    Repository(const Repository& other) = delete;
+    Repository& operator=(const Repository& other) = delete;
+    Repository(Repository&& other) = delete;
+    Repository& operator=(Repository&& other) = delete;
+
+    const auto& get_index() const noexcept { return m_index; }
+
+    const ::tyr::formalism::planning::Repository& get_formalism_repository() const noexcept { return m_formalism_repository; }
+
+    template<typename T>
+    std::optional<ygg::Index<T>> find(const ygg::Data<T>& builder) const noexcept
+    {
+        const auto& indexed_hash_set = std::get<Entry<T>>(m_repository).container;
+
+        if (const auto index_or_nullopt = indexed_hash_set.find(builder))
+            return *index_or_nullopt;
+
+        return std::nullopt;
+    }
+
+    template<typename T>
+    std::pair<ygg::Index<T>, bool> get_or_create(ygg::Data<T>& builder)
+    {
+        auto& indexed_hash_set = std::get<Entry<T>>(m_repository).container;
+
+        builder.index.value = indexed_hash_set.size();
+
+        const auto [index, success] = indexed_hash_set.insert(builder);
+
+        return std::make_pair(index, success);
+    }
+
+    /// @brief Access the element with the given index.
+    template<typename T>
+    const ygg::Data<T>& operator[](ygg::Index<T> index) const noexcept
+    {
+        assert(index != ygg::Index<T>::max() && "Unassigned index.");
+
+        const auto& repository = std::get<Entry<T>>(m_repository).container;
+
+        return repository[index];
+    }
+
+    template<typename T>
+    const ygg::Data<T>& front() const
+    {
+        const auto& repository = std::get<Entry<T>>(m_repository).container;
+
+        return repository.front();
+    }
+
+    /// @brief Get the number of stored elements.
+    template<typename T>
+    size_t size() const noexcept
+    {
+        const auto& repository = std::get<Entry<T>>(m_repository).container;
+
+        return repository.size();
+    }
+
+    /// @brief Clear the repository but keep memory allocated.
+    void clear() noexcept
+    {
+        std::apply([](auto&... slots) { (slots.container.clear(), ...); }, m_repository);
+    }
+};
+
+static_assert(RepositoryConcept<Repository<::tyr::formalism::planning::GroundAction>, ::tyr::formalism::planning::GroundAction>);
+
+static_assert(Context<Repository<::tyr::formalism::planning::GroundAction>, ::tyr::formalism::planning::GroundAction>);
+
+}
+
+#endif

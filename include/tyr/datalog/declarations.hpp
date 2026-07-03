@@ -18,6 +18,7 @@
 #ifndef TYR_DATALOG_DECLARATIONS_HPP_
 #define TYR_DATALOG_DECLARATIONS_HPP_
 
+#include "tyr/declarations.hpp"
 #include "tyr/formalism/declarations.hpp"
 
 namespace tyr::datalog
@@ -47,14 +48,31 @@ struct TaggedFactSets;
 struct FactSets;
 
 class StaticConsistencyGraph;
+template<TaskKind Kind>
+class NoOrAnnotationPolicy;
+template<TaskKind Kind>
+class NoAndAnnotationPolicy;
+template<TaskKind Kind>
+class OrAnnotationPolicy;
+template<TaskKind Kind, typename AggregationFunction>
+class AndAnnotationPolicy;
+template<TaskKind Kind, typename AggregationFunction>
+class AchieverAndAnnotationPolicy;
+template<TaskKind Kind>
+class NoTerminationPolicy;
+template<TaskKind Kind, typename AggregationFunction>
+class TerminationPolicy;
+template<TaskKind Kind>
+class RuleCostPolicy;
+template<TaskKind Kind>
+class RuleCostOverridePolicy;
 
 struct D2PWorkspace;
 struct FactsWorkspace;
 struct ConstFactsWorkspace;
 struct P2DWorkspace;
+template<TaskKind Kind>
 struct ConstProgramWorkspace;
-template<typename AndAP>
-struct RuleWorkspace;
 struct ConstRuleWorkspace;
 
 class RuleSchedulerStratum;

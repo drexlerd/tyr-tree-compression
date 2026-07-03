@@ -18,12 +18,12 @@
 #ifndef TYR_PLANNING_STATE_STORAGE_NUMERIC_TREE_COMPRESSION_HPP_
 #define TYR_PLANNING_STATE_STORAGE_NUMERIC_TREE_COMPRESSION_HPP_
 
-#include <yggdrasil/core/config.hpp>
 #include "tyr/planning/state_storage.hpp"
 #include "tyr/planning/state_storage/tags.hpp"
 
 #include <limits>
 #include <valla/valla.hpp>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {

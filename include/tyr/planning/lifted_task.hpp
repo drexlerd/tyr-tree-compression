@@ -15,29 +15,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_LIFTED_TASK_HPP_
-#define TYR_PLANNING_LIFTED_TASK_HPP_
+#ifndef TYR_PLANNING_LIFTED_HPP_
+#define TYR_PLANNING_LIFTED_HPP_
 
-#include <yggdrasil/core/config.hpp>          // for ygg::float_t, ygg::uint_t
-#include <yggdrasil/containers/dynamic_bitset.hpp>  // for test
-#include <yggdrasil/execution/onetbb.hpp>
-#include <yggdrasil/containers/vector.hpp>                    // for get
 #include "tyr/formalism/planning/declarations.hpp"  // for OverlayRepos...
 #include "tyr/formalism/planning/fdr_context.hpp"
 #include "tyr/formalism/planning/grounder_decl.hpp"
 #include "tyr/formalism/planning/planning_task.hpp"
 #include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/lifted_task/task_grounder_decl.hpp"
-#include "tyr/planning/programs/action.hpp"
-#include "tyr/planning/programs/axiom.hpp"
-#include "tyr/planning/programs/rpg.hpp"
+#include "tyr/planning/lifted/programs/action.hpp"
+#include "tyr/planning/lifted/programs/axiom.hpp"
+#include "tyr/planning/lifted/programs/rpg.hpp"
+#include "tyr/planning/lifted/task_grounder_decl.hpp"
 #include "tyr/planning/task.hpp"
 
-#include <boost/dynamic_bitset.hpp>  // for dynamic_bitset
-#include <limits>                    // for numeric_limits
-#include <memory>                    // for shared_ptr
-#include <vector>                    // for vector
+#include <boost/dynamic_bitset.hpp>                 // for dynamic_bitset
+#include <limits>                                   // for numeric_limits
+#include <memory>                                   // for shared_ptr
+#include <vector>                                   // for vector
+#include <yggdrasil/containers/dynamic_bitset.hpp>  // for test
+#include <yggdrasil/containers/vector.hpp>          // for get
+#include <yggdrasil/core/config.hpp>                // for ygg::float_t, ygg::uint_t
+#include <yggdrasil/execution/onetbb.hpp>
 
 namespace tyr::planning
 {
@@ -77,7 +77,10 @@ public:
 
     const auto& get_static_atoms_bitset() const noexcept { return m_static_atoms_bitset; }
     const auto& get_static_numeric_variables() const noexcept { return m_static_numeric_variables; }
-    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const { return ygg::test(ygg::uint_t(index), m_static_atoms_bitset); }
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const
+    {
+        return ygg::test(ygg::uint_t(index), m_static_atoms_bitset);
+    }
     ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>> index) const
     {
         return ygg::get(ygg::uint_t(index), m_static_numeric_variables, std::numeric_limits<ygg::float_t>::quiet_NaN());
@@ -89,11 +92,11 @@ private:
     boost::dynamic_bitset<> m_static_atoms_bitset;
     std::vector<ygg::float_t> m_static_numeric_variables;
 
-    AxiomEvaluatorProgram m_axiom_program;
+    AxiomEvaluatorProgram<LiftedTag> m_axiom_program;
 
-    ApplicableActionProgram m_action_program;
+    ApplicableActionProgram<LiftedTag> m_action_program;
 
-    RPGProgram m_rpg_program;
+    RPGProgram<LiftedTag> m_rpg_program;
 
     ::tyr::formalism::planning::GrounderCache m_grounder_cache;
 };

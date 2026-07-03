@@ -18,8 +18,6 @@
 #ifndef TYR_PLANNING_STATE_REPOSITORY_HPP_
 #define TYR_PLANNING_STATE_REPOSITORY_HPP_
 
-#include <yggdrasil/execution/onetbb.hpp>
-#include <yggdrasil/containers/shared_object_pool.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_builder.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -28,6 +26,8 @@
 #include "tyr/planning/task.hpp"
 
 #include <concepts>
+#include <yggdrasil/containers/shared_object_pool.hpp>
+#include <yggdrasil/execution/onetbb.hpp>
 
 namespace tyr::planning
 {

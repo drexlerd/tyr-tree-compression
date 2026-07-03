@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/datalog/policies/annotation.hpp"
-#include "tyr/datalog/policies/cost.hpp"
-#include "tyr/datalog/policies/termination.hpp"
+#include "tyr/datalog/lifted/policies/annotation.hpp"
+#include "tyr/datalog/lifted/policies/cost.hpp"
+#include "tyr/datalog/lifted/policies/termination.hpp"
 #include "tyr/formalism/formalism.hpp"
-#include "tyr/planning/lifted_task/heuristics/rpg.hpp"
+#include "tyr/planning/lifted/heuristics/rpg.hpp"
 #include "tyr/planning/planning.hpp"
 
 #include <algorithm>
@@ -38,26 +38,28 @@ namespace tyr::tests
 namespace
 {
 class TestCostAdaptedMaxRPG :
-    public p::RPGBase<TestCostAdaptedMaxRPG,
-                      d::OrAnnotationPolicy,
-                      d::AndAnnotationPolicy<d::MaxAggregation>,
-                      d::TerminationPolicy<d::MaxAggregation>,
-                      d::RuleBindingCostOverridePolicy>
+    public p::RPGBase<p::LiftedTag,
+                      TestCostAdaptedMaxRPG,
+                      d::OrAnnotationPolicy<LiftedTag>,
+                      d::AndAnnotationPolicy<LiftedTag, d::MaxAggregation>,
+                      d::TerminationPolicy<LiftedTag, d::MaxAggregation>,
+                      d::RuleCostOverridePolicy<LiftedTag>>
 {
 public:
-    using Base = p::RPGBase<TestCostAdaptedMaxRPG,
-                            d::OrAnnotationPolicy,
-                            d::AndAnnotationPolicy<d::MaxAggregation>,
-                            d::TerminationPolicy<d::MaxAggregation>,
-                            d::RuleBindingCostOverridePolicy>;
+    using Base = p::RPGBase<p::LiftedTag,
+                            TestCostAdaptedMaxRPG,
+                            d::OrAnnotationPolicy<LiftedTag>,
+                            d::AndAnnotationPolicy<LiftedTag, d::MaxAggregation>,
+                            d::TerminationPolicy<LiftedTag, d::MaxAggregation>,
+                            d::RuleCostOverridePolicy<LiftedTag>>;
 
     TestCostAdaptedMaxRPG(p::TaskPtr<p::LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
         Base(task,
              std::move(execution_context),
-             d::OrAnnotationPolicy(),
-             d::AndAnnotationPolicy<d::MaxAggregation>(),
-             d::TerminationPolicy<d::MaxAggregation>(task->get_rpg_program().get_program_context().get_program().get_predicates<f::FluentTag>(),
-                                                     task->get_rpg_program().get_program_context().get_workspace_repository()))
+             d::OrAnnotationPolicy<LiftedTag>(),
+             d::AndAnnotationPolicy<LiftedTag, d::MaxAggregation>(),
+             d::TerminationPolicy<LiftedTag, d::MaxAggregation>(task->get_rpg_program().get_program_context().get_program().get_predicates<f::FluentTag>(),
+                                                                task->get_rpg_program().get_program_context().get_workspace_repository()))
     {
     }
 

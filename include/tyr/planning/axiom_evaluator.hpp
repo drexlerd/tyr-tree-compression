@@ -18,13 +18,13 @@
 #ifndef TYR_PLANNING_AXIOM_EVALUATOR_HPP_
 #define TYR_PLANNING_AXIOM_EVALUATOR_HPP_
 
-#include <yggdrasil/core/concepts.hpp>
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/execution/onetbb.hpp>
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/state_builder.hpp"
 
 #include <concepts>
+#include <yggdrasil/core/concepts.hpp>
+#include <yggdrasil/core/config.hpp>
+#include <yggdrasil/execution/onetbb.hpp>
 
 namespace tyr::planning
 {

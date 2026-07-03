@@ -18,11 +18,11 @@
 #ifndef TYR_PLANNING_ALGORITHMS_SERIALIZED_STATISTICS_HPP_
 #define TYR_PLANNING_ALGORITHMS_SERIALIZED_STATISTICS_HPP_
 
-#include <yggdrasil/core/types.hpp>
 #include "tyr/planning/algorithms/concepts.hpp"
 #include "tyr/planning/algorithms/utils.hpp"
 
 #include <vector>
+#include <yggdrasil/core/types.hpp>
 
 namespace tyr::planning::serialized
 {

@@ -15,27 +15,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_POLICIES_COST_CONCEPT_HPP_
-#define TYR_DATALOG_POLICIES_COST_CONCEPT_HPP_
+#ifndef TYR_DATALOG_POLICIES_COST_CONCEPT_BY_KIND_HPP_
+#define TYR_DATALOG_POLICIES_COST_CONCEPT_BY_KIND_HPP_
 
-#include "tyr/datalog/policies/annotation_types.hpp"
-#include "tyr/formalism/datalog/repository.hpp"
-
-#include <concepts>
+#include "tyr/datalog/ground/policies/cost_concept.hpp"
+#include "tyr/datalog/lifted/policies/cost_concept.hpp"
+#include "tyr/declarations.hpp"
 
 namespace tyr::datalog
 {
 
-template<typename T>
-concept CostPolicyConcept = requires(const T& p, ::tyr::formalism::datalog::RuleView rule, ::tyr::formalism::datalog::RuleBindingView rule_binding) {
-    { p.get_cost(rule, rule_binding) } -> std::same_as<Cost>;
-};
+template<typename T, typename Kind>
+concept RuleCostPolicyConcept = TaskKind<Kind> && details::RuleCostPolicyConceptImpl<Kind, T>::value;
 
-template<typename T>
-concept MutableCostPolicyConcept = CostPolicyConcept<T> && requires(T& p, ::tyr::formalism::datalog::RuleBindingView rule_binding, Cost cost) {
-    { p.clear() } -> std::same_as<void>;
-    { p.set_cost(rule_binding, cost) } -> std::same_as<void>;
-};
+template<typename T, typename Kind>
+concept MutableRuleCostPolicyConcept = TaskKind<Kind> && details::MutableRuleCostPolicyConceptImpl<Kind, T>::value;
 
 }
 

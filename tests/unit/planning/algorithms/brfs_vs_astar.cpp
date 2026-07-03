@@ -15,13 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <yggdrasil/serialization/json.hpp>
-#include <yggdrasil/serialization/json_suite.hpp>
-
-#include <gtest/gtest.h>
 #include <filesystem>
+#include <gtest/gtest.h>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
+#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace p = tyr::planning;
 namespace fp = tyr::formalism::planning;

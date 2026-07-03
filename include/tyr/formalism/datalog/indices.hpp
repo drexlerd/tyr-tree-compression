@@ -28,6 +28,7 @@
 #include "tyr/formalism/datalog/ground_function_term_value_index.hpp"
 #include "tyr/formalism/datalog/ground_literal_index.hpp"
 #include "tyr/formalism/datalog/ground_numeric_effect_index.hpp"
+#include "tyr/formalism/datalog/ground_program_index.hpp"
 #include "tyr/formalism/datalog/ground_rule_index.hpp"
 #include "tyr/formalism/datalog/literal_index.hpp"
 #include "tyr/formalism/datalog/multi_operator_index.hpp"

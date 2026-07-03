@@ -18,13 +18,13 @@
 #ifndef TYR_PLANNING_STATE_BUILDER_HPP_
 #define TYR_PLANNING_STATE_BUILDER_HPP_
 
-#include <yggdrasil/core/config.hpp>
 #include "tyr/formalism/declarations.hpp"
 #include "tyr/formalism/planning/fdr_value.hpp"
 #include "tyr/planning/state_index.hpp"
 
 #include <boost/dynamic_bitset.hpp>
 #include <concepts>
+#include <yggdrasil/core/config.hpp>
 
 namespace tyr::planning
 {

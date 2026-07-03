@@ -15,25 +15,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_GROUND_TASK_HPP_
-#define TYR_PLANNING_GROUND_TASK_HPP_
+#ifndef TYR_PLANNING_GROUND_HPP_
+#define TYR_PLANNING_GROUND_HPP_
 
-#include <yggdrasil/core/config.hpp>                    // for ygg::float_t, ygg::uint_t
-#include <yggdrasil/containers/dynamic_bitset.hpp>            // for test
-#include <yggdrasil/containers/vector.hpp>                    // for get
 #include "tyr/formalism/planning/declarations.hpp"  // for OverlayRepos...
 #include "tyr/formalism/planning/fdr_context.hpp"
 #include "tyr/formalism/planning/planning_fdr_task.hpp"
 #include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/ground_task/match_tree/match_tree.hpp"  // for Matc...
+#include "tyr/planning/ground/match_tree/match_tree.hpp"  // for Matc...
+#include "tyr/planning/ground/programs/action.hpp"
+#include "tyr/planning/ground/programs/axiom.hpp"
+#include "tyr/planning/ground/programs/rpg.hpp"
 #include "tyr/planning/task.hpp"
 
-#include <boost/dynamic_bitset.hpp>  // for dynamic_bitset
-#include <limits>                    // for numeric_limits
-#include <optional>                  // for optional
-#include <stddef.h>                  // for size_t
-#include <vector>                    // for vector
+#include <boost/dynamic_bitset.hpp>                 // for dynamic_bitset
+#include <limits>                                   // for numeric_limits
+#include <optional>                                 // for optional
+#include <stddef.h>                                 // for size_t
+#include <vector>                                   // for vector
+#include <yggdrasil/containers/dynamic_bitset.hpp>  // for test
+#include <yggdrasil/containers/vector.hpp>          // for get
+#include <yggdrasil/core/config.hpp>                // for ygg::float_t, ygg::uint_t
 
 namespace tyr::planning
 {
@@ -51,7 +54,10 @@ public:
 
     const auto& get_static_atoms_bitset() const noexcept { return m_static_atoms_bitset; }
     const auto& get_static_numeric_variables() const noexcept { return m_static_numeric_variables; }
-    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const { return ygg::test(ygg::uint_t(index), m_static_atoms_bitset); }
+    bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const
+    {
+        return ygg::test(ygg::uint_t(index), m_static_atoms_bitset);
+    }
     ygg::float_t get(ygg::Index<::tyr::formalism::planning::GroundFunctionTerm<::tyr::formalism::StaticTag>> index) const noexcept
     {
         return ygg::get(ygg::uint_t(index), m_static_numeric_variables, std::numeric_limits<ygg::float_t>::quiet_NaN());
@@ -69,6 +75,13 @@ public:
     ::tyr::formalism::planning::GroundActionView get_ground_action(::tyr::formalism::planning::ActionBindingView binding) const;
     const auto& get_axiom_match_tree_strata() const noexcept { return m_axiom_match_tree_strata; }
 
+    auto& get_axiom_program() noexcept { return m_axiom_program; }
+    const auto& get_axiom_program() const noexcept { return m_axiom_program; }
+    auto& get_action_program() noexcept { return m_action_program; }
+    const auto& get_action_program() const noexcept { return m_action_program; }
+    auto& get_rpg_program() noexcept { return m_rpg_program; }
+    const auto& get_rpg_program() const noexcept { return m_rpg_program; }
+
 private:
     ::tyr::formalism::planning::PlanningFDRTask m_task;
 
@@ -79,6 +92,12 @@ private:
     ygg::UnorderedMap<::tyr::formalism::planning::ActionBindingView, ::tyr::formalism::planning::GroundActionView> m_action_binding_to_ground_action;
 
     std::vector<match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAxiom>> m_axiom_match_tree_strata;
+
+    AxiomEvaluatorProgram<GroundTag> m_axiom_program;
+
+    ApplicableActionProgram<GroundTag> m_action_program;
+
+    RPGProgram<GroundTag> m_rpg_program;
 };
 
 }
