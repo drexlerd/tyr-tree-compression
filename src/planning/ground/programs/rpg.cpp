@@ -37,14 +37,11 @@ struct GroundProgramBuildContext
 {
     using StaticPredicateMapping = ygg::UnorderedMap<fp::PredicateView<f::StaticTag>, fd::PredicateView<f::StaticTag>>;
     using FluentPredicateMapping = ygg::UnorderedMap<fp::PredicateView<f::FluentTag>, fd::PredicateView<f::FluentTag>>;
-    using DerivedPredicateMapping = ygg::UnorderedMap<fp::PredicateView<f::DerivedTag>, fd::PredicateView<f::FluentTag>>;
-
     fd::Builder builder;
     fp::MergeDatalogContext merge_context;
     ygg::Data<fd::GroundProgram> program;
     StaticPredicateMapping static_predicates;
     FluentPredicateMapping fluent_predicates;
-    DerivedPredicateMapping derived_predicates;
     ygg::uint_t next_rule_id = 0;
 
     GroundProgramBuildContext(fd::Repository& repository) : builder(), merge_context(builder, repository), program() { program.clear(); }
@@ -142,9 +139,6 @@ fd::GroundConjunctiveConditionView create_delete_free_condition(fp::GroundConjun
         if (const auto literal = fp::merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context))
             result.fluent_literals.push_back(literal->get_index());
 
-    for (const auto numeric_constraint : condition.get_numeric_constraints())
-        result.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context.merge_context));
-
     canonicalize(result);
     return context.merge_context.destination.get_or_create(result).first;
 }
@@ -165,7 +159,6 @@ fd::GroundConjunctiveConditionView create_delete_free_effect_condition(fd::Groun
     auto& result = *condition_ptr;
     result.clear();
     result.fluent_literals = merged_condition.get_literals<f::FluentTag>().get_data();
-    result.numeric_constraints = merged_condition.get_numeric_constraints().get_data();
     result.fluent_literals.push_back(create_positive_literal(applicability_atom, context).get_index());
     canonicalize(result);
     return context.merge_context.destination.get_or_create(result).first;
@@ -245,24 +238,6 @@ fd::GroundProgramView create_rpg_ground_program(fp::FDRTaskView task,
         context.fluent_predicates.emplace(predicate, new_predicate);
         program.fluent_predicates.push_back(new_predicate.get_index());
     }
-    for (const auto predicate : task.get_domain().get_predicates<f::DerivedTag>())
-    {
-        const auto new_predicate = fp::merge_p2d<f::DerivedTag, f::FluentTag>(predicate, merge_context).first;
-        context.derived_predicates.emplace(predicate, new_predicate);
-        program.fluent_predicates.push_back(new_predicate.get_index());
-    }
-    for (const auto predicate : task.get_derived_predicates())
-    {
-        const auto new_predicate = fp::merge_p2d<f::DerivedTag, f::FluentTag>(predicate, merge_context).first;
-        context.derived_predicates.emplace(predicate, new_predicate);
-        program.fluent_predicates.push_back(new_predicate.get_index());
-    }
-
-    for (const auto function : task.get_domain().get_functions<f::StaticTag>())
-        program.static_functions.push_back(fp::merge_p2d(function, merge_context).first.get_index());
-    for (const auto function : task.get_domain().get_functions<f::FluentTag>())
-        program.fluent_functions.push_back(fp::merge_p2d(function, merge_context).first.get_index());
-
     for (const auto object : task.get_domain().get_constants())
         program.objects.push_back(fp::merge_p2d(object, merge_context).first.get_index());
     for (const auto object : task.get_objects())
@@ -291,19 +266,6 @@ fd::GroundProgramView create_rpg_ground_program(fp::FDRTaskView task,
                 program.fluent_atoms.push_back(new_atom.get_index());
         }
     }
-    for (const auto atom : task.get_atoms<f::DerivedTag>())
-    {
-        const auto new_atom =
-            fp::merge_p2d<f::DerivedTag, f::FluentTag>(atom, translation_context.p2d.derived_to_fluent_atom, context.derived_predicates, merge_context).first;
-        translation_context.d2p.fluent_to_derived_atom.emplace(new_atom, atom);
-        program.fluent_atoms.push_back(new_atom.get_index());
-    }
-
-    for (const auto fterm_value : task.get_fterm_values<f::StaticTag>())
-        program.static_fterm_values.push_back(fp::merge_p2d(fterm_value, merge_context).first.get_index());
-    for (const auto fterm_value : task.get_fterm_values<f::FluentTag>())
-        program.fluent_fterm_values.push_back(fp::merge_p2d(fterm_value, merge_context).first.get_index());
-
     context.program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).get_index();
 
     for (const auto action : task.get_ground_actions())
