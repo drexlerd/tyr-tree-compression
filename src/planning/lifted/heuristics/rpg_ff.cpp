@@ -44,10 +44,10 @@ FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Executio
         datalog::OrAnnotationPolicy<LiftedTag>(),
         datalog::AndAnnotationPolicy<LiftedTag, datalog::SumAggregation>(),
         datalog::TerminationPolicy<LiftedTag, datalog::SumAggregation>(
-            task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>(),
-            task->get_rpg_program().get_program_context().get_workspace_repository())),
-    m_markings(task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>().size()),
-    m_function_markings(task->get_rpg_program().get_program_context().get_program().get_functions<::tyr::formalism::FluentTag>().size()),
+            task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>(),
+            task->get_rpg_program().get_datalog_program().get_workspace_repository())),
+    m_markings(task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>().size()),
+    m_function_markings(task->get_rpg_program().get_datalog_program().get_program().get_functions<::tyr::formalism::FluentTag>().size()),
     m_binding(),
     m_iter_workspace(),
     m_effect_families(),
@@ -204,7 +204,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
     const auto& mapping = this->m_task->get_rpg_program().get_rule_to_action_mapping();
 
     const auto rule_row = witness.get_rule_row();
-    const auto rule = ygg::make_view(rule_row.get_relation().get_index(), this->m_task->get_rpg_program().get_program_context().get_program_repository());
+    const auto rule = ygg::make_view(rule_row.get_relation().get_index(), this->m_task->get_rpg_program().get_datalog_program().get_program_repository());
     const auto row = rule_row.get_objects();
 
     if (const auto it = mapping.find(rule); it != mapping.end())

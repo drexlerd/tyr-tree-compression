@@ -68,6 +68,13 @@ merge_p2d(GroundAtomView<T_SRC> element,  //
           MergeDatalogContext& context);
 
 template<FactKind T_SRC, FactKind T_DST = T_SRC>
+std::pair<::tyr::formalism::datalog::GroundAtomView<T_DST>, bool>
+merge_p2d(GroundAtomView<T_SRC> element,  //
+          ygg::UnorderedMap<GroundAtomView<T_SRC>, ::tyr::formalism::datalog::GroundAtomView<T_DST>>& atom_mapping,
+          const ygg::UnorderedMap<PredicateView<T_SRC>, ::tyr::formalism::datalog::PredicateView<T_DST>>& predicate_mapping,
+          MergeDatalogContext& context);
+
+template<FactKind T_SRC, FactKind T_DST = T_SRC>
 std::pair<::tyr::formalism::datalog::LiteralView<T_DST>, bool>
 merge_p2d(LiteralView<T_SRC> element,  //
           const ygg::UnorderedMap<PredicateView<T_SRC>, ::tyr::formalism::datalog::PredicateView<T_DST>>& predicate_mapping,
@@ -79,9 +86,23 @@ merge_p2d(GroundLiteralView<T_SRC> element,  //
           const ygg::UnorderedMap<PredicateView<T_SRC>, ::tyr::formalism::datalog::PredicateView<T_DST>>& predicate_mapping,
           MergeDatalogContext& context);
 
+template<FactKind T_SRC, FactKind T_DST = T_SRC>
+std::pair<::tyr::formalism::datalog::GroundLiteralView<T_DST>, bool>
+merge_p2d(GroundLiteralView<T_SRC> element,  //
+          ygg::UnorderedMap<GroundAtomView<T_SRC>, ::tyr::formalism::datalog::GroundAtomView<T_DST>>& atom_mapping,
+          const ygg::UnorderedMap<PredicateView<T_SRC>, ::tyr::formalism::datalog::PredicateView<T_DST>>& predicate_mapping,
+          MergeDatalogContext& context);
+
 std::optional<::tyr::formalism::datalog::GroundLiteralView<FluentTag>>
 merge_p2d(FDRFactView<FluentTag> element,
           bool polarity,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& predicate_mapping,
+          MergeDatalogContext& context);
+
+std::optional<::tyr::formalism::datalog::GroundLiteralView<FluentTag>>
+merge_p2d(FDRFactView<FluentTag> element,
+          bool polarity,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& atom_mapping,
           const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& predicate_mapping,
           MergeDatalogContext& context);
 
@@ -89,6 +110,20 @@ std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
 merge_p2d(GroundConjunctiveConditionView element,
           const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
           const ygg::UnorderedMap<PredicateView<DerivedTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& derived_predicate_mapping,
+          MergeDatalogContext& context);
+
+std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
+merge_p2d(GroundConjunctiveConditionView element,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& fluent_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
+          ygg::UnorderedMap<GroundAtomView<DerivedTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& derived_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<DerivedTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& derived_predicate_mapping,
+          MergeDatalogContext& context);
+
+std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
+merge_p2d(GroundConjunctiveConditionView element,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& fluent_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
           MergeDatalogContext& context);
 
 // Numeric
@@ -256,6 +291,21 @@ merge_p2d(GroundAtomView<T_SRC> element,  //
 }
 
 template<FactKind T_SRC, FactKind T_DST>
+std::pair<::tyr::formalism::datalog::GroundAtomView<T_DST>, bool>
+merge_p2d(GroundAtomView<T_SRC> element,  //
+          ygg::UnorderedMap<GroundAtomView<T_SRC>, ::tyr::formalism::datalog::GroundAtomView<T_DST>>& atom_mapping,
+          const ygg::UnorderedMap<PredicateView<T_SRC>, ::tyr::formalism::datalog::PredicateView<T_DST>>& predicate_mapping,
+          MergeDatalogContext& context)
+{
+    if (const auto it = atom_mapping.find(element); it != atom_mapping.end())
+        return std::make_pair(it->second, false);
+
+    auto [atom, inserted] = merge_p2d<T_SRC, T_DST>(element, predicate_mapping, context);
+    atom_mapping.emplace(element, atom);
+    return std::make_pair(atom, inserted);
+}
+
+template<FactKind T_SRC, FactKind T_DST>
 std::pair<::tyr::formalism::datalog::LiteralView<T_DST>, bool>
 merge_p2d(LiteralView<T_SRC> element,  //
           const ygg::UnorderedMap<PredicateView<T_SRC>, ::tyr::formalism::datalog::PredicateView<T_DST>>& predicate_mapping,
@@ -289,6 +339,24 @@ merge_p2d(GroundLiteralView<T_SRC> element,  //
     return context.destination.get_or_create(literal);
 }
 
+template<FactKind T_SRC, FactKind T_DST>
+std::pair<::tyr::formalism::datalog::GroundLiteralView<T_DST>, bool>
+merge_p2d(GroundLiteralView<T_SRC> element,  //
+          ygg::UnorderedMap<GroundAtomView<T_SRC>, ::tyr::formalism::datalog::GroundAtomView<T_DST>>& atom_mapping,
+          const ygg::UnorderedMap<PredicateView<T_SRC>, ::tyr::formalism::datalog::PredicateView<T_DST>>& predicate_mapping,
+          MergeDatalogContext& context)
+{
+    auto literal_ptr = context.builder.template get_builder<::tyr::formalism::datalog::GroundLiteral<T_DST>>();
+    auto& literal = *literal_ptr;
+    literal.clear();
+
+    literal.polarity = element.get_polarity();
+    literal.atom = merge_p2d<T_SRC, T_DST>(element.get_atom(), atom_mapping, predicate_mapping, context).first.get_index();
+
+    canonicalize(literal);
+    return context.destination.get_or_create(literal);
+}
+
 inline std::optional<::tyr::formalism::datalog::GroundLiteralView<FluentTag>>
 merge_p2d(FDRFactView<FluentTag> element,
           bool polarity,
@@ -303,6 +371,26 @@ merge_p2d(FDRFactView<FluentTag> element,
     literal.clear();
     literal.polarity = polarity;
     literal.atom = merge_p2d(element.get_atom().value(), predicate_mapping, context).first.get_index();
+
+    ::tyr::formalism::datalog::canonicalize(literal);
+    return context.destination.get_or_create(literal).first;
+}
+
+inline std::optional<::tyr::formalism::datalog::GroundLiteralView<FluentTag>>
+merge_p2d(FDRFactView<FluentTag> element,
+          bool polarity,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& predicate_mapping,
+          MergeDatalogContext& context)
+{
+    if (!element.has_value())
+        return std::nullopt;
+
+    auto literal_ptr = context.builder.template get_builder<::tyr::formalism::datalog::GroundLiteral<FluentTag>>();
+    auto& literal = *literal_ptr;
+    literal.clear();
+    literal.polarity = polarity;
+    literal.atom = merge_p2d(element.get_atom().value(), atom_mapping, predicate_mapping, context).first.get_index();
 
     ::tyr::formalism::datalog::canonicalize(literal);
     return context.destination.get_or_create(literal).first;
@@ -328,6 +416,61 @@ merge_p2d(GroundConjunctiveConditionView element,
 
     for (const auto literal : element.template get_literals<DerivedTag>())
         condition.fluent_literals.push_back(merge_p2d(literal, derived_predicate_mapping, context).first.get_index());
+
+    for (const auto numeric_constraint : element.get_numeric_constraints())
+        condition.numeric_constraints.push_back(merge_p2d(numeric_constraint, context));
+
+    ::tyr::formalism::datalog::canonicalize(condition);
+    return context.destination.get_or_create(condition);
+}
+
+inline std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
+merge_p2d(GroundConjunctiveConditionView element,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& fluent_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
+          ygg::UnorderedMap<GroundAtomView<DerivedTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& derived_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<DerivedTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& derived_predicate_mapping,
+          MergeDatalogContext& context)
+{
+    auto condition_ptr = context.builder.template get_builder<::tyr::formalism::datalog::GroundConjunctiveCondition>();
+    auto& condition = *condition_ptr;
+    condition.clear();
+
+    for (const auto fact : element.template get_facts<PositiveTag>())
+        if (const auto literal = merge_p2d(fact, true, fluent_atom_mapping, fluent_predicate_mapping, context))
+            condition.fluent_literals.push_back(literal->get_index());
+
+    for (const auto fact : element.template get_facts<NegativeTag>())
+        if (const auto literal = merge_p2d(fact, false, fluent_atom_mapping, fluent_predicate_mapping, context))
+            condition.fluent_literals.push_back(literal->get_index());
+
+    for (const auto literal : element.template get_literals<DerivedTag>())
+        condition.fluent_literals.push_back(merge_p2d(literal, derived_atom_mapping, derived_predicate_mapping, context).first.get_index());
+
+    for (const auto numeric_constraint : element.get_numeric_constraints())
+        condition.numeric_constraints.push_back(merge_p2d(numeric_constraint, context));
+
+    ::tyr::formalism::datalog::canonicalize(condition);
+    return context.destination.get_or_create(condition);
+}
+
+inline std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
+merge_p2d(GroundConjunctiveConditionView element,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& fluent_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
+          MergeDatalogContext& context)
+{
+    auto condition_ptr = context.builder.template get_builder<::tyr::formalism::datalog::GroundConjunctiveCondition>();
+    auto& condition = *condition_ptr;
+    condition.clear();
+
+    for (const auto fact : element.template get_facts<PositiveTag>())
+        if (const auto literal = merge_p2d(fact, true, fluent_atom_mapping, fluent_predicate_mapping, context))
+            condition.fluent_literals.push_back(literal->get_index());
+
+    for (const auto fact : element.template get_facts<NegativeTag>())
+        if (const auto literal = merge_p2d(fact, false, fluent_atom_mapping, fluent_predicate_mapping, context))
+            condition.fluent_literals.push_back(literal->get_index());
 
     for (const auto numeric_constraint : element.get_numeric_constraints())
         condition.numeric_constraints.push_back(merge_p2d(numeric_constraint, context));
@@ -643,10 +786,31 @@ merge_p2d(FDRFactView<FluentTag> element,
           const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& predicate_mapping,
           MergeDatalogContext& context);
 
+std::optional<::tyr::formalism::datalog::GroundLiteralView<FluentTag>>
+merge_p2d(FDRFactView<FluentTag> element,
+          bool polarity,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& predicate_mapping,
+          MergeDatalogContext& context);
+
 std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
 merge_p2d(GroundConjunctiveConditionView element,
           const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
           const ygg::UnorderedMap<PredicateView<DerivedTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& derived_predicate_mapping,
+          MergeDatalogContext& context);
+
+std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
+merge_p2d(GroundConjunctiveConditionView element,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& fluent_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
+          ygg::UnorderedMap<GroundAtomView<DerivedTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& derived_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<DerivedTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& derived_predicate_mapping,
+          MergeDatalogContext& context);
+
+std::pair<::tyr::formalism::datalog::GroundConjunctiveConditionView, bool>
+merge_p2d(GroundConjunctiveConditionView element,
+          ygg::UnorderedMap<GroundAtomView<FluentTag>, ::tyr::formalism::datalog::GroundAtomView<FluentTag>>& fluent_atom_mapping,
+          const ygg::UnorderedMap<PredicateView<FluentTag>, ::tyr::formalism::datalog::PredicateView<FluentTag>>& fluent_predicate_mapping,
           MergeDatalogContext& context);
 
 // Numeric

@@ -17,7 +17,7 @@
 
 #include "tyr/planning/lifted/programs/axiom.hpp"
 
-#include "common.hpp"
+#include "../../programs/common.hpp"
 #include "tyr/analysis/domains.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
@@ -37,7 +37,7 @@ namespace tyr::planning
 namespace
 {
 void process_axiom_body(fp::ConjunctiveConditionView axiom_body,
-                        const TranslationContext& translation_context,
+                        const TranslationContext<LiftedTag>& translation_context,
                         fp::MergeDatalogContext& context,
                         ygg::Data<fd::ConjunctiveCondition>& conj_cond)
 {
@@ -55,7 +55,7 @@ void process_axiom_body(fp::ConjunctiveConditionView axiom_body,
         conj_cond.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context));
 }
 
-auto create_axiom_rule(fp::AxiomView axiom, const TranslationContext& translation_context, fp::MergeDatalogContext& context)
+auto create_axiom_rule(fp::AxiomView axiom, const TranslationContext<LiftedTag>& translation_context, fp::MergeDatalogContext& context)
 {
     auto rule_ptr = context.builder.get_builder<fd::Rule>();
     auto& rule = *rule_ptr;
@@ -84,7 +84,7 @@ auto create_axiom_rule(fp::AxiomView axiom, const TranslationContext& translatio
     return context.destination.get_or_create(rule);
 }
 
-auto create_program(fp::TaskView task, TranslationContext& translation_context, fd::Repository& repository)
+auto create_program(fp::TaskView task, TranslationContext<LiftedTag>& translation_context, fd::Repository& repository)
 {
     auto builder = fd::Builder();
     auto context = fp::MergeDatalogContext(builder, repository);
@@ -150,7 +150,7 @@ auto create_program(fp::TaskView task, TranslationContext& translation_context, 
     return repository.get_or_create(program).first;
 }
 
-auto create_program_context(fp::TaskView task, TranslationContext& translation_context)
+auto create_datalog_program(fp::TaskView task, TranslationContext<LiftedTag>& translation_context)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
     auto repository = factory->create_shared();
@@ -159,23 +159,25 @@ auto create_program_context(fp::TaskView task, TranslationContext& translation_c
     auto strata = analysis::compute_rule_stratification(program);
     auto listeners = analysis::compute_listeners(strata, *repository);
 
-    return datalog::ProgramContext(program, std::move(repository), std::move(factory), std::move(domains), std::move(strata), std::move(listeners));
+    return datalog::Program<LiftedTag>(program, std::move(repository), std::move(factory), std::move(domains), std::move(strata), std::move(listeners));
 }
 }
 
 AxiomEvaluatorProgram<LiftedTag>::AxiomEvaluatorProgram(fp::TaskView task) :
     m_translation_context(),
-    m_program_context(create_program_context(task, m_translation_context)),
-    m_program_workspace(m_program_context)
+    m_datalog_program(create_datalog_program(task, m_translation_context))
 {
-    // std::cout << m_program_context.get_program() << std::endl;
+    // std::cout << m_datalog_program.get_program() << std::endl;
 }
 
-const TranslationContext& AxiomEvaluatorProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
+const TranslationContext<LiftedTag>& AxiomEvaluatorProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
 
-datalog::ProgramContext& AxiomEvaluatorProgram<LiftedTag>::get_program_context() noexcept { return m_program_context; }
+datalog::Program<LiftedTag>& AxiomEvaluatorProgram<LiftedTag>::get_datalog_program() noexcept { return m_datalog_program; }
 
-const datalog::ProgramContext& AxiomEvaluatorProgram<LiftedTag>::get_program_context() const noexcept { return m_program_context; }
+const datalog::Program<LiftedTag>& AxiomEvaluatorProgram<LiftedTag>::get_datalog_program() const noexcept { return m_datalog_program; }
 
-const datalog::ConstProgramWorkspace<LiftedTag>& AxiomEvaluatorProgram<LiftedTag>::get_const_program_workspace() const noexcept { return m_program_workspace; }
+const datalog::ConstProgramWorkspace<LiftedTag>& AxiomEvaluatorProgram<LiftedTag>::get_const_program_workspace() const noexcept
+{
+    return m_datalog_program.get_const_program_workspace();
+}
 }

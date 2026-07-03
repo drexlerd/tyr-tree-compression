@@ -20,6 +20,7 @@
 
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/formatter.hpp"
+#include "tyr/datalog/ground/programs/program.hpp"
 #include "tyr/datalog/ground/queue.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
 #include "tyr/datalog/lifted/assignment.hpp"
@@ -27,8 +28,10 @@
 #include "tyr/datalog/lifted/consistency_graph.hpp"
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
 #include "tyr/datalog/lifted/fact_sets.hpp"
+#include "tyr/datalog/lifted/programs/program.hpp"
 #include "tyr/datalog/lifted/workspaces/facts.hpp"
 #include "tyr/datalog/lifted/workspaces/rule.hpp"
+#include "tyr/datalog/programs/program.hpp"
 #include "tyr/datalog/statistics/program.hpp"
 #include "tyr/datalog/statistics/rule.hpp"
 #include "tyr/datalog/workspaces/program.hpp"

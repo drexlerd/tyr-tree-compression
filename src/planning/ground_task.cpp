@@ -42,8 +42,6 @@ Task<GroundTag>::Task(::tyr::formalism::planning::PlanningFDRTask task) :
     m_action_match_tree(match_tree::MatchTree<fp::GroundAction>::create(get_task().get_ground_actions().get_data(), get_task().get_context())),
     m_action_binding_to_ground_action(),
     m_axiom_match_tree_strata(),
-    m_axiom_program(get_task()),
-    m_action_program(get_task()),
     m_rpg_program(get_task())
 {
     for (const auto action : get_task().get_ground_actions())

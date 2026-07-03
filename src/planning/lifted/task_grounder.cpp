@@ -38,7 +38,7 @@
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground_task.hpp"
 #include "tyr/planning/lifted_task.hpp"
-#include "tyr/planning/programs/ground.hpp"
+#include "tyr/planning/lifted/programs/ground.hpp"
 #include "tyr/planning/task_utils.hpp"
 
 #include <algorithm>
@@ -421,9 +421,9 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
      */
 
     auto ground_program = GroundTaskProgram(lifted_task.get_task());
-    const auto const_workspace = d::ConstProgramWorkspace<LiftedTag>(ground_program.get_program_context());
+    const auto& const_workspace = ground_program.get_const_program_workspace();
     auto workspace = d::ProgramWorkspace<LiftedTag, d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
-        ground_program.get_program_context(),
+        ground_program.get_datalog_program(),
         const_workspace,
         d::NoOrAnnotationPolicy<LiftedTag>(),
         d::NoAndAnnotationPolicy<LiftedTag>(),

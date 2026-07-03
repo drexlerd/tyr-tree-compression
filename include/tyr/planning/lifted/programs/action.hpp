@@ -18,12 +18,11 @@
 #ifndef TYR_PLANNING_LIFTED_PROGRAMS_ACTION_HPP_
 #define TYR_PLANNING_LIFTED_PROGRAMS_ACTION_HPP_
 
-#include "tyr/datalog/program_context.hpp"
-#include "tyr/datalog/lifted/workspaces/program.hpp"
+#include "tyr/datalog/lifted/programs/program.hpp"
 #include "tyr/formalism/datalog/views.hpp"
 #include "tyr/formalism/planning/views.hpp"
+#include "tyr/planning/lifted/programs/translation_context.hpp"
 #include "tyr/planning/programs/action.hpp"
-#include "tyr/planning/programs/translation_context.hpp"
 
 #include <yggdrasil/containers/associative_containers.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
@@ -41,17 +40,16 @@ public:
 
     explicit ApplicableActionProgram(::tyr::formalism::planning::TaskView task);
 
-    const TranslationContext& get_translation_context() const noexcept;
+    const TranslationContext<LiftedTag>& get_translation_context() const noexcept;
     const AppPredicateToActionMapping& get_predicate_to_action_mapping() const noexcept;
-    datalog::ProgramContext& get_program_context() noexcept;
-    const datalog::ProgramContext& get_program_context() const noexcept;
+    datalog::Program<LiftedTag>& get_datalog_program() noexcept;
+    const datalog::Program<LiftedTag>& get_datalog_program() const noexcept;
     const datalog::ConstProgramWorkspace<LiftedTag>& get_const_program_workspace() const noexcept;
 
 private:
-    TranslationContext m_translation_context;
+    TranslationContext<LiftedTag> m_translation_context;
     AppPredicateToActionMapping m_predicate_to_actions;
-    datalog::ProgramContext m_program_context;
-    datalog::ConstProgramWorkspace<LiftedTag> m_program_workspace;
+    datalog::Program<LiftedTag> m_datalog_program;
 };
 
 }

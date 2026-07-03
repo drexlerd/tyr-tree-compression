@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <optional>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -220,6 +221,27 @@ bool fire_rule(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule)
     return stop;
 }
 
+void validate_supported_program(fd::GroundProgramView program)
+{
+    if (!program.template get_fterm_values<f::StaticTag>().empty() || !program.template get_fterm_values<f::FluentTag>().empty())
+        throw std::invalid_argument("ground queue solver does not support function facts");
+
+    for (const auto rule : program.get_ground_rules())
+    {
+        if (!rule.get_body().get_numeric_constraints().empty())
+            throw std::invalid_argument("ground queue solver does not support numeric constraints");
+
+        ygg::visit(
+            [](auto&& head)
+            {
+                using Head = std::decay_t<decltype(head)>;
+                if constexpr (!std::is_same_v<Head, fd::GroundAtomView<f::FluentTag>>)
+                    throw std::invalid_argument("ground queue solver only supports fluent atom heads");
+            },
+            rule.get_head());
+    }
+}
+
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          AndAnnotationPolicyConcept<GroundTag> AndAP,
          TerminationPolicyConcept<GroundTag> TP,
@@ -238,6 +260,7 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          RuleCostPolicyConcept<GroundTag> CP>
 GroundQueueResult solve_ground_queue(ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>& ctx)
 {
+    validate_supported_program(ctx.in().program());
     seed_queue(ctx);
 
     while (auto entry = pop_next_entry(ctx))

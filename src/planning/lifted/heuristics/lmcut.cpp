@@ -28,8 +28,8 @@ LMCutHeuristic<LiftedTag>::LMCutHeuristic(TaskPtr<LiftedTag> task, ygg::Executio
          datalog::OrAnnotationPolicy<LiftedTag>(),
          datalog::AchieverAndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>(),
          datalog::TerminationPolicy<LiftedTag, datalog::MaxAggregation>(
-             task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>(),
-             task->get_rpg_program().get_program_context().get_workspace_repository())),
+             task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>(),
+             task->get_rpg_program().get_datalog_program().get_workspace_repository())),
     m_residual_costs(),
     m_goal_zone(),
     m_before_goal_zone(),
@@ -47,7 +47,7 @@ LMCutHeuristicPtr<LiftedTag> LMCutHeuristic<LiftedTag>::create(TaskPtr<LiftedTag
 
 ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& state)
 {
-    const auto& program = m_task->get_rpg_program().get_program_context().get_program();
+    const auto& program = m_task->get_rpg_program().get_datalog_program().get_program();
     if (!program.get_functions<::tyr::formalism::FluentTag>().empty())
         return Base::evaluate(state);
 

@@ -20,6 +20,7 @@
 #include "tyr/datalog/lifted/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/lifted/programs/program.hpp"
 
 namespace tyr::datalog
 {
@@ -27,22 +28,22 @@ template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
          AndAnnotationPolicyConcept<LiftedTag> AndAP,
          TerminationPolicyConcept<LiftedTag> TP,
          RuleCostPolicyConcept<LiftedTag> CP>
-ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>::ProgramWorkspace(ProgramContext& context,
+ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>::ProgramWorkspace(Program<LiftedTag>& program,
                                                                    const ConstProgramWorkspace<LiftedTag>& cws,
                                                                    OrAP or_ap,
                                                                    AndAP and_ap,
                                                                    TP tp,
                                                                    CP cost_policy) :
-    program_repository(context.get_program_repository()),
-    workspace_repository(context.get_workspace_repository()),
-    facts(context.get_program().get_predicates<::tyr::formalism::FluentTag>(),
-          context.get_program().get_functions<::tyr::formalism::FluentTag>(),
-          context.get_domains().fluent_predicate_domains,
-          context.get_domains().fluent_function_domains,
-          context.get_program().get_objects().size(),
-          context.get_program().get_atoms<::tyr::formalism::FluentTag>(),
-          context.get_program().get_fterm_values<::tyr::formalism::FluentTag>(),
-          context.get_workspace_repository()),
+    program_repository(program.get_program_repository()),
+    workspace_repository(program.get_workspace_repository()),
+    facts(program.get_program().get_predicates<::tyr::formalism::FluentTag>(),
+          program.get_program().get_functions<::tyr::formalism::FluentTag>(),
+          program.get_domains().fluent_predicate_domains,
+          program.get_domains().fluent_function_domains,
+          program.get_program().get_objects().size(),
+          program.get_program().get_atoms<::tyr::formalism::FluentTag>(),
+          program.get_program().get_fterm_values<::tyr::formalism::FluentTag>(),
+          program.get_workspace_repository()),
     or_ap(or_ap),
     and_annot(),
     numeric_and_annot(),
@@ -52,18 +53,18 @@ ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>::ProgramWorkspace(ProgramContex
     rules(),
     planning_builder(),
     datalog_builder(),
-    schedulers(create_schedulers(context.get_strata(),
-                                 context.get_listeners(),
+    schedulers(create_schedulers(program.get_strata(),
+                                 program.get_listeners(),
                                  program_repository,
-                                 context.get_program().get_predicates<::tyr::formalism::FluentTag>().size(),
-                                 context.get_program().get_functions<::tyr::formalism::FluentTag>().size())),
+                                 program.get_program().get_predicates<::tyr::formalism::FluentTag>().size(),
+                                 program.get_program().get_functions<::tyr::formalism::FluentTag>().size())),
     cost_buckets(),
     statistics()
 {
-    for (ygg::uint_t i = 0; i < context.get_program().get_rules().size(); ++i)
+    for (ygg::uint_t i = 0; i < program.get_program().get_rules().size(); ++i)
         rules.emplace_back(
             cws.rules[i].has_value() ?
-                std::make_unique<RuleWorkspace<AndAP>>(context.get_repository_factory(), program_repository, workspace_repository, *cws.rules[i], and_ap) :
+                std::make_unique<RuleWorkspace<AndAP>>(program.get_repository_factory(), program_repository, workspace_repository, *cws.rules[i], and_ap) :
                 nullptr);
 }
 
@@ -109,26 +110,26 @@ template struct ProgramWorkspace<LiftedTag,
                                  TerminationPolicy<LiftedTag, MaxAggregation>,
                                  RuleCostOverridePolicy<LiftedTag>>;
 
-ConstProgramWorkspace<LiftedTag>::ConstProgramWorkspace(ProgramContext& context) :
-    facts(context.get_program().get_predicates<::tyr::formalism::StaticTag>(),
-          context.get_program().get_functions<::tyr::formalism::StaticTag>(),
-          context.get_domains().static_predicate_domains,
-          context.get_domains().static_function_domains,
-          context.get_program().get_objects().size(),
-          context.get_program().get_atoms<::tyr::formalism::StaticTag>(),
-          context.get_program().get_fterm_values<::tyr::formalism::StaticTag>(),
-          context.get_program_repository()),
+ConstProgramWorkspace<LiftedTag>::ConstProgramWorkspace(Program<LiftedTag>& program) :
+    facts(program.get_program().get_predicates<::tyr::formalism::StaticTag>(),
+          program.get_program().get_functions<::tyr::formalism::StaticTag>(),
+          program.get_domains().static_predicate_domains,
+          program.get_domains().static_function_domains,
+          program.get_program().get_objects().size(),
+          program.get_program().get_atoms<::tyr::formalism::StaticTag>(),
+          program.get_program().get_fterm_values<::tyr::formalism::StaticTag>(),
+          program.get_program_repository()),
     rules()
 {
-    rules.resize(context.get_program().get_rules().size());
-    for (ygg::uint_t i = 0; i < context.get_program().get_rules().size(); ++i)
+    rules.resize(program.get_program().get_rules().size());
+    for (ygg::uint_t i = 0; i < program.get_program().get_rules().size(); ++i)
     {
-        const auto rule = context.get_program().get_rules()[i];
+        const auto rule = program.get_program().get_rules()[i];
         rules[i].emplace(rule,
-                         context.get_workspace_repository(),
-                         context.get_domains().rule_domains.at(rule.get_index()).payload,
-                         context.get_program().get_objects().size(),
-                         context.get_program().get_predicates<::tyr::formalism::FluentTag>().size(),
+                         program.get_workspace_repository(),
+                         program.get_domains().rule_domains.at(rule.get_index()).payload,
+                         program.get_program().get_objects().size(),
+                         program.get_program().get_predicates<::tyr::formalism::FluentTag>().size(),
                          facts.assignment_sets);
     }
 }

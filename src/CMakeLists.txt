@@ -77,6 +77,7 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     datalog/lifted/policies/annotation.cpp
     datalog/lifted/policies/numeric_support.cpp
     datalog/lifted/policies/termination.cpp
+    datalog/lifted/programs/program.cpp
     datalog/lifted/workspaces/facts.cpp
     datalog/lifted/workspaces/program.cpp
     datalog/lifted/workspaces/rule.cpp
@@ -87,6 +88,7 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     datalog/lifted/delta_kpkc_graph.cpp
     datalog/lifted/delta_kpkc.cpp
     datalog/lifted/fact_set.cpp
+    datalog/ground/programs/program.cpp
     datalog/ground/workspaces/program.cpp
     datalog/ground/queue.cpp
     datalog/lifted/rule_scheduler.cpp
@@ -102,6 +104,10 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     planning/ground/state_repository.cpp
     planning/ground/state.cpp
     planning/ground/successor_generator.cpp
+    planning/ground/heuristics/rpg_add.cpp
+    planning/ground/heuristics/rpg_max.cpp
+    planning/ground/heuristics/rpg_ff.cpp
+    planning/ground/heuristics/lmcut.cpp
 
     planning/lifted/heuristics/rpg_add.cpp
     planning/lifted/heuristics/rpg_max.cpp
@@ -114,12 +120,12 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     planning/lifted/successor_generator.cpp
     planning/lifted/task_grounder.cpp
 
-    planning/programs/action.cpp
-    planning/programs/axiom.cpp
+    planning/lifted/programs/action.cpp
+    planning/lifted/programs/axiom.cpp
     planning/programs/common.cpp
-    planning/programs/rpg.cpp
-    planning/programs/ground.cpp
-    planning/programs/ground_specializations.cpp
+    planning/lifted/programs/rpg.cpp
+    planning/lifted/programs/ground.cpp
+    planning/ground/programs/rpg.cpp
 
     planning/algorithms/astar_eager.cpp
     planning/algorithms/astar_eager/event_handler.cpp

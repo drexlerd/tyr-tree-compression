@@ -26,7 +26,7 @@
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/policies/cost_concept.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
-#include "tyr/datalog/program_context.hpp"
+#include "tyr/datalog/programs/program.hpp"
 #include "tyr/datalog/statistics/program.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
 #include "tyr/formalism/datalog/builder.hpp"
@@ -202,7 +202,7 @@ struct ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>
 
     ProgramStatistics statistics;
 
-    explicit ProgramWorkspace(ProgramContext& context, const ConstProgramWorkspace<LiftedTag>& cws, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy = CP());
+    explicit ProgramWorkspace(Program<LiftedTag>& program, const ConstProgramWorkspace<LiftedTag>& cws, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy = CP());
 
     void clear_costs() { cost_policy.clear(); }
 };
@@ -214,7 +214,7 @@ struct ConstProgramWorkspace<LiftedTag>
 
     std::vector<std::optional<ConstRuleWorkspace>> rules;
 
-    explicit ConstProgramWorkspace(ProgramContext& context);
+    explicit ConstProgramWorkspace(Program<LiftedTag>& program);
 };
 
 }

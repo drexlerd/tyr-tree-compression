@@ -24,8 +24,6 @@
 #include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground/match_tree/match_tree.hpp"  // for Matc...
-#include "tyr/planning/ground/programs/action.hpp"
-#include "tyr/planning/ground/programs/axiom.hpp"
 #include "tyr/planning/ground/programs/rpg.hpp"
 #include "tyr/planning/task.hpp"
 
@@ -75,10 +73,6 @@ public:
     ::tyr::formalism::planning::GroundActionView get_ground_action(::tyr::formalism::planning::ActionBindingView binding) const;
     const auto& get_axiom_match_tree_strata() const noexcept { return m_axiom_match_tree_strata; }
 
-    auto& get_axiom_program() noexcept { return m_axiom_program; }
-    const auto& get_axiom_program() const noexcept { return m_axiom_program; }
-    auto& get_action_program() noexcept { return m_action_program; }
-    const auto& get_action_program() const noexcept { return m_action_program; }
     auto& get_rpg_program() noexcept { return m_rpg_program; }
     const auto& get_rpg_program() const noexcept { return m_rpg_program; }
 
@@ -92,10 +86,6 @@ private:
     ygg::UnorderedMap<::tyr::formalism::planning::ActionBindingView, ::tyr::formalism::planning::GroundActionView> m_action_binding_to_ground_action;
 
     std::vector<match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAxiom>> m_axiom_match_tree_strata;
-
-    AxiomEvaluatorProgram<GroundTag> m_axiom_program;
-
-    ApplicableActionProgram<GroundTag> m_action_program;
 
     RPGProgram<GroundTag> m_rpg_program;
 };

@@ -71,7 +71,7 @@ void insert_numeric_variables_to_fact_set(const UnpackedState<LiftedTag>& state,
 
 void insert_extended_state(const UnpackedState<LiftedTag>& unpacked_state,
                            const fp::Repository& atoms_context,
-                           const P2DTranslationContext& translation_context,
+                           const P2DTranslationContext<LiftedTag>& translation_context,
                            fp::MergeDatalogContext& merge_context,
                            datalog::TaggedFactSets<f::FluentTag>& fact_sets,
                            datalog::TaggedAssignmentSets<f::FluentTag>& assignment_sets)
@@ -88,7 +88,7 @@ void insert_extended_state(const UnpackedState<LiftedTag>& unpacked_state,
 
 void insert_unextended_state(const UnpackedState<LiftedTag>& unpacked_state,
                              const fp::Repository& atoms_context,
-                             const P2DTranslationContext& translation_context,
+                             const P2DTranslationContext<LiftedTag>& translation_context,
                              fp::MergeDatalogContext& merge_context,
                              datalog::TaggedFactSets<f::FluentTag>& fact_sets,
                              datalog::TaggedAssignmentSets<f::FluentTag>& assignment_sets)

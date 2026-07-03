@@ -49,6 +49,8 @@ struct FactSets;
 
 class StaticConsistencyGraph;
 template<TaskKind Kind>
+class Program;
+template<TaskKind Kind>
 class NoOrAnnotationPolicy;
 template<TaskKind Kind>
 class NoAndAnnotationPolicy;
@@ -82,8 +84,6 @@ struct RuleStatistics;
 struct AggregatedRuleStatistics;
 struct RuleWorkerStatistics;
 struct AggregatedRuleWorkerStatistics;
-
-class ProgramContext;
 
 namespace details
 {

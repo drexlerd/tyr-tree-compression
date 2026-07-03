@@ -15,36 +15,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_PROGRAM_CONTEXT_HPP_
-#define TYR_DATALOG_PROGRAM_CONTEXT_HPP_
+#ifndef TYR_DATALOG_LIFTED_PROGRAMS_PROGRAM_HPP_
+#define TYR_DATALOG_LIFTED_PROGRAMS_PROGRAM_HPP_
 
 #include "tyr/analysis/declarations.hpp"
 #include "tyr/analysis/listeners.hpp"
 #include "tyr/analysis/stratification.hpp"
+#include "tyr/datalog/lifted/workspaces/program.hpp"
+#include "tyr/datalog/programs/program.hpp"
 #include "tyr/formalism/datalog/program_index.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
 namespace tyr::datalog
 {
-/// @brief `ProgramContext` stores the program and all derived necessities together.
-class ProgramContext
+
+template<>
+class Program<LiftedTag>
 {
 public:
-    ProgramContext(::tyr::formalism::datalog::ProgramView program,
-                   ::tyr::formalism::datalog::RepositoryPtr program_repository,
-                   ::tyr::formalism::datalog::RepositoryFactoryPtr repository_factory,
-                   analysis::ProgramVariableDomains domains,
-                   analysis::RuleStrata strata,
-                   analysis::ListenerStrata listeners) :
-        m_program(program),
-        m_program_repository(std::move(program_repository)),
-        m_repository_factory(std::move(repository_factory)),
-        m_workspace_repository(m_repository_factory->create_shared(m_program_repository.get())),
-        m_domains(std::move(domains)),
-        m_strata(std::move(strata)),
-        m_listeners(std::move(listeners))
-    {
-    }
+    Program(::tyr::formalism::datalog::ProgramView program,
+            ::tyr::formalism::datalog::RepositoryPtr program_repository,
+            ::tyr::formalism::datalog::RepositoryFactoryPtr repository_factory,
+            analysis::ProgramVariableDomains domains,
+            analysis::RuleStrata strata,
+            analysis::ListenerStrata listeners);
+
     auto get_program() const noexcept { return m_program; }
     const auto& get_program_repository() const noexcept { return *m_program_repository; }
     auto& get_repository_factory() noexcept { return *m_repository_factory; }
@@ -53,6 +48,7 @@ public:
     const auto& get_domains() const noexcept { return m_domains; }
     const auto& get_strata() const noexcept { return m_strata; }
     const auto& get_listeners() const noexcept { return m_listeners; }
+    const auto& get_const_program_workspace() const noexcept { return m_const_program_workspace; }
 
 private:
     ::tyr::formalism::datalog::ProgramView m_program;
@@ -62,6 +58,9 @@ private:
     analysis::ProgramVariableDomains m_domains;
     analysis::RuleStrata m_strata;
     analysis::ListenerStrata m_listeners;
+    ConstProgramWorkspace<LiftedTag> m_const_program_workspace;
 };
+
 }
+
 #endif

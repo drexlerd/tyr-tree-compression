@@ -30,8 +30,8 @@ AddRPGHeuristic<LiftedTag>::AddRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Execut
         datalog::OrAnnotationPolicy<LiftedTag>(),
         datalog::AndAnnotationPolicy<LiftedTag, datalog::SumAggregation>(),
         datalog::TerminationPolicy<LiftedTag, datalog::SumAggregation>(
-            task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>(),
-            task->get_rpg_program().get_program_context().get_workspace_repository()))
+            task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>(),
+            task->get_rpg_program().get_datalog_program().get_workspace_repository()))
 {
 }
 

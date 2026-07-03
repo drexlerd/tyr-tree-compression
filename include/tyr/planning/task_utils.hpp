@@ -23,8 +23,8 @@
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/planning/merge_datalog_decl.hpp"
 #include "tyr/formalism/planning/repository.hpp"
+#include "tyr/planning/lifted/programs/translation_context.hpp"
 #include "tyr/planning/lifted/state_builder.hpp"
-#include "tyr/planning/programs/translation_context.hpp"
 #include "tyr/planning/task.hpp"
 
 #include <yggdrasil/core/config.hpp>
@@ -55,14 +55,14 @@ void insert_numeric_variables_to_fact_set(const UnpackedState<LiftedTag>& state,
 
 void insert_extended_state(const UnpackedState<LiftedTag>& unpacked_state,
                            const ::tyr::formalism::planning::Repository& atoms_context,
-                           const P2DTranslationContext& translation_context,
+                           const P2DTranslationContext<LiftedTag>& translation_context,
                            ::tyr::formalism::planning::MergeDatalogContext& merge_context,
                            datalog::TaggedFactSets<::tyr::formalism::FluentTag>& fact_sets,
                            datalog::TaggedAssignmentSets<::tyr::formalism::FluentTag>& assignment_sets);
 
 void insert_unextended_state(const UnpackedState<LiftedTag>& unpacked_state,
                              const ::tyr::formalism::planning::Repository& atoms_context,
-                             const P2DTranslationContext& translation_context,
+                             const P2DTranslationContext<LiftedTag>& translation_context,
                              ::tyr::formalism::planning::MergeDatalogContext& merge_context,
                              datalog::TaggedFactSets<::tyr::formalism::FluentTag>& fact_sets,
                              datalog::TaggedAssignmentSets<::tyr::formalism::FluentTag>& assignment_sets);

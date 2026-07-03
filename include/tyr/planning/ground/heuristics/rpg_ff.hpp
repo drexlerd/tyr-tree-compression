@@ -58,6 +58,7 @@ private:
 
 private:
     std::vector<boost::dynamic_bitset<>> m_markings;
+    ::tyr::formalism::planning::EffectFamilyList m_effect_families;
     ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_relaxed_plan;
     ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_preferred_actions;
     ygg::UnorderedSet<::tyr::formalism::planning::GroundActionView> m_preferred_action_views;

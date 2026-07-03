@@ -62,7 +62,7 @@ public:
     explicit RPGBase(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, const OrAP& or_ap, const AndAP& and_ap, const TP& tp) :
         m_task(std::move(task)),
         m_execution_context(std::move(execution_context)),
-        m_workspace(m_task->get_rpg_program().get_program_context(), m_task->get_rpg_program().get_const_program_workspace(), or_ap, and_ap, tp)
+        m_workspace(m_task->get_rpg_program().get_datalog_program(), m_task->get_rpg_program().get_const_program_workspace(), or_ap, and_ap, tp)
     {
         m_workspace.tp.set_goals(m_task->get_rpg_program().get_goal());
     }
@@ -159,7 +159,7 @@ protected:
     std::optional<::tyr::formalism::planning::ActionBindingView> get_action_binding(const datalog::WitnessAnnotation& witness)
     {
         const auto rule_binding = witness.get_rule_row();
-        const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_program_context().get_program_repository());
+        const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_datalog_program().get_program_repository());
         const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
         const auto it = mapping.find(rule);
         if (it == mapping.end())
@@ -176,7 +176,7 @@ protected:
     void for_each_witness_precondition(const datalog::WitnessAnnotation& witness, Callback&& callback)
     {
         const auto rule_binding = witness.get_rule_row();
-        const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_program_context().get_program_repository());
+        const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_task->get_rpg_program().get_datalog_program().get_program_repository());
         const auto row = rule_binding.get_objects();
         const auto& const_rule_workspace = *m_task->get_rpg_program().get_const_program_workspace().rules[ygg::uint_t(rule.get_index())];
         const auto witness_condition = const_rule_workspace.get_witness_rule().get_body();

@@ -50,7 +50,7 @@ namespace tyr::planning
 {
 namespace
 {
-void read_derived_atoms_from_program_context(const AxiomEvaluatorProgram<LiftedTag>& axiom_program,
+void read_derived_atoms_from_datalog_program(const AxiomEvaluatorProgram<LiftedTag>& axiom_program,
                                              UnpackedState<LiftedTag>& unpacked_state,
                                              fp::MergePlanningContext& merge_context,
                                              d::TaggedFactSets<f::FluentTag>& fact_sets)
@@ -78,7 +78,7 @@ AxiomEvaluator<LiftedTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<LiftedTag> 
     m_index(index),
     m_task(std::move(task)),
     m_execution_context(std::move(execution_context)),
-    m_workspace(m_task->get_axiom_program().get_program_context(),
+    m_workspace(m_task->get_axiom_program().get_datalog_program(),
                 m_task->get_axiom_program().get_const_program_workspace(),
                 d::NoOrAnnotationPolicy<LiftedTag>(),
                 d::NoAndAnnotationPolicy<LiftedTag>(),
@@ -108,7 +108,7 @@ void AxiomEvaluator<LiftedTag>::compute_extended_state(UnpackedState<LiftedTag>&
 
     auto merge_planning_context = fp::MergePlanningContext { m_workspace.planning_builder, *m_task->get_repository() };
 
-    read_derived_atoms_from_program_context(program, unpacked_state, merge_planning_context, m_workspace.facts.fact_sets);
+    read_derived_atoms_from_datalog_program(program, unpacked_state, merge_planning_context, m_workspace.facts.fact_sets);
 }
 
 void AxiomEvaluator<LiftedTag>::print_summary(size_t verbosity) const

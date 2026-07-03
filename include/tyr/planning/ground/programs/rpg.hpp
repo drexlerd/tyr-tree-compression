@@ -18,11 +18,11 @@
 #ifndef TYR_PLANNING_GROUND_PROGRAMS_RPG_HPP_
 #define TYR_PLANNING_GROUND_PROGRAMS_RPG_HPP_
 
-#include "tyr/formalism/datalog/repository.hpp"
+#include "tyr/datalog/ground/programs/program.hpp"
 #include "tyr/formalism/datalog/views.hpp"
 #include "tyr/formalism/planning/views.hpp"
+#include "tyr/planning/ground/programs/translation_context.hpp"
 #include "tyr/planning/programs/rpg.hpp"
-#include "tyr/planning/programs/translation_context.hpp"
 
 #include <yggdrasil/containers/associative_containers.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
@@ -39,18 +39,17 @@ public:
 
     explicit RPGProgram(::tyr::formalism::planning::FDRTaskView task);
 
-    const TranslationContext& get_translation_context() const noexcept;
+    const TranslationContext<GroundTag>& get_translation_context() const noexcept;
     const GroundRuleToActionMapping& get_ground_rule_to_action_mapping() const noexcept;
     ::tyr::formalism::datalog::GroundProgramView get_ground_program() const noexcept;
-    const ::tyr::formalism::datalog::Repository& get_program_repository() const noexcept;
+    datalog::Program<GroundTag>& get_datalog_program() noexcept;
+    const datalog::Program<GroundTag>& get_datalog_program() const noexcept;
     ::tyr::formalism::datalog::GroundConjunctiveConditionView get_goal() const noexcept;
 
 private:
-    TranslationContext m_translation_context;
+    TranslationContext<GroundTag> m_translation_context;
     GroundRuleToActionMapping m_ground_rule_to_action;
-    ::tyr::formalism::datalog::RepositoryFactoryPtr m_repository_factory;
-    ::tyr::formalism::datalog::RepositoryPtr m_repository;
-    ::tyr::formalism::datalog::GroundProgramView m_ground_program;
+    datalog::Program<GroundTag> m_datalog_program;
 };
 
 }

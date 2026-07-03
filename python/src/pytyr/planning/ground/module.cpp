@@ -68,6 +68,10 @@ void bind_ground_module_definitions(nb::module_& m)
     bind_pruning_strategy<GroundTag>(m, "PruningStrategy");
     bind_heuristic<GroundTag>(m, "Heuristic");
     bind_blind_heuristic<GroundTag>(m, "BlindHeuristic");
+    bind_rpg_max_heuristic<GroundTag>(m, "MaxRPGHeuristic");
+    bind_rpg_add_heuristic<GroundTag>(m, "AddRPGHeuristic");
+    bind_rpg_ff_heuristic<GroundTag>(m, "FFRPGHeuristic");
+    bind_lmcut_heuristic<GroundTag>(m, "LMCutHeuristic");
     bind_goal_count_heuristic<GroundTag>(m, "GoalCountHeuristic");
 }
 

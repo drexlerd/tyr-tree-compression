@@ -17,7 +17,7 @@
 
 #include "tyr/planning/lifted/programs/action.hpp"
 
-#include "common.hpp"
+#include "../../programs/common.hpp"
 #include "tyr/analysis/domains.hpp"
 #include "tyr/formalism/datalog/builder.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
@@ -67,7 +67,7 @@ auto create_applicability_atom(fp::ActionView action, fp::MergeDatalogContext& c
 }
 
 auto create_program(fp::TaskView task,
-                    TranslationContext& translation_context,
+                    TranslationContext<LiftedTag>& translation_context,
                     ApplicableActionProgram<LiftedTag>::AppPredicateToActionMapping& predicate_to_actions,
                     fd::Repository& repository)
 {
@@ -181,8 +181,8 @@ auto create_program(fp::TaskView task,
     return repository.get_or_create(program).first;
 }
 
-auto create_program_context(fp::TaskView task,
-                            TranslationContext& translation_context,
+auto create_datalog_program(fp::TaskView task,
+                            TranslationContext<LiftedTag>& translation_context,
                             ApplicableActionProgram<LiftedTag>::AppPredicateToActionMapping& mapping)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
@@ -192,32 +192,31 @@ auto create_program_context(fp::TaskView task,
     auto strata = analysis::compute_rule_stratification(program);
     auto listeners = analysis::compute_listeners(strata, *repository);
 
-    return datalog::ProgramContext(program, std::move(repository), std::move(factory), std::move(domains), std::move(strata), std::move(listeners));
+    return datalog::Program<LiftedTag>(program, std::move(repository), std::move(factory), std::move(domains), std::move(strata), std::move(listeners));
 }
 }
 
 ApplicableActionProgram<LiftedTag>::ApplicableActionProgram(fp::TaskView task) :
     m_translation_context(),
     m_predicate_to_actions(),
-    m_program_context(create_program_context(task, m_translation_context, m_predicate_to_actions)),
-    m_program_workspace(m_program_context)
+    m_datalog_program(create_datalog_program(task, m_translation_context, m_predicate_to_actions))
 {
-    // std::cout << m_program_context.get_program() << std::endl;
+    // std::cout << m_datalog_program.get_program() << std::endl;
 }
 
-const TranslationContext& ApplicableActionProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
+const TranslationContext<LiftedTag>& ApplicableActionProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
 
 const ApplicableActionProgram<LiftedTag>::AppPredicateToActionMapping& ApplicableActionProgram<LiftedTag>::get_predicate_to_action_mapping() const noexcept
 {
     return m_predicate_to_actions;
 }
 
-datalog::ProgramContext& ApplicableActionProgram<LiftedTag>::get_program_context() noexcept { return m_program_context; }
+datalog::Program<LiftedTag>& ApplicableActionProgram<LiftedTag>::get_datalog_program() noexcept { return m_datalog_program; }
 
-const datalog::ProgramContext& ApplicableActionProgram<LiftedTag>::get_program_context() const noexcept { return m_program_context; }
+const datalog::Program<LiftedTag>& ApplicableActionProgram<LiftedTag>::get_datalog_program() const noexcept { return m_datalog_program; }
 
 const datalog::ConstProgramWorkspace<LiftedTag>& ApplicableActionProgram<LiftedTag>::get_const_program_workspace() const noexcept
 {
-    return m_program_workspace;
+    return m_datalog_program.get_const_program_workspace();
 }
 }

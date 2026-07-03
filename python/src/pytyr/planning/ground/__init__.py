@@ -20,6 +20,10 @@ from ..._pytyr.planning.ground import (
     PruningStrategy,
     Heuristic,
     BlindHeuristic,
+    MaxRPGHeuristic,
+    AddRPGHeuristic,
+    FFRPGHeuristic,
+    LMCutHeuristic,
     GoalCountHeuristic,
 )
 

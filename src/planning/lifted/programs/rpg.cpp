@@ -17,7 +17,7 @@
 
 #include "tyr/planning/lifted/programs/rpg.hpp"
 
-#include "common.hpp"
+#include "../../programs/common.hpp"
 #include "tyr/analysis/domains.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -40,7 +40,7 @@ namespace
 {
 void fill_delete_free_condition(fp::ActionView action,
                                 fp::ConditionalEffectView cond_eff,
-                                TranslationContext& translation_context,
+                                TranslationContext<LiftedTag>& translation_context,
                                 ::tyr::formalism::planning::MergeDatalogContext& context,
                                 ygg::Data<::tyr::formalism::datalog::ConjunctiveCondition>& conj_cond)
 {
@@ -67,7 +67,7 @@ void fill_delete_free_condition(fp::ActionView action,
 }
 
 auto create_delete_free_goal(fp::GroundConjunctiveConditionView goal,
-                             TranslationContext& translation_context,
+                             TranslationContext<LiftedTag>& translation_context,
                              ::tyr::formalism::planning::MergeDatalogContext& context)
 {
     auto conj_cond_ptr = context.builder.get_builder<::tyr::formalism::datalog::GroundConjunctiveCondition>();
@@ -88,7 +88,7 @@ auto create_delete_free_goal(fp::GroundConjunctiveConditionView goal,
 auto create_cond_effect_rule(fp::ActionView action,
                              fp::ConditionalEffectView cond_eff,
                              fp::AtomView<::tyr::formalism::FluentTag> effect,
-                             TranslationContext& translation_context,
+                             TranslationContext<LiftedTag>& translation_context,
                              ::tyr::formalism::planning::MergeDatalogContext& context)
 {
     auto rule_ptr = context.builder.get_builder<::tyr::formalism::datalog::Rule>();
@@ -113,37 +113,9 @@ auto create_cond_effect_rule(fp::ActionView action,
     return context.destination.get_or_create(rule);
 }
 
-auto create_cond_numeric_effect_rule(fp::ActionView action,
-                                     fp::ConditionalEffectView cond_eff,
-                                     fp::NumericEffectOperatorView<::tyr::formalism::FluentTag> effect,
-                                     TranslationContext& translation_context,
-                                     ::tyr::formalism::planning::MergeDatalogContext& context)
-{
-    auto rule_ptr = context.builder.get_builder<::tyr::formalism::datalog::Rule>();
-    auto& rule = *rule_ptr;
-    rule.clear();
-
-    auto conj_cond_ptr = context.builder.get_builder<::tyr::formalism::datalog::ConjunctiveCondition>();
-    auto& conj_cond = *conj_cond_ptr;
-    conj_cond.clear();
-
-    fill_delete_free_condition(action, cond_eff, translation_context, context, conj_cond);
-
-    canonicalize(conj_cond);
-    const auto new_conj_cond = context.destination.get_or_create(conj_cond).first;
-
-    rule.variables = new_conj_cond.get_variables().get_data();
-    rule.body = new_conj_cond.get_index();
-    rule.head = merge_p2d(effect, context);
-    rule.cost = 1;
-
-    canonicalize(rule);
-    return context.destination.get_or_create(rule);
-}
-
 void translate_action_to_delete_free_rules(fp::ActionView action,
                                            ygg::Data<fd::Program>& program,
-                                           TranslationContext& translation_context,
+                                           TranslationContext<LiftedTag>& translation_context,
                                            fp::MergeDatalogContext& context,
                                            RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
 {
@@ -159,19 +131,11 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
             program.rules.push_back(rule.get_index());
             rule_to_action.emplace(rule, action);
         }
-
-        for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
-        {
-            const auto rule = create_cond_numeric_effect_rule(action, cond_eff, numeric_effect, translation_context, context).first;
-
-            program.rules.push_back(rule.get_index());
-            rule_to_action.emplace(rule, action);
-        }
     }
 }
 
 auto create_program(fp::TaskView task,
-                    TranslationContext& translation_context,
+                    TranslationContext<LiftedTag>& translation_context,
                     RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action,
                     fd::Repository& destination)
 {
@@ -225,7 +189,7 @@ auto create_program(fp::TaskView task,
     return destination.get_or_create(program).first;
 }
 
-auto create_program_context(fp::TaskView task, TranslationContext& translation_context, RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
+auto create_datalog_program(fp::TaskView task, TranslationContext<LiftedTag>& translation_context, RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
     auto repository = factory->create_shared();
@@ -234,7 +198,7 @@ auto create_program_context(fp::TaskView task, TranslationContext& translation_c
     auto strata = analysis::compute_rule_stratification(program);
     auto listeners = analysis::compute_listeners(strata, *repository);
 
-    return datalog::ProgramContext(program, std::move(repository), std::move(factory), std::move(domains), std::move(strata), std::move(listeners));
+    return datalog::Program<LiftedTag>(program, std::move(repository), std::move(factory), std::move(domains), std::move(strata), std::move(listeners));
 }
 
 }
@@ -242,25 +206,27 @@ auto create_program_context(fp::TaskView task, TranslationContext& translation_c
 RPGProgram<LiftedTag>::RPGProgram(fp::TaskView task) :
     m_translation_context(),
     m_rule_to_action(),
-    m_program_context(create_program_context(task, m_translation_context, m_rule_to_action)),
-    m_program_workspace(m_program_context)
+    m_datalog_program(create_datalog_program(task, m_translation_context, m_rule_to_action))
 {
-    // std::cout << m_program_context.get_program() << std::endl;
+    // std::cout << m_datalog_program.get_program() << std::endl;
 }
 
-const TranslationContext& RPGProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
+const TranslationContext<LiftedTag>& RPGProgram<LiftedTag>::get_translation_context() const noexcept { return m_translation_context; }
 
 const RPGProgram<LiftedTag>::RuleToActionMapping& RPGProgram<LiftedTag>::get_rule_to_action_mapping() const noexcept { return m_rule_to_action; }
 
-datalog::ProgramContext& RPGProgram<LiftedTag>::get_program_context() noexcept { return m_program_context; }
+datalog::Program<LiftedTag>& RPGProgram<LiftedTag>::get_datalog_program() noexcept { return m_datalog_program; }
 
-const datalog::ProgramContext& RPGProgram<LiftedTag>::get_program_context() const noexcept { return m_program_context; }
+const datalog::Program<LiftedTag>& RPGProgram<LiftedTag>::get_datalog_program() const noexcept { return m_datalog_program; }
 
-const datalog::ConstProgramWorkspace<LiftedTag>& RPGProgram<LiftedTag>::get_const_program_workspace() const noexcept { return m_program_workspace; }
+const datalog::ConstProgramWorkspace<LiftedTag>& RPGProgram<LiftedTag>::get_const_program_workspace() const noexcept
+{
+    return m_datalog_program.get_const_program_workspace();
+}
 
 ::tyr::formalism::datalog::GroundConjunctiveConditionView RPGProgram<LiftedTag>::get_goal() const noexcept
 {
-    return m_program_context.get_program().get_goal().value();
+    return m_datalog_program.get_program().get_goal().value();
 }
 
 }

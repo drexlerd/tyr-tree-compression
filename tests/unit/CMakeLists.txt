@@ -31,6 +31,7 @@ add_gtest(datalog_cost_policy                           "datalog/cost_policy.cpp
 add_gtest(datalog_ground_queue                         "datalog/ground_queue.cpp")
 
 add_gtest(planning_rpg_costs                         "planning/heuristics/rpg_costs.cpp")
+add_gtest(planning_ground_rpg_heuristics            "planning/heuristics/ground_rpg.cpp")
 add_gtest(planning_lmcut                             "planning/heuristics/lmcut.cpp")
 target_link_libraries(planning_lmcut PRIVATE Boost::json)
 

@@ -15,30 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_PROGRAMS_TRANSLATION_CONTEXT_HPP_
-#define TYR_PLANNING_PROGRAMS_TRANSLATION_CONTEXT_HPP_
+#ifndef TYR_DATALOG_PROGRAMS_PROGRAM_HPP_
+#define TYR_DATALOG_PROGRAMS_PROGRAM_HPP_
 
 #include "tyr/declarations.hpp"
 
-namespace tyr::planning
+namespace tyr::datalog
 {
 
 template<TaskKind Kind>
-struct D2PTranslationContext
-{
-};
-
-template<TaskKind Kind>
-struct P2DTranslationContext
-{
-};
-
-template<TaskKind Kind>
-struct TranslationContext
-{
-    D2PTranslationContext<Kind> d2p;
-    P2DTranslationContext<Kind> p2d;
-};
+class Program;
 
 }
 

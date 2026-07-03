@@ -58,8 +58,8 @@ public:
              std::move(execution_context),
              d::OrAnnotationPolicy<LiftedTag>(),
              d::AndAnnotationPolicy<LiftedTag, d::MaxAggregation>(),
-             d::TerminationPolicy<LiftedTag, d::MaxAggregation>(task->get_rpg_program().get_program_context().get_program().get_predicates<f::FluentTag>(),
-                                                                task->get_rpg_program().get_program_context().get_workspace_repository()))
+             d::TerminationPolicy<LiftedTag, d::MaxAggregation>(task->get_rpg_program().get_datalog_program().get_program().get_predicates<f::FluentTag>(),
+                                                                task->get_rpg_program().get_datalog_program().get_workspace_repository()))
     {
     }
 

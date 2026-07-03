@@ -36,8 +36,8 @@ MaxRPGHeuristic<LiftedTag>::MaxRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Execut
         datalog::OrAnnotationPolicy<LiftedTag>(),
         datalog::AndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>(),
         datalog::TerminationPolicy<LiftedTag, datalog::MaxAggregation>(
-            task->get_rpg_program().get_program_context().get_program().get_predicates<::tyr::formalism::FluentTag>(),
-            task->get_rpg_program().get_program_context().get_workspace_repository()))
+            task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>(),
+            task->get_rpg_program().get_datalog_program().get_workspace_repository()))
 {
 }
 
