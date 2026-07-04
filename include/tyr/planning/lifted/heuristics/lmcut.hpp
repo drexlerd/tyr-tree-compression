@@ -43,6 +43,25 @@ struct LiftedLMCutNumericNode
     auto identifying_members() const noexcept { return std::make_tuple(binding, lower(interval), upper(interval)); }
 };
 
+struct LiftedLMCutRuleEdge
+{
+    ygg::Index<::tyr::formalism::datalog::Rule> rule;
+    ygg::IndexList<::tyr::formalism::Object> objects;
+
+    auto identifying_members() const noexcept { return std::tie(rule, objects); }
+};
+
+struct LiftedLMCutNumericEdge
+{
+    ygg::Index<::tyr::formalism::datalog::Rule> rule;
+    ygg::IndexList<::tyr::formalism::Object> rule_objects;
+    ygg::Index<::tyr::formalism::Function<::tyr::formalism::FluentTag>> function;
+    ygg::IndexList<::tyr::formalism::Object> function_objects;
+    ygg::ClosedInterval<ygg::float_t> interval;
+
+    auto identifying_members() const noexcept { return std::make_tuple(rule, rule_objects, function, function_objects, lower(interval), upper(interval)); }
+};
+
 template<>
 class LMCutHeuristic<LiftedTag> :
     public RPGBase<LiftedTag,
@@ -73,14 +92,22 @@ private:
     using PredicateBinding = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
 
     using NumericNode = LiftedLMCutNumericNode;
+    using RuleEdge = LiftedLMCutRuleEdge;
+    using NumericEdge = LiftedLMCutNumericEdge;
     using Precondition = std::variant<PredicateBinding, NumericNode>;
 
+    RuleEdge make_rule_edge(const datalog::WitnessAnnotation<LiftedTag>& witness) const;
+    NumericEdge make_numeric_edge(const datalog::WitnessAnnotation<LiftedTag>& witness, NumericNode node) const;
     datalog::Cost get_residual_cost(ActionBinding action_binding) const;
+    datalog::Cost get_witness_body_cost(const datalog::WitnessAnnotation<LiftedTag>& witness);
+    datalog::Cost get_witness_edge_residual_cost(const datalog::WitnessAnnotation<LiftedTag>& witness);
     void set_residual_cost(ActionBinding action_binding, datalog::Cost cost);
+    void use_rule_edge_cost(RuleEdge edge, datalog::Cost cost);
+    void use_numeric_edge_cost(NumericEdge edge, datalog::Cost cost);
     void apply_residual_costs();
     datalog::Cost get_numeric_cost(NumericNode node) const noexcept;
     const datalog::WitnessAnnotation<LiftedTag>* get_numeric_witness(NumericNode node) const noexcept;
-    const std::vector<Precondition>& get_witness_max_preconditions(const datalog::WitnessAnnotation<LiftedTag>& witness);
+    const std::vector<Precondition>& get_witness_max_preconditions(const datalog::WitnessAnnotation<LiftedTag>& witness, datalog::Cost edge_cost);
     void release_witness_max_preconditions();
     void mark_goal_zone(PredicateBinding binding);
     void mark_goal_zone(NumericNode node);
@@ -89,8 +116,11 @@ private:
     bool is_before_goal_zone(NumericNode node);
     bool is_before_goal_zone(Precondition precondition);
     void extract_cut();
+    void extract_expanded_cut();
 
     ygg::UnorderedMap<ActionBinding, datalog::Cost> m_residual_costs;
+    ygg::UnorderedMap<RuleEdge, datalog::Cost> m_rule_edge_used_costs;
+    ygg::UnorderedMap<NumericEdge, datalog::Cost> m_numeric_edge_used_costs;
     ygg::UnorderedSet<PredicateBinding> m_goal_zone;
     ygg::UnorderedSet<NumericNode> m_numeric_goal_zone;
     ygg::UnorderedSet<PredicateBinding> m_before_goal_zone;
@@ -98,8 +128,11 @@ private:
     ygg::UnorderedSet<PredicateBinding> m_not_before_goal_zone;
     ygg::UnorderedSet<NumericNode> m_numeric_not_before_goal_zone;
     ygg::UnorderedSet<ActionBinding> m_cut;
+    ygg::UnorderedMap<RuleEdge, datalog::Cost> m_rule_cut;
+    ygg::UnorderedMap<NumericEdge, datalog::Cost> m_numeric_cut;
     std::deque<std::vector<Precondition>> m_max_precondition_buffers;
     size_t m_max_precondition_depth;
+    bool m_use_expanded_edges;
 };
 
 }

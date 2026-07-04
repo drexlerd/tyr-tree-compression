@@ -24,19 +24,43 @@
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <span>
+#include <tuple>
+#include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/core/config.hpp>
 #include <yggdrasil/containers/associative_containers.hpp>
 #include <yggdrasil/containers/vector.hpp>
 
 namespace tyr::datalog
 {
 
+struct LiftedNumericTransitionCostKey
+{
+    ::tyr::formalism::datalog::RuleBindingView rule_binding;
+    ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding;
+    ygg::ClosedInterval<ygg::float_t> interval;
+
+    auto identifying_members() const noexcept { return std::make_tuple(rule_binding, binding, lower(interval), upper(interval)); }
+};
+
 template<>
 class RuleCostPolicy<LiftedTag>
 {
 public:
     Cost get_cost(::tyr::formalism::datalog::RuleView, ::tyr::formalism::datalog::RuleBindingView) const noexcept { return Cost(0); }
+    Cost get_cost(::tyr::formalism::datalog::RuleBindingView,
+                  ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>,
+                  ygg::ClosedInterval<ygg::float_t>) const noexcept
+    {
+        return Cost(0);
+    }
     void clear() noexcept {}
     void set_cost(::tyr::formalism::datalog::RuleBindingView, Cost) noexcept {}
+    void set_cost(::tyr::formalism::datalog::RuleBindingView,
+                  ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>,
+                  ygg::ClosedInterval<ygg::float_t>,
+                  Cost) noexcept
+    {
+    }
 };
 
 template<>
@@ -44,9 +68,10 @@ class RuleCostOverridePolicy<LiftedTag>
 {
 public:
     using CostMap = ygg::UnorderedMap<::tyr::formalism::datalog::RuleBindingView, Cost>;
+    using NumericTransitionCostMap = ygg::UnorderedMap<LiftedNumericTransitionCostKey, Cost>;
 
     RuleCostOverridePolicy() = default;
-    explicit RuleCostOverridePolicy(CostMap costs) : m_costs(std::move(costs)), m_prefix_costs() {}
+    explicit RuleCostOverridePolicy(CostMap costs) : m_costs(std::move(costs)), m_numeric_transition_costs(), m_prefix_costs() {}
 
     Cost get_cost(::tyr::formalism::datalog::RuleView rule, ::tyr::formalism::datalog::RuleBindingView rule_binding) const
     {
@@ -57,13 +82,31 @@ public:
         return Cost(0);
     }
 
+    Cost get_cost(::tyr::formalism::datalog::RuleBindingView rule_binding,
+                  ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
+                  ygg::ClosedInterval<ygg::float_t> interval) const
+    {
+        if (const auto it = find_numeric_transition_override(rule_binding, binding, interval); it != m_numeric_transition_costs.end())
+            return it->second;
+        return Cost(0);
+    }
+
     void clear() noexcept
     {
         m_costs.clear();
+        m_numeric_transition_costs.clear();
         m_prefix_costs.clear();
     }
 
     void set_cost(::tyr::formalism::datalog::RuleBindingView rule_binding, Cost cost) { m_costs.insert_or_assign(rule_binding, cost); }
+
+    void set_cost(::tyr::formalism::datalog::RuleBindingView rule_binding,
+                  ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
+                  ygg::ClosedInterval<ygg::float_t> interval,
+                  Cost cost)
+    {
+        m_numeric_transition_costs.insert_or_assign(LiftedNumericTransitionCostKey { rule_binding, binding, interval }, cost);
+    }
 
     void set_prefix_cost(::tyr::formalism::datalog::RuleView rule, std::span<const ygg::Index<::tyr::formalism::Object>> objects, Cost cost)
     {
@@ -81,6 +124,7 @@ public:
 
     const CostMap& get_costs() const noexcept { return m_costs; }
     CostMap& get_costs() noexcept { return m_costs; }
+    const NumericTransitionCostMap& get_numeric_transition_costs() const noexcept { return m_numeric_transition_costs; }
     size_t get_num_prefix_costs() const noexcept { return m_prefix_costs.size(); }
 
 private:
@@ -106,6 +150,34 @@ private:
         }
 
         return m_costs.end();
+    }
+
+
+    NumericTransitionCostMap::const_iterator find_numeric_transition_override(::tyr::formalism::datalog::RuleBindingView rule_binding,
+                                                                              ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
+                                                                              ygg::ClosedInterval<ygg::float_t> interval) const
+    {
+        const auto key = LiftedNumericTransitionCostKey { rule_binding, binding, interval };
+        if (const auto it = m_numeric_transition_costs.find(key); it != m_numeric_transition_costs.end())
+            return it;
+
+        for (auto it = m_numeric_transition_costs.begin(); it != m_numeric_transition_costs.end(); ++it)
+        {
+            const auto candidate = it->first;
+            if (candidate.interval != interval)
+                continue;
+            if (candidate.rule_binding.get_relation().get_index() != rule_binding.get_relation().get_index())
+                continue;
+            if (candidate.rule_binding.get_objects().get_data() != rule_binding.get_objects().get_data())
+                continue;
+            if (candidate.binding.get_relation().get_index() != binding.get_relation().get_index())
+                continue;
+            if (candidate.binding.get_objects().get_data() != binding.get_objects().get_data())
+                continue;
+            return it;
+        }
+
+        return m_numeric_transition_costs.end();
     }
 
     const Cost* find_prefix_override(::tyr::formalism::datalog::RuleBindingView rule_binding) const
@@ -134,6 +206,7 @@ private:
     }
 
     CostMap m_costs;
+    NumericTransitionCostMap m_numeric_transition_costs;
     std::vector<PrefixCost> m_prefix_costs;
 };
 

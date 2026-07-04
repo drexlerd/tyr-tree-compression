@@ -151,6 +151,13 @@ bool NumericSupportSelector::is_supported(fd::GroundBooleanOperatorView element,
     return evaluate(element, m_fact_sets, *this, selection);
 }
 
+ygg::ClosedInterval<ygg::float_t>
+NumericSupportSelector::evaluate_effect_expression(fd::GroundFunctionExpressionView expression,
+                                                   std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const
+{
+    return evaluate(expression, m_fact_sets, *this, selection);
+}
+
 ygg::ClosedInterval<ygg::float_t> NumericSupportSelector::select_fluent_interval(fd::FunctionBindingView<f::FluentTag> binding,
                                                                                  std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const
 {

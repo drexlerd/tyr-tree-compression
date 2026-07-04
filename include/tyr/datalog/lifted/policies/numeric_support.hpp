@@ -59,6 +59,9 @@ public:
     ygg::ClosedInterval<ygg::float_t> select_fluent_interval(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                                              std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
 
+    ygg::ClosedInterval<ygg::float_t> evaluate_effect_expression(::tyr::formalism::datalog::GroundFunctionExpressionView expression,
+                                                                 std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
+
     template<typename AggregationFunction>
     Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
                              NumericSupportSelectorWorkspace& workspace,

@@ -753,10 +753,13 @@ bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
     if (!empty(current) && subset(interval, current))
         return false;
 
-    if (!pending_numeric.insert(effect_cost, effect.get_fterm(), interval))
+    const auto used_transition_cost = ctx.out().cost_policy().get_cost(rule, effect.get_fterm(), interval);
+    const auto transition_cost = used_transition_cost >= effect_cost ? Cost(0) : effect_cost - used_transition_cost;
+
+    if (!pending_numeric.insert(transition_cost, effect.get_fterm(), interval))
         return false;
 
-    update_numeric_annotation(ctx, rule, effect.get_fterm(), interval, effect_cost, selection);
+    update_numeric_annotation(ctx, rule, effect.get_fterm(), interval, transition_cost, selection);
     return true;
 }
 
@@ -790,6 +793,14 @@ update_fact_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView r
             if (selector.get_constraint_cost(numeric_constraint, selection, typename std::decay_t<decltype(AndAP::agg)> {}) != std::numeric_limits<Cost>::max())
                 append_numeric_supports(numeric_supports, selection);
 
+        auto metric_selection = std::vector<NumericSelectionEntry> {};
+        const auto metric_cost = aggregate_metric_effect_cost(rule, ctx, metric_selection);
+        if (metric_cost != std::numeric_limits<Cost>::max())
+        {
+            metric = add_metric_delta<AndAP>(metric, metric_cost);
+            metric = aggregate_numeric_selection_metric(metric, metric_selection, ctx);
+            append_numeric_supports(numeric_supports, metric_selection);
+        }
     }
     const auto context = GroundAndAnnotationContext { metric, cost, std::move(numeric_supports), rule, out.and_annot() };
 

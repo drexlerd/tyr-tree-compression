@@ -107,10 +107,12 @@ struct RuleUpdateInput
     fd::GrounderContext& solve_context;
     fd::GrounderContext& iteration_context;
 
-    AndAnnotationContext<LiftedTag> make_annotation_context(fd::RuleBindingView rule_binding, Cost metric_effect_cost) const
+    AndAnnotationContext<LiftedTag> make_annotation_context(fd::RuleBindingView rule_binding,
+                                                             Cost metric_effect_cost,
+                                                             std::vector<NumericSupport<LiftedTag>> numeric_supports = {}) const
     {
         return AndAnnotationContext<LiftedTag> { current_cost,
-                                                 {},
+                                                 std::move(numeric_supports),
                                                  rule,
                                                  rule_binding,
                                                  metric_effect_cost,
@@ -175,6 +177,71 @@ Cost metric_effect_delta(fd::NumericEffectView<Op, f::FluentTag> effect, const R
     }
 }
 
+static void append_numeric_supports(const std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection,
+                                    std::vector<NumericSupport<LiftedTag>>& supports)
+{
+    for (const auto& entry : selection)
+        supports.push_back(NumericSupport<LiftedTag> { entry.binding, entry.interval, entry.cost });
+}
+
+template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
+static bool collect_expression_supports(fd::FunctionExpressionView expression,
+                                        const RuleUpdateInput<AndAP, CP>& input,
+                                        std::vector<NumericSupport<LiftedTag>>& supports,
+                                        std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
+{
+    const auto ground_expression = fd::ground(expression, input.iteration_context);
+    const auto value = input.numeric_support_selector.evaluate_effect_expression(ygg::make_view(ground_expression, input.iteration_context.destination), selection);
+    if (empty(value))
+        return false;
+
+    append_numeric_supports(selection, supports);
+    return true;
+}
+
+template<f::NumericEffectOpKind Op, AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
+static bool collect_numeric_head_supports(fd::NumericEffectView<Op, f::FluentTag> effect,
+                                          fd::FunctionBindingView<f::FluentTag> program_head,
+                                          const RuleUpdateInput<AndAP, CP>& input,
+                                          std::vector<NumericSupport<LiftedTag>>& supports)
+{
+    auto selection = std::vector<NumericSupportSelectorWorkspace::SelectionEntry> {};
+
+    if constexpr (!std::is_same_v<Op, f::Assign>)
+    {
+        if (empty(input.numeric_support_selector.select_fluent_interval(program_head, selection)))
+            return false;
+    }
+
+    return collect_expression_supports(effect.get_fexpr(), input, supports, selection);
+}
+
+template<f::NumericEffectOpKind Op, AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
+static bool collect_metric_effect_supports(fd::NumericEffectView<Op, f::FluentTag> effect,
+                                           const RuleUpdateInput<AndAP, CP>& input,
+                                           std::vector<NumericSupport<LiftedTag>>& supports)
+{
+    auto selection = std::vector<NumericSupportSelectorWorkspace::SelectionEntry> {};
+
+    if constexpr (!std::is_same_v<Op, f::Increase> && !std::is_same_v<Op, f::Decrease>)
+    {
+        const auto binding = fd::ground(effect.get_fterm(), input.iteration_context).first.get_row();
+        if (empty(input.numeric_support_selector.select_fluent_interval(binding, selection)))
+            return false;
+    }
+
+    return collect_expression_supports(effect.get_fexpr(), input, supports, selection);
+}
+
+template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
+static bool collect_metric_effect_supports(const RuleUpdateInput<AndAP, CP>& input, std::vector<NumericSupport<LiftedTag>>& supports)
+{
+    for (const auto metric_effect : input.rule.get_metric_effects())
+        if (!ygg::visit([&](auto&& effect) { return collect_metric_effect_supports(effect, input, supports); }, metric_effect.get_variant()))
+            return false;
+    return true;
+}
+
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
 Cost metric_effect_cost(fd::RuleBindingView rule_binding, const RuleUpdateInput<AndAP, CP>& input)
 {
@@ -200,7 +267,10 @@ static void record_propositional_achiever(fd::AtomView<f::FluentTag> head, const
     const auto cost = metric_effect_cost(rule_binding, input);
     if (cost == std::numeric_limits<Cost>::max())
         return;
-    const auto context = input.make_annotation_context(rule_binding, cost);
+    auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
+    if (!collect_metric_effect_supports(input, numeric_supports))
+        return;
+    const auto context = input.make_annotation_context(rule_binding, cost, std::move(numeric_supports));
 
     input.and_ap.record_achiever(program_head, context);
 }
@@ -223,7 +293,10 @@ static void insert_propositional_update(fd::AtomView<f::FluentTag> head,
     const auto cost = metric_effect_cost(rule_binding, input);
     if (cost == std::numeric_limits<Cost>::max())
         return;
-    const auto context = input.make_annotation_context(rule_binding, cost);
+    auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
+    if (!collect_metric_effect_supports(input, numeric_supports))
+        return;
+    const auto context = input.make_annotation_context(rule_binding, cost, std::move(numeric_supports));
 
     input.and_ap.record_achiever(program_head, context);
 
@@ -249,10 +322,15 @@ static void insert_numeric_update(fd::NumericEffectOperatorView<f::FluentTag> he
             const auto program_head = fd::ground(effect.get_fterm(), input.iteration_context).first.get_row();
             const auto worker_head = fd::ground(effect.get_fterm(), input.solve_context).first;
             const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
-            const auto cost = metric_effect_cost(rule_binding, input);
-            if (cost == std::numeric_limits<Cost>::max())
+            const auto metric_cost = metric_effect_cost(rule_binding, input);
+            if (metric_cost == std::numeric_limits<Cost>::max())
                 return;
-            const auto context = input.make_annotation_context(rule_binding, cost);
+            const auto used_transition_cost = input.cost_policy.get_cost(rule_binding, program_head, interval);
+            const auto cost = used_transition_cost >= metric_cost ? Cost(0) : metric_cost - used_transition_cost;
+            auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
+            if (!collect_metric_effect_supports(input, numeric_supports) || !collect_numeric_head_supports(effect, program_head, input, numeric_supports))
+                return;
+            const auto context = input.make_annotation_context(rule_binding, cost, std::move(numeric_supports));
 
             input.and_ap.update_annotation(program_head, worker_head.get_row(), interval, context, numeric_and_annot);
 
