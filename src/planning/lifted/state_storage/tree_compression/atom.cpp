@@ -18,7 +18,7 @@
 #include "tyr/planning/lifted/state_storage/tree_compression/atom.hpp"
 
 #include "tyr/planning/lifted/state_storage/tree_compression/context.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 
 namespace tyr::planning
 {

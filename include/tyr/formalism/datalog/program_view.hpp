@@ -18,17 +18,19 @@
 #ifndef TYR_FORMALISM_DATALOG_PROGRAM_VIEW_HPP_
 #define TYR_FORMALISM_DATALOG_PROGRAM_VIEW_HPP_
 
-#include <yggdrasil/containers/optional.hpp>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
 #include "tyr/formalism/datalog/ground_conjunctive_condition_index.hpp"
 #include "tyr/formalism/datalog/ground_function_term_value_index.hpp"
+#include "tyr/formalism/datalog/metric_index.hpp"
 #include "tyr/formalism/datalog/program_index.hpp"
 #include "tyr/formalism/datalog/rule_view.hpp"
 #include "tyr/formalism/function_index.hpp"
 #include "tyr/formalism/predicate_index.hpp"
+
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace ygg
 {
@@ -69,10 +71,8 @@ public:
     {
         return ygg::make_view(get_data().template get_fterm_values<T>(), *m_context);
     }
-    auto get_goal() const noexcept
-    {
-        return ygg::make_view(get_data().goal, *m_context);
-    }
+    auto get_goal() const noexcept { return ygg::make_view(get_data().goal, *m_context); }
+    auto get_metric() const noexcept { return ygg::make_view(get_data().metric, *m_context); }
     auto get_rules() const noexcept { return ygg::make_view(get_data().rules, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }

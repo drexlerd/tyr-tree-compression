@@ -28,8 +28,7 @@ AddRPGHeuristic<GroundTag>::AddRPGHeuristic(TaskPtr<GroundTag> task, ygg::Execut
             datalog::TerminationPolicy<GroundTag, datalog::SumAggregation>>(std::move(task),
                                                                             std::move(execution_context),
                                                                             datalog::OrAnnotationPolicy<GroundTag>(),
-                                                                            datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>(),
-                                                                            datalog::TerminationPolicy<GroundTag, datalog::SumAggregation>())
+                                                                            datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>())
 {
 }
 

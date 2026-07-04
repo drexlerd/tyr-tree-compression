@@ -18,7 +18,7 @@
 #include "tyr/planning/lifted/state_storage/hash_set/fact.hpp"
 
 #include "tyr/planning/lifted/state_storage/hash_set/context.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 
 namespace tyr::planning
 {

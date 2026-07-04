@@ -15,8 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
 #ifndef TYR_FORMALISM_DATALOG_CANONICALIZATION_HPP_
 #define TYR_FORMALISM_DATALOG_CANONICALIZATION_HPP_
 
@@ -156,22 +154,34 @@ inline bool is_canonical(const ygg::Data<GroundConjunctiveCondition>& data)
     return is_canonical(data.static_literals) && is_canonical(data.fluent_literals) && is_canonical(data.numeric_constraints);
 }
 
+inline bool is_canonical(const ygg::Data<ConjunctiveEffect>& data) { return is_canonical(data.numeric_effects); }
+
+inline bool is_canonical(const ygg::Data<GroundConjunctiveEffect>& data) { return is_canonical(data.numeric_effects); }
+
+inline bool is_canonical(const ygg::Data<ConditionalEffect>& data) { return true; }
+
+inline bool is_canonical(const ygg::Data<GroundConditionalEffect>& data) { return true; }
+
 inline bool is_canonical(const ygg::Data<Rule>& data) { return true; }
 
 inline bool is_canonical(const ygg::Data<GroundRule>& data) { return true; }
+
+inline bool is_canonical(const ygg::Data<Metric>& data) { return true; }
 
 inline bool is_canonical(const ygg::Data<Program>& data)
 {
     return is_canonical(data.static_predicates) && is_canonical(data.fluent_predicates) && is_canonical(data.static_functions)
            && is_canonical(data.fluent_functions) && is_canonical(data.objects) && is_canonical(data.static_atoms) && is_canonical(data.fluent_atoms)
-           && is_canonical(data.static_fterm_values) && is_canonical(data.fluent_fterm_values) && is_canonical(data.goal) && is_canonical(data.rules);
+           && is_canonical(data.static_fterm_values) && is_canonical(data.fluent_fterm_values) && is_canonical(data.goal) && is_canonical(data.metric)
+           && is_canonical(data.rules);
 }
 
 inline bool is_canonical(const ygg::Data<GroundProgram>& data)
 {
     return is_canonical(data.static_predicates) && is_canonical(data.fluent_predicates) && is_canonical(data.static_functions)
            && is_canonical(data.fluent_functions) && is_canonical(data.objects) && is_canonical(data.static_atoms) && is_canonical(data.fluent_atoms)
-           && is_canonical(data.static_fterm_values) && is_canonical(data.fluent_fterm_values) && is_canonical(data.goal) && is_canonical(data.ground_rules);
+           && is_canonical(data.static_fterm_values) && is_canonical(data.fluent_fterm_values) && is_canonical(data.goal) && is_canonical(data.metric)
+           && is_canonical(data.ground_rules);
 }
 
 /**
@@ -312,12 +322,25 @@ inline void canonicalize(ygg::Data<GroundConjunctiveCondition>& data)
     canonicalize(data.numeric_constraints);
 }
 
+inline void canonicalize(ygg::Data<ConjunctiveEffect>& data) { canonicalize(data.numeric_effects); }
+
+inline void canonicalize(ygg::Data<GroundConjunctiveEffect>& data) { canonicalize(data.numeric_effects); }
+
+inline void canonicalize(ygg::Data<ConditionalEffect>& data) {}
+
+inline void canonicalize(ygg::Data<GroundConditionalEffect>& data) {}
+
 inline void canonicalize(ygg::Data<Rule>& data)
 {
     // Trivially canonical
 }
 
 inline void canonicalize(ygg::Data<GroundRule>& data)
+{
+    // Trivially canonical
+}
+
+inline void canonicalize(ygg::Data<Metric>& data)
 {
     // Trivially canonical
 }
@@ -334,6 +357,7 @@ inline void canonicalize(ygg::Data<Program>& data)
     canonicalize(data.static_fterm_values);
     canonicalize(data.fluent_fterm_values);
     canonicalize(data.goal);
+    canonicalize(data.metric);
     canonicalize(data.rules);
 }
 
@@ -349,6 +373,7 @@ inline void canonicalize(ygg::Data<GroundProgram>& data)
     canonicalize(data.static_fterm_values);
     canonicalize(data.fluent_fterm_values);
     canonicalize(data.goal);
+    canonicalize(data.metric);
     canonicalize(data.ground_rules);
 }
 

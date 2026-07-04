@@ -26,6 +26,8 @@
 #include "tyr/planning/ground/match_tree/declarations.hpp"
 #include "tyr/planning/ground/match_tree/match_tree.hpp"
 
+#include <vector>
+
 namespace tyr::planning
 {
 template<>
@@ -44,6 +46,7 @@ public:
 private:
     ygg::uint_t m_index;
     TaskPtr<GroundTag> m_task;
+    std::vector<match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAxiom>> m_axiom_match_tree_strata;
 
     ygg::IndexList<::tyr::formalism::planning::GroundAxiom> m_applicable_axioms;
 };

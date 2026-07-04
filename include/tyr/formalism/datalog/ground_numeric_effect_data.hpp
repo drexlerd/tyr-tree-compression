@@ -18,12 +18,13 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_NUMERIC_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_NUMERIC_EFFECT_DATA_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_function_expression_data.hpp"
 #include "tyr/formalism/datalog/ground_function_term_index.hpp"
 #include "tyr/formalism/datalog/ground_numeric_effect_index.hpp"
+
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 
 namespace ygg
 {

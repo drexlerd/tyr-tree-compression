@@ -516,6 +516,98 @@ struct formatter<tyr::formalism::datalog::ConjunctiveConditionView, char>
 };
 
 template<>
+struct formatter<ygg::Data<tyr::formalism::datalog::ConjunctiveEffect>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const ygg::Data<tyr::formalism::datalog::ConjunctiveEffect>& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "ConjunctiveEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.index);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "numeric effects = ", value.numeric_effects);
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<tyr::formalism::datalog::ConjunctiveEffectView, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::formalism::datalog::ConjunctiveEffectView& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "ConjunctiveEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.get_index());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "numeric effects = ", value.get_numeric_effects());
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<ygg::Data<tyr::formalism::datalog::ConditionalEffect>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const ygg::Data<tyr::formalism::datalog::ConditionalEffect>& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "ConditionalEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.index);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "variables = ", value.variables);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "condition = ", value.condition);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "effect = ", value.effect);
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<tyr::formalism::datalog::ConditionalEffectView, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::formalism::datalog::ConditionalEffectView& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "ConditionalEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.get_index());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "variables = ", value.get_variables());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "condition = ", value.get_condition());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "effect = ", value.get_effect());
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
 struct formatter<ygg::Data<tyr::formalism::datalog::Rule>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
@@ -536,6 +628,8 @@ struct formatter<ygg::Data<tyr::formalism::datalog::Rule>, char>
             fmt::print(os, "{}{}\n", "body = ", value.body);
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "cost = ", value.cost);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "conditional costs = ", value.conditional_costs);
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
@@ -563,6 +657,8 @@ struct formatter<tyr::formalism::datalog::RuleView, char>
             fmt::print(os, "{}{}\n", "body = ", value.get_body());
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "cost = ", value.get_cost());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "conditional costs = ", value.get_conditional_costs());
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
@@ -620,6 +716,94 @@ struct formatter<tyr::formalism::datalog::GroundConjunctiveConditionView, char>
 };
 
 template<>
+struct formatter<ygg::Data<tyr::formalism::datalog::GroundConjunctiveEffect>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const ygg::Data<tyr::formalism::datalog::GroundConjunctiveEffect>& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "GroundConjunctiveEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.index);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "numeric effects = ", value.numeric_effects);
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<tyr::formalism::datalog::GroundConjunctiveEffectView, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::formalism::datalog::GroundConjunctiveEffectView& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "GroundConjunctiveEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.get_index());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "numeric effects = ", value.get_numeric_effects());
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<ygg::Data<tyr::formalism::datalog::GroundConditionalEffect>, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const ygg::Data<tyr::formalism::datalog::GroundConditionalEffect>& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "GroundConditionalEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.index);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "condition = ", value.condition);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "effect = ", value.effect);
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
+struct formatter<tyr::formalism::datalog::GroundConditionalEffectView, char>
+{
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    template<typename FormatContext>
+    auto format(const tyr::formalism::datalog::GroundConditionalEffectView& value, FormatContext& ctx) const
+    {
+        auto os = std::stringstream {};
+        os << "GroundConditionalEffect(\n";
+        {
+            ygg::IndentScope scope(os);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "index = ", value.get_index());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "condition = ", value.get_condition());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "effect = ", value.get_effect());
+        }
+        os << ygg::print_indent << ")";
+        return fmt::format_to(ctx.out(), "{}", os.str());
+    }
+};
+
+template<>
 struct formatter<ygg::Data<tyr::formalism::datalog::GroundRule>, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
@@ -636,6 +820,8 @@ struct formatter<ygg::Data<tyr::formalism::datalog::GroundRule>, char>
             fmt::print(os, "{}{}\n", "head = ", value.head);
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.body);
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "conditional costs = ", value.conditional_costs);
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
@@ -659,6 +845,8 @@ struct formatter<tyr::formalism::datalog::GroundRuleView, char>
             fmt::print(os, "{}{}\n", "head = ", value.get_head());
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.get_body());
+            os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "conditional costs = ", value.get_conditional_costs());
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());

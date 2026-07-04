@@ -18,7 +18,7 @@
 #include "tyr/planning/ground/state_builder.hpp"
 #include "tyr/planning/ground/state_repository.hpp"
 #include "tyr/planning/ground/state_view.hpp"
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 
 #include <cassert>
 #include <limits>

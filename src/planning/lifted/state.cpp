@@ -18,7 +18,7 @@
 #include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/lifted/state_repository.hpp"
 #include "tyr/planning/lifted/state_view.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 
 #include <cassert>
 #include <limits>

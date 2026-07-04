@@ -25,7 +25,10 @@
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/planning/action_executor.hpp"
 #include "tyr/planning/declarations.hpp"
+#include "tyr/planning/ground/match_tree/match_tree.hpp"
 #include "tyr/planning/successor_generator.hpp"
+
+#include <yggdrasil/containers/associative_containers.hpp>
 
 namespace tyr::planning
 {
@@ -55,6 +58,8 @@ public:
 private:
     ygg::uint_t m_index;
     TaskPtr<GroundTag> m_task;
+    match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAction> m_action_match_tree;
+    ygg::UnorderedMap<::tyr::formalism::planning::ActionBindingView, ::tyr::formalism::planning::GroundActionView> m_action_binding_to_ground_action;
 
     ygg::IndexList<::tyr::formalism::planning::GroundAction> m_applicable_actions;
 

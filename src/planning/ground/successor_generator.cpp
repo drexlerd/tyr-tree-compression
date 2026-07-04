@@ -27,9 +27,11 @@
 #include "tyr/planning/ground/state_builder.hpp"
 #include "tyr/planning/ground/state_repository.hpp"
 #include "tyr/planning/ground/state_view.hpp"
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 #include "tyr/planning/state_index.hpp"
 #include "tyr/planning/task_utils.hpp"
+
+#include <cassert>
 
 namespace fp = tyr::formalism::planning;
 
@@ -42,11 +44,15 @@ SuccessorGenerator<GroundTag>::SuccessorGenerator(ygg::uint_t index,
                                                   StateRepositoryPtr<GroundTag> state_repository) :
     m_index(index),
     m_task(std::move(task)),
+    m_action_match_tree(match_tree::MatchTree<fp::GroundAction>::create(m_task->get_task().get_ground_actions().get_data(), m_task->get_task().get_context())),
+    m_action_binding_to_ground_action(),
     m_applicable_actions(),
     m_state_repository(std::move(state_repository)),
     m_executor()
 {
     static_cast<void>(execution_context);
+    for (const auto action : m_task->get_task().get_ground_actions())
+        m_action_binding_to_ground_action.emplace(action.get_row(), action);
 }
 
 Node<GroundTag> SuccessorGenerator<GroundTag>::get_initial_node()
@@ -77,7 +83,7 @@ void SuccessorGenerator<GroundTag>::get_labeled_successor_nodes(const Node<Groun
 
     const auto state_context = StateContext<GroundTag>(*m_task, state.get_unpacked_state(), node.get_metric());
 
-    m_task->get_action_match_tree()->generate(state_context, m_applicable_actions);
+    m_action_match_tree->generate(state_context, m_applicable_actions);
 
     for (const auto ground_action : ygg::make_view(m_applicable_actions, *m_task->get_repository()))
     {
@@ -94,7 +100,12 @@ Node<GroundTag> SuccessorGenerator<GroundTag>::get_successor_node(const Node<Gro
     return m_executor.apply_action(state_context, action, *m_state_repository);
 }
 
-fp::GroundActionView SuccessorGenerator<GroundTag>::get_ground_action(fp::ActionBindingView binding) const { return m_task->get_ground_action(binding); }
+fp::GroundActionView SuccessorGenerator<GroundTag>::get_ground_action(fp::ActionBindingView binding) const
+{
+    const auto it = m_action_binding_to_ground_action.find(binding);
+    assert(it != m_action_binding_to_ground_action.end() && "Ground action binding not found.");
+    return it->second;
+}
 
 Node<GroundTag> SuccessorGenerator<GroundTag>::get_node(ygg::Index<State<GroundTag>> state_index)
 {

@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_LIFTED_HPP_
-#define TYR_PLANNING_LIFTED_HPP_
+#ifndef TYR_PLANNING_LIFTED_TASK_HPP_
+#define TYR_PLANNING_LIFTED_TASK_HPP_
 
 #include "tyr/formalism/planning/declarations.hpp"  // for OverlayRepos...
 #include "tyr/formalism/planning/fdr_context.hpp"
@@ -24,9 +24,6 @@
 #include "tyr/formalism/planning/planning_task.hpp"
 #include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/lifted/programs/action.hpp"
-#include "tyr/planning/lifted/programs/axiom.hpp"
-#include "tyr/planning/lifted/programs/rpg.hpp"
 #include "tyr/planning/lifted/task_grounder_decl.hpp"
 #include "tyr/planning/task.hpp"
 
@@ -65,16 +62,6 @@ public:
     const auto& get_repository() const noexcept { return m_task.get_repository(); }
     bool has_axioms() const noexcept { return !get_task().get_axioms().empty() || !get_domain().get_domain().get_axioms().empty(); }
 
-    auto& get_axiom_program() noexcept { return m_axiom_program; }
-    const auto& get_axiom_program() const noexcept { return m_axiom_program; }
-    auto& get_action_program() noexcept { return m_action_program; }
-    const auto& get_action_program() const noexcept { return m_action_program; }
-    auto& get_rpg_program() noexcept { return m_rpg_program; }
-    const auto& get_rpg_program() const noexcept { return m_rpg_program; }
-
-    auto& get_grounder_cache() noexcept { return m_grounder_cache; }
-    const auto& get_grounder_cache() const noexcept { return m_grounder_cache; }
-
     const auto& get_static_atoms_bitset() const noexcept { return m_static_atoms_bitset; }
     const auto& get_static_numeric_variables() const noexcept { return m_static_numeric_variables; }
     bool test(ygg::Index<::tyr::formalism::planning::GroundAtom<::tyr::formalism::StaticTag>> index) const
@@ -91,14 +78,6 @@ private:
 
     boost::dynamic_bitset<> m_static_atoms_bitset;
     std::vector<ygg::float_t> m_static_numeric_variables;
-
-    AxiomEvaluatorProgram<LiftedTag> m_axiom_program;
-
-    ApplicableActionProgram<LiftedTag> m_action_program;
-
-    RPGProgram<LiftedTag> m_rpg_program;
-
-    ::tyr::formalism::planning::GrounderCache m_grounder_cache;
 };
 
 }

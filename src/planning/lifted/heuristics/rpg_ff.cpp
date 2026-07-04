@@ -38,18 +38,15 @@ FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Executio
             FFRPGHeuristic<LiftedTag>,
             datalog::OrAnnotationPolicy<LiftedTag>,
             datalog::AndAnnotationPolicy<LiftedTag, datalog::SumAggregation>,
-            datalog::TerminationPolicy<LiftedTag, datalog::SumAggregation>>(
-        task,
-        std::move(execution_context),
-        datalog::OrAnnotationPolicy<LiftedTag>(),
-        datalog::AndAnnotationPolicy<LiftedTag, datalog::SumAggregation>(),
-        datalog::TerminationPolicy<LiftedTag, datalog::SumAggregation>(
-            task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>(),
-            task->get_rpg_program().get_datalog_program().get_workspace_repository())),
-    m_markings(task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>().size()),
-    m_function_markings(task->get_rpg_program().get_datalog_program().get_program().get_functions<::tyr::formalism::FluentTag>().size()),
+            datalog::TerminationPolicy<LiftedTag, datalog::SumAggregation>>(task,
+                                                                            std::move(execution_context),
+                                                                            datalog::OrAnnotationPolicy<LiftedTag>(),
+                                                                            datalog::AndAnnotationPolicy<LiftedTag, datalog::SumAggregation>()),
+    m_markings(m_rpg_program.get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>().size()),
+    m_function_markings(m_rpg_program.get_datalog_program().get_program().get_functions<::tyr::formalism::FluentTag>().size()),
     m_binding(),
     m_iter_workspace(),
+    m_grounder_cache(),
     m_effect_families(),
     m_numeric_support_selector_workspace(),
     m_relaxed_plan(),
@@ -201,10 +198,10 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
                                                                            const StateContext<LiftedTag>& state_context,
                                                                            ::tyr::formalism::planning::GrounderContext& grounder_context)
 {
-    const auto& mapping = this->m_task->get_rpg_program().get_rule_to_action_mapping();
+    const auto& mapping = this->m_rpg_program.get_rule_to_action_mapping();
 
     const auto rule_row = witness.get_rule_row();
-    const auto rule = ygg::make_view(rule_row.get_relation().get_index(), this->m_task->get_rpg_program().get_datalog_program().get_program_repository());
+    const auto rule = ygg::make_view(rule_row.get_relation().get_index(), this->m_rpg_program.get_datalog_program().get_program_repository());
     const auto row = rule_row.get_objects();
 
     if (const auto it = mapping.find(rule); it != mapping.end())
@@ -217,7 +214,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
 
         const auto ground_action = ::tyr::formalism::planning::ground(action,
                                                                       grounder_context,
-                                                                      m_task->get_grounder_cache(),
+                                                                      m_grounder_cache,
                                                                       m_task->get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
                                                                       m_iter_workspace,
                                                                       *m_task->get_fdr_context())
@@ -235,7 +232,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
 
     auto datalog_grounder_context =
         ::tyr::formalism::datalog::GrounderContext { m_workspace.datalog_builder, m_workspace.workspace_repository, m_workspace.binding };
-    const auto& const_rule_workspace = *m_task->get_rpg_program().get_const_program_workspace().rules[ygg::uint_t(rule.get_index())];
+    const auto& const_rule_workspace = *m_rpg_program.get_const_program_workspace().rules[ygg::uint_t(rule.get_index())];
 
     const auto witness_condition = const_rule_workspace.get_witness_rule().get_body();
 

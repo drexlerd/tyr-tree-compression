@@ -21,7 +21,9 @@
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/ground_action_index.hpp"
 #include "tyr/planning/declarations.hpp"
+#include "tyr/planning/ground/node.hpp"
 #include "tyr/planning/ground/state_view.hpp"
+#include "tyr/planning/lifted/node.hpp"
 #include "tyr/planning/lifted/state_view.hpp"
 
 #include <yggdrasil/containers/associative_containers.hpp>
@@ -39,6 +41,10 @@ public:
     virtual void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) = 0;
 
     virtual ygg::float_t evaluate(const StateView<Kind>& state) = 0;
+
+    virtual ygg::float_t evaluate(const Node<Kind>& node) { return evaluate(node.get_state()); }
+
+    virtual void set_cost_mode([[maybe_unused]] CostMode mode) {}
 
     virtual const ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>>& get_preferred_actions()
     {

@@ -57,11 +57,13 @@ public:
     ygg::float_t extract_cost_and_set_preferred_actions_impl(const StateView<GroundTag>& state);
 
 private:
-    using Action = ::tyr::formalism::planning::GroundActionView;
+    using Rule = ::tyr::formalism::datalog::GroundRuleView;
+    using CostKey = ::tyr::formalism::planning::GroundConditionalEffectView;
     using Atom = ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>;
 
-    datalog::Cost get_residual_cost(Action action) const;
-    void set_residual_cost(Action action, datalog::Cost cost);
+    datalog::Cost get_residual_cost(Rule rule) const;
+    void set_residual_cost(Rule rule, datalog::Cost cost);
+    ygg::float_t evaluate_impl(const StateView<GroundTag>& state);
     void apply_residual_costs();
     const std::vector<Atom>& get_witness_max_preconditions(const datalog::GroundWitnessAnnotation& witness);
     void release_witness_max_preconditions();
@@ -69,11 +71,11 @@ private:
     bool is_before_goal_zone(Atom atom);
     void extract_cut();
 
-    ygg::UnorderedMap<Action, datalog::Cost> m_residual_costs;
+    ygg::UnorderedMap<CostKey, datalog::Cost> m_residual_costs;
     ygg::UnorderedSet<Atom> m_goal_zone;
     ygg::UnorderedSet<Atom> m_before_goal_zone;
     ygg::UnorderedSet<Atom> m_not_before_goal_zone;
-    ygg::UnorderedSet<Action> m_cut;
+    ygg::UnorderedSet<CostKey> m_cut;
     std::deque<std::vector<Atom>> m_max_precondition_buffers;
     size_t m_max_precondition_depth;
 };

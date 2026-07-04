@@ -17,7 +17,7 @@
 
 #include "tyr/planning/ground/state_storage/tree_compression/context.hpp"
 
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 
 namespace tyr::planning
 {

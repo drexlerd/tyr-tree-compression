@@ -124,11 +124,31 @@ struct GroundConjunctiveCondition
 {
 };
 
+struct ConjunctiveEffect
+{
+};
+
+struct GroundConjunctiveEffect
+{
+};
+
+struct ConditionalEffect
+{
+};
+
+struct GroundConditionalEffect
+{
+};
+
 struct Rule
 {
 };
 
 struct GroundRule
+{
+};
+
+struct Metric
 {
 };
 
@@ -146,10 +166,10 @@ using AtomTypes = ygg::MapTypeListT<Atom, StaticFluentTags>;
 using GroundAtomTypes = ygg::MapTypeListT<GroundAtom, StaticFluentTags>;
 using LiteralTypes = ygg::MapTypeListT<Literal, StaticFluentTags>;
 using GroundLiteralTypes = ygg::MapTypeListT<GroundLiteral, StaticFluentTags>;
-using FunctionTypes = ygg::MapTypeListT<Function, StaticFluentTags>;
-using FunctionTermTypes = ygg::MapTypeListT<FunctionTerm, StaticFluentTags>;
-using GroundFunctionTermTypes = ygg::MapTypeListT<GroundFunctionTerm, StaticFluentTags>;
-using GroundFunctionTermValueTypes = ygg::MapTypeListT<GroundFunctionTermValue, StaticFluentTags>;
+using FunctionTypes = ygg::MapTypeListT<Function, StaticFluentAuxiliaryTags>;
+using FunctionTermTypes = ygg::MapTypeListT<FunctionTerm, StaticFluentAuxiliaryTags>;
+using GroundFunctionTermTypes = ygg::MapTypeListT<GroundFunctionTerm, StaticFluentAuxiliaryTags>;
+using GroundFunctionTermValueTypes = ygg::MapTypeListT<GroundFunctionTermValue, StaticFluentAuxiliaryTags>;
 template<typename Op>
 using FluentNumericEffectType = NumericEffect<Op, FluentTag>;
 template<typename Op>
@@ -192,7 +212,17 @@ using GroundBooleanExpressionTypes = ygg::MapTypeListT<GroundBinaryOperatorType,
 using ExpressionTypes =
     ygg::ConcatTypeListsT<LiftedArithmeticExpressionTypes, LiftedBooleanExpressionTypes, GroundArithmeticExpressionTypes, GroundBooleanExpressionTypes>;
 using EffectTypes = ygg::ConcatTypeListsT<NumericEffectTypes, GroundNumericEffectTypes>;
-using CompoundTypes = ygg::TypeList<ConjunctiveCondition, Rule, GroundConjunctiveCondition, GroundRule, Program, GroundProgram>;
+using CompoundTypes = ygg::TypeList<ConjunctiveCondition,
+                                    ConjunctiveEffect,
+                                    ConditionalEffect,
+                                    Rule,
+                                    GroundConjunctiveCondition,
+                                    GroundConjunctiveEffect,
+                                    GroundConditionalEffect,
+                                    GroundRule,
+                                    Metric,
+                                    Program,
+                                    GroundProgram>;
 
 using SymbolRepositoryTypes = ygg::ConcatTypeListsT<CoreTypes,
                                                     PredicateTypes,

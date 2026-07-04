@@ -24,8 +24,8 @@
 #include "tyr/planning/algorithms/siw/statistics.hpp"
 #include "tyr/planning/algorithms/statistics.hpp"
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/ground/task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 #include "tyr/planning/plan.hpp"
 #include "tyr/planning/state_view.hpp"
 

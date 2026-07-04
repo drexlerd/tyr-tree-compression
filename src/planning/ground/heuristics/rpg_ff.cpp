@@ -33,8 +33,7 @@ FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::Executio
             datalog::TerminationPolicy<GroundTag, datalog::SumAggregation>>(task,
                                                                             std::move(execution_context),
                                                                             datalog::OrAnnotationPolicy<GroundTag>(),
-                                                                            datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>(),
-                                                                            datalog::TerminationPolicy<GroundTag, datalog::SumAggregation>()),
+                                                                            datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>()),
     m_markings(1),
     m_function_markings(),
     m_numeric_support_selector_workspace(),
@@ -44,7 +43,7 @@ FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::Executio
     m_preferred_action_views(),
     m_preferred_action_views_dirty(true)
 {
-    m_markings.front().resize(task->get_rpg_program().get_datalog_program().get_program().get_atoms<f::FluentTag>().size());
+    m_markings.front().resize(m_rpg_program.get_datalog_program().get_program().get_atoms<f::FluentTag>().size());
 }
 
 FFRPGHeuristicPtr<GroundTag> FFRPGHeuristic<GroundTag>::create(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context)
@@ -161,7 +160,7 @@ void FFRPGHeuristic<GroundTag>::extract_relaxed_plan_and_preferred_actions(const
                                                                            const StateContext<GroundTag>& state_context)
 {
     const auto rule = witness.get_rule();
-    const auto& mapping = this->m_task->get_rpg_program().get_rule_to_action_mapping();
+    const auto& mapping = this->m_rpg_program.get_rule_to_action_mapping();
     if (const auto it = mapping.find(rule); it != mapping.end())
     {
         const auto action = it->second;

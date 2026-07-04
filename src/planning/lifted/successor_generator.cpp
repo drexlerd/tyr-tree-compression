@@ -32,7 +32,7 @@
 #include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/lifted/state_repository.hpp"
 #include "tyr/planning/lifted/state_view.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 #include "tyr/planning/successor_generator.hpp"
 #include "tyr/planning/task_utils.hpp"
 
@@ -83,8 +83,10 @@ SuccessorGenerator<LiftedTag>::SuccessorGenerator(ygg::uint_t index,
     m_index(index),
     m_task(std::move(task)),
     m_execution_context(std::move(execution_context)),
-    m_workspace(m_task->get_action_program().get_datalog_program(),
-                m_task->get_action_program().get_const_program_workspace(),
+    m_action_program(m_task->get_task()),
+    m_grounder_cache(),
+    m_workspace(m_action_program.get_datalog_program(),
+                m_action_program.get_const_program_workspace(),
                 d::NoOrAnnotationPolicy<LiftedTag>(),
                 d::NoAndAnnotationPolicy<LiftedTag>(),
                 d::NoTerminationPolicy<LiftedTag>()),
@@ -120,13 +122,13 @@ void SuccessorGenerator<LiftedTag>::get_labeled_successor_nodes(const Node<Lifte
     const auto state_context = StateContext<LiftedTag>(*m_task, node.get_state().get_unpacked_state(), node.get_metric());
 
     for_each_action_binding(m_workspace,
-                            m_task->get_action_program(),
+                            m_action_program,
                             m_workspace.binding,
                             [&](const auto& action, const auto&)
                             {
                                 const auto ground_action = fp::ground(action,
                                                                       grounder_context,
-                                                                      m_task->get_grounder_cache(),
+                                                                      m_grounder_cache,
                                                                       m_task->get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
                                                                       m_cartesian_workspace,
                                                                       *m_task->get_fdr_context())
@@ -154,7 +156,7 @@ fp::GroundActionView SuccessorGenerator<LiftedTag>::get_ground_action(fp::Action
     const auto action = binding.get_relation();
     return fp::ground(action,
                       grounder_context,
-                      m_task->get_grounder_cache(),
+                      m_grounder_cache,
                       m_task->get_formalism_task().get_variable_domains().action_domains.at(action.get_index()),
                       m_cartesian_workspace,
                       *m_task->get_fdr_context())
@@ -190,7 +192,7 @@ void SuccessorGenerator<LiftedTag>::get_applicable_action_bindings(const Node<Li
     auto grounder_context = fp::GrounderContext { m_workspace.planning_builder, *m_task->get_repository(), m_workspace.binding };
 
     for_each_action_binding(m_workspace,
-                            m_task->get_action_program(),
+                            m_action_program,
                             m_workspace.binding,
                             [&](const auto& action, const auto& binding)
                             {
@@ -228,7 +230,7 @@ void SuccessorGenerator<LiftedTag>::for_each_applicable_action_binding_impl(
 
     const auto state_context = StateContext<LiftedTag>(*m_task, node.get_state().get_unpacked_state(), node.get_metric());
     auto grounder_context = fp::GrounderContext { m_workspace.planning_builder, *m_task->get_repository(), scratch_binding.objects };
-    const auto& mapping = m_task->get_action_program().get_predicate_to_action_mapping();
+    const auto& mapping = m_action_program.get_predicate_to_action_mapping();
 
     for (const auto& set : m_workspace.facts.fact_sets.predicate.get_sets())
     {
@@ -281,7 +283,7 @@ void SuccessorGenerator<LiftedTag>::compute_action_facts(const Node<LiftedTag>& 
 {
     const auto state = node.get_state();
     auto merge_context = fp::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
-    const auto& program = m_task->get_action_program();
+    const auto& program = m_action_program;
 
     insert_extended_state(state.get_unpacked_state(),
                           *m_task->get_repository(),

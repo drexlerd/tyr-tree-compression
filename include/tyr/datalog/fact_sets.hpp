@@ -172,7 +172,7 @@ struct FactSets
     FactSets(const TaggedFactSets<::tyr::formalism::StaticTag>& static_sets, const TaggedFactSets<::tyr::formalism::FluentTag>& fluent_sets) noexcept;
 
     template<::tyr::formalism::FactKind T>
-    const TaggedFactSets<T>& get() const noexcept;
+    const TaggedFactSets<T>& get() const;
 };
 
 }

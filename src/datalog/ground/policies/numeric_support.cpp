@@ -55,6 +55,14 @@ ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundFunctionTermView<f::FluentT
     return selector.select_fluent_interval(term, selection);
 }
 
+ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundFunctionTermView<f::AuxiliaryTag>,
+                                           const FactsWorkspace<GroundTag>&,
+                                           const GroundNumericSupportSelector&,
+                                           std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>&)
+{
+    return ygg::ClosedInterval<ygg::float_t>();
+}
+
 ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundFunctionExpressionView expression,
                                            const FactsWorkspace<GroundTag>& facts,
                                            const GroundNumericSupportSelector& selector,

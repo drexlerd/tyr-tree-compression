@@ -18,9 +18,9 @@
 #include "tyr/planning/applicability.hpp"
 
 #include "tyr/planning/ground/state_builder.hpp"
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 #include "tyr/planning/lifted/state_builder.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 
 #ifndef TYR_HEADER_INSTANTIATION
 

@@ -15,21 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_PLANNING_GROUND_HPP_
-#define TYR_PLANNING_GROUND_HPP_
+#ifndef TYR_PLANNING_GROUND_TASK_HPP_
+#define TYR_PLANNING_GROUND_TASK_HPP_
 
 #include "tyr/formalism/planning/declarations.hpp"  // for OverlayRepos...
 #include "tyr/formalism/planning/fdr_context.hpp"
 #include "tyr/formalism/planning/planning_fdr_task.hpp"
 #include "tyr/formalism/planning/views.hpp"  // for ygg::View
 #include "tyr/planning/declarations.hpp"
-#include "tyr/planning/ground/match_tree/match_tree.hpp"  // for Matc...
-#include "tyr/planning/ground/programs/rpg.hpp"
 #include "tyr/planning/task.hpp"
 
 #include <boost/dynamic_bitset.hpp>                 // for dynamic_bitset
 #include <limits>                                   // for numeric_limits
-#include <optional>                                 // for optional
 #include <stddef.h>                                 // for size_t
 #include <vector>                                   // for vector
 #include <yggdrasil/containers/dynamic_bitset.hpp>  // for test
@@ -68,26 +65,11 @@ public:
     const auto& get_repository() const noexcept { return m_task.get_repository(); }
     bool has_axioms() const noexcept { return !get_task().get_ground_axioms().empty(); }
 
-    const auto& get_action_match_tree() const noexcept { return m_action_match_tree; }
-    std::optional<::tyr::formalism::planning::GroundActionView> find_ground_action(::tyr::formalism::planning::ActionBindingView binding) const;
-    ::tyr::formalism::planning::GroundActionView get_ground_action(::tyr::formalism::planning::ActionBindingView binding) const;
-    const auto& get_axiom_match_tree_strata() const noexcept { return m_axiom_match_tree_strata; }
-
-    auto& get_rpg_program() noexcept { return m_rpg_program; }
-    const auto& get_rpg_program() const noexcept { return m_rpg_program; }
-
 private:
     ::tyr::formalism::planning::PlanningFDRTask m_task;
 
     boost::dynamic_bitset<> m_static_atoms_bitset;
     std::vector<ygg::float_t> m_static_numeric_variables;
-
-    match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAction> m_action_match_tree;
-    ygg::UnorderedMap<::tyr::formalism::planning::ActionBindingView, ::tyr::formalism::planning::GroundActionView> m_action_binding_to_ground_action;
-
-    std::vector<match_tree::MatchTreePtr<::tyr::formalism::planning::GroundAxiom>> m_axiom_match_tree_strata;
-
-    RPGProgram<GroundTag> m_rpg_program;
 };
 
 }

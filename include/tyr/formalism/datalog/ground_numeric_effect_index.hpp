@@ -18,9 +18,10 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_NUMERIC_EFFECT_INDEX_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_NUMERIC_EFFECT_INDEX_HPP_
 
-#include <yggdrasil/ids/index_mixins.hpp>
-#include <yggdrasil/core/types.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
+
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/ids/index_mixins.hpp>
 
 namespace ygg
 {

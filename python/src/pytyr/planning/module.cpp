@@ -61,10 +61,10 @@ void bind_module_definitions(nb::module_& m)
         .export_values();
 
     /**
-     * ActionCostMode
+     * CostMode
      */
 
-    nb::enum_<ActionCostMode>(m, "ActionCostMode").value("UNIT", ActionCostMode::UNIT).value("GENERAL", ActionCostMode::GENERAL).export_values();
+    nb::enum_<CostMode>(m, "CostMode").value("UNIT", CostMode::UNIT).value("GENERAL", CostMode::GENERAL).export_values();
 
     /**
      * Statistics

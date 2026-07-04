@@ -15,14 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 
-#include "tyr/formalism/planning/fdr_context.hpp"        // for Genera...
-#include "tyr/formalism/planning/repository.hpp"         // for Reposi...
-#include "tyr/formalism/planning/views.hpp"              // for ygg::Index
-#include "tyr/planning/ground/axiom_stratification.hpp"  // for compute...
+#include "tyr/formalism/planning/fdr_context.hpp"  // for Genera...
+#include "tyr/formalism/planning/repository.hpp"   // for Reposi...
+#include "tyr/formalism/planning/views.hpp"        // for ygg::Index
 
-#include <cassert>                                  // for assert
 #include <tuple>                                    // for operat...
 #include <utility>                                  // for move
 #include <yggdrasil/containers/dynamic_bitset.hpp>  // for set
@@ -35,18 +33,8 @@ namespace fp = tyr::formalism::planning;
 namespace tyr::planning
 {
 
-Task<GroundTag>::Task(::tyr::formalism::planning::PlanningFDRTask task) :
-    m_task(std::move(task)),
-    m_static_atoms_bitset(),
-    m_static_numeric_variables(),
-    m_action_match_tree(match_tree::MatchTree<fp::GroundAction>::create(get_task().get_ground_actions().get_data(), get_task().get_context())),
-    m_action_binding_to_ground_action(),
-    m_axiom_match_tree_strata(),
-    m_rpg_program(get_task())
+Task<GroundTag>::Task(::tyr::formalism::planning::PlanningFDRTask task) : m_task(std::move(task)), m_static_atoms_bitset(), m_static_numeric_variables()
 {
-    for (const auto action : get_task().get_ground_actions())
-        m_action_binding_to_ground_action.emplace(action.get_row(), action);
-
     for (const auto atom : get_task().template get_atoms<f::StaticTag>())
         ygg::set(ygg::uint_t(atom.get_index()), true, m_static_atoms_bitset);
 
@@ -55,11 +43,6 @@ Task<GroundTag>::Task(::tyr::formalism::planning::PlanningFDRTask task) :
                  fterm_value.get_value(),
                  m_static_numeric_variables,
                  std::numeric_limits<ygg::float_t>::quiet_NaN());
-
-    auto axiom_strata = compute_ground_axiom_stratification(get_task());
-
-    for (const auto& stratum : axiom_strata.data)
-        m_axiom_match_tree_strata.emplace_back(match_tree::MatchTree<fp::GroundAxiom>::create(stratum, get_task().get_context()));
 }
 
 template<f::FactKind T>
@@ -75,18 +58,4 @@ size_t Task<GroundTag>::get_num_actions() const noexcept { return get_task().get
 
 size_t Task<GroundTag>::get_num_axioms() const noexcept { return get_task().get_ground_axioms().size(); }
 
-std::optional<fp::GroundActionView> Task<GroundTag>::find_ground_action(fp::ActionBindingView binding) const
-{
-    const auto it = m_action_binding_to_ground_action.find(binding);
-    if (it == m_action_binding_to_ground_action.end())
-        return std::nullopt;
-    return it->second;
-}
-
-fp::GroundActionView Task<GroundTag>::get_ground_action(fp::ActionBindingView binding) const
-{
-    const auto action = find_ground_action(binding);
-    assert(action.has_value() && "Ground action binding not found.");
-    return action.value();
-}
 }

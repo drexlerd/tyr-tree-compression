@@ -38,6 +38,7 @@ struct Builder;
 namespace tyr::planning
 {
 
+using ::tyr::CostMode;
 using ::tyr::GroundTag;
 using ::tyr::LiftedTag;
 using ::tyr::TaskKind;

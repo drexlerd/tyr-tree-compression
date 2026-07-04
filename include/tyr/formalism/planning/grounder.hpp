@@ -19,8 +19,6 @@
 #define TYR_FORMALISM_PLANNING_GROUNDER_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include <yggdrasil/core/itertools.hpp>
-#include <yggdrasil/containers/tuple.hpp>
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/canonicalization.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
@@ -30,6 +28,9 @@
 #include "tyr/formalism/planning/merge.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
+
+#include <yggdrasil/containers/tuple.hpp>
+#include <yggdrasil/core/itertools.hpp>
 
 namespace tyr::formalism::planning
 {
@@ -88,14 +89,14 @@ std::pair<ActionBindingView, bool> ground(ActionView action, GrounderContext& co
 
 std::pair<GroundActionView, bool> ground(ActionView element,
                                          GrounderContext& context,
-                                         GrounderCache& cache,
+                                         GrounderCacheEntry<Action>& cache,
                                          const analysis::ActionDomain& action_domains,
                                          ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>>& iter_workspace,
                                          FDRContext& fdr);
 
 std::pair<AxiomBindingView, bool> ground(AxiomView axiom, GrounderContext& context);
 
-std::pair<GroundAxiomView, bool> ground(AxiomView element, GrounderContext& context, GrounderCache& cache, FDRContext& fdr);
+std::pair<GroundAxiomView, bool> ground(AxiomView element, GrounderContext& context, GrounderCacheEntry<Axiom>& cache, FDRContext& fdr);
 
 /**
  * try_ground
@@ -421,14 +422,14 @@ inline std::pair<ActionBindingView, bool> ground(ActionView action, GrounderCont
 
 inline std::pair<GroundActionView, bool> ground(ActionView element,
                                                 GrounderContext& context,
-                                                GrounderCache& cache,
+                                                GrounderCacheEntry<Action>& cache,
                                                 const analysis::ActionDomain& action_domains,
                                                 ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>>& iter_workspace,
                                                 FDRContext& fdr)
 {
     const auto binding = ground(element, context).first.get_index();
 
-    auto& action_cache = cache.get_cache<Action>();
+    auto& action_cache = cache.container;
     if (auto it = action_cache.find(binding); it != action_cache.end())
         return { ygg::make_view(it->second, context.destination), false };
 
@@ -449,15 +450,15 @@ inline std::pair<GroundActionView, bool> ground(ActionView element,
         assert(std::distance(parameter_domains.begin(), parameter_domains.end()) == static_cast<int>(element.get_arity() + cond_effect.get_arity()));
 
         ygg::itertools::cartesian_set::for_each_element(parameter_domains.begin() + element.get_arity(),
-                                                   parameter_domains.end(),
-                                                   iter_workspace,
-                                                   [&](auto&& binding_cond)
-                                                   {
-                                                       context.binding.resize(binding_size);
-                                                       context.binding.insert(context.binding.end(), binding_cond.begin(), binding_cond.end());
+                                                        parameter_domains.end(),
+                                                        iter_workspace,
+                                                        [&](auto&& binding_cond)
+                                                        {
+                                                            context.binding.resize(binding_size);
+                                                            context.binding.insert(context.binding.end(), binding_cond.begin(), binding_cond.end());
 
-                                                       action.effects.push_back(ground(cond_effect, context, fdr).first.get_index());
-                                                   });
+                                                            action.effects.push_back(ground(cond_effect, context, fdr).first.get_index());
+                                                        });
     }
 
     context.binding.resize(binding_size);
@@ -485,11 +486,11 @@ inline std::pair<AxiomBindingView, bool> ground(AxiomView axiom, GrounderContext
     return context.destination.get_or_create(binding);
 }
 
-inline std::pair<GroundAxiomView, bool> ground(AxiomView element, GrounderContext& context, GrounderCache& cache, FDRContext& fdr)
+inline std::pair<GroundAxiomView, bool> ground(AxiomView element, GrounderContext& context, GrounderCacheEntry<Axiom>& cache, FDRContext& fdr)
 {
     const auto binding = ground(element, context).first.get_index();
 
-    auto& axiom_cache = cache.get_cache<Axiom>();
+    auto& axiom_cache = cache.container;
     if (auto it = axiom_cache.find(binding); it != axiom_cache.end())
         return { ygg::make_view(it->second, context.destination), false };
 

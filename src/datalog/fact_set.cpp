@@ -21,6 +21,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <limits>
+#include <stdexcept>
 #include <yggdrasil/containers/dynamic_bitset.hpp>
 
 namespace f = tyr::formalism;
@@ -348,6 +349,7 @@ const std::vector<ygg::ClosedInterval<ygg::float_t>>& FunctionFactSet<T>::get_va
 
 template class FunctionFactSet<f::StaticTag>;
 template class FunctionFactSet<f::FluentTag>;
+template class FunctionFactSet<f::AuxiliaryTag>;
 
 /**
  * FunctionFactSets
@@ -453,6 +455,7 @@ const std::vector<FunctionFactSet<T>>& FunctionFactSets<T>::get_sets() const noe
 
 template class FunctionFactSets<f::StaticTag>;
 template class FunctionFactSets<f::FluentTag>;
+template class FunctionFactSets<f::AuxiliaryTag>;
 
 /**
  * TaggedFactSets
@@ -506,17 +509,19 @@ FactSets::FactSets(const TaggedFactSets<f::StaticTag>& static_sets, const Tagged
 }
 
 template<f::FactKind T>
-const TaggedFactSets<T>& FactSets::get() const noexcept
+const TaggedFactSets<T>& FactSets::get() const
 {
     if constexpr (std::is_same_v<T, f::StaticTag>)
         return static_sets;
     else if constexpr (std::is_same_v<T, f::FluentTag>)
         return fluent_sets;
     else
-        static_assert(ygg::dependent_false<T>::value, "Missing case");
+        throw std::logic_error("FactSets stores only static and fluent fact sets.");
 }
 
-template const TaggedFactSets<f::StaticTag>& FactSets::get<f::StaticTag>() const noexcept;
-template const TaggedFactSets<f::FluentTag>& FactSets::get<f::FluentTag>() const noexcept;
+template const TaggedFactSets<f::StaticTag>& FactSets::get<f::StaticTag>() const;
+template const TaggedFactSets<f::FluentTag>& FactSets::get<f::FluentTag>() const;
+template const TaggedFactSets<f::DerivedTag>& FactSets::get<f::DerivedTag>() const;
+template const TaggedFactSets<f::AuxiliaryTag>& FactSets::get<f::AuxiliaryTag>() const;
 
 }

@@ -84,7 +84,7 @@ TEST_P(BrfsTest, PlanLengthMatchesBlindAstar)
 
     const auto brfs_result = p::brfs::find_solution(*brfs_context.task, *brfs_context.successor_generator);
     auto astar_options = p::astar_eager::Options<p::GroundTag>();
-    astar_options.action_cost_mode = p::ActionCostMode::UNIT;
+    astar_options.action_cost_mode = p::CostMode::UNIT;
     const auto astar_result = p::astar_eager::find_solution(*astar_context.task, *astar_context.successor_generator, *heuristic, astar_options);
 
     ASSERT_EQ(brfs_result.status, astar_result.status);

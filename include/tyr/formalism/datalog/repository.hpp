@@ -114,6 +114,14 @@ using ConjunctiveConditionView = ygg::View<ygg::Index<ConjunctiveCondition>, Rep
 
 using ConjunctiveConditionListView = ygg::View<ygg::IndexList<ConjunctiveCondition>, Repository>;
 
+using ConjunctiveEffectView = ygg::View<ygg::Index<ConjunctiveEffect>, Repository>;
+
+using ConjunctiveEffectListView = ygg::View<ygg::IndexList<ConjunctiveEffect>, Repository>;
+
+using ConditionalEffectView = ygg::View<ygg::Index<ConditionalEffect>, Repository>;
+
+using ConditionalEffectListView = ygg::View<ygg::IndexList<ConditionalEffect>, Repository>;
+
 using FunctionExpressionView = ygg::View<ygg::Data<FunctionExpression>, Repository>;
 
 using FunctionExpressionListView = ygg::View<ygg::DataList<FunctionExpression>, Repository>;
@@ -139,6 +147,14 @@ using GroundAtomListView = ygg::View<ygg::IndexList<GroundAtom<T>>, Repository>;
 using GroundConjunctiveConditionView = ygg::View<ygg::Index<GroundConjunctiveCondition>, Repository>;
 
 using GroundConjunctiveConditionListView = ygg::View<ygg::IndexList<GroundConjunctiveCondition>, Repository>;
+
+using GroundConjunctiveEffectView = ygg::View<ygg::Index<GroundConjunctiveEffect>, Repository>;
+
+using GroundConjunctiveEffectListView = ygg::View<ygg::IndexList<GroundConjunctiveEffect>, Repository>;
+
+using GroundConditionalEffectView = ygg::View<ygg::Index<GroundConditionalEffect>, Repository>;
+
+using GroundConditionalEffectListView = ygg::View<ygg::IndexList<GroundConditionalEffect>, Repository>;
 
 using GroundFunctionExpressionView = ygg::View<ygg::Data<GroundFunctionExpression>, Repository>;
 
@@ -175,6 +191,10 @@ using GroundRuleListView = ygg::View<ygg::IndexList<GroundRule>, Repository>;
 using GroundProgramView = ygg::View<ygg::Index<ProgramTag<::tyr::GroundTag>>, Repository>;
 
 using GroundProgramListView = ygg::View<ygg::IndexList<ProgramTag<::tyr::GroundTag>>, Repository>;
+
+using MetricView = ygg::View<ygg::Index<Metric>, Repository>;
+
+using MetricListView = ygg::View<ygg::IndexList<Metric>, Repository>;
 
 template<::tyr::formalism::FactKind T>
 using LiteralView = ygg::View<ygg::Index<Literal<T>>, Repository>;

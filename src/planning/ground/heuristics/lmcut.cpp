@@ -31,8 +31,7 @@ LMCutHeuristic<GroundTag>::LMCutHeuristic(TaskPtr<GroundTag> task, ygg::Executio
     Base(std::move(task),
          std::move(execution_context),
          datalog::OrAnnotationPolicy<GroundTag>(),
-         datalog::AchieverAndAnnotationPolicy<GroundTag, datalog::MaxAggregation>(),
-         datalog::TerminationPolicy<GroundTag, datalog::MaxAggregation>()),
+         datalog::AchieverAndAnnotationPolicy<GroundTag, datalog::MaxAggregation>()),
     m_residual_costs(),
     m_goal_zone(),
     m_before_goal_zone(),
@@ -48,19 +47,24 @@ LMCutHeuristicPtr<GroundTag> LMCutHeuristic<GroundTag>::create(TaskPtr<GroundTag
     return std::make_shared<LMCutHeuristic<GroundTag>>(std::move(task), std::move(execution_context));
 }
 
-ygg::float_t LMCutHeuristic<GroundTag>::evaluate(const StateView<GroundTag>& state)
+ygg::float_t LMCutHeuristic<GroundTag>::evaluate(const StateView<GroundTag>& state) { return evaluate_impl(state); }
+
+ygg::float_t LMCutHeuristic<GroundTag>::evaluate_impl(const StateView<GroundTag>& state)
 {
-    const auto& program = m_task->get_rpg_program().get_datalog_program().get_program();
+    const auto& program = m_rpg_program.get_datalog_program().get_program();
     if (!program.get_functions<::tyr::formalism::FluentTag>().empty())
-        return Base::evaluate(state);
+        return Base::evaluate_impl(state, true);
 
     auto value = datalog::Cost(0);
     m_residual_costs.clear();
+    initialize_rule_costs(state);
+    for (const auto& [rule, cond_eff] : m_rpg_program.get_rule_to_conditional_effect_mapping())
+        m_residual_costs.emplace(cond_eff, m_workspace.cost_policy.get_cost(rule));
 
     while (true)
     {
         apply_residual_costs();
-        const auto hmax = Base::evaluate(state);
+        const auto hmax = Base::evaluate_impl(state, false);
         if (hmax == std::numeric_limits<ygg::float_t>::infinity())
             return hmax;
 
@@ -73,33 +77,43 @@ ygg::float_t LMCutHeuristic<GroundTag>::evaluate(const StateView<GroundTag>& sta
             return ygg::float_t(value + hmax_cost);
 
         auto cut_cost = std::numeric_limits<datalog::Cost>::max();
-        for (const auto action : m_cut)
-            cut_cost = std::min(cut_cost, get_residual_cost(action));
+        for (const auto key : m_cut)
+            cut_cost = std::min(cut_cost, m_residual_costs.at(key));
 
         assert(cut_cost > 0 && cut_cost != std::numeric_limits<datalog::Cost>::max());
 
         value += cut_cost;
-        for (const auto action : m_cut)
-            set_residual_cost(action, get_residual_cost(action) - cut_cost);
+        for (const auto key : m_cut)
+            m_residual_costs.insert_or_assign(key, m_residual_costs.at(key) - cut_cost);
     }
 }
 
 ygg::float_t LMCutHeuristic<GroundTag>::extract_cost_and_set_preferred_actions_impl(const StateView<GroundTag>&) { return get_goal_cost(); }
 
-datalog::Cost LMCutHeuristic<GroundTag>::get_residual_cost(Action action) const
+datalog::Cost LMCutHeuristic<GroundTag>::get_residual_cost(Rule rule) const
 {
-    const auto it = m_residual_costs.find(action);
-    return it == m_residual_costs.end() ? datalog::Cost(1) : it->second;
+    const auto& mapping = m_rpg_program.get_rule_to_conditional_effect_mapping();
+    const auto mapping_it = mapping.find(rule);
+    if (mapping_it == mapping.end())
+        return rule.get_rule().get_cost();
+
+    const auto cost_it = m_residual_costs.find(mapping_it->second);
+    return cost_it == m_residual_costs.end() ? rule.get_rule().get_cost() : cost_it->second;
 }
 
-void LMCutHeuristic<GroundTag>::set_residual_cost(Action action, datalog::Cost cost) { m_residual_costs.insert_or_assign(action, cost); }
+void LMCutHeuristic<GroundTag>::set_residual_cost(Rule rule, datalog::Cost cost)
+{
+    const auto& mapping = m_rpg_program.get_rule_to_conditional_effect_mapping();
+    if (const auto it = mapping.find(rule); it != mapping.end())
+        m_residual_costs.insert_or_assign(it->second, cost);
+}
 
 void LMCutHeuristic<GroundTag>::apply_residual_costs()
 {
     m_workspace.clear_costs();
-    const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
-    for (const auto& [rule, action] : mapping)
-        m_workspace.cost_policy.set_cost(rule, get_residual_cost(action));
+    const auto& mapping = m_rpg_program.get_rule_to_conditional_effect_mapping();
+    for (const auto& [rule, cond_eff] : mapping)
+        m_workspace.cost_policy.set_cost(rule, m_residual_costs.at(cond_eff));
 }
 
 const std::vector<LMCutHeuristic<GroundTag>::Atom>& LMCutHeuristic<GroundTag>::get_witness_max_preconditions(const datalog::GroundWitnessAnnotation& witness)
@@ -109,11 +123,10 @@ const std::vector<LMCutHeuristic<GroundTag>::Atom>& LMCutHeuristic<GroundTag>::g
 
     auto& result = m_max_precondition_buffers[m_max_precondition_depth++];
     result.clear();
-
     const auto rule = witness.get_rule();
-    const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
+    const auto& mapping = m_rpg_program.get_rule_to_conditional_effect_mapping();
     const auto it = mapping.find(rule);
-    const auto rule_cost = it == mapping.end() ? datalog::Cost(0) : get_residual_cost(it->second);
+    const auto rule_cost = it == mapping.end() ? datalog::Cost(0) : get_residual_cost(rule);
     if (witness.get_cost() < rule_cost)
         return result;
 
@@ -143,9 +156,9 @@ void LMCutHeuristic<GroundTag>::mark_goal_zone(Atom atom)
             if (witness.get_cost() != atom_cost)
                 continue;
 
-            const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
+            const auto& mapping = m_rpg_program.get_rule_to_action_mapping();
             const auto action_it = mapping.find(witness.get_rule());
-            if (action_it != mapping.end() && get_residual_cost(action_it->second) > 0)
+            if (action_it != mapping.end() && get_residual_cost(witness.get_rule()) > 0)
                 continue;
 
             const auto& preconditions = get_witness_max_preconditions(witness);
@@ -217,7 +230,7 @@ void LMCutHeuristic<GroundTag>::extract_cut()
         }
     }
 
-    const auto& mapping = m_task->get_rpg_program().get_rule_to_action_mapping();
+    const auto& mapping = m_rpg_program.get_rule_to_conditional_effect_mapping();
     for (const auto atom : m_goal_zone)
     {
         const auto atom_cost = get_atom_cost(atom);
@@ -228,8 +241,8 @@ void LMCutHeuristic<GroundTag>::extract_cut()
                 if (witness.get_cost() != atom_cost)
                     continue;
 
-                const auto action_it = mapping.find(witness.get_rule());
-                if (action_it == mapping.end() || get_residual_cost(action_it->second) == 0)
+                const auto it = mapping.find(witness.get_rule());
+                if (it == mapping.end() || get_residual_cost(witness.get_rule()) == 0)
                     continue;
 
                 const auto& preconditions = get_witness_max_preconditions(witness);
@@ -237,7 +250,7 @@ void LMCutHeuristic<GroundTag>::extract_cut()
                     preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
                 release_witness_max_preconditions();
                 if (crosses_cut)
-                    m_cut.insert(action_it->second);
+                    m_cut.insert(it->second);
             }
         }
     }

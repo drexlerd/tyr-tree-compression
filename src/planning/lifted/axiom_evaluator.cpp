@@ -27,8 +27,8 @@
 #include "tyr/formalism/planning/repository.hpp"      // for Repository
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/lifted/state_builder.hpp"  // for UnpackedState
-#include "tyr/planning/lifted_task.hpp"           // for LiftedTag
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"           // for LiftedTag
+#include "tyr/planning/lifted/task.hpp"
 #include "tyr/planning/task_utils.hpp"  // for insert_fact_s...
 
 #include <cista/containers/hash_storage.h>  // for operator!=
@@ -78,8 +78,9 @@ AxiomEvaluator<LiftedTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<LiftedTag> 
     m_index(index),
     m_task(std::move(task)),
     m_execution_context(std::move(execution_context)),
-    m_workspace(m_task->get_axiom_program().get_datalog_program(),
-                m_task->get_axiom_program().get_const_program_workspace(),
+    m_axiom_program(m_task->get_task()),
+    m_workspace(m_axiom_program.get_datalog_program(),
+                m_axiom_program.get_const_program_workspace(),
                 d::NoOrAnnotationPolicy<LiftedTag>(),
                 d::NoAndAnnotationPolicy<LiftedTag>(),
                 d::NoTerminationPolicy<LiftedTag>())
@@ -89,7 +90,7 @@ AxiomEvaluator<LiftedTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<LiftedTag> 
 void AxiomEvaluator<LiftedTag>::compute_extended_state(UnpackedState<LiftedTag>& unpacked_state)
 {
     auto merge_datalog_context = fp::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
-    const auto& program = m_task->get_axiom_program();
+    const auto& program = m_axiom_program;
 
     insert_unextended_state(unpacked_state,
                             *m_task->get_repository(),

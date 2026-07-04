@@ -18,12 +18,13 @@
 #ifndef TYR_FORMALISM_DATALOG_EXPRESSION_PROPERTIES_HPP_
 #define TYR_FORMALISM_DATALOG_EXPRESSION_PROPERTIES_HPP_
 
-#include <yggdrasil/semantics/comparators.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
+
+#include <yggdrasil/semantics/comparators.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::formalism::datalog
 {
@@ -78,6 +79,18 @@ void collect_fterms(LiftedBooleanOperatorView element, ygg::UnorderedSet<Functio
 
 template<FactKind T>
 void collect_fterms(GroundBooleanOperatorView element, ygg::UnorderedSet<GroundFunctionTermView<T>>& result);
+
+template<FactKind T1, NumericEffectOpKind Op, FactKind T2>
+void collect_fterms(NumericEffectView<Op, T1> element, ygg::UnorderedSet<FunctionTermView<T2>>& result);
+
+template<FactKind T1, NumericEffectOpKind Op, FactKind T2>
+void collect_fterms(GroundNumericEffectView<Op, T1> element, ygg::UnorderedSet<GroundFunctionTermView<T2>>& result);
+
+template<FactKind T1, FactKind T2>
+void collect_fterms(NumericEffectOperatorView<T1> element, ygg::UnorderedSet<FunctionTermView<T2>>& result);
+
+template<FactKind T1, FactKind T2>
+void collect_fterms(GroundNumericEffectOperatorView<T1> element, ygg::UnorderedSet<GroundFunctionTermView<T2>>& result);
 
 /**
  * Implementations
@@ -179,6 +192,32 @@ inline void collect_fterms(LiftedBooleanOperatorView element, ygg::UnorderedSet<
 
 template<FactKind T>
 inline void collect_fterms(GroundBooleanOperatorView element, ygg::UnorderedSet<GroundFunctionTermView<T>>& result)
+{
+    visit([&](auto&& arg) { collect_fterms(arg, result); }, element.get_variant());
+}
+
+template<FactKind T1, NumericEffectOpKind Op, FactKind T2>
+inline void collect_fterms(NumericEffectView<Op, T1> element, ygg::UnorderedSet<FunctionTermView<T2>>& result)
+{
+    collect_fterms(element.get_fterm(), result);
+    collect_fterms(element.get_fexpr(), result);
+}
+
+template<FactKind T1, NumericEffectOpKind Op, FactKind T2>
+inline void collect_fterms(GroundNumericEffectView<Op, T1> element, ygg::UnorderedSet<GroundFunctionTermView<T2>>& result)
+{
+    collect_fterms(element.get_fterm(), result);
+    collect_fterms(element.get_fexpr(), result);
+}
+
+template<FactKind T1, FactKind T2>
+inline void collect_fterms(NumericEffectOperatorView<T1> element, ygg::UnorderedSet<FunctionTermView<T2>>& result)
+{
+    visit([&](auto&& arg) { collect_fterms(arg, result); }, element.get_variant());
+}
+
+template<FactKind T1, FactKind T2>
+inline void collect_fterms(GroundNumericEffectOperatorView<T1> element, ygg::UnorderedSet<GroundFunctionTermView<T2>>& result)
 {
     visit([&](auto&& arg) { collect_fterms(arg, result); }, element.get_variant());
 }

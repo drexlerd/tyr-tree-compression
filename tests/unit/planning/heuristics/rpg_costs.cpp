@@ -54,12 +54,7 @@ public:
                             d::RuleCostOverridePolicy<LiftedTag>>;
 
     TestCostAdaptedMaxRPG(p::TaskPtr<p::LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
-        Base(task,
-             std::move(execution_context),
-             d::OrAnnotationPolicy<LiftedTag>(),
-             d::AndAnnotationPolicy<LiftedTag, d::MaxAggregation>(),
-             d::TerminationPolicy<LiftedTag, d::MaxAggregation>(task->get_rpg_program().get_datalog_program().get_program().get_predicates<f::FluentTag>(),
-                                                                task->get_rpg_program().get_datalog_program().get_workspace_repository()))
+        Base(task, std::move(execution_context), d::OrAnnotationPolicy<LiftedTag>(), d::AndAnnotationPolicy<LiftedTag, d::MaxAggregation>())
     {
     }
 
@@ -69,9 +64,9 @@ public:
     ygg::float_t extract_cost_and_set_preferred_actions_impl(const p::StateView<p::LiftedTag>&) { return 0; }
 };
 
-size_t count_rules_for_action(const p::Task<p::LiftedTag>& task, fp::ActionView action)
+size_t count_rules_for_action(const TestCostAdaptedMaxRPG& heuristic, fp::ActionView action)
 {
-    return std::ranges::count_if(task.get_rpg_program().get_rule_to_action_mapping(),
+    return std::ranges::count_if(heuristic.get_rpg_program().get_rule_to_action_mapping(),
                                  [&](const auto& entry) { return entry.second.get_index() == action.get_index(); });
 }
 
@@ -87,10 +82,12 @@ TEST(TyrPlanningRPGCostsTest, ActionBindingCostOverridesAllRPGRuleBindingsForAct
     const auto initial_node = successor_generator->get_initial_node();
     const auto action_bindings = successor_generator->get_applicable_action_bindings(initial_node);
 
+    auto heuristic = TestCostAdaptedMaxRPG(task, execution_context);
+
     auto selected_binding = std::optional<fp::ActionBindingView>();
     for (const auto binding : action_bindings)
     {
-        if (count_rules_for_action(*task, binding.get_relation()) > 1)
+        if (count_rules_for_action(heuristic, binding.get_relation()) > 1)
         {
             selected_binding = binding;
             break;
@@ -98,10 +95,9 @@ TEST(TyrPlanningRPGCostsTest, ActionBindingCostOverridesAllRPGRuleBindingsForAct
     }
     ASSERT_TRUE(selected_binding.has_value());
 
-    auto heuristic = TestCostAdaptedMaxRPG(task, execution_context);
     heuristic.set_action_binding_cost(*selected_binding, 5);
 
-    const auto expected_num_rules = count_rules_for_action(*task, selected_binding->get_relation());
+    const auto expected_num_rules = count_rules_for_action(heuristic, selected_binding->get_relation());
     EXPECT_TRUE(heuristic.get_workspace().cost_policy.get_costs().empty());
     EXPECT_EQ(heuristic.get_workspace().cost_policy.get_num_prefix_costs(), expected_num_rules);
 }

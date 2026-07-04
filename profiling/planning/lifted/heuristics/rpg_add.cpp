@@ -23,7 +23,7 @@
 #include "tyr/planning/factory.hpp"
 #include "tyr/planning/lifted/node.hpp"
 #include "tyr/planning/lifted/successor_generator.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 
 #include <benchmark/benchmark.h>
 #include <filesystem>

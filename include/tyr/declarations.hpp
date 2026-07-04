@@ -34,6 +34,12 @@ struct LiftedTag
 template<typename Tag>
 concept TaskKind = std::same_as<Tag, GroundTag> || std::same_as<Tag, LiftedTag>;
 
+enum class CostMode
+{
+    UNIT,
+    GENERAL
+};
+
 }
 
 #endif

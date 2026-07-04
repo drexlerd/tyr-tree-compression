@@ -195,6 +195,11 @@ ygg::ClosedInterval<ygg::float_t> evaluate(::tyr::formalism::datalog::GroundFunc
     return fact_sets.template get<T>().function[element];
 }
 
+inline ygg::ClosedInterval<ygg::float_t> evaluate(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::AuxiliaryTag>, const FactSets&)
+{
+    throw std::logic_error("Auxiliary function terms are not stored in datalog fact sets.");
+}
+
 inline ygg::ClosedInterval<ygg::float_t> evaluate(::tyr::formalism::datalog::GroundFunctionExpressionView element, const FactSets& fact_sets)
 {
     return visit([&](auto&& arg) { return evaluate(arg, fact_sets); }, element.get_variant());

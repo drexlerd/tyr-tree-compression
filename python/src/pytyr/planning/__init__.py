@@ -3,7 +3,7 @@
 from pyyggdrasil.execution import ExecutionContext
 
 from .._pytyr.planning import (
-    ActionCostMode,
+    CostMode,
     ProgressStatistics,
     ProgressStatisticsSnapshot,
     SearchStatus,

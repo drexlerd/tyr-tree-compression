@@ -18,7 +18,7 @@
 #include "tyr/planning/ground/state_storage/hash_set/fact.hpp"
 
 #include "tyr/planning/ground/state_storage/hash_set/context.hpp"
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 
 #include <yggdrasil/core/bit.hpp>
 

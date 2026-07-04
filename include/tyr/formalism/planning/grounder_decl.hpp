@@ -18,9 +18,10 @@
 #ifndef TYR_FORMALISM_PLANNING_GROUNDER_DECL_HPP_
 #define TYR_FORMALISM_PLANNING_GROUNDER_DECL_HPP_
 
-#include <yggdrasil/containers/associative_containers.hpp>
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/repository.hpp"
+
+#include <yggdrasil/containers/associative_containers.hpp>
 
 namespace tyr::formalism::planning
 {
@@ -48,25 +49,6 @@ struct GrounderCacheEntry<Axiom>
     using container_type = ygg::UnorderedMap<ygg::Index<RelationBinding<Axiom>>, ygg::Index<GroundAxiom>>;
 
     container_type container;
-};
-
-struct GrounderCache
-{
-    using Storage = std::tuple<GrounderCacheEntry<Action>, GrounderCacheEntry<Axiom>>;
-
-    Storage m_cache;
-
-    template<typename T>
-    [[nodiscard]] auto& get_cache() noexcept
-    {
-        return std::get<GrounderCacheEntry<T>>(m_cache).container;
-    }
-
-    template<typename T>
-    [[nodiscard]] const auto& get_cache() const noexcept
-    {
-        return std::get<GrounderCacheEntry<T>>(m_cache).container;
-    }
 };
 
 }

@@ -22,14 +22,16 @@
 #include "tyr/datalog/lifted/policies/termination.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/formalism/planning/ground_action_view.hpp"
+#include "tyr/formalism/planning/grounder_decl.hpp"
 #include "tyr/planning/action_executor.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/ground/match_tree/declarations.hpp"
 #include "tyr/planning/lifted/axiom_evaluator.hpp"
 #include "tyr/planning/lifted/node.hpp"
+#include "tyr/planning/lifted/programs/action.hpp"
 #include "tyr/planning/lifted/state_repository.hpp"
 #include "tyr/planning/lifted/state_view.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 #include "tyr/planning/successor_generator.hpp"
 
 #include <type_traits>
@@ -104,6 +106,8 @@ private:
     ygg::ExecutionContextPtr m_execution_context;
     ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>> m_cartesian_workspace;
     ygg::Data<::tyr::formalism::RelationBinding<::tyr::formalism::planning::Action>> m_scratch_action_binding;
+    ApplicableActionProgram<LiftedTag> m_action_program;
+    ::tyr::formalism::planning::GrounderCacheEntry<::tyr::formalism::planning::Action> m_grounder_cache;
 
     datalog::ProgramWorkspace<
         LiftedTag>::Instance<datalog::NoOrAnnotationPolicy<LiftedTag>, datalog::NoAndAnnotationPolicy<LiftedTag>, datalog::NoTerminationPolicy<LiftedTag>>

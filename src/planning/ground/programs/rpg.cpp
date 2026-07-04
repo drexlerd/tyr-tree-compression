@@ -154,6 +154,16 @@ fd::GroundConjunctiveConditionView create_delete_free_condition(fp::GroundConjun
     return context.merge_context.destination.get_or_create(result).first;
 }
 
+fd::MetricView create_metric(fp::MetricView metric, GroundProgramBuildContext& context)
+{
+    auto metric_ptr = context.builder.get_builder<fd::Metric>();
+    auto& result = *metric_ptr;
+    result.clear();
+    result.fexpr = fp::merge_p2d(metric.get_fexpr(), context.merge_context);
+    canonicalize(result);
+    return context.merge_context.destination.get_or_create(result).first;
+}
+
 fd::GroundConjunctiveConditionView
 create_delete_free_goal(fp::GroundConjunctiveConditionView goal, TranslationContext<GroundTag>& translation_context, GroundProgramBuildContext& context)
 {
@@ -223,7 +233,8 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
                                            ygg::Data<fd::GroundProgram>& program,
                                            TranslationContext<GroundTag>& translation_context,
                                            GroundProgramBuildContext& context,
-                                           RPGProgram<GroundTag>::RuleToActionMapping& rule_to_action)
+                                           RPGProgram<GroundTag>::RuleToActionMapping& rule_to_action,
+                                           RPGProgram<GroundTag>::RuleToConditionalEffectMapping& rule_to_conditional_effect)
 {
     const auto applicability_atom = create_applicability_atom(action, context);
     const auto applicability_rule = create_applicability_rule(action, applicability_atom, translation_context, context);
@@ -241,6 +252,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
                 const auto rule = create_ground_atom_rule(body, literal->get_atom(), context, d::Cost(1));
                 program.ground_rules.push_back(rule.get_index());
                 rule_to_action.emplace(rule, action);
+                rule_to_conditional_effect.emplace(rule, cond_eff);
             }
         }
 
@@ -249,6 +261,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
             const auto rule = create_ground_numeric_effect_rule(body, numeric_effect, context, d::Cost(1));
             program.ground_rules.push_back(rule.get_index());
             rule_to_action.emplace(rule, action);
+            rule_to_conditional_effect.emplace(rule, cond_eff);
         }
     }
 }
@@ -256,6 +269,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
 fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
                                                      TranslationContext<GroundTag>& translation_context,
                                                      RPGProgram<GroundTag>::RuleToActionMapping& mapping,
+                                                     RPGProgram<GroundTag>::RuleToConditionalEffectMapping& rule_to_conditional_effect,
                                                      fd::Repository& repository)
 {
     auto context = GroundProgramBuildContext(repository);
@@ -325,19 +339,23 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
     }
 
     context.program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).get_index();
+    if (task.get_metric())
+        program.metric = create_metric(task.get_metric().value(), context).get_index();
 
     for (const auto action : task.get_ground_actions())
-        translate_action_to_delete_free_rules(action, program, translation_context, context, mapping);
+        translate_action_to_delete_free_rules(action, program, translation_context, context, mapping, rule_to_conditional_effect);
 
     return finish_program(context);
 }
 
-d::Program<GroundTag>
-create_rpg_datalog_program(fp::FDRTaskView task, TranslationContext<GroundTag>& translation_context, RPGProgram<GroundTag>::RuleToActionMapping& mapping)
+d::Program<GroundTag> create_rpg_datalog_program(fp::FDRTaskView task,
+                                                 TranslationContext<GroundTag>& translation_context,
+                                                 RPGProgram<GroundTag>::RuleToActionMapping& mapping,
+                                                 RPGProgram<GroundTag>::RuleToConditionalEffectMapping& rule_to_conditional_effect)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
     auto repository = factory->create_shared();
-    auto program = create_rpg_ground_program(task, translation_context, mapping, *repository);
+    auto program = create_rpg_ground_program(task, translation_context, mapping, rule_to_conditional_effect, *repository);
     return d::Program<GroundTag>(program, std::move(repository), std::move(factory));
 }
 
@@ -346,13 +364,19 @@ create_rpg_datalog_program(fp::FDRTaskView task, TranslationContext<GroundTag>& 
 RPGProgram<GroundTag>::RPGProgram(fp::FDRTaskView task) :
     m_translation_context(),
     m_rule_to_action(),
-    m_datalog_program(create_rpg_datalog_program(task, m_translation_context, m_rule_to_action))
+    m_rule_to_conditional_effect(),
+    m_datalog_program(create_rpg_datalog_program(task, m_translation_context, m_rule_to_action, m_rule_to_conditional_effect))
 {
 }
 
 const TranslationContext<GroundTag>& RPGProgram<GroundTag>::get_translation_context() const noexcept { return m_translation_context; }
 
 const RPGProgram<GroundTag>::RuleToActionMapping& RPGProgram<GroundTag>::get_rule_to_action_mapping() const noexcept { return m_rule_to_action; }
+
+const RPGProgram<GroundTag>::RuleToConditionalEffectMapping& RPGProgram<GroundTag>::get_rule_to_conditional_effect_mapping() const noexcept
+{
+    return m_rule_to_conditional_effect;
+}
 
 fd::ProgramView<GroundTag> RPGProgram<GroundTag>::get_program() const noexcept { return m_datalog_program.get_program(); }
 

@@ -18,11 +18,12 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_NUMERIC_EFFECT_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_NUMERIC_EFFECT_OPERATOR_DATA_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
-#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_numeric_effect_index.hpp"
+
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 
 namespace ygg
 {
@@ -31,11 +32,12 @@ using namespace ::tyr;
 template<>
 struct Data<::tyr::formalism::datalog::GroundNumericEffectOperator<::tyr::formalism::FluentTag>>
 {
-    using Variant = ::cista::offset::variant<ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::Assign, ::tyr::formalism::FluentTag>>,
-                                             ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::Increase, ::tyr::formalism::FluentTag>>,
-                                             ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag>>,
-                                             ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag>>,
-                                             ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag>>>;
+    using Variant =
+        ::cista::offset::variant<ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::Assign, ::tyr::formalism::FluentTag>>,
+                                 ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::Increase, ::tyr::formalism::FluentTag>>,
+                                 ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::Decrease, ::tyr::formalism::FluentTag>>,
+                                 ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::ScaleUp, ::tyr::formalism::FluentTag>>,
+                                 ygg::Index<::tyr::formalism::datalog::GroundNumericEffect<::tyr::formalism::ScaleDown, ::tyr::formalism::FluentTag>>>;
 
     Variant value;
 

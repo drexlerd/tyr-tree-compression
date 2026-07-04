@@ -17,6 +17,8 @@
 
 #include "tyr/datalog/ground/workspaces/program.hpp"
 
+#include "tyr/formalism/datalog/expression_properties.hpp"
+
 #include <type_traits>
 #include <yggdrasil/containers/variant.hpp>
 
@@ -25,74 +27,6 @@ namespace fd = tyr::formalism::datalog;
 
 namespace tyr::datalog
 {
-namespace
-{
-void collect_fluent_terms(ygg::float_t, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>&) {}
-
-void collect_fluent_terms(fd::GroundFunctionTermView<f::StaticTag>, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>&) {}
-
-void collect_fluent_terms(fd::GroundFunctionTermView<f::FluentTag> term, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    terms.insert(term);
-}
-
-void collect_fluent_terms(fd::GroundFunctionExpressionView expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms);
-
-void collect_fluent_terms(fd::GroundArithmeticOperatorView expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms);
-
-template<f::ArithmeticOpKind O>
-void collect_fluent_terms(fd::GroundUnaryOperatorView<O> expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    collect_fluent_terms(expression.get_arg(), terms);
-}
-
-template<f::ArithmeticOpKind O>
-void collect_fluent_terms(fd::GroundBinaryOperatorView<O> expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    collect_fluent_terms(expression.get_lhs(), terms);
-    collect_fluent_terms(expression.get_rhs(), terms);
-}
-
-template<f::ArithmeticOpKind O>
-void collect_fluent_terms(fd::GroundMultiOperatorView<O> expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    for (const auto child : expression.get_args())
-        collect_fluent_terms(child, terms);
-}
-
-template<f::BooleanOpKind O>
-void collect_fluent_terms(fd::GroundBinaryOperatorView<O> expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    collect_fluent_terms(expression.get_lhs(), terms);
-    collect_fluent_terms(expression.get_rhs(), terms);
-}
-
-void collect_fluent_terms(fd::GroundFunctionExpressionView expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    ygg::visit([&](auto&& arg) { collect_fluent_terms(arg, terms); }, expression.get_variant());
-}
-
-void collect_fluent_terms(fd::GroundArithmeticOperatorView expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    ygg::visit([&](auto&& arg) { collect_fluent_terms(arg, terms); }, expression.get_variant());
-}
-
-void collect_fluent_terms(fd::GroundBooleanOperatorView expression, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    ygg::visit([&](auto&& arg) { collect_fluent_terms(arg, terms); }, expression.get_variant());
-}
-
-void collect_fluent_terms(fd::GroundNumericEffectOperatorView<f::FluentTag> effect, ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& terms)
-{
-    ygg::visit(
-        [&](auto&& concrete_effect)
-        {
-            terms.insert(concrete_effect.get_fterm());
-            collect_fluent_terms(concrete_effect.get_fexpr(), terms);
-        },
-        effect.get_variant());
-}
-}
 
 ConstProgramWorkspace<GroundTag>::ConstProgramWorkspace(fd::ProgramView<GroundTag> program_) :
     program(program_),
@@ -108,13 +42,13 @@ ConstProgramWorkspace<GroundTag>::ConstProgramWorkspace(fd::ProgramView<GroundTa
 
         auto fluent_terms = ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>();
         for (const auto numeric_constraint : body.get_numeric_constraints())
-            collect_fluent_terms(numeric_constraint, fluent_terms);
+            fd::collect_fterms<f::FluentTag>(numeric_constraint, fluent_terms);
         ygg::visit(
             [&](auto&& head)
             {
                 using Head = std::decay_t<decltype(head)>;
                 if constexpr (std::is_same_v<Head, fd::GroundNumericEffectOperatorView<f::FluentTag>>)
-                    collect_fluent_terms(head, fluent_terms);
+                    fd::collect_fterms<f::FluentTag>(head, fluent_terms);
             },
             rule.get_head());
 

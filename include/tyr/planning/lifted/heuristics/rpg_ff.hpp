@@ -83,6 +83,7 @@ private:
     /// For grounding actions
     ygg::IndexList<::tyr::formalism::Object> m_binding;
     ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>> m_iter_workspace;
+    ::tyr::formalism::planning::GrounderCacheEntry<::tyr::formalism::planning::Action> m_grounder_cache;
     ::tyr::formalism::planning::EffectFamilyList m_effect_families;
     datalog::NumericSupportSelectorWorkspace m_numeric_support_selector_workspace;
 

@@ -18,11 +18,12 @@
 #ifndef TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_OPERATOR_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_OPERATOR_DATA_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
-#include <yggdrasil/containers/variant.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/numeric_effect_index.hpp"
+
+#include <yggdrasil/containers/variant.hpp>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 
 namespace ygg
 {

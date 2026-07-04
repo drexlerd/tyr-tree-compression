@@ -66,6 +66,16 @@ void fill_delete_free_condition(fp::ActionView action,
         conj_cond.numeric_constraints.push_back(merge_p2d(numeric_constraint, context));
 }
 
+fd::MetricView create_metric(fp::MetricView metric, fp::MergeDatalogContext& context)
+{
+    auto metric_ptr = context.builder.get_builder<fd::Metric>();
+    auto& result = *metric_ptr;
+    result.clear();
+    result.fexpr = fp::merge_p2d(metric.get_fexpr(), context);
+    canonicalize(result);
+    return context.destination.get_or_create(result).first;
+}
+
 auto create_delete_free_goal(fp::GroundConjunctiveConditionView goal,
                              TranslationContext<LiftedTag>& translation_context,
                              ::tyr::formalism::planning::MergeDatalogContext& context)
@@ -217,6 +227,8 @@ auto create_program(fp::TaskView task,
         program.fluent_fterm_values.push_back(fp::merge_p2d(fterm_value, context).first.get_index());
 
     program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).first.get_index();
+    if (task.get_metric())
+        program.metric = create_metric(task.get_metric().value(), context).get_index();
 
     for (const auto action : task.get_domain().get_actions())
         translate_action_to_delete_free_rules(action, program, translation_context, context, rule_to_action);

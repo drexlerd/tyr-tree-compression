@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 
 #include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/formalism/planning/views.hpp"  // for ygg::View
@@ -33,13 +33,7 @@ namespace fp = tyr::formalism::planning;
 
 namespace tyr::planning
 {
-Task<LiftedTag>::Task(::tyr::formalism::planning::PlanningTask task) :
-    m_task(std::move(task)),
-    m_static_atoms_bitset(),
-    m_static_numeric_variables(),
-    m_axiom_program(get_task()),
-    m_action_program(get_task()),
-    m_rpg_program(get_task())
+Task<LiftedTag>::Task(::tyr::formalism::planning::PlanningTask task) : m_task(std::move(task)), m_static_atoms_bitset(), m_static_numeric_variables()
 {
     for (const auto atom : get_task().template get_atoms<f::StaticTag>())
         ygg::set(ygg::uint_t(atom.get_index()), true, m_static_atoms_bitset);

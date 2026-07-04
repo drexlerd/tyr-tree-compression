@@ -30,14 +30,10 @@ MaxRPGHeuristic<LiftedTag>::MaxRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Execut
             MaxRPGHeuristic<LiftedTag>,
             datalog::OrAnnotationPolicy<LiftedTag>,
             datalog::AndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>,
-            datalog::TerminationPolicy<LiftedTag, datalog::MaxAggregation>>(
-        task,
-        std::move(execution_context),
-        datalog::OrAnnotationPolicy<LiftedTag>(),
-        datalog::AndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>(),
-        datalog::TerminationPolicy<LiftedTag, datalog::MaxAggregation>(
-            task->get_rpg_program().get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>(),
-            task->get_rpg_program().get_datalog_program().get_workspace_repository()))
+            datalog::TerminationPolicy<LiftedTag, datalog::MaxAggregation>>(task,
+                                                                            std::move(execution_context),
+                                                                            datalog::OrAnnotationPolicy<LiftedTag>(),
+                                                                            datalog::AndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>())
 {
 }
 
@@ -48,11 +44,10 @@ MaxRPGHeuristicPtr<LiftedTag> MaxRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedT
 
 ygg::float_t MaxRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state)
 {
-    return m_workspace.tp.get_total_cost(
-        datalog::FactSets { m_task->get_rpg_program().get_const_program_workspace().facts.fact_sets, m_workspace.facts.fact_sets },
-        this->m_workspace.and_annot,
-        this->m_workspace.numeric_and_annot,
-        *this->m_workspace.numeric_support_selector);
+    return m_workspace.tp.get_total_cost(datalog::FactSets { m_rpg_program.get_const_program_workspace().facts.fact_sets, m_workspace.facts.fact_sets },
+                                         this->m_workspace.and_annot,
+                                         this->m_workspace.numeric_and_annot,
+                                         *this->m_workspace.numeric_support_selector);
 }
 
 }

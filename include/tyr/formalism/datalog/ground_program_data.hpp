@@ -24,6 +24,7 @@
 #include "tyr/formalism/datalog/ground_function_term_value_index.hpp"
 #include "tyr/formalism/datalog/ground_program_index.hpp"
 #include "tyr/formalism/datalog/ground_rule_index.hpp"
+#include "tyr/formalism/datalog/metric_index.hpp"
 #include "tyr/formalism/function_index.hpp"
 #include "tyr/formalism/object_index.hpp"
 #include "tyr/formalism/predicate_index.hpp"
@@ -49,6 +50,7 @@ struct Data<::tyr::formalism::datalog::GroundProgram>
     ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::StaticTag>> static_fterm_values;
     ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::FluentTag>> fluent_fterm_values;
     ::cista::optional<ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition>> goal;
+    ::cista::optional<ygg::Index<::tyr::formalism::datalog::Metric>> metric;
     ygg::IndexList<::tyr::formalism::datalog::GroundRule> ground_rules;
 
     Data() = default;
@@ -63,6 +65,7 @@ struct Data<::tyr::formalism::datalog::GroundProgram>
          ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::StaticTag>> static_fterm_values,
          ygg::IndexList<::tyr::formalism::datalog::GroundFunctionTermValue<::tyr::formalism::FluentTag>> fluent_fterm_values,
          ::cista::optional<ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition>> goal,
+         ::cista::optional<ygg::Index<::tyr::formalism::datalog::Metric>> metric,
          ygg::IndexList<::tyr::formalism::datalog::GroundRule> ground_rules) :
         index(index),
         static_predicates(std::move(static_predicates)),
@@ -75,6 +78,7 @@ struct Data<::tyr::formalism::datalog::GroundProgram>
         static_fterm_values(std::move(static_fterm_values)),
         fluent_fterm_values(std::move(fluent_fterm_values)),
         goal(goal),
+        metric(metric),
         ground_rules(std::move(ground_rules))
     {
     }
@@ -96,6 +100,7 @@ struct Data<::tyr::formalism::datalog::GroundProgram>
         ygg::clear(static_fterm_values);
         ygg::clear(fluent_fterm_values);
         ygg::clear(goal);
+        ygg::clear(metric);
         ygg::clear(ground_rules);
     }
 
@@ -156,6 +161,7 @@ struct Data<::tyr::formalism::datalog::GroundProgram>
                         static_fterm_values,
                         fluent_fterm_values,
                         goal,
+                        metric,
                         ground_rules);
     }
     auto identifying_members() const noexcept
@@ -170,6 +176,7 @@ struct Data<::tyr::formalism::datalog::GroundProgram>
                         static_fterm_values,
                         fluent_fterm_values,
                         goal,
+                        metric,
                         ground_rules);
     }
 };

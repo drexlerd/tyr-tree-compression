@@ -48,16 +48,16 @@ void expect_invalid_argument_message(Callable&& callable, std::string_view expec
 }
 }
 
-TEST(PlanningAlgorithmUtilsTest, ComputeSuccessorGValueUsesUnitActionCosts) { EXPECT_EQ(p::compute_successor_g_value(3.0, 9.0, p::ActionCostMode::UNIT), 4.0); }
+TEST(PlanningAlgorithmUtilsTest, ComputeSuccessorGValueUsesUnitActionCosts) { EXPECT_EQ(p::compute_successor_g_value(3.0, 9.0, p::CostMode::UNIT), 4.0); }
 
 TEST(PlanningAlgorithmUtilsTest, ComputeSuccessorGValueUsesGeneratedMetricWithGeneralActionCosts)
 {
-    EXPECT_EQ(p::compute_successor_g_value(3.0, 9.0, p::ActionCostMode::GENERAL), 9.0);
+    EXPECT_EQ(p::compute_successor_g_value(3.0, 9.0, p::CostMode::GENERAL), 9.0);
 }
 
-TEST(PlanningAlgorithmUtilsTest, ComputeSuccessorGValueRejectsUnknownActionCostMode)
+TEST(PlanningAlgorithmUtilsTest, ComputeSuccessorGValueRejectsUnknownCostMode)
 {
-    EXPECT_THROW((void) p::compute_successor_g_value(3.0, 9.0, static_cast<p::ActionCostMode>(255)), std::runtime_error);
+    EXPECT_THROW((void) p::compute_successor_g_value(3.0, 9.0, static_cast<p::CostMode>(255)), std::runtime_error);
 }
 
 TEST(PlanningAlgorithmUtilsTest, BlindHeuristicHasNoPreferredActionsByDefault)

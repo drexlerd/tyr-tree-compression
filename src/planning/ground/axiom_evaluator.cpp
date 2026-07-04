@@ -20,12 +20,15 @@
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/applicability.hpp"
+#include "tyr/planning/ground/axiom_stratification.hpp"
 #include "tyr/planning/ground/match_tree/match_tree.hpp"
 #include "tyr/planning/ground/state_builder.hpp"
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 
 #include <yggdrasil/core/config.hpp>
 #include <yggdrasil/semantics/comparators.hpp>
+
+namespace fp = tyr::formalism::planning;
 
 namespace tyr::planning
 {
@@ -33,15 +36,19 @@ namespace tyr::planning
 AxiomEvaluator<GroundTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<GroundTag> task, ygg::ExecutionContextPtr) :
     m_index(index),
     m_task(task),
+    m_axiom_match_tree_strata(),
     m_applicable_axioms()
 {
+    auto axiom_strata = compute_ground_axiom_stratification(m_task->get_task());
+    for (const auto& stratum : axiom_strata.data)
+        m_axiom_match_tree_strata.emplace_back(match_tree::MatchTree<fp::GroundAxiom>::create(stratum, m_task->get_task().get_context()));
 }
 
 void AxiomEvaluator<GroundTag>::compute_extended_state(UnpackedState<GroundTag>& unpacked_state)
 {
     auto state_context = StateContext<GroundTag> { *m_task, unpacked_state, ygg::float_t(0) };
 
-    for (const auto& match_tree : m_task->get_axiom_match_tree_strata())
+    for (const auto& match_tree : m_axiom_match_tree_strata)
     {
         while (true)
         {

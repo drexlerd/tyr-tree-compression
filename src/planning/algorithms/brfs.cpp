@@ -30,13 +30,13 @@
 #include "tyr/planning/ground/state_repository.hpp"
 #include "tyr/planning/ground/state_view.hpp"
 #include "tyr/planning/ground/successor_generator.hpp"
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 #include "tyr/planning/lifted/node.hpp"
 #include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/lifted/state_repository.hpp"
 #include "tyr/planning/lifted/state_view.hpp"
 #include "tyr/planning/lifted/successor_generator.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 #include "tyr/planning/search_node.hpp"
 #include "tyr/planning/search_space.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -159,7 +159,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
         {
             event_handler->on_expand_goal_node(node);
 
-            result.plan = extract_total_ordered_plan(search_node, node, search_nodes, successor_generator, ActionCostMode::UNIT);
+            result.plan = extract_total_ordered_plan(search_node, node, search_nodes, successor_generator, CostMode::UNIT);
             result.goal_node = node;
             result.status = SearchStatus::SOLVED;
 
@@ -233,7 +233,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
                 event_handler->on_expand_goal_node(brfs_succ_node);
 
-                result.plan = extract_total_ordered_plan(successor_search_node, brfs_succ_node, search_nodes, successor_generator, ActionCostMode::UNIT);
+                result.plan = extract_total_ordered_plan(successor_search_node, brfs_succ_node, search_nodes, successor_generator, CostMode::UNIT);
                 result.goal_node = brfs_succ_node;
                 result.status = SearchStatus::SOLVED;
 

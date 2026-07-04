@@ -31,14 +31,14 @@
 #include "tyr/planning/ground/state_repository.hpp"
 #include "tyr/planning/ground/state_view.hpp"
 #include "tyr/planning/ground/successor_generator.hpp"
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 #include "tyr/planning/heuristic.hpp"
 #include "tyr/planning/lifted/node.hpp"
 #include "tyr/planning/lifted/state_builder.hpp"
 #include "tyr/planning/lifted/state_repository.hpp"
 #include "tyr/planning/lifted/state_view.hpp"
 #include "tyr/planning/lifted/successor_generator.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 #include "tyr/planning/search_node.hpp"
 #include "tyr/planning/search_space.hpp"
 #include "tyr/planning/state_index.hpp"
@@ -109,6 +109,7 @@ template<TaskKind Kind>
 SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& successor_generator, Heuristic<Kind>& heuristic, const Options<Kind>& options)
 {
     const auto start_node = (options.start_node) ? options.start_node.value() : successor_generator.get_initial_node();
+    heuristic.set_cost_mode(options.action_cost_mode);
     const auto& start_state = start_node.get_state();
     const auto start_state_index = start_state.get_index();
     const auto event_handler = (options.event_handler) ? options.event_handler : DefaultEventHandler<Kind>::create(0);
@@ -121,7 +122,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
     auto search_nodes = SearchNodeVector<Kind>();
     auto openlist = Queue<Kind>();
     const auto start_g_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(start_node.get_metric());
-    const auto start_h_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(heuristic.evaluate(start_state));
+    const auto start_h_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(heuristic.evaluate(start_node));
     const auto start_f_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(start_g_value + start_h_value);
     auto& start_search_node = get_or_create_search_node(start_state_index, search_nodes);
     start_search_node.status = (start_h_value == std::numeric_limits<ygg::float_t>::infinity()) ? SearchNodeStatus::DEAD_END : SearchNodeStatus::OPEN;
@@ -298,7 +299,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
                 successor_search_node.parent_state = state_index;
                 successor_search_node.g_value = successor_g_value;
 
-                const auto successor_h_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(heuristic.evaluate(succ_state));
+                const auto successor_h_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(heuristic.evaluate(normalized_succ_node));
 
                 if (successor_h_value == std::numeric_limits<ygg::float_t>::infinity())
                 {

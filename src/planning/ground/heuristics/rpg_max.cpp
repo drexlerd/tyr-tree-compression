@@ -28,8 +28,7 @@ MaxRPGHeuristic<GroundTag>::MaxRPGHeuristic(TaskPtr<GroundTag> task, ygg::Execut
             datalog::TerminationPolicy<GroundTag, datalog::MaxAggregation>>(std::move(task),
                                                                             std::move(execution_context),
                                                                             datalog::OrAnnotationPolicy<GroundTag>(),
-                                                                            datalog::AndAnnotationPolicy<GroundTag, datalog::MaxAggregation>(),
-                                                                            datalog::TerminationPolicy<GroundTag, datalog::MaxAggregation>())
+                                                                            datalog::AndAnnotationPolicy<GroundTag, datalog::MaxAggregation>())
 {
 }
 

@@ -59,7 +59,7 @@ NodeList<Kind> extract_node_trajectory(const ygg::SegmentedVector<SearchNode>& s
 template<TaskKind Kind>
 LabeledNodeList<Kind> extract_labeled_node_trajectory(const NodeList<Kind>& node_trajectory,
                                                       SuccessorGenerator<Kind>& successor_generator,
-                                                      ActionCostMode action_cost_mode = ActionCostMode::GENERAL)
+                                                      CostMode action_cost_mode = CostMode::GENERAL)
 {
     assert(!node_trajectory.empty());
 
@@ -94,7 +94,7 @@ inline Plan<Kind> extract_total_ordered_plan(const SearchNode& final_search_node
                                              const Node<Kind>& final_node,
                                              const ygg::SegmentedVector<SearchNode>& search_nodes,
                                              SuccessorGenerator<Kind>& successor_generator,
-                                             ActionCostMode action_cost_mode = ActionCostMode::GENERAL)
+                                             CostMode action_cost_mode = CostMode::GENERAL)
 {
     const auto node_trajectory = extract_node_trajectory(search_nodes, final_search_node, final_node, successor_generator);
 

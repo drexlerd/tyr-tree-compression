@@ -19,7 +19,7 @@
 
 #include "tyr/planning/ground/state_view.hpp"
 //
-#include "tyr/planning/ground_task.hpp"
+#include "tyr/planning/ground/task.hpp"
 #include "tyr/planning/state_index.hpp"
 
 #include <yggdrasil/core/config.hpp>

@@ -18,13 +18,14 @@
 #ifndef TYR_FORMALISM_DATALOG_GROUND_FUNCTION_EXPRESSION_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_GROUND_FUNCTION_EXPRESSION_DATA_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/arithmetic_operator_data.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_function_term_index.hpp"
 #include "tyr/formalism/planning/function_expression_data.hpp"
 #include "tyr/formalism/planning/ground_function_expression_data.hpp"
+
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 
 namespace ygg
 {
@@ -33,10 +34,12 @@ using namespace ::tyr;
 template<>
 struct Data<::tyr::formalism::datalog::GroundFunctionExpression>
 {
-    using Variant = ::cista::offset::variant<ygg::float_t,
-                                             ygg::Data<::tyr::formalism::datalog::ArithmeticOperator<ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>>>,
-                                             ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::StaticTag>>,
-                                             ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::FluentTag>>>;
+    using Variant =
+        ::cista::offset::variant<ygg::float_t,
+                                 ygg::Data<::tyr::formalism::datalog::ArithmeticOperator<ygg::Data<::tyr::formalism::datalog::GroundFunctionExpression>>>,
+                                 ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::StaticTag>>,
+                                 ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::FluentTag>>,
+                                 ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::AuxiliaryTag>>>;
 
     Variant value;
 

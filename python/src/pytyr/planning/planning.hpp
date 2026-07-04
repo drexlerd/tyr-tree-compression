@@ -419,7 +419,11 @@ void bind_heuristic(nb::module_& m, const std::string& name)
     nb::class_<T, PyHeuristic<Kind>>(m, name.c_str())  //
         .def(nb::init<>())
         .def("set_goal", &T::set_goal, "goal"_a)
-        .def("evaluate", &T::evaluate, "state"_a, nb::call_guard<nb::gil_scoped_release>())
+        .def(
+            "evaluate",
+            [](T& self, const StateView<Kind>& state) { return self.evaluate(state); },
+            "state"_a,
+            nb::call_guard<nb::gil_scoped_release>())
         .def("get_preferred_action_indices", &T::get_preferred_actions)
         .def("get_preferred_action_views", &T::get_preferred_action_views)
         .def("get_preferred_actions", &T::get_preferred_action_views);

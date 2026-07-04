@@ -18,12 +18,13 @@
 #ifndef TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_DATA_HPP_
 #define TYR_FORMALISM_DATALOG_NUMERIC_EFFECT_DATA_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/function_expression_data.hpp"
 #include "tyr/formalism/datalog/function_term_index.hpp"
 #include "tyr/formalism/datalog/numeric_effect_index.hpp"
+
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 
 namespace ygg
 {
@@ -39,7 +40,12 @@ struct Data<::tyr::formalism::datalog::NumericEffect<Op, T>>
     ygg::Data<::tyr::formalism::datalog::FunctionExpression> fexpr;
 
     Data() = default;
-    Data(ygg::Index<::tyr::formalism::datalog::FunctionTerm<T>> fterm_, ygg::Data<::tyr::formalism::datalog::FunctionExpression> fexpr_) : index(), fterm(fterm_), fexpr(fexpr_) {}
+    Data(ygg::Index<::tyr::formalism::datalog::FunctionTerm<T>> fterm_, ygg::Data<::tyr::formalism::datalog::FunctionExpression> fexpr_) :
+        index(),
+        fterm(fterm_),
+        fexpr(fexpr_)
+    {
+    }
 
     void clear() noexcept
     {

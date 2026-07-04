@@ -25,6 +25,7 @@
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/planning/axiom_evaluator.hpp"
 #include "tyr/planning/declarations.hpp"
+#include "tyr/planning/lifted/programs/axiom.hpp"
 
 #include <memory>
 #include <yggdrasil/execution/onetbb.hpp>
@@ -53,6 +54,7 @@ private:
     ygg::uint_t m_index;
     TaskPtr<LiftedTag> m_task;
     ygg::ExecutionContextPtr m_execution_context;
+    AxiomEvaluatorProgram<LiftedTag> m_axiom_program;
 
     datalog::ProgramWorkspace<
         LiftedTag>::Instance<datalog::NoOrAnnotationPolicy<LiftedTag>, datalog::NoAndAnnotationPolicy<LiftedTag>, datalog::NoTerminationPolicy<LiftedTag>>

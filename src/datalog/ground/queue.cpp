@@ -720,6 +720,9 @@ bool process_rule_frontier(GroundCtx<OrAP, AndAP, TP, CP>& ctx, PendingNumericBu
 
         if (fire_rule(ctx, entry->rule, entry->cost, pending_numeric))
             return true;
+
+        if (pending_numeric.min_cost() == cost)
+            return false;
     }
 
     return false;
@@ -743,10 +746,10 @@ void solve_ground_queue(ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>&
         const auto numeric_cost = pending_numeric.min_cost();
         const auto cost = std::min(rule_cost, numeric_cost);
 
-        if (rule_cost == cost && process_rule_frontier(ctx, pending_numeric, cost))
+        if (numeric_cost == cost && commit_numeric_bucket(ctx, pending_numeric, cost))
             break;
 
-        if (numeric_cost == cost && commit_numeric_bucket(ctx, pending_numeric, cost))
+        if (rule_cost == cost && process_rule_frontier(ctx, pending_numeric, cost))
             break;
     }
 }

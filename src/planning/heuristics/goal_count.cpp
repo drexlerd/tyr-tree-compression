@@ -18,8 +18,8 @@
 #include "tyr/planning/heuristics/goal_count.hpp"
 
 #include "tyr/planning/applicability.hpp"
-#include "tyr/planning/ground_task.hpp"
-#include "tyr/planning/lifted_task.hpp"
+#include "tyr/planning/ground/task.hpp"
+#include "tyr/planning/lifted/task.hpp"
 
 namespace tyr::planning
 {
