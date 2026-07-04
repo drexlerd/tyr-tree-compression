@@ -17,16 +17,16 @@
 
 #include "datas.hpp"
 
-#include "pytyr/bindings.hpp"
-
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
 #include <yggdrasil/python/type_casters.hpp>
 
 namespace tyr::formalism::planning
 {
+
 namespace
 {
 
@@ -50,8 +50,8 @@ void bind_variable_builder(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const std::string&>(), "name"_a)
                    .def_rw("name", &V::name);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_term_builder(nb::module_& m, const std::string& name)
@@ -61,8 +61,8 @@ void bind_term_builder(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a)
                    .def_rw("value", &V::value);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<typename Tag>
@@ -72,8 +72,8 @@ void bind_relation_binding_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<ygg::View<ygg::Index<Tag>, Repository>, const ObjectViewList&>(), "relation"_a, "objects"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -83,8 +83,8 @@ void bind_predicate_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const std::string&, ygg::uint_t>(), "name"_a, "arity"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -94,8 +94,8 @@ void bind_atom_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<PredicateView<T>, const TermViewList&>(), "predicate"_a, "terms"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -105,8 +105,8 @@ void bind_ground_atom_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<PredicateBindingView<T>>(), "binding"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -116,8 +116,8 @@ void bind_literal_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<AtomView<T>, bool>(), "atom"_a, "polarity"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -127,8 +127,8 @@ void bind_ground_literal_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<GroundAtomView<T>, bool>(), "atom"_a, "polarity"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -138,8 +138,8 @@ void bind_fdr_variable_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const GroundAtomViewList<T>>(), "atoms"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -149,8 +149,8 @@ void bind_fdr_fact_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FDRVariableView<T>, FDRValue>(), "variable"_a, "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -160,8 +160,8 @@ void bind_function_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const std::string&, ygg::uint_t>(), "name"_a, "arity"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -171,8 +171,8 @@ void bind_function_term_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FunctionView<T>, const TermViewList&>(), "function"_a, "terms"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -182,8 +182,8 @@ void bind_ground_function_term_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FunctionBindingView<T>>(), "binding"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -193,8 +193,8 @@ void bind_ground_function_term_value_builder(nb::module_& m, const std::string& 
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<GroundFunctionTermView<T>, ygg::float_t>(), "fterm"_a, "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<NumericEffectOpKind Op, FactKind T>
@@ -204,8 +204,8 @@ void bind_numeric_effect_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<FunctionTermView<T>, FunctionExpressionView>(), "fterm"_a, "fexpr"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<NumericEffectOpKind Op, FactKind T>
@@ -215,8 +215,8 @@ void bind_ground_numeric_effect_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<GroundFunctionTermView<T>, GroundFunctionExpressionView>(), "fterm"_a, "fexpr"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -226,8 +226,8 @@ void bind_numeric_effect_operator_builder(nb::module_& m, const std::string& nam
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -237,8 +237,8 @@ void bind_ground_numeric_effect_operator_builder(nb::module_& m, const std::stri
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_function_expression_builder(nb::module_& m, const std::string& name)
@@ -247,8 +247,8 @@ void bind_function_expression_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_conjunctive_condition_builder(nb::module_& m, const std::string& name)
@@ -266,8 +266,8 @@ void bind_conjunctive_condition_builder(nb::module_& m, const std::string& name)
                         "fluent_literals"_a,
                         "derived_literals"_a,
                         "numeric_constraints"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_conjunctive_effect_builder(nb::module_& m, const std::string& name)
@@ -281,8 +281,8 @@ void bind_conjunctive_effect_builder(nb::module_& m, const std::string& name)
                         "fluent_literals"_a,
                         "fluent_numeric_effects"_a,
                         "auxiliary_numeric_effect"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_conditional_effect_builder(nb::module_& m, const std::string& name)
@@ -291,8 +291,8 @@ void bind_conditional_effect_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const VariableViewList&, ConjunctiveConditionView, ConjunctiveEffectView>(), "variables"_a, "condition"_a, "effect"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_action_builder(nb::module_& m, const std::string& name)
@@ -306,8 +306,8 @@ void bind_action_builder(nb::module_& m, const std::string& name)
                         "variables"_a,
                         "condition"_a,
                         "effects"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_axiom_builder(nb::module_& m, const std::string& name)
@@ -316,8 +316,8 @@ void bind_axiom_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const VariableViewList&, ConjunctiveConditionView, AtomView<DerivedTag>>(), "variables"_a, "body"_a, "head"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_ground_function_expression_builder(nb::module_& m, const std::string& name)
@@ -326,8 +326,8 @@ void bind_ground_function_expression_builder(nb::module_& m, const std::string& 
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_ground_conjunctive_condition_builder(nb::module_& m, const std::string& name)
@@ -345,8 +345,8 @@ void bind_ground_conjunctive_condition_builder(nb::module_& m, const std::string
                         "positive_facts"_a,
                         "negative_facts"_a,
                         "numeric_constraints"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_ground_conjunctive_effect_builder(nb::module_& m, const std::string& name)
@@ -362,8 +362,8 @@ void bind_ground_conjunctive_effect_builder(nb::module_& m, const std::string& n
                         "del_facts"_a,
                         "fluent_numeric_effects"_a,
                         "auxiliary_numeric_effect"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_ground_conditional_effect_builder(nb::module_& m, const std::string& name)
@@ -372,8 +372,8 @@ void bind_ground_conditional_effect_builder(nb::module_& m, const std::string& n
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<GroundConjunctiveConditionView, GroundConjunctiveEffectView>(), "condition"_a, "effect"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_ground_action_builder(nb::module_& m, const std::string& name)
@@ -385,8 +385,8 @@ void bind_ground_action_builder(nb::module_& m, const std::string& name)
                         "binding"_a,
                         "condition"_a,
                         "effects"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_ground_axiom_builder(nb::module_& m, const std::string& name)
@@ -395,8 +395,8 @@ void bind_ground_axiom_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<AxiomBindingView, GroundConjunctiveConditionView, GroundAtomView<DerivedTag>>(), "binding"_a, "body"_a, "head"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_metric_builder(nb::module_& m, const std::string& name)
@@ -405,8 +405,8 @@ void bind_metric_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::ObjectiveVariant, GroundFunctionExpressionView>(), "objective_kind"_a, "fexpr"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_domain_builder(nb::module_& m, const std::string& name)
@@ -434,8 +434,8 @@ void bind_domain_builder(nb::module_& m, const std::string& name)
                         "constants"_a,
                         "actions"_a,
                         "axioms"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_lifted_task_builder(nb::module_& m, const std::string& name)
@@ -467,8 +467,8 @@ void bind_lifted_task_builder(nb::module_& m, const std::string& name)
                         "goal"_a,
                         "metric"_a,
                         "axioms"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_ground_task_builder(nb::module_& m, const std::string& name)
@@ -511,8 +511,8 @@ void bind_ground_task_builder(nb::module_& m, const std::string& name)
                         "goal"_a,
                         "ground_actions"_a,
                         "ground_axioms"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<OpKind Op, typename T>
@@ -522,8 +522,8 @@ void bind_unary_operator_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<ygg::View<T, Repository>>(), "arg"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<OpKind Op, typename T>
@@ -533,8 +533,8 @@ void bind_binary_operator_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<ygg::View<T, Repository>, ygg::View<T, Repository>>(), "lhs"_a, "rhs"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<OpKind Op, typename T>
@@ -544,8 +544,8 @@ void bind_multi_operator_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<const std::vector<ygg::View<T, Repository>>&>(), "args"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<typename T>
@@ -555,8 +555,8 @@ void bind_arithmetic_operator_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<typename T>
@@ -566,8 +566,8 @@ void bind_boolean_operator_builder(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<typename V::template ViewVariant<Repository>>(), "value"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 }
 

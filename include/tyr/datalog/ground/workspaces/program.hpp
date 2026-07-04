@@ -70,7 +70,7 @@ struct ProgramWorkspace<GroundTag>
         RuleWorkspace<GroundTag> rules;
 
         explicit Instance(const ConstProgramWorkspace<GroundTag>& cws, OrAP or_ap_ = OrAP(), AndAP and_ap_ = AndAP(), TP tp_ = TP(), CP cost_policy_ = CP()) :
-            facts(),
+            facts(cws.program),
             or_ap(std::move(or_ap_)),
             and_ap(std::move(and_ap_)),
             and_annot(),

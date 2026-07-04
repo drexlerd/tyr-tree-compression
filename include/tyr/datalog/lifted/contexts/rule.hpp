@@ -19,8 +19,8 @@
 #define TYR_DATALOG_CONTEXTS_RULE_HPP_
 
 #include "tyr/datalog/declarations.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/lifted/assignment_sets.hpp"
-#include "tyr/datalog/lifted/fact_sets.hpp"
 #include "tyr/datalog/lifted/policies/cost.hpp"
 #include "tyr/datalog/lifted/workspaces/rule.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"

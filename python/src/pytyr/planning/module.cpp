@@ -19,7 +19,6 @@
 
 #include "ground/module.hpp"
 #include "lifted/module.hpp"
-#include "pytyr/bindings.hpp"
 
 #include <cstdint>
 #include <nanobind/stl/chrono.h>
@@ -28,6 +27,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
 
 namespace tyr::planning
 {
@@ -83,7 +83,7 @@ void bind_module_definitions(nb::module_& m)
                               .def("get_num_pruned", &Statistics::get_num_pruned)
                               .def("get_search_time", &Statistics::get_search_time)
                               .def("get_current_search_time", &Statistics::get_current_search_time);
-    add_print(statistics_cls);
+    ygg::add_print(statistics_cls);
 
     using ProgressSnapshot = ProgressStatistics::Snapshot;
 
@@ -94,7 +94,7 @@ void bind_module_definitions(nb::module_& m)
             .def("get_num_expanded", &ProgressSnapshot::get_num_expanded)
             .def("get_num_deadends", &ProgressSnapshot::get_num_deadends)
             .def("get_num_pruned", &ProgressSnapshot::get_num_pruned);
-    add_print(progress_snapshot_cls);
+    ygg::add_print(progress_snapshot_cls);
 
     auto progress_statistics_cls = nb::class_<ProgressStatistics>(m, "ProgressStatistics")
                                        .def(nb::init<>())
@@ -104,7 +104,7 @@ void bind_module_definitions(nb::module_& m)
                                        .def("empty", &ProgressStatistics::empty)
                                        .def("size", &ProgressStatistics::size)
                                        .def("get_snapshots", &ProgressStatistics::get_snapshots, nb::rv_policy::copy);
-    add_print(progress_statistics_cls);
+    ygg::add_print(progress_statistics_cls);
 }
 
 }  // namespace tyr::planning

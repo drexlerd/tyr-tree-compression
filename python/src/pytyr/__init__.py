@@ -25,9 +25,12 @@ def _source_version() -> str:
 
 
 try:
-    __version__ = version("pytyr")
-except PackageNotFoundError:
-    __version__ = _source_version()
+    from ._version import __version__
+except ImportError:
+    try:
+        __version__ = version("pytyr")
+    except PackageNotFoundError:
+        __version__ = _source_version()
 
 
 def native_prefix() -> Path:

@@ -24,6 +24,9 @@ namespace tyr::datalog
 {
 
 template<TaskKind Kind>
+struct RuleState;
+
+template<TaskKind Kind>
 struct RuleWorkspace;
 
 template<TaskKind Kind>

@@ -18,7 +18,7 @@
 #ifndef TYR_SOLVER_POLICIES_TERMINATION_CONCEPT_HPP_
 #define TYR_SOLVER_POLICIES_TERMINATION_CONCEPT_HPP_
 
-#include "tyr/datalog/lifted/fact_sets.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/lifted/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
 #include "tyr/declarations.hpp"

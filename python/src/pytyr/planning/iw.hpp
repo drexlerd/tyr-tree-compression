@@ -56,7 +56,7 @@ void bind_statistics(nb::module_& m, const std::string& name)
                    .def("clear", &T::clear)
                    .def("set_solution_arity", &T::set_solution_arity, "arity"_a)
                    .def("get_solution_arity", &T::get_solution_arity);
-    add_print(cls);
+    ygg::add_print(cls);
 }
 
 template<TaskKind Kind>

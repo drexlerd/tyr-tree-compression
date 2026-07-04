@@ -64,7 +64,7 @@ void bind_statistics(nb::module_& m, const std::string& name)
                    .def("get_maximum_effective_width", &T::get_maximum_effective_width)
                    .def("get_average_effective_width", &T::get_average_effective_width)
                    .def("get_num_solved_subsearches", &T::get_num_solved_subsearches);
-    add_print(cls);
+    ygg::add_print(cls);
 }
 
 template<TaskKind Kind>

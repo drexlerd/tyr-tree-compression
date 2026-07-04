@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (C) 2025-2026 Dominik Drexler
  *
@@ -16,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
+
 
 #ifndef TYR_FORMALISM_DATALOG_CANONICALIZATION_HPP_
 #define TYR_FORMALISM_DATALOG_CANONICALIZATION_HPP_

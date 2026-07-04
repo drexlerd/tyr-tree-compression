@@ -134,9 +134,13 @@ bool evaluate(fd::GroundBooleanOperatorView expression,
 
 void GroundNumericSupportSelectorWorkspace::clear() noexcept { selection.clear(); }
 
-GroundNumericSupportSelector::GroundNumericSupportSelector(const FactsWorkspace<GroundTag>& facts, const NumericIntervalAnnotations<GroundTag>& annotations) :
+GroundNumericSupportSelector::GroundNumericSupportSelector(const FactsWorkspace<GroundTag>& facts,
+                                                           const NumericIntervalAnnotations<GroundTag>& annotations,
+                                                           bool initial_intervals_cost_zero) :
     m_facts(facts),
-    m_annotations(annotations)
+    m_annotations(annotations),
+    m_initial_intervals_cost_zero(initial_intervals_cost_zero),
+    m_selection()
 {
 }
 
@@ -144,6 +148,13 @@ bool GroundNumericSupportSelector::is_supported(fd::GroundBooleanOperatorView co
                                                 std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const
 {
     return evaluate(constraint, m_facts, *this, selection);
+}
+
+ygg::ClosedInterval<ygg::float_t>
+GroundNumericSupportSelector::evaluate_effect_expression(fd::GroundFunctionExpressionView expression,
+                                                         std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const
+{
+    return evaluate(expression, m_facts, *this, selection);
 }
 
 ygg::ClosedInterval<ygg::float_t>
@@ -185,7 +196,7 @@ Cost GroundNumericSupportSelector::get_current_interval_cost(fd::GroundFunctionT
 {
     const auto* entries = find_entries(term);
     if (!entries)
-        return std::numeric_limits<Cost>::max();
+        return m_initial_intervals_cost_zero ? Cost(0) : std::numeric_limits<Cost>::max();
 
     auto best_cost = std::numeric_limits<Cost>::max();
     auto covered = ygg::ClosedInterval<ygg::float_t>();

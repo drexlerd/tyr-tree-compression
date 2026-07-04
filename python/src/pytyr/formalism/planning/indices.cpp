@@ -17,11 +17,13 @@
 
 #include "indices.hpp"
 
-#include "pytyr/bindings.hpp"
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
 
 namespace tyr::formalism::planning
 {
+using ygg::bind_index;
+
 namespace
 {
 template<typename Tag>
@@ -32,8 +34,8 @@ void bind_relation_binding_index(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def_ro("relation_index", &V::relation)
                    .def_ro("row_index", &V::row);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 }

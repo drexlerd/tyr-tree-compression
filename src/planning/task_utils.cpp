@@ -18,8 +18,8 @@
 #include "tyr/planning/task_utils.hpp"
 
 #include "tyr/analysis/declarations.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/lifted/assignment_sets.hpp"
-#include "tyr/datalog/lifted/fact_sets.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
 #include "tyr/formalism/datalog/merge.hpp"
 #include "tyr/formalism/datalog/repository.hpp"

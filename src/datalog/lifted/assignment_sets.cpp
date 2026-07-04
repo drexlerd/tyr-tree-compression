@@ -18,9 +18,9 @@
 #include "tyr/datalog/lifted/assignment_sets.hpp"
 
 #include "tyr/analysis/declarations.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/formatter.hpp"
 #include "tyr/datalog/lifted/assignment.hpp"
-#include "tyr/datalog/lifted/fact_sets.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"

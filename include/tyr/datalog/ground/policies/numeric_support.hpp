@@ -52,17 +52,37 @@ public:
 class GroundNumericSupportSelector
 {
 public:
-    GroundNumericSupportSelector(const FactsWorkspace<GroundTag>& facts, const NumericIntervalAnnotations<GroundTag>& annotations);
+    GroundNumericSupportSelector(const FactsWorkspace<GroundTag>& facts,
+                                 const NumericIntervalAnnotations<GroundTag>& annotations,
+                                 bool initial_intervals_cost_zero = false);
 
     ygg::ClosedInterval<ygg::float_t> select_fluent_interval(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
                                                              std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
+
+    ygg::ClosedInterval<ygg::float_t> evaluate_effect_expression(::tyr::formalism::datalog::GroundFunctionExpressionView expression,
+                                                                 std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
+
+    template<typename AggregationFunction>
+    Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
+                             std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection,
+                             AggregationFunction agg) const
+    {
+        return get_greedy_support_cost(selection, agg, [&](auto& selected) { return is_supported(constraint, selected); });
+    }
+
+    template<typename AggregationFunction>
+    Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint, AggregationFunction agg) const
+    {
+        m_selection.clear();
+        return get_constraint_cost(constraint, m_selection, agg);
+    }
 
     template<typename AggregationFunction>
     Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
                              GroundNumericSupportSelectorWorkspace& workspace,
                              AggregationFunction agg) const
     {
-        return get_greedy_support_cost(workspace.selection, agg, [&](auto& selection) { return is_supported(constraint, selection); });
+        return get_constraint_cost(constraint, workspace.selection, agg);
     }
 
     template<typename AggregationFunction, typename Callback>
@@ -152,6 +172,8 @@ private:
 
     const FactsWorkspace<GroundTag>& m_facts;
     const NumericIntervalAnnotations<GroundTag>& m_annotations;
+    bool m_initial_intervals_cost_zero;
+    mutable std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry> m_selection;
 };
 
 }

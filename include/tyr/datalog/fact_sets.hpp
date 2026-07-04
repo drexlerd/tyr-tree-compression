@@ -21,7 +21,6 @@
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <boost/dynamic_bitset.hpp>
-#include <iostream>
 #include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
 #include <yggdrasil/semantics/hash.hpp>

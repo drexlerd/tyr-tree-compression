@@ -354,7 +354,7 @@ LiteralViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::Litera
         auto& literal = *literal_ptr;
         literal.clear();
         literal.atom = atom.get_index();
-        literal.polarity = element.is_positive();
+        literal.polarity = element.get_polarity();
         canonicalize(literal);
         return context.get_or_create(literal).first;
     };
@@ -1094,7 +1094,7 @@ GroundLiteralViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism
         auto& literal = *literal_ptr;
         literal.clear();
         literal.atom = atom.get_index();
-        literal.polarity = element.is_positive();
+        literal.polarity = element.get_polarity();
         canonicalize(literal);
         return context.get_or_create(literal).first;
     };

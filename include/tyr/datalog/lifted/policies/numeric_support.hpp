@@ -1,7 +1,24 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #ifndef TYR_SOLVER_POLICIES_NUMERIC_SUPPORT_HPP_
 #define TYR_SOLVER_POLICIES_NUMERIC_SUPPORT_HPP_
 
-#include "tyr/datalog/lifted/fact_sets.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -141,7 +158,8 @@ private:
     bool is_supported(::tyr::formalism::datalog::GroundBooleanOperatorView element,
                       std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
 
-    const NumericIntervalAnnotations<LiftedTag>::Entries* find_entries(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
+    const NumericIntervalAnnotations<LiftedTag>::Entries*
+    find_entries(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
     ygg::ClosedInterval<ygg::float_t> current_interval(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding) const;
     Cost get_current_interval_cost(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding,
                                    ygg::ClosedInterval<ygg::float_t> current) const;

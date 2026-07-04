@@ -17,12 +17,12 @@
 
 #include "domains.hpp"
 
-#include "pytyr/bindings.hpp"
 #include "tyr/analysis/formatter.hpp"
 
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/vector.h>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
 #include <yggdrasil/python/type_casters.hpp>
 
 namespace nb = nanobind;
@@ -30,6 +30,7 @@ using namespace nb::literals;
 
 namespace tyr::formalism::planning
 {
+
 namespace
 {
 
@@ -40,7 +41,7 @@ void bind_variable_domain_view(nb::module_& m, const char* name)
 
     auto cls = nb::class_<T>(m, name)  //
                    .def_ro("objects", &T::objects);
-    add_print(cls);
+    ygg::add_print(cls);
 }
 
 template<typename Element, typename C>
@@ -51,7 +52,7 @@ void bind_simple_scoped_domain_view(nb::module_& m, const char* name)
     auto cls = nb::class_<T>(m, name)  //
                    .def_ro("element", &T::element)
                    .def_ro("variable_domains", &T::payload);
-    add_print(cls);
+    ygg::add_print(cls);
 }
 
 template<typename C>
@@ -61,12 +62,9 @@ void bind_conditional_effect_domain_view(nb::module_& m, const char* name)
 
     auto cls = nb::class_<T>(m, name)
                    .def_ro("element", &T::element)
-                   .def_prop_ro(
-                       "condition_domain",
-                       [](const T& self) -> const auto& { return self.payload.condition_domain; },
-                       nb::rv_policy::reference_internal)
-                   .def_prop_ro("effect_domain", [](const T& self) -> const auto& { return self.payload.effect_domain; }, nb::rv_policy::reference_internal);
-    add_print(cls);
+                   .def_prop_ro("condition_domain", [](const T& self) -> const auto& { return self.payload.condition_domain; })
+                   .def_prop_ro("effect_domain", [](const T& self) -> const auto& { return self.payload.effect_domain; });
+    ygg::add_print(cls);
 }
 
 template<typename C>
@@ -76,12 +74,9 @@ void bind_action_domain_view(nb::module_& m, const char* name)
 
     auto cls = nb::class_<T>(m, name)
                    .def_ro("element", &T::element)
-                   .def_prop_ro(
-                       "precondition_domain",
-                       [](const T& self) -> const auto& { return self.payload.precondition_domain; },
-                       nb::rv_policy::reference_internal)
-                   .def_prop_ro("effect_domains", [](const T& self) -> const auto& { return self.payload.effect_domains; }, nb::rv_policy::reference_internal);
-    add_print(cls);
+                   .def_prop_ro("precondition_domain", [](const T& self) -> const auto& { return self.payload.precondition_domain; })
+                   .def_prop_ro("effect_domains", [](const T& self) -> const auto& { return self.payload.effect_domains; });
+    ygg::add_print(cls);
 }
 
 void bind_task_variable_domains_view(nb::module_& m, const char* name)
@@ -96,7 +91,7 @@ void bind_task_variable_domains_view(nb::module_& m, const char* name)
                    .def_ro("fluent_function_domains", &T::fluent_function_domains)
                    .def_ro("action_domains", &T::action_domains)
                    .def_ro("axiom_domains", &T::axiom_domains);
-    add_print(cls);
+    ygg::add_print(cls);
 }
 
 }  // namespace

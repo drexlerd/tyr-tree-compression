@@ -18,12 +18,12 @@
 #include "tyr/datalog/lifted/bottom_up.hpp"
 
 #include "tyr/datalog/declarations.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/formatter.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
 #include "tyr/datalog/lifted/assignment_sets.hpp"
 #include "tyr/datalog/lifted/consistency_graph.hpp"
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
-#include "tyr/datalog/lifted/fact_sets.hpp"
 #include "tyr/datalog/lifted/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
@@ -109,16 +109,16 @@ struct RuleUpdateInput
     AndAnnotationContext<LiftedTag> make_annotation_context(fd::RuleBindingView rule_binding, Cost rule_cost) const
     {
         return AndAnnotationContext<LiftedTag> { current_cost,
-                                      rule,
-                                      rule_binding,
-                                      rule_cost,
-                                      witness_condition,
-                                      numeric_support_selector,
-                                      numeric_support_selector_workspace,
-                                      program_and_annot,
-                                      program_numeric_and_annot,
-                                      solve_context,
-                                      iteration_context };
+                                                 rule,
+                                                 rule_binding,
+                                                 rule_cost,
+                                                 witness_condition,
+                                                 numeric_support_selector,
+                                                 numeric_support_selector_workspace,
+                                                 program_and_annot,
+                                                 program_numeric_and_annot,
+                                                 solve_context,
+                                                 iteration_context };
     }
 };
 

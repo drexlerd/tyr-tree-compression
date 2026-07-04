@@ -19,8 +19,8 @@
 #define TYR_DATALOG_LIFTED_CONTEXTS_PROGRAM_HPP_
 
 #include "tyr/datalog/contexts/program.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/lifted/contexts/stratum.hpp"
-#include "tyr/datalog/lifted/fact_sets.hpp"
 #include "tyr/datalog/lifted/policies/cost.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/datalog/lifted/workspaces/rule.hpp"

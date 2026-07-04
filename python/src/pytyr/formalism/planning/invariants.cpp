@@ -20,12 +20,13 @@
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/vector.h>
-#include "pytyr/bindings.hpp"
-#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
+#include <yggdrasil/python/type_casters.hpp>
 
 namespace tyr::formalism::planning::invariant
 {
+
 namespace
 {
 template<typename T>
@@ -38,7 +39,7 @@ void bind_substitution_function(nb::module_& m, const std::string& name)
                    .def(nb::init<std::vector<ParameterIndex>>(), "parameters"_a)
                    .def_static("from_range", &V::from_range, "offset"_a, "size"_a)
                    .def("size", &V::size)
-                   .def_prop_ro("parameters", &V::parameters, nb::rv_policy::reference_internal)
+                   .def_prop_ro("parameters", &V::parameters)
                    .def("contains_parameter", &V::contains_parameter, "parameter"_a)
                    .def("is_bound", &V::is_bound, "parameter"_a)
                    .def("is_unbound", &V::is_unbound, "parameter"_a)
@@ -103,8 +104,8 @@ void bind_substitution_function(nb::module_& m, const std::string& name)
                             return result;
                         })
                    .def("__contains__", [](const V& self, ParameterIndex p) { return self.contains_parameter(p); }, "parameter"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_invariant(nb::module_& m, const std::string& name)
@@ -116,8 +117,8 @@ void bind_invariant(nb::module_& m, const std::string& name)
                    .def_ro("num_counted_variables", &V::num_counted_variables)
                    .def_ro("atoms", &V::atoms)
                    .def_ro("predicates", &V::predicates);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_invariant_match_data(nb::module_& m, const std::string& name)
@@ -128,7 +129,7 @@ void bind_invariant_match_data(nb::module_& m, const std::string& name)
     nb::class_<V>(m, name.c_str())
         .def(nb::init<Invariant, std::vector<ObjectSubstitution>>(), "invariant"_a, "rigid_variable_bindings"_a)
         .def_prop_ro("invariant", &V::invariant, nb::rv_policy::reference_internal)
-        .def_prop_ro("rigid_variable_bindings", &V::rigid_variable_bindings, nb::rv_policy::reference_internal);
+        .def_prop_ro("rigid_variable_bindings", &V::rigid_variable_bindings);
 }
 
 void bind_query_workspace(nb::module_& m, const std::string& name)

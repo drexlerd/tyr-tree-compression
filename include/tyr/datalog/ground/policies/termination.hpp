@@ -20,96 +20,17 @@
 
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/ground/policies/numeric_support.hpp"
+#include "tyr/datalog/lifted/applicability.hpp"
 #include "tyr/datalog/lifted/policies/aggregation.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
-#include "tyr/formalism/arithmetic_operator_utils.hpp"
-#include "tyr/formalism/boolean_operator_utils.hpp"
 
 #include <cassert>
 #include <limits>
-#include <numeric>
 #include <optional>
-#include <yggdrasil/containers/variant.hpp>
-#include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/core/config.hpp>
 
 namespace tyr::datalog
 {
-
-namespace details
-{
-inline ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(ygg::float_t value, const FactsWorkspace<GroundTag>&)
-{
-    return ygg::ClosedInterval<ygg::float_t>(value, value);
-}
-
-inline ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::StaticTag> term,
-                                                              const FactsWorkspace<GroundTag>& facts)
-{
-    const auto it = facts.static_fterm_intervals.find(term);
-    return it == facts.static_fterm_intervals.end() ? ygg::ClosedInterval<ygg::float_t>() : it->second;
-}
-
-inline ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
-                                                              const FactsWorkspace<GroundTag>& facts)
-{
-    const auto it = facts.fluent_fterm_intervals.find(term);
-    return it == facts.fluent_fterm_intervals.end() ? ygg::ClosedInterval<ygg::float_t>() : it->second;
-}
-
-inline ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundFunctionExpressionView expression,
-                                                              const FactsWorkspace<GroundTag>& facts);
-inline ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundArithmeticOperatorView expression,
-                                                              const FactsWorkspace<GroundTag>& facts);
-
-template<::tyr::formalism::ArithmeticOpKind O>
-ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundUnaryOperatorView<O> expression, const FactsWorkspace<GroundTag>& facts)
-{
-    return ::tyr::formalism::apply(O {}, evaluate_ground_goal(expression.get_arg(), facts));
-}
-
-template<::tyr::formalism::ArithmeticOpKind O>
-ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundBinaryOperatorView<O> expression,
-                                                       const FactsWorkspace<GroundTag>& facts)
-{
-    return ::tyr::formalism::apply(O {}, evaluate_ground_goal(expression.get_lhs(), facts), evaluate_ground_goal(expression.get_rhs(), facts));
-}
-
-template<::tyr::formalism::ArithmeticOpKind O>
-ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundMultiOperatorView<O> expression, const FactsWorkspace<GroundTag>& facts)
-{
-    const auto args = expression.get_args();
-    if (args.empty())
-        return ygg::ClosedInterval<ygg::float_t>();
-    return std::accumulate(std::next(args.begin()),
-                           args.end(),
-                           evaluate_ground_goal(args.front(), facts),
-                           [&](const auto& value, const auto& arg) { return ::tyr::formalism::apply(O {}, value, evaluate_ground_goal(arg, facts)); });
-}
-
-template<::tyr::formalism::BooleanOpKind O>
-bool evaluate_ground_goal(::tyr::formalism::datalog::GroundBinaryOperatorView<O> expression, const FactsWorkspace<GroundTag>& facts)
-{
-    return ::tyr::formalism::apply_existential(O {}, evaluate_ground_goal(expression.get_lhs(), facts), evaluate_ground_goal(expression.get_rhs(), facts));
-}
-
-inline ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundFunctionExpressionView expression,
-                                                              const FactsWorkspace<GroundTag>& facts)
-{
-    return ygg::visit([&](auto&& arg) { return evaluate_ground_goal(arg, facts); }, expression.get_variant());
-}
-
-inline ygg::ClosedInterval<ygg::float_t> evaluate_ground_goal(::tyr::formalism::datalog::GroundArithmeticOperatorView expression,
-                                                              const FactsWorkspace<GroundTag>& facts)
-{
-    return ygg::visit([&](auto&& arg) { return evaluate_ground_goal(arg, facts); }, expression.get_variant());
-}
-
-inline bool evaluate_ground_goal(::tyr::formalism::datalog::GroundBooleanOperatorView expression, const FactsWorkspace<GroundTag>& facts)
-{
-    return ygg::visit([&](auto&& arg) { return evaluate_ground_goal(arg, facts); }, expression.get_variant());
-}
-}
 
 template<>
 class NoTerminationPolicy<GroundTag>
@@ -140,24 +61,12 @@ public:
         goals = goals_;
     }
 
-    bool check(::tyr::formalism::datalog::ProgramView<GroundTag> program, const FactsWorkspace<GroundTag>& facts) const noexcept
+    bool check(::tyr::formalism::datalog::ProgramView<GroundTag>, const FactsWorkspace<GroundTag>& facts) const noexcept
     {
         if (!goals.has_value())
             return false;
 
-        for (const auto literal : goals->template get_literals<::tyr::formalism::StaticTag>())
-            if (literal.get_polarity() && !is_static_fact_true(program, literal.get_atom()))
-                return false;
-
-        for (const auto literal : goals->template get_literals<::tyr::formalism::FluentTag>())
-            if (literal.get_polarity() && !facts.fluent_atoms.contains(literal.get_atom()))
-                return false;
-
-        for (const auto numeric_constraint : goals->get_numeric_constraints())
-            if (!details::evaluate_ground_goal(numeric_constraint, facts))
-                return false;
-
-        return true;
+        return is_applicable(*goals, FactSets { facts.static_fact_sets, facts.fluent_fact_sets });
     }
 
     Cost get_total_cost(const FactsWorkspace<GroundTag>&,
@@ -207,15 +116,6 @@ public:
     }
 
 private:
-    static bool is_static_fact_true(::tyr::formalism::datalog::ProgramView<GroundTag> program,
-                                    ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::StaticTag> fact) noexcept
-    {
-        for (const auto atom : program.template get_atoms<::tyr::formalism::StaticTag>())
-            if (atom.get_index() == fact.get_index())
-                return true;
-        return false;
-    }
-
     std::optional<::tyr::formalism::datalog::GroundConjunctiveConditionView> goals;
     mutable GroundNumericSupportSelectorWorkspace numeric_support_selector_workspace;
     AggregationFunction agg;

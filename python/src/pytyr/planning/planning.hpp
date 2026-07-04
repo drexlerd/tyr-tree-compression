@@ -19,7 +19,6 @@
 #define TYR_PYTHON_PLANNING_PLANNING_HPP_
 
 #include "module.hpp"
-#include "pytyr/bindings.hpp"
 
 #include <nanobind/stl/chrono.h>
 #include <nanobind/stl/optional.h>
@@ -30,10 +29,12 @@
 #include <ranges>
 #include <type_traits>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
 #include <yggdrasil/python/type_casters.hpp>
 
 namespace tyr::planning
 {
+using ygg::bind_index;
 
 namespace fp = tyr::formalism::planning;
 
@@ -163,8 +164,8 @@ void bind_state(nb::module_& m, const std::string& name)
                                                                                                                          s.get_fluent_fterm_values_view());
                        },
                        nb::keep_alive<0, 1>());
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<TaskKind Kind>
@@ -176,8 +177,8 @@ void bind_node(nb::module_& m, const std::string& name)
                    .def(nb::init<StateView<Kind>, ygg::float_t>(), "state"_a, "metric_value"_a)
                    .def("get_state", &T::get_state, nb::rv_policy::reference_internal)
                    .def("get_metric", &T::get_metric, nb::rv_policy::copy);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<TaskKind Kind>
@@ -189,7 +190,7 @@ void bind_labeled_node(nb::module_& m, const std::string& name)
                    .def(nb::init<fp::GroundActionView, Node<Kind>>(), "label"_a, "node"_a)
                    .def_ro("label", &T::label, nb::rv_policy::copy)
                    .def_ro("node", &T::node, nb::rv_policy::copy);
-    add_print(cls);
+    ygg::add_print(cls);
 }
 
 template<TaskKind Kind>
@@ -205,7 +206,7 @@ void bind_plan(nb::module_& m, const std::string& name)
                    .def("get_cost", &T::get_cost)
                    .def("get_length", &T::get_length)
                    .def("empty", &T::empty);
-    add_print(cls);
+    ygg::add_print(cls);
 }
 
 template<TaskKind Kind>
@@ -419,9 +420,9 @@ void bind_heuristic(nb::module_& m, const std::string& name)
         .def(nb::init<>())
         .def("set_goal", &T::set_goal, "goal"_a)
         .def("evaluate", &T::evaluate, "state"_a, nb::call_guard<nb::gil_scoped_release>())
-        .def("get_preferred_action_indices", &T::get_preferred_actions, nb::rv_policy::reference_internal)
-        .def("get_preferred_action_views", &T::get_preferred_action_views, nb::rv_policy::reference_internal)
-        .def("get_preferred_actions", &T::get_preferred_action_views, nb::rv_policy::reference_internal);
+        .def("get_preferred_action_indices", &T::get_preferred_actions)
+        .def("get_preferred_action_views", &T::get_preferred_action_views)
+        .def("get_preferred_actions", &T::get_preferred_action_views);
 }
 
 template<TaskKind Kind>

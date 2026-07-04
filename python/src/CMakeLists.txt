@@ -57,6 +57,13 @@ yggdrasil_install_native_export(
 
 yggdrasil_install_runtime_path_fixup(PYTYR pytyr)
 
+set(PYTYR_GENERATED_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/pytyr/_version.py")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/pytyr")
+file(WRITE "${PYTYR_GENERATED_VERSION_FILE}" "__version__ = \"${PROJECT_VERSION}\"\n")
+install(FILES "${PYTYR_GENERATED_VERSION_FILE}"
+        DESTINATION "pytyr"
+        COMPONENT pytyr)
+
 yggdrasil_install_python_files(pytyr "${CMAKE_CURRENT_SOURCE_DIR}"
     FILES
     pytyr/__init__.py

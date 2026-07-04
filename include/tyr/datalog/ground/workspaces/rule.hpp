@@ -29,21 +29,22 @@ namespace tyr::datalog
 {
 
 template<>
+struct RuleState<GroundTag>
+{
+    ygg::uint_t unsatisfied_count = 0;
+    bool fired = false;
+    std::optional<Cost> queued_cost;
+    std::vector<bool> numeric_constraint_satisfied;
+};
+
+template<>
 struct RuleWorkspace<GroundTag>
 {
-    std::vector<ygg::uint_t> unsatisfied_counts;
-    std::vector<bool> fired_rules;
-    std::vector<std::optional<Cost>> queued_costs;
-    std::vector<std::vector<bool>> numeric_constraint_satisfied_by_rule;
+    std::vector<RuleState<GroundTag>> states;
+
     explicit RuleWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag>) {}
 
-    void clear()
-    {
-        unsatisfied_counts.clear();
-        fired_rules.clear();
-        queued_costs.clear();
-        numeric_constraint_satisfied_by_rule.clear();
-    }
+    void clear() { states.clear(); }
 };
 
 }

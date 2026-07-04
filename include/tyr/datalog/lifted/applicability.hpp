@@ -18,7 +18,7 @@
 #ifndef TYR_DATALOG_APPLICABILITY_HPP_
 #define TYR_DATALOG_APPLICABILITY_HPP_
 
-#include "tyr/datalog/lifted/fact_sets.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/formalism/arithmetic_operator_utils.hpp"
 #include "tyr/formalism/boolean_operator_utils.hpp"
 #include "tyr/formalism/datalog/builder.hpp"

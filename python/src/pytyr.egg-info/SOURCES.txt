@@ -85,7 +85,7 @@ include/tyr/datalog/datalog.hpp
 include/tyr/datalog/declarations.hpp
 include/tyr/datalog/lifted/delta_kpkc.hpp
 include/tyr/datalog/lifted/delta_kpkc_graph.hpp
-include/tyr/datalog/lifted/fact_sets.hpp
+include/tyr/datalog/fact_sets.hpp
 include/tyr/datalog/formatter.hpp
 include/tyr/datalog/program_context.hpp
 include/tyr/datalog/lifted/rule_scheduler.hpp

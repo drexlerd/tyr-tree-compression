@@ -56,6 +56,7 @@ fd::RuleBindingView create_rule_binding(GroundProgramBuildContext& context, d::C
     predicate.arity = 0;
     canonicalize(predicate);
     const auto new_predicate = context.merge_context.destination.get_or_create(predicate).first;
+    context.program.fluent_predicates.push_back(new_predicate.get_index());
 
     auto atom_ptr = context.builder.get_builder<fd::Atom<f::FluentTag>>();
     auto& atom = *atom_ptr;

@@ -88,7 +88,7 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     datalog/lifted/consistency_graph.cpp
     datalog/lifted/delta_kpkc_graph.cpp
     datalog/lifted/delta_kpkc.cpp
-    datalog/lifted/fact_set.cpp
+    datalog/fact_set.cpp
     datalog/ground/programs/program.cpp
     datalog/ground/workspaces/program.cpp
     datalog/ground/queue.cpp

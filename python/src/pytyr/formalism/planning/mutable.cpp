@@ -19,12 +19,13 @@
 
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include "pytyr/bindings.hpp"
-#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
+#include <yggdrasil/python/type_casters.hpp>
 
 namespace tyr::formalism::planning
 {
+
 namespace
 {
 template<FactKind T>
@@ -37,8 +38,8 @@ void bind_atom(nb::module_& m, const std::string& name)
                    .def(nb::init<AtomView<T>>(), "atom"_a)
                    .def_rw("predicate", &V::predicate)
                    .def_rw("terms", &V::terms);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 template<FactKind T>
@@ -49,8 +50,8 @@ void bind_literal(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<MutableAtom<T>, bool>(), "atom"_a, "polarity"_a)
                    .def(nb::init<LiteralView<T>>(), "literal"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_conjunctive_condition(nb::module_& m, const std::string& name)
@@ -59,8 +60,8 @@ void bind_conjunctive_condition(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<size_t, ConjunctiveConditionView>(), "num_parent_variables"_a, "condition"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_conjunctive_effect(nb::module_& m, const std::string& name)
@@ -69,8 +70,8 @@ void bind_conjunctive_effect(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<size_t, size_t, ConjunctiveEffectView>(), "num_parent_variables"_a, "num_variables"_a, "effect"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_conditional_effect(nb::module_& m, const std::string& name)
@@ -79,8 +80,8 @@ void bind_conditional_effect(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<size_t, ConditionalEffectView>(), "num_parent_variables"_a, "effect"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 
 void bind_action(nb::module_& m, const std::string& name)
@@ -89,8 +90,8 @@ void bind_action(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def(nb::init<ActionView>(), "action"_a);
-    add_print(cls);
-    add_hash(cls);
+    ygg::add_print(cls);
+    ygg::add_hash(cls);
 }
 }
 

@@ -39,6 +39,7 @@ struct GroundQueueFixture
 {
     fd::RepositoryFactory factory;
     fd::Repository repository = factory.create();
+    std::vector<ygg::Index<f::Predicate<f::FluentTag>>> fluent_predicates;
     std::vector<ygg::Index<fd::GroundAtom<f::FluentTag>>> initial_fluent_atoms;
     std::vector<ygg::Index<fd::GroundRule>> ground_rules;
     ygg::uint_t next_rule_id = 0;
@@ -48,7 +49,8 @@ struct GroundQueueFixture
         auto predicate_builder = ygg::Data<f::Predicate<f::FluentTag>>(name, 0);
         canonicalize(predicate_builder);
         const auto [predicate, predicate_inserted] = repository.get_or_create(predicate_builder);
-        (void) predicate_inserted;
+        if (predicate_inserted)
+            fluent_predicates.push_back(predicate.get_index());
 
         auto binding_builder = ygg::Data<f::RelationBinding<f::Predicate<f::FluentTag>>>();
         binding_builder.relation = predicate.get_index();
@@ -119,6 +121,7 @@ struct GroundQueueFixture
     fd::ProgramView<GroundTag> program()
     {
         auto program_builder = ygg::Data<fd::GroundProgram>();
+        program_builder.fluent_predicates.insert(program_builder.fluent_predicates.end(), fluent_predicates.begin(), fluent_predicates.end());
         program_builder.fluent_atoms.insert(program_builder.fluent_atoms.end(), initial_fluent_atoms.begin(), initial_fluent_atoms.end());
         program_builder.ground_rules.insert(program_builder.ground_rules.end(), ground_rules.begin(), ground_rules.end());
         canonicalize(program_builder);
@@ -305,7 +308,7 @@ TEST(TyrDatalogGroundQueueTest, InitialFluentFactsSatisfyDynamicUnsatisfiedCount
     EXPECT_EQ(rule_indices(a_it->second), std::vector<ygg::Index<fd::GroundRule>>({ fixture.ground_rules[0] }));
 
     ctx.initialize(initial_fluent_atoms(fixture));
-    EXPECT_EQ(ctx.out().unsatisfied_counts()[fixture.ground_rules[0].get_value()], 0);
+    EXPECT_EQ(ctx.out().rule_states()[fixture.ground_rules[0].get_value()].unsatisfied_count, 0);
 }
 
 TEST(TyrDatalogGroundQueueTest, ExplicitFluentStateDrivesDynamicUnsatisfiedCounts)
@@ -324,7 +327,7 @@ TEST(TyrDatalogGroundQueueTest, ExplicitFluentStateDrivesDynamicUnsatisfiedCount
 
     ctx.out().fluent_atoms().clear();
     ctx.initialize();
-    EXPECT_EQ(ctx.out().unsatisfied_counts()[fixture.ground_rules[0].get_value()], 1);
+    EXPECT_EQ(ctx.out().rule_states()[fixture.ground_rules[0].get_value()].unsatisfied_count, 1);
 }
 
 TEST(TyrDatalogGroundQueueTest, DerivedFactOnlyDecrementsRulesWaitingOnThatFact)
@@ -348,8 +351,8 @@ TEST(TyrDatalogGroundQueueTest, DerivedFactOnlyDecrementsRulesWaitingOnThatFact)
     dq::solve_ground_queue(ctx);
 
     EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a, b }));
-    EXPECT_EQ(ctx.out().unsatisfied_counts()[fixture.ground_rules[1].get_value()], 0);
-    EXPECT_EQ(ctx.out().unsatisfied_counts()[fixture.ground_rules[2].get_value()], 1);
+    EXPECT_EQ(ctx.out().rule_states()[fixture.ground_rules[1].get_value()].unsatisfied_count, 0);
+    EXPECT_EQ(ctx.out().rule_states()[fixture.ground_rules[2].get_value()].unsatisfied_count, 1);
 }
 
 TEST(TyrDatalogGroundQueueTest, DuplicateHeadsDeriveFactOnce)

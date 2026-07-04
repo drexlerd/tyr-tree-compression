@@ -80,16 +80,12 @@ struct ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>
         const auto& cost_policy() const noexcept { return m_ws.cost_policy; }
         auto& rules() noexcept { return m_ws.rules; }
         const auto& rules() const noexcept { return m_ws.rules; }
-        auto& unsatisfied_counts() noexcept { return m_ws.rules.unsatisfied_counts; }
-        const auto& unsatisfied_counts() const noexcept { return m_ws.rules.unsatisfied_counts; }
-        auto& fired_rules() noexcept { return m_ws.rules.fired_rules; }
-        const auto& fired_rules() const noexcept { return m_ws.rules.fired_rules; }
-        auto& queued_costs() noexcept { return m_ws.rules.queued_costs; }
-        const auto& queued_costs() const noexcept { return m_ws.rules.queued_costs; }
-        auto& numeric_constraint_satisfied_by_rule() noexcept { return m_ws.rules.numeric_constraint_satisfied_by_rule; }
-        const auto& numeric_constraint_satisfied_by_rule() const noexcept { return m_ws.rules.numeric_constraint_satisfied_by_rule; }
+        auto& rule_states() noexcept { return m_ws.rules.states; }
+        const auto& rule_states() const noexcept { return m_ws.rules.states; }
         auto& queue_storage() noexcept { return m_queue_ws.storage; }
         const auto& queue_storage() const noexcept { return m_queue_ws.storage; }
+        auto& fluent_fact_sets() noexcept { return m_ws.facts.fluent_fact_sets; }
+        const auto& fluent_fact_sets() const noexcept { return m_ws.facts.fluent_fact_sets; }
         auto& fluent_atoms() noexcept { return m_ws.facts.fluent_atoms; }
         const auto& fluent_atoms() const noexcept { return m_ws.facts.fluent_atoms; }
         auto& static_fterm_intervals() noexcept { return m_ws.facts.static_fterm_intervals; }
@@ -114,9 +110,9 @@ struct ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>
     {
     }
 
-    void clear() { initialize_from_current_fluent_atoms(); }
+    void clear() { reset_from_current_facts(); }
 
-    void initialize() { initialize_from_current_fluent_atoms(); }
+    void initialize() { reset_from_current_facts(); }
 
     template<typename Range>
     void initialize(const Range& fluent_atoms)
@@ -167,14 +163,22 @@ private:
             m_out.static_fterm_intervals().insert_or_assign(fterm_value.get_fterm(),
                                                             ygg::ClosedInterval<ygg::float_t>(fterm_value.get_value(), fterm_value.get_value()));
 
+        m_out.fluent_fact_sets().reset();
+
         for (const auto fact : m_out.fluent_atoms())
+        {
+            m_out.fluent_fact_sets().predicate.insert(fact);
             m_out.or_ap().initialize_annotation(fact, m_out.and_annot());
+        }
 
         for (const auto& [fterm, interval] : m_out.fluent_fterm_intervals())
+        {
+            m_out.fluent_fact_sets().function.insert(fterm, interval);
             m_out.or_ap().initialize_annotation(fterm, interval, m_out.numeric_and_annot());
+        }
     }
 
-    void initialize_from_current_fluent_atoms()
+    void reset_from_current_facts()
     {
         initialize_annotations();
         m_out.rules().clear();
@@ -182,13 +186,10 @@ private:
         for (const auto rule : m_in.program().get_ground_rules())
         {
             const auto rule_index = rule.get_index();
-            if (position(rule_index) >= m_out.unsatisfied_counts().size())
-            {
-                m_out.unsatisfied_counts().resize(position(rule_index) + 1, 0);
-                m_out.fired_rules().resize(position(rule_index) + 1, false);
-                m_out.queued_costs().resize(position(rule_index) + 1, std::nullopt);
-                m_out.numeric_constraint_satisfied_by_rule().resize(position(rule_index) + 1);
-            }
+            if (position(rule_index) >= m_out.rule_states().size())
+                m_out.rule_states().resize(position(rule_index) + 1);
+
+            auto& state = at(m_out.rule_states(), rule_index);
 
             auto unsatisfied_count = ygg::uint_t(0);
             for (const auto literal : rule.get_body().template get_literals<::tyr::formalism::FluentTag>())
@@ -199,14 +200,13 @@ private:
                     ++unsatisfied_count;
             }
             const auto numeric_constraints = rule.get_body().get_numeric_constraints();
-            auto& numeric_constraint_satisfied = at(m_out.numeric_constraint_satisfied_by_rule(), rule_index);
-            numeric_constraint_satisfied.assign(numeric_constraints.size(), false);
+            state.numeric_constraint_satisfied.assign(numeric_constraints.size(), false);
             for (ygg::uint_t i = 0; i < numeric_constraints.size(); ++i)
                 ++unsatisfied_count;
 
-            at(m_out.unsatisfied_counts(), rule_index) = unsatisfied_count;
-            at(m_out.fired_rules(), rule_index) = false;
-            at(m_out.queued_costs(), rule_index) = std::nullopt;
+            state.unsatisfied_count = unsatisfied_count;
+            state.fired = false;
+            state.queued_cost = std::nullopt;
         }
     }
 

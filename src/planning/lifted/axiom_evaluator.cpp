@@ -17,10 +17,10 @@
 
 #include "tyr/planning/lifted/axiom_evaluator.hpp"
 
+#include "tyr/datalog/fact_sets.hpp"  // for FactSets, Pre...
 #include "tyr/datalog/formatter.hpp"
 #include "tyr/datalog/lifted/bottom_up.hpp"  // for solve_bottom_up
 #include "tyr/datalog/lifted/contexts/program.hpp"
-#include "tyr/datalog/lifted/fact_sets.hpp"  // for FactSets, Pre...
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/planning/merge_datalog.hpp"   // for MergeContext
 #include "tyr/formalism/planning/merge_planning.hpp"  // for MergeContext

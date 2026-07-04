@@ -22,7 +22,6 @@
 #include "planning/module.hpp"
 #include "planning/mutable.hpp"
 #include "planning/views.hpp"
-#include "pytyr/bindings.hpp"
 
 #include <nanobind/stl/chrono.h>
 #include <nanobind/stl/filesystem.h>
@@ -32,10 +31,13 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/bindings.hpp>
 #include <yggdrasil/python/type_casters.hpp>
 
 namespace tyr::formalism::planning
 {
+using ygg::bind_fixed_uint;
+
 namespace
 {
 template<typename T>
@@ -305,7 +307,7 @@ void bind_module_definitions(nb::module_& m)
              "ground_mutex_groups"_a,
              "repository"_a)
         .def("get_fact", nb::overload_cast<GroundAtomView<FluentTag>>(&FDRContext::get_fact_view), "atom"_a, nb::keep_alive<0, 1>())
-        .def("get_variables", &FDRContext::get_variables, nb::rv_policy::reference_internal);
+        .def("get_variables", &FDRContext::get_variables);
 
     /**
      * PlanningDomain

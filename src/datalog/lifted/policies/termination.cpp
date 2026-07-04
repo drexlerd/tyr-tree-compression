@@ -17,8 +17,8 @@
 
 #include "tyr/datalog/lifted/policies/termination.hpp"
 
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
-#include "tyr/datalog/lifted/fact_sets.hpp"
 #include "tyr/datalog/lifted/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
