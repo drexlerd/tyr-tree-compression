@@ -716,7 +716,7 @@ def test_state_repository_create_state_accepts_state_iterables():
         )
         value_recreated_state = state_repository.create_state(
             [
-                formalism_planning.FluentFDRFactBuilder(fact.get_variable(), fact.get_value())
+                formalism_planning.FluentFDRFactData(fact.get_variable(), fact.get_value())
                 for fact in initial_state.fluent_facts()
             ],
             [(fterm.get_index(), value) for fterm, value in initial_state.fluent_fterm_values()],

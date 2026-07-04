@@ -15,26 +15,26 @@ from pyyggdrasil.execution import ExecutionContext
 from pytyr.formalism.planning import (
     ParameterIndex,
     RepositoryFactory,
-    ObjectBuilder,
-    VariableBuilder,
-    TermBuilder,
-    StaticPredicateBuilder,
-    FluentPredicateBuilder,
-    StaticPredicateBindingBuilder,
-    FluentPredicateBindingBuilder,
-    StaticAtomBuilder,
-    FluentAtomBuilder,
-    StaticGroundAtomBuilder,
-    FluentGroundAtomBuilder,
-    StaticLiteralBuilder,
-    FluentLiteralBuilder,
-    ConjunctiveConditionBuilder,
-    ConjunctiveEffectBuilder,
-    ConditionalEffectBuilder,
-    ActionBuilder,
-    DomainBuilder,
-    GroundConjunctiveConditionBuilder,
-    LiftedTaskBuilder,
+    ObjectData,
+    VariableData,
+    TermData,
+    StaticPredicateData,
+    FluentPredicateData,
+    StaticPredicateBindingData,
+    FluentPredicateBindingData,
+    StaticAtomData,
+    FluentAtomData,
+    StaticGroundAtomData,
+    FluentGroundAtomData,
+    StaticLiteralData,
+    FluentLiteralData,
+    ConjunctiveConditionData,
+    ConjunctiveEffectData,
+    ConditionalEffectData,
+    ActionData,
+    DomainData,
+    GroundConjunctiveConditionData,
+    LiftedTaskData,
     FDRContext,
     PlanningDomain,
     PlanningTask,
@@ -56,35 +56,35 @@ def get(repository, builder):
 
 
 def make_term(repository, value):
-    return get(repository, TermBuilder(value))
+    return get(repository, TermData(value))
 
 
 def make_static_atom(repository, predicate, terms):
-    return get(repository, StaticAtomBuilder(predicate, terms))
+    return get(repository, StaticAtomData(predicate, terms))
 
 
 def make_fluent_atom(repository, predicate, terms):
-    return get(repository, FluentAtomBuilder(predicate, terms))
+    return get(repository, FluentAtomData(predicate, terms))
 
 
 def make_static_literal(repository, predicate, terms, polarity=True):
     atom = make_static_atom(repository, predicate, terms)
-    return get(repository, StaticLiteralBuilder(atom, polarity))
+    return get(repository, StaticLiteralData(atom, polarity))
 
 
 def make_fluent_literal(repository, predicate, terms, polarity=True):
     atom = make_fluent_atom(repository, predicate, terms)
-    return get(repository, FluentLiteralBuilder(atom, polarity))
+    return get(repository, FluentLiteralData(atom, polarity))
 
 
 def make_static_ground_atom(repository, predicate, objects):
-    binding = get(repository, StaticPredicateBindingBuilder(predicate, objects))
-    return get(repository, StaticGroundAtomBuilder(binding))
+    binding = get(repository, StaticPredicateBindingData(predicate, objects))
+    return get(repository, StaticGroundAtomData(binding))
 
 
 def make_fluent_ground_atom(repository, predicate, objects):
-    binding = get(repository, FluentPredicateBindingBuilder(predicate, objects))
-    return get(repository, FluentGroundAtomBuilder(binding))
+    binding = get(repository, FluentPredicateBindingData(predicate, objects))
+    return get(repository, FluentGroundAtomData(binding))
 
 
 def main():
@@ -98,38 +98,38 @@ def main():
     domain_repository = factory.create_repository()
 
     # Static predicates
-    room = get(domain_repository, StaticPredicateBuilder("room", 1))
-    ball = get(domain_repository, StaticPredicateBuilder("ball", 1))
-    gripper = get(domain_repository, StaticPredicateBuilder("gripper", 1))
+    room = get(domain_repository, StaticPredicateData("room", 1))
+    ball = get(domain_repository, StaticPredicateData("ball", 1))
+    gripper = get(domain_repository, StaticPredicateData("gripper", 1))
 
     # Fluent predicates
-    at_robby = get(domain_repository, FluentPredicateBuilder("at-robby", 1))
-    at = get(domain_repository, FluentPredicateBuilder("at", 2))
-    free = get(domain_repository, FluentPredicateBuilder("free", 1))
-    carry = get(domain_repository, FluentPredicateBuilder("carry", 2))
+    at_robby = get(domain_repository, FluentPredicateData("at-robby", 1))
+    at = get(domain_repository, FluentPredicateData("at", 2))
+    free = get(domain_repository, FluentPredicateData("free", 1))
+    carry = get(domain_repository, FluentPredicateData("carry", 2))
 
     # Constants
-    rooma = get(domain_repository, ObjectBuilder("rooma"))
-    roomb = get(domain_repository, ObjectBuilder("roomb"))
+    rooma = get(domain_repository, ObjectData("rooma"))
+    roomb = get(domain_repository, ObjectData("roomb"))
 
     # --------------------------------------------------------------------------
     # Lifted variables
     # --------------------------------------------------------------------------
 
-    v_from = get(domain_repository, VariableBuilder("?from"))
-    v_to = get(domain_repository, VariableBuilder("?to"))
+    v_from = get(domain_repository, VariableData("?from"))
+    v_to = get(domain_repository, VariableData("?to"))
 
-    v_obj = get(domain_repository, VariableBuilder("?obj"))
-    v_room = get(domain_repository, VariableBuilder("?room"))
-    v_gripper = get(domain_repository, VariableBuilder("?gripper"))
+    v_obj = get(domain_repository, VariableData("?obj"))
+    v_room = get(domain_repository, VariableData("?room"))
+    v_gripper = get(domain_repository, VariableData("?gripper"))
 
     # Terms
-    t_from = create(domain_repository, TermBuilder(ParameterIndex(0)))
-    t_to = create(domain_repository, TermBuilder(ParameterIndex(1)))
+    t_from = create(domain_repository, TermData(ParameterIndex(0)))
+    t_to = create(domain_repository, TermData(ParameterIndex(1)))
 
-    t_obj = create(domain_repository, TermBuilder(ParameterIndex(0)))
-    t_room = create(domain_repository, TermBuilder(ParameterIndex(1)))
-    t_gripper = create(domain_repository, TermBuilder(ParameterIndex(2)))
+    t_obj = create(domain_repository, TermData(ParameterIndex(0)))
+    t_room = create(domain_repository, TermData(ParameterIndex(1)))
+    t_gripper = create(domain_repository, TermData(ParameterIndex(2)))
 
     # --------------------------------------------------------------------------
     # move action
@@ -141,7 +141,7 @@ def main():
 
     move_condition = get(
         domain_repository,
-        ConjunctiveConditionBuilder(
+        ConjunctiveConditionData(
             variables=[v_from, v_to],
             static_literals=[
                 make_static_literal(domain_repository, room, [t_from], True),
@@ -157,7 +157,7 @@ def main():
 
     move_effect = get(
         domain_repository,
-        ConjunctiveEffectBuilder(
+        ConjunctiveEffectData(
             fluent_literals=[
                 make_fluent_literal(domain_repository, at_robby, [t_to], True),
                 make_fluent_literal(domain_repository, at_robby, [t_from], False),
@@ -169,11 +169,11 @@ def main():
 
     move_conditional_effect = get(
         domain_repository,
-        ConditionalEffectBuilder(
+        ConditionalEffectData(
             variables=[],
             condition=get(
                 domain_repository,
-                ConjunctiveConditionBuilder(
+                ConjunctiveConditionData(
                     variables=[],
                     static_literals=[],
                     fluent_literals=[],
@@ -187,7 +187,7 @@ def main():
 
     move = get(
         domain_repository,
-        ActionBuilder(
+        ActionData(
             name="move",
             original_arity=2,
             variables=[v_from, v_to],
@@ -209,7 +209,7 @@ def main():
 
     pick_condition = get(
         domain_repository,
-        ConjunctiveConditionBuilder(
+        ConjunctiveConditionData(
             variables=[v_obj, v_room, v_gripper],
             static_literals=[
                 make_static_literal(domain_repository, ball, [t_obj], True),
@@ -228,7 +228,7 @@ def main():
 
     pick_effect = get(
         domain_repository,
-        ConjunctiveEffectBuilder(
+        ConjunctiveEffectData(
             fluent_literals=[
                 make_fluent_literal(domain_repository, carry, [t_obj, t_gripper], True),
                 make_fluent_literal(domain_repository, at, [t_obj, t_room], False),
@@ -241,11 +241,11 @@ def main():
 
     pick_conditional_effect = get(
         domain_repository,
-        ConditionalEffectBuilder(
+        ConditionalEffectData(
             variables=[],
             condition=get(
                 domain_repository,
-                ConjunctiveConditionBuilder(
+                ConjunctiveConditionData(
                     variables=[],
                     static_literals=[],
                     fluent_literals=[],
@@ -259,7 +259,7 @@ def main():
 
     pick = get(
         domain_repository,
-        ActionBuilder(
+        ActionData(
             name="pick",
             original_arity=3,
             variables=[v_obj, v_room, v_gripper],
@@ -281,7 +281,7 @@ def main():
 
     drop_condition = get(
         domain_repository,
-        ConjunctiveConditionBuilder(
+        ConjunctiveConditionData(
             variables=[v_obj, v_room, v_gripper],
             static_literals=[
                 make_static_literal(domain_repository, ball, [t_obj], True),
@@ -299,7 +299,7 @@ def main():
 
     drop_effect = get(
         domain_repository,
-        ConjunctiveEffectBuilder(
+        ConjunctiveEffectData(
             fluent_literals=[
                 make_fluent_literal(domain_repository, at, [t_obj, t_room], True),
                 make_fluent_literal(domain_repository, free, [t_gripper], True),
@@ -312,11 +312,11 @@ def main():
 
     drop_conditional_effect = get(
         domain_repository,
-        ConditionalEffectBuilder(
+        ConditionalEffectData(
             variables=[],
             condition=get(
                 domain_repository,
-                ConjunctiveConditionBuilder(
+                ConjunctiveConditionData(
                     variables=[],
                     static_literals=[],
                     fluent_literals=[],
@@ -330,7 +330,7 @@ def main():
 
     drop = get(
         domain_repository,
-        ActionBuilder(
+        ActionData(
             name="drop",
             original_arity=3,
             variables=[v_obj, v_room, v_gripper],
@@ -341,7 +341,7 @@ def main():
 
     domain = get(
         domain_repository,
-        DomainBuilder(
+        DomainData(
             name="gripper-strips",
             static_predicates=[room, ball, gripper],
             fluent_predicates=[at_robby, at, free, carry],
@@ -368,9 +368,9 @@ def main():
 
     fdr_context = FDRContext(task_repository)
 
-    left = get(task_repository, ObjectBuilder("left"))
-    right = get(task_repository, ObjectBuilder("right"))
-    ball1 = get(task_repository, ObjectBuilder("ball1"))
+    left = get(task_repository, ObjectData("left"))
+    right = get(task_repository, ObjectData("right"))
+    ball1 = get(task_repository, ObjectData("ball1"))
 
     # Static atoms from typing
     static_atoms = [
@@ -392,7 +392,7 @@ def main():
     # --------------------------------------------------------------------------
     # Goal
     #
-    # Your GroundConjunctiveConditionBuilder expects fluent goals as FDR facts,
+    # Your GroundConjunctiveConditionData expects fluent goals as FDR facts,
     # not as fluent ground atoms.
     #
     # We use the FDR context to automatically create binary FDR variables
@@ -406,7 +406,7 @@ def main():
 
     goal = get(
         task_repository,
-        GroundConjunctiveConditionBuilder(
+        GroundConjunctiveConditionData(
             static_literals=[],            
             derived_literals=[],
             positive_facts=[goal_at_ball1_roomb],
@@ -417,7 +417,7 @@ def main():
 
     task = get(
         task_repository,
-        LiftedTaskBuilder(
+        LiftedTaskData(
             name="gripper-1",
             domain=domain,
             derived_predicates=[],

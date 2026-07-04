@@ -34,7 +34,7 @@ namespace
  * ygg::Data
  */
 
-void bind_object_builder(nb::module_& m, const std::string& name)
+void bind_object_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Object>;
 
@@ -43,7 +43,7 @@ void bind_object_builder(nb::module_& m, const std::string& name)
         .def_rw("name", &V::name);
 }
 
-void bind_variable_builder(nb::module_& m, const std::string& name)
+void bind_variable_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Variable>;
 
@@ -54,7 +54,7 @@ void bind_variable_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_term_builder(nb::module_& m, const std::string& name)
+void bind_term_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Term>;
 
@@ -66,7 +66,7 @@ void bind_term_builder(nb::module_& m, const std::string& name)
 }
 
 template<typename Tag>
-void bind_relation_binding_builder(nb::module_& m, const std::string& name)
+void bind_relation_binding_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<RelationBinding<Tag>>;
 
@@ -77,7 +77,7 @@ void bind_relation_binding_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_predicate_builder(nb::module_& m, const std::string& name)
+void bind_predicate_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Predicate<T>>;
 
@@ -88,7 +88,7 @@ void bind_predicate_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_atom_builder(nb::module_& m, const std::string& name)
+void bind_atom_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Atom<T>>;
 
@@ -99,7 +99,7 @@ void bind_atom_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_ground_atom_builder(nb::module_& m, const std::string& name)
+void bind_ground_atom_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundAtom<T>>;
 
@@ -110,7 +110,7 @@ void bind_ground_atom_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_literal_builder(nb::module_& m, const std::string& name)
+void bind_literal_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Literal<T>>;
 
@@ -121,7 +121,7 @@ void bind_literal_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_ground_literal_builder(nb::module_& m, const std::string& name)
+void bind_ground_literal_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundLiteral<T>>;
 
@@ -132,7 +132,7 @@ void bind_ground_literal_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_fdr_variable_builder(nb::module_& m, const std::string& name)
+void bind_fdr_variable_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<FDRVariable<T>>;
 
@@ -143,7 +143,7 @@ void bind_fdr_variable_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_fdr_fact_builder(nb::module_& m, const std::string& name)
+void bind_fdr_fact_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<FDRFact<T>>;
 
@@ -154,7 +154,7 @@ void bind_fdr_fact_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_function_builder(nb::module_& m, const std::string& name)
+void bind_function_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Function<T>>;
 
@@ -165,7 +165,7 @@ void bind_function_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_function_term_builder(nb::module_& m, const std::string& name)
+void bind_function_term_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<FunctionTerm<T>>;
 
@@ -176,7 +176,7 @@ void bind_function_term_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_ground_function_term_builder(nb::module_& m, const std::string& name)
+void bind_ground_function_term_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundFunctionTerm<T>>;
 
@@ -187,7 +187,7 @@ void bind_ground_function_term_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_ground_function_term_value_builder(nb::module_& m, const std::string& name)
+void bind_ground_function_term_value_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundFunctionTermValue<T>>;
 
@@ -198,7 +198,7 @@ void bind_ground_function_term_value_builder(nb::module_& m, const std::string& 
 }
 
 template<NumericEffectOpKind Op, FactKind T>
-void bind_numeric_effect_builder(nb::module_& m, const std::string& name)
+void bind_numeric_effect_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<NumericEffect<Op, T>>;
 
@@ -209,7 +209,7 @@ void bind_numeric_effect_builder(nb::module_& m, const std::string& name)
 }
 
 template<NumericEffectOpKind Op, FactKind T>
-void bind_ground_numeric_effect_builder(nb::module_& m, const std::string& name)
+void bind_ground_numeric_effect_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundNumericEffect<Op, T>>;
 
@@ -220,7 +220,7 @@ void bind_ground_numeric_effect_builder(nb::module_& m, const std::string& name)
 }
 
 template<FactKind T>
-void bind_numeric_effect_operator_builder(nb::module_& m, const std::string& name)
+void bind_numeric_effect_operator_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<NumericEffectOperator<T>>;
 
@@ -231,7 +231,7 @@ void bind_numeric_effect_operator_builder(nb::module_& m, const std::string& nam
 }
 
 template<FactKind T>
-void bind_ground_numeric_effect_operator_builder(nb::module_& m, const std::string& name)
+void bind_ground_numeric_effect_operator_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundNumericEffectOperator<T>>;
 
@@ -241,7 +241,7 @@ void bind_ground_numeric_effect_operator_builder(nb::module_& m, const std::stri
     ygg::add_hash(cls);
 }
 
-void bind_function_expression_builder(nb::module_& m, const std::string& name)
+void bind_function_expression_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<FunctionExpression>;
 
@@ -251,7 +251,7 @@ void bind_function_expression_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_conjunctive_condition_builder(nb::module_& m, const std::string& name)
+void bind_conjunctive_condition_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<ConjunctiveCondition>;
 
@@ -270,7 +270,7 @@ void bind_conjunctive_condition_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_conjunctive_effect_builder(nb::module_& m, const std::string& name)
+void bind_conjunctive_effect_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<ConjunctiveEffect>;
 
@@ -285,7 +285,7 @@ void bind_conjunctive_effect_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_conditional_effect_builder(nb::module_& m, const std::string& name)
+void bind_conditional_effect_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<ConditionalEffect>;
 
@@ -295,7 +295,7 @@ void bind_conditional_effect_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_action_builder(nb::module_& m, const std::string& name)
+void bind_action_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Action>;
 
@@ -310,7 +310,7 @@ void bind_action_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_axiom_builder(nb::module_& m, const std::string& name)
+void bind_axiom_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Axiom>;
 
@@ -320,7 +320,7 @@ void bind_axiom_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_ground_function_expression_builder(nb::module_& m, const std::string& name)
+void bind_ground_function_expression_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundFunctionExpression>;
 
@@ -330,7 +330,7 @@ void bind_ground_function_expression_builder(nb::module_& m, const std::string& 
     ygg::add_hash(cls);
 }
 
-void bind_ground_conjunctive_condition_builder(nb::module_& m, const std::string& name)
+void bind_ground_conjunctive_condition_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundConjunctiveCondition>;
 
@@ -349,7 +349,7 @@ void bind_ground_conjunctive_condition_builder(nb::module_& m, const std::string
     ygg::add_hash(cls);
 }
 
-void bind_ground_conjunctive_effect_builder(nb::module_& m, const std::string& name)
+void bind_ground_conjunctive_effect_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundConjunctiveEffect>;
 
@@ -366,7 +366,7 @@ void bind_ground_conjunctive_effect_builder(nb::module_& m, const std::string& n
     ygg::add_hash(cls);
 }
 
-void bind_ground_conditional_effect_builder(nb::module_& m, const std::string& name)
+void bind_ground_conditional_effect_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundConditionalEffect>;
 
@@ -376,7 +376,7 @@ void bind_ground_conditional_effect_builder(nb::module_& m, const std::string& n
     ygg::add_hash(cls);
 }
 
-void bind_ground_action_builder(nb::module_& m, const std::string& name)
+void bind_ground_action_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundAction>;
 
@@ -389,7 +389,7 @@ void bind_ground_action_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_ground_axiom_builder(nb::module_& m, const std::string& name)
+void bind_ground_axiom_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<GroundAxiom>;
 
@@ -399,7 +399,7 @@ void bind_ground_axiom_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_metric_builder(nb::module_& m, const std::string& name)
+void bind_metric_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Metric>;
 
@@ -409,7 +409,7 @@ void bind_metric_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_domain_builder(nb::module_& m, const std::string& name)
+void bind_domain_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Domain>;
 
@@ -438,7 +438,7 @@ void bind_domain_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_lifted_task_builder(nb::module_& m, const std::string& name)
+void bind_lifted_task_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<Task>;
 
@@ -471,7 +471,7 @@ void bind_lifted_task_builder(nb::module_& m, const std::string& name)
     ygg::add_hash(cls);
 }
 
-void bind_ground_task_builder(nb::module_& m, const std::string& name)
+void bind_ground_task_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<FDRTask>;
 
@@ -516,7 +516,7 @@ void bind_ground_task_builder(nb::module_& m, const std::string& name)
 }
 
 template<OpKind Op, typename T>
-void bind_unary_operator_builder(nb::module_& m, const std::string& name)
+void bind_unary_operator_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<UnaryOperator<Op, T>>;
 
@@ -527,7 +527,7 @@ void bind_unary_operator_builder(nb::module_& m, const std::string& name)
 }
 
 template<OpKind Op, typename T>
-void bind_binary_operator_builder(nb::module_& m, const std::string& name)
+void bind_binary_operator_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<BinaryOperator<Op, T>>;
 
@@ -538,7 +538,7 @@ void bind_binary_operator_builder(nb::module_& m, const std::string& name)
 }
 
 template<OpKind Op, typename T>
-void bind_multi_operator_builder(nb::module_& m, const std::string& name)
+void bind_multi_operator_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<MultiOperator<Op, T>>;
 
@@ -549,7 +549,7 @@ void bind_multi_operator_builder(nb::module_& m, const std::string& name)
 }
 
 template<typename T>
-void bind_arithmetic_operator_builder(nb::module_& m, const std::string& name)
+void bind_arithmetic_operator_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<ArithmeticOperator<T>>;
 
@@ -560,7 +560,7 @@ void bind_arithmetic_operator_builder(nb::module_& m, const std::string& name)
 }
 
 template<typename T>
-void bind_boolean_operator_builder(nb::module_& m, const std::string& name)
+void bind_boolean_operator_data(nb::module_& m, const std::string& name)
 {
     using V = ygg::Data<BooleanOperator<T>>;
 
@@ -577,134 +577,134 @@ void bind_boolean_operator_builder(nb::module_& m, const std::string& name)
 
 void bind_datas(nb::module_& m)
 {
-    bind_object_builder(m, "ObjectBuilder");
-    bind_variable_builder(m, "VariableBuilder");
-    bind_term_builder(m, "TermBuilder");
-    bind_relation_binding_builder<Predicate<StaticTag>>(m, "StaticPredicateBindingBuilder");
-    bind_relation_binding_builder<Predicate<FluentTag>>(m, "FluentPredicateBindingBuilder");
-    bind_relation_binding_builder<Predicate<DerivedTag>>(m, "DerivedPredicateBindingBuilder");
-    bind_relation_binding_builder<Function<StaticTag>>(m, "StaticFunctionBindingBuilder");
-    bind_relation_binding_builder<Function<FluentTag>>(m, "FluentFunctionBindingBuilder");
-    bind_relation_binding_builder<Function<AuxiliaryTag>>(m, "AuxiliaryFunctionBindingBuilder");
-    bind_relation_binding_builder<Action>(m, "ActionBindingBuilder");
-    bind_relation_binding_builder<Axiom>(m, "AxiomBindingBuilder");
+    bind_object_data(m, "ObjectData");
+    bind_variable_data(m, "VariableData");
+    bind_term_data(m, "TermData");
+    bind_relation_binding_data<Predicate<StaticTag>>(m, "StaticPredicateBindingData");
+    bind_relation_binding_data<Predicate<FluentTag>>(m, "FluentPredicateBindingData");
+    bind_relation_binding_data<Predicate<DerivedTag>>(m, "DerivedPredicateBindingData");
+    bind_relation_binding_data<Function<StaticTag>>(m, "StaticFunctionBindingData");
+    bind_relation_binding_data<Function<FluentTag>>(m, "FluentFunctionBindingData");
+    bind_relation_binding_data<Function<AuxiliaryTag>>(m, "AuxiliaryFunctionBindingData");
+    bind_relation_binding_data<Action>(m, "ActionBindingData");
+    bind_relation_binding_data<Axiom>(m, "AxiomBindingData");
 
-    bind_predicate_builder<StaticTag>(m, "StaticPredicateBuilder");
-    bind_predicate_builder<FluentTag>(m, "FluentPredicateBuilder");
-    bind_predicate_builder<DerivedTag>(m, "DerivedPredicateBuilder");
+    bind_predicate_data<StaticTag>(m, "StaticPredicateData");
+    bind_predicate_data<FluentTag>(m, "FluentPredicateData");
+    bind_predicate_data<DerivedTag>(m, "DerivedPredicateData");
 
-    bind_atom_builder<StaticTag>(m, "StaticAtomBuilder");
-    bind_atom_builder<FluentTag>(m, "FluentAtomBuilder");
-    bind_atom_builder<DerivedTag>(m, "DerivedAtomBuilder");
+    bind_atom_data<StaticTag>(m, "StaticAtomData");
+    bind_atom_data<FluentTag>(m, "FluentAtomData");
+    bind_atom_data<DerivedTag>(m, "DerivedAtomData");
 
-    bind_ground_atom_builder<StaticTag>(m, "StaticGroundAtomBuilder");
-    bind_ground_atom_builder<FluentTag>(m, "FluentGroundAtomBuilder");
-    bind_ground_atom_builder<DerivedTag>(m, "DerivedGroundAtomBuilder");
+    bind_ground_atom_data<StaticTag>(m, "StaticGroundAtomData");
+    bind_ground_atom_data<FluentTag>(m, "FluentGroundAtomData");
+    bind_ground_atom_data<DerivedTag>(m, "DerivedGroundAtomData");
 
-    bind_literal_builder<StaticTag>(m, "StaticLiteralBuilder");
-    bind_literal_builder<FluentTag>(m, "FluentLiteralBuilder");
-    bind_literal_builder<DerivedTag>(m, "DerivedLiteralBuilder");
+    bind_literal_data<StaticTag>(m, "StaticLiteralData");
+    bind_literal_data<FluentTag>(m, "FluentLiteralData");
+    bind_literal_data<DerivedTag>(m, "DerivedLiteralData");
 
-    bind_ground_literal_builder<StaticTag>(m, "StaticGroundLiteralBuilder");
-    bind_ground_literal_builder<FluentTag>(m, "FluentGroundLiteralBuilder");
-    bind_ground_literal_builder<DerivedTag>(m, "DerivedGroundLiteralBuilder");
+    bind_ground_literal_data<StaticTag>(m, "StaticGroundLiteralData");
+    bind_ground_literal_data<FluentTag>(m, "FluentGroundLiteralData");
+    bind_ground_literal_data<DerivedTag>(m, "DerivedGroundLiteralData");
 
-    bind_fdr_variable_builder<FluentTag>(m, "FluentFDRVariableBuilder");
-    bind_fdr_fact_builder<FluentTag>(m, "FluentFDRFactBuilder");
+    bind_fdr_variable_data<FluentTag>(m, "FluentFDRVariableData");
+    bind_fdr_fact_data<FluentTag>(m, "FluentFDRFactData");
 
-    bind_function_builder<StaticTag>(m, "StaticFunctionBuilder");
-    bind_function_builder<FluentTag>(m, "FluentFunctionBuilder");
-    bind_function_builder<AuxiliaryTag>(m, "AuxiliaryFunctionBuilder");
+    bind_function_data<StaticTag>(m, "StaticFunctionData");
+    bind_function_data<FluentTag>(m, "FluentFunctionData");
+    bind_function_data<AuxiliaryTag>(m, "AuxiliaryFunctionData");
 
-    bind_function_term_builder<StaticTag>(m, "StaticFunctionTermBuilder");
-    bind_function_term_builder<FluentTag>(m, "FluentFunctionTermBuilder");
-    bind_function_term_builder<AuxiliaryTag>(m, "AuxiliaryFunctionTermBuilder");
+    bind_function_term_data<StaticTag>(m, "StaticFunctionTermData");
+    bind_function_term_data<FluentTag>(m, "FluentFunctionTermData");
+    bind_function_term_data<AuxiliaryTag>(m, "AuxiliaryFunctionTermData");
 
-    bind_ground_function_term_builder<StaticTag>(m, "StaticGroundFunctionTermBuilder");
-    bind_ground_function_term_builder<FluentTag>(m, "FluentGroundFunctionTermBuilder");
-    bind_ground_function_term_builder<AuxiliaryTag>(m, "AuxiliaryGroundFunctionTermBuilder");
+    bind_ground_function_term_data<StaticTag>(m, "StaticGroundFunctionTermData");
+    bind_ground_function_term_data<FluentTag>(m, "FluentGroundFunctionTermData");
+    bind_ground_function_term_data<AuxiliaryTag>(m, "AuxiliaryGroundFunctionTermData");
 
-    bind_ground_function_term_value_builder<StaticTag>(m, "StaticGroundFunctionTermValueBuilder");
-    bind_ground_function_term_value_builder<FluentTag>(m, "FluentGroundFunctionTermValueBuilder");
-    bind_ground_function_term_value_builder<AuxiliaryTag>(m, "AuxiliaryGroundFunctionTermValueBuilder");
+    bind_ground_function_term_value_data<StaticTag>(m, "StaticGroundFunctionTermValueData");
+    bind_ground_function_term_value_data<FluentTag>(m, "FluentGroundFunctionTermValueData");
+    bind_ground_function_term_value_data<AuxiliaryTag>(m, "AuxiliaryGroundFunctionTermValueData");
 
-    bind_unary_operator_builder<Sub, ygg::Data<FunctionExpression>>(m, "UnaryOperatorSubBuilder");
-    bind_binary_operator_builder<Add, ygg::Data<FunctionExpression>>(m, "BinaryOperatorAddBuilder");
-    bind_binary_operator_builder<Sub, ygg::Data<FunctionExpression>>(m, "BinaryOperatorSubBuilder");
-    bind_binary_operator_builder<Mul, ygg::Data<FunctionExpression>>(m, "BinaryOperatorMulBuilder");
-    bind_binary_operator_builder<Div, ygg::Data<FunctionExpression>>(m, "BinaryOperatorDivBuilder");
-    bind_binary_operator_builder<Eq, ygg::Data<FunctionExpression>>(m, "BinaryOperatorEqBuilder");
-    bind_binary_operator_builder<Ne, ygg::Data<FunctionExpression>>(m, "BinaryOperatorNeBuilder");
-    bind_binary_operator_builder<Le, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLeBuilder");
-    bind_binary_operator_builder<Lt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLtBuilder");
-    bind_binary_operator_builder<Ge, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGeBuilder");
-    bind_binary_operator_builder<Gt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGtBuilder");
+    bind_unary_operator_data<Sub, ygg::Data<FunctionExpression>>(m, "UnaryOperatorSubData");
+    bind_binary_operator_data<Add, ygg::Data<FunctionExpression>>(m, "BinaryOperatorAddData");
+    bind_binary_operator_data<Sub, ygg::Data<FunctionExpression>>(m, "BinaryOperatorSubData");
+    bind_binary_operator_data<Mul, ygg::Data<FunctionExpression>>(m, "BinaryOperatorMulData");
+    bind_binary_operator_data<Div, ygg::Data<FunctionExpression>>(m, "BinaryOperatorDivData");
+    bind_binary_operator_data<Eq, ygg::Data<FunctionExpression>>(m, "BinaryOperatorEqData");
+    bind_binary_operator_data<Ne, ygg::Data<FunctionExpression>>(m, "BinaryOperatorNeData");
+    bind_binary_operator_data<Le, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLeData");
+    bind_binary_operator_data<Lt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorLtData");
+    bind_binary_operator_data<Ge, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGeData");
+    bind_binary_operator_data<Gt, ygg::Data<FunctionExpression>>(m, "BinaryOperatorGtData");
 
-    bind_multi_operator_builder<Add, ygg::Data<FunctionExpression>>(m, "MultiOperatorAddBuilder");
-    bind_multi_operator_builder<Mul, ygg::Data<FunctionExpression>>(m, "MultiOperatorMulBuilder");
+    bind_multi_operator_data<Add, ygg::Data<FunctionExpression>>(m, "MultiOperatorAddData");
+    bind_multi_operator_data<Mul, ygg::Data<FunctionExpression>>(m, "MultiOperatorMulData");
 
-    bind_arithmetic_operator_builder<ygg::Data<FunctionExpression>>(m, "ArithmeticOperatorBuilder");
-    bind_boolean_operator_builder<ygg::Data<FunctionExpression>>(m, "BooleanOperatorBuilder");
+    bind_arithmetic_operator_data<ygg::Data<FunctionExpression>>(m, "ArithmeticOperatorData");
+    bind_boolean_operator_data<ygg::Data<FunctionExpression>>(m, "BooleanOperatorData");
 
-    bind_function_expression_builder(m, "FunctionExpressionBuilder");
-    bind_conjunctive_condition_builder(m, "ConjunctiveConditionBuilder");
+    bind_function_expression_data(m, "FunctionExpressionData");
+    bind_conjunctive_condition_data(m, "ConjunctiveConditionData");
 
-    bind_numeric_effect_builder<Assign, FluentTag>(m, "FluentNumericEffectAssignBuilder");
-    bind_numeric_effect_builder<Increase, FluentTag>(m, "FluentNumericEffectIncreaseBuilder");
-    bind_numeric_effect_builder<Decrease, FluentTag>(m, "FluentNumericEffectDecreaseBuilder");
-    bind_numeric_effect_builder<ScaleUp, FluentTag>(m, "FluentNumericEffectScaleUpBuilder");
-    bind_numeric_effect_builder<ScaleDown, FluentTag>(m, "FluentNumericEffectScaleDownBuilder");
-    bind_numeric_effect_builder<Increase, AuxiliaryTag>(m, "AuxiliaryNumericEffectIncreaseBuilder");
+    bind_numeric_effect_data<Assign, FluentTag>(m, "FluentNumericEffectAssignData");
+    bind_numeric_effect_data<Increase, FluentTag>(m, "FluentNumericEffectIncreaseData");
+    bind_numeric_effect_data<Decrease, FluentTag>(m, "FluentNumericEffectDecreaseData");
+    bind_numeric_effect_data<ScaleUp, FluentTag>(m, "FluentNumericEffectScaleUpData");
+    bind_numeric_effect_data<ScaleDown, FluentTag>(m, "FluentNumericEffectScaleDownData");
+    bind_numeric_effect_data<Increase, AuxiliaryTag>(m, "AuxiliaryNumericEffectIncreaseData");
 
-    bind_numeric_effect_operator_builder<FluentTag>(m, "FluentNumericEffectOperatorBuilder");
-    bind_numeric_effect_operator_builder<AuxiliaryTag>(m, "AuxiliaryNumericEffectOperatorBuilder");
+    bind_numeric_effect_operator_data<FluentTag>(m, "FluentNumericEffectOperatorData");
+    bind_numeric_effect_operator_data<AuxiliaryTag>(m, "AuxiliaryNumericEffectOperatorData");
 
-    bind_conjunctive_effect_builder(m, "ConjunctiveEffectBuilder");
-    bind_conditional_effect_builder(m, "ConditionalEffectBuilder");
-    bind_action_builder(m, "ActionBuilder");
-    bind_axiom_builder(m, "AxiomBuilder");
+    bind_conjunctive_effect_data(m, "ConjunctiveEffectData");
+    bind_conditional_effect_data(m, "ConditionalEffectData");
+    bind_action_data(m, "ActionData");
+    bind_axiom_data(m, "AxiomData");
 
-    bind_unary_operator_builder<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundUnaryOperatorSubBuilder");
-    bind_binary_operator_builder<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorAddBuilder");
-    bind_binary_operator_builder<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorSubBuilder");
-    bind_binary_operator_builder<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorMulBuilder");
-    bind_binary_operator_builder<Div, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorDivBuilder");
-    bind_binary_operator_builder<Eq, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorEqBuilder");
-    bind_binary_operator_builder<Ne, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorNeBuilder");
-    bind_binary_operator_builder<Le, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLeBuilder");
-    bind_binary_operator_builder<Lt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLtBuilder");
-    bind_binary_operator_builder<Ge, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGeBuilder");
-    bind_binary_operator_builder<Gt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGtBuilder");
+    bind_unary_operator_data<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundUnaryOperatorSubData");
+    bind_binary_operator_data<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorAddData");
+    bind_binary_operator_data<Sub, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorSubData");
+    bind_binary_operator_data<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorMulData");
+    bind_binary_operator_data<Div, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorDivData");
+    bind_binary_operator_data<Eq, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorEqData");
+    bind_binary_operator_data<Ne, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorNeData");
+    bind_binary_operator_data<Le, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLeData");
+    bind_binary_operator_data<Lt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorLtData");
+    bind_binary_operator_data<Ge, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGeData");
+    bind_binary_operator_data<Gt, ygg::Data<GroundFunctionExpression>>(m, "GroundBinaryOperatorGtData");
 
-    bind_multi_operator_builder<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorAddBuilder");
-    bind_multi_operator_builder<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorMulBuilder");
+    bind_multi_operator_data<Add, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorAddData");
+    bind_multi_operator_data<Mul, ygg::Data<GroundFunctionExpression>>(m, "GroundMultiOperatorMulData");
 
-    bind_arithmetic_operator_builder<ygg::Data<GroundFunctionExpression>>(m, "GroundArithmeticOperatorBuilder");
-    bind_boolean_operator_builder<ygg::Data<GroundFunctionExpression>>(m, "GroundBooleanOperatorBuilder");
+    bind_arithmetic_operator_data<ygg::Data<GroundFunctionExpression>>(m, "GroundArithmeticOperatorData");
+    bind_boolean_operator_data<ygg::Data<GroundFunctionExpression>>(m, "GroundBooleanOperatorData");
 
-    bind_ground_function_expression_builder(m, "GroundFunctionExpressionBuilder");
+    bind_ground_function_expression_data(m, "GroundFunctionExpressionData");
 
-    bind_ground_conjunctive_condition_builder(m, "GroundConjunctiveConditionBuilder");
+    bind_ground_conjunctive_condition_data(m, "GroundConjunctiveConditionData");
 
-    bind_ground_numeric_effect_builder<Assign, FluentTag>(m, "FluentGroundNumericEffectAssignBuilder");
-    bind_ground_numeric_effect_builder<Increase, FluentTag>(m, "FluentGroundNumericEffectIncreaseBuilder");
-    bind_ground_numeric_effect_builder<Decrease, FluentTag>(m, "FluentGroundNumericEffectDecreaseBuilder");
-    bind_ground_numeric_effect_builder<ScaleUp, FluentTag>(m, "FluentGroundNumericEffectScaleUpBuilder");
-    bind_ground_numeric_effect_builder<ScaleDown, FluentTag>(m, "FluentGroundNumericEffectScaleDownBuilder");
-    bind_ground_numeric_effect_builder<Increase, AuxiliaryTag>(m, "AuxiliaryGroundNumericEffectIncreaseBuilder");
+    bind_ground_numeric_effect_data<Assign, FluentTag>(m, "FluentGroundNumericEffectAssignData");
+    bind_ground_numeric_effect_data<Increase, FluentTag>(m, "FluentGroundNumericEffectIncreaseData");
+    bind_ground_numeric_effect_data<Decrease, FluentTag>(m, "FluentGroundNumericEffectDecreaseData");
+    bind_ground_numeric_effect_data<ScaleUp, FluentTag>(m, "FluentGroundNumericEffectScaleUpData");
+    bind_ground_numeric_effect_data<ScaleDown, FluentTag>(m, "FluentGroundNumericEffectScaleDownData");
+    bind_ground_numeric_effect_data<Increase, AuxiliaryTag>(m, "AuxiliaryGroundNumericEffectIncreaseData");
 
-    bind_ground_numeric_effect_operator_builder<FluentTag>(m, "FluentGroundNumericEffectOperatorBuilder");
-    bind_ground_numeric_effect_operator_builder<AuxiliaryTag>(m, "AuxiliaryGroundNumericEffectOperatorBuilder");
+    bind_ground_numeric_effect_operator_data<FluentTag>(m, "FluentGroundNumericEffectOperatorData");
+    bind_ground_numeric_effect_operator_data<AuxiliaryTag>(m, "AuxiliaryGroundNumericEffectOperatorData");
 
-    bind_ground_conjunctive_effect_builder(m, "GroundConjunctiveEffectBuilder");
-    bind_ground_conditional_effect_builder(m, "GroundConditionalEffectBuilder");
-    bind_ground_action_builder(m, "GroundActionBuilder");
-    bind_ground_axiom_builder(m, "GroundAxiomBuilder");
+    bind_ground_conjunctive_effect_data(m, "GroundConjunctiveEffectData");
+    bind_ground_conditional_effect_data(m, "GroundConditionalEffectData");
+    bind_ground_action_data(m, "GroundActionData");
+    bind_ground_axiom_data(m, "GroundAxiomData");
 
-    bind_metric_builder(m, "MetricBuilder");
-    bind_domain_builder(m, "DomainBuilder");
-    bind_lifted_task_builder(m, "LiftedTaskBuilder");
-    bind_ground_task_builder(m, "GroundTaskBuilder");
+    bind_metric_data(m, "MetricData");
+    bind_domain_data(m, "DomainData");
+    bind_lifted_task_data(m, "LiftedTaskData");
+    bind_ground_task_data(m, "GroundTaskData");
 }
 
 }
