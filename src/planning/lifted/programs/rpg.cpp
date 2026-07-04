@@ -29,6 +29,7 @@
 #include "tyr/formalism/planning/views.hpp"
 
 #include <optional>
+#include <stdexcept>
 #include <yggdrasil/containers/unordered_set.hpp>
 
 namespace f = tyr::formalism;
@@ -110,55 +111,91 @@ auto create_delete_free_goal(fp::GroundConjunctiveConditionView goal,
     return context.destination.get_or_create(conj_cond);
 }
 
-auto create_conditional_cost(fp::ActionView action,
-                             fp::ConditionalEffectView cond_eff,
-                             const MetricFunctionSet& metric_functions,
-                             TranslationContext<LiftedTag>& translation_context,
-                             fp::MergeDatalogContext& context)
+bool is_real_conditional_effect(fp::ConditionalEffectView cond_eff)
 {
-    auto conj_effect_ptr = context.builder.get_builder<fd::ConjunctiveEffect>();
-    auto& conj_effect = *conj_effect_ptr;
-    conj_effect.clear();
-
-    for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
-        if (targets_metric_function(numeric_effect, metric_functions, context))
-            conj_effect.numeric_effects.push_back(merge_p2d(numeric_effect, context));
-
-    if (conj_effect.numeric_effects.empty())
-        return std::optional<fd::ConditionalEffectView> {};
-
-    canonicalize(conj_effect);
-    const auto effect = context.destination.get_or_create(conj_effect).first;
-
-    auto conj_cond_ptr = context.builder.get_builder<fd::ConjunctiveCondition>();
-    auto& conj_cond = *conj_cond_ptr;
-    conj_cond.clear();
-    fill_delete_free_condition(action, cond_eff, translation_context, context, conj_cond);
-    canonicalize(conj_cond);
-    const auto condition = context.destination.get_or_create(conj_cond).first;
-
-    auto cond_eff_ptr = context.builder.get_builder<fd::ConditionalEffect>();
-    auto& result = *cond_eff_ptr;
-    result.clear();
-    result.variables = condition.get_variables().get_data();
-    result.condition = condition.get_index();
-    result.effect = effect.get_index();
-    canonicalize(result);
-    return std::optional<fd::ConditionalEffectView> { context.destination.get_or_create(result).first };
+    const auto condition = cond_eff.get_condition();
+    return !cond_eff.get_variables().empty() || !condition.get_literals<f::StaticTag>().empty() || !condition.get_literals<f::FluentTag>().empty()
+           || !condition.get_literals<f::DerivedTag>().empty() || !condition.get_numeric_constraints().empty();
 }
 
-ygg::IndexList<fd::ConditionalEffect> create_conditional_costs(fp::ActionView action,
-                                                               const MetricFunctionSet& metric_functions,
-                                                               TranslationContext<LiftedTag>& translation_context,
-                                                               fp::MergeDatalogContext& context)
+ygg::Data<fd::NumericEffectOperator<f::FluentTag>> create_unit_metric_effect(fd::FunctionTermView<f::FluentTag> term, fp::MergeDatalogContext& context)
 {
-    auto result = ygg::IndexList<fd::ConditionalEffect> {};
+    auto effect_ptr = context.builder.get_builder<fd::NumericEffect<f::Increase, f::FluentTag>>();
+    auto& effect = *effect_ptr;
+    effect.clear();
+    effect.fterm = term.get_index();
+    effect.fexpr = ygg::Data<fd::FunctionExpression>(ygg::float_t(1));
+    canonicalize(effect);
+    return ygg::Data<fd::NumericEffectOperator<f::FluentTag>>(context.destination.get_or_create(effect).first.get_index());
+}
+
+ygg::DataList<fd::NumericEffectOperator<f::FluentTag>> create_unit_metric(ygg::Data<fd::Program>& program, fp::MergeDatalogContext& context)
+{
+    auto function_ptr = context.builder.get_builder<f::Function<f::FluentTag>>();
+    auto& function = *function_ptr;
+    function.clear();
+    function.name = "__tyr_unit_cost";
+    function.arity = 0;
+    canonicalize(function);
+    const auto unit_function = context.destination.get_or_create(function).first;
+    program.fluent_functions.push_back(unit_function.get_index());
+
+    auto lifted_term_ptr = context.builder.get_builder<fd::FunctionTerm<f::FluentTag>>();
+    auto& lifted_term = *lifted_term_ptr;
+    lifted_term.clear();
+    lifted_term.function = unit_function.get_index();
+    canonicalize(lifted_term);
+    const auto unit_term = context.destination.get_or_create(lifted_term).first;
+
+    auto binding_ptr = context.builder.get_builder<f::RelationBinding<f::Function<f::FluentTag>>>();
+    auto& binding = *binding_ptr;
+    binding.clear();
+    binding.relation = unit_function.get_index();
+    canonicalize(binding);
+    const auto unit_binding = context.destination.get_or_create(binding).first;
+
+    auto ground_term_ptr = context.builder.get_builder<fd::GroundFunctionTerm<f::FluentTag>>();
+    auto& ground_term = *ground_term_ptr;
+    ground_term.clear();
+    ground_term.binding = unit_binding.get_index();
+    canonicalize(ground_term);
+    const auto unit_ground_term = context.destination.get_or_create(ground_term).first;
+
+    auto metric_ptr = context.builder.get_builder<fd::Metric>();
+    auto& metric = *metric_ptr;
+    metric.clear();
+    metric.fexpr = ygg::Data<fd::GroundFunctionExpression>(unit_ground_term.get_index());
+    canonicalize(metric);
+    program.metric = context.destination.get_or_create(metric).first.get_index();
+
+    auto result = ygg::DataList<fd::NumericEffectOperator<f::FluentTag>> {};
+    result.push_back(create_unit_metric_effect(unit_term, context));
+    return result;
+}
+
+ygg::DataList<fd::NumericEffectOperator<f::FluentTag>> create_metric_effects(fp::ActionView action,
+                                                                             CostMode cost_mode,
+                                                                             const ygg::DataList<fd::NumericEffectOperator<f::FluentTag>>& unit_metric_effects,
+                                                                             const MetricFunctionSet& metric_functions,
+                                                                             TranslationContext<LiftedTag>& translation_context,
+                                                                             fp::MergeDatalogContext& context)
+{
+    if (cost_mode == CostMode::UNIT)
+        return unit_metric_effects;
+
+    auto result = ygg::DataList<fd::NumericEffectOperator<f::FluentTag>> {};
     if (metric_functions.empty())
         return result;
 
     for (const auto cond_eff : action.get_effects())
-        if (const auto conditional_cost = create_conditional_cost(action, cond_eff, metric_functions, translation_context, context))
-            result.push_back(conditional_cost->get_index());
+    {
+        if (is_real_conditional_effect(cond_eff))
+            throw std::invalid_argument("GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first.");
+
+        for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
+            if (targets_metric_function(numeric_effect, metric_functions, context))
+                result.push_back(merge_p2d(numeric_effect, context));
+    }
 
     return result;
 }
@@ -166,7 +203,7 @@ ygg::IndexList<fd::ConditionalEffect> create_conditional_costs(fp::ActionView ac
 auto create_cond_effect_rule(fp::ActionView action,
                              fp::ConditionalEffectView cond_eff,
                              fp::AtomView<::tyr::formalism::FluentTag> effect,
-                             const ygg::IndexList<fd::ConditionalEffect>& conditional_costs,
+                             const ygg::DataList<fd::NumericEffectOperator<f::FluentTag>>& metric_effects,
                              TranslationContext<LiftedTag>& translation_context,
                              ::tyr::formalism::planning::MergeDatalogContext& context)
 {
@@ -186,7 +223,7 @@ auto create_cond_effect_rule(fp::ActionView action,
     rule.variables = new_conj_cond.get_variables().get_data();
     rule.body = new_conj_cond.get_index();
     rule.head = merge_p2d(effect, translation_context.p2d.fluent_to_fluent_predicate, context).first.get_index();
-    rule.conditional_costs = conditional_costs;
+    rule.metric_effects = metric_effects;
 
     canonicalize(rule);
     return context.destination.get_or_create(rule);
@@ -195,7 +232,7 @@ auto create_cond_effect_rule(fp::ActionView action,
 auto create_cond_numeric_effect_rule(fp::ActionView action,
                                      fp::ConditionalEffectView cond_eff,
                                      fp::NumericEffectOperatorView<::tyr::formalism::FluentTag> effect,
-                                     const ygg::IndexList<fd::ConditionalEffect>& conditional_costs,
+                                     const ygg::DataList<fd::NumericEffectOperator<f::FluentTag>>& metric_effects,
                                      TranslationContext<LiftedTag>& translation_context,
                                      ::tyr::formalism::planning::MergeDatalogContext& context)
 {
@@ -215,7 +252,7 @@ auto create_cond_numeric_effect_rule(fp::ActionView action,
     rule.variables = new_conj_cond.get_variables().get_data();
     rule.body = new_conj_cond.get_index();
     rule.head = merge_p2d(effect, context);
-    rule.conditional_costs = conditional_costs;
+    rule.metric_effects = metric_effects;
 
     canonicalize(rule);
     return context.destination.get_or_create(rule);
@@ -223,12 +260,14 @@ auto create_cond_numeric_effect_rule(fp::ActionView action,
 
 void translate_action_to_delete_free_rules(fp::ActionView action,
                                            ygg::Data<fd::Program>& program,
+                                           CostMode cost_mode,
+                                           const ygg::DataList<fd::NumericEffectOperator<f::FluentTag>>& unit_metric_effects,
                                            const MetricFunctionSet& metric_functions,
                                            TranslationContext<LiftedTag>& translation_context,
                                            fp::MergeDatalogContext& context,
                                            RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
 {
-    const auto conditional_costs = create_conditional_costs(action, metric_functions, translation_context, context);
+    const auto metric_effects = create_metric_effects(action, cost_mode, unit_metric_effects, metric_functions, translation_context, context);
 
     for (const auto cond_eff : action.get_effects())
     {
@@ -237,7 +276,7 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
             if (!literal.get_polarity())
                 continue;  /// ignore delete effects
 
-            const auto rule = create_cond_effect_rule(action, cond_eff, literal.get_atom(), conditional_costs, translation_context, context).first;
+            const auto rule = create_cond_effect_rule(action, cond_eff, literal.get_atom(), metric_effects, translation_context, context).first;
 
             program.rules.push_back(rule.get_index());
             rule_to_action.emplace(rule, action);
@@ -245,7 +284,7 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
 
         for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
         {
-            const auto rule = create_cond_numeric_effect_rule(action, cond_eff, numeric_effect, conditional_costs, translation_context, context).first;
+            const auto rule = create_cond_numeric_effect_rule(action, cond_eff, numeric_effect, metric_effects, translation_context, context).first;
 
             program.rules.push_back(rule.get_index());
             rule_to_action.emplace(rule, action);
@@ -254,6 +293,7 @@ void translate_action_to_delete_free_rules(fp::ActionView action,
 }
 
 auto create_program(fp::TaskView task,
+                    CostMode cost_mode,
                     TranslationContext<LiftedTag>& translation_context,
                     RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action,
                     fd::Repository& destination)
@@ -301,7 +341,12 @@ auto create_program(fp::TaskView task,
 
     program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).first.get_index();
     auto metric_functions = MetricFunctionSet {};
-    if (task.get_metric())
+    auto unit_metric_effects = ygg::DataList<fd::NumericEffectOperator<f::FluentTag>> {};
+    if (cost_mode == CostMode::UNIT)
+    {
+        unit_metric_effects = create_unit_metric(program, context);
+    }
+    else if (task.get_metric())
     {
         const auto metric = create_metric(task.get_metric().value(), context);
         program.metric = metric.get_index();
@@ -313,17 +358,20 @@ auto create_program(fp::TaskView task,
     }
 
     for (const auto action : task.get_domain().get_actions())
-        translate_action_to_delete_free_rules(action, program, metric_functions, translation_context, context, rule_to_action);
+        translate_action_to_delete_free_rules(action, program, cost_mode, unit_metric_effects, metric_functions, translation_context, context, rule_to_action);
 
     canonicalize(program);
     return destination.get_or_create(program).first;
 }
 
-auto create_datalog_program(fp::TaskView task, TranslationContext<LiftedTag>& translation_context, RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
+auto create_datalog_program(fp::TaskView task,
+                            CostMode cost_mode,
+                            TranslationContext<LiftedTag>& translation_context,
+                            RPGProgram<LiftedTag>::RuleToActionMapping& rule_to_action)
 {
     auto factory = std::make_shared<fd::RepositoryFactory>();
     auto repository = factory->create_shared();
-    auto program = create_program(task, translation_context, rule_to_action, *repository);
+    auto program = create_program(task, cost_mode, translation_context, rule_to_action, *repository);
     auto domains = analysis::compute_variable_domains(program);
     auto strata = analysis::compute_rule_stratification(program);
     auto listeners = analysis::compute_listeners(strata, *repository);
@@ -333,10 +381,10 @@ auto create_datalog_program(fp::TaskView task, TranslationContext<LiftedTag>& tr
 
 }
 
-RPGProgram<LiftedTag>::RPGProgram(fp::TaskView task) :
+RPGProgram<LiftedTag>::RPGProgram(fp::TaskView task, CostMode cost_mode) :
     m_translation_context(),
     m_rule_to_action(),
-    m_datalog_program(create_datalog_program(task, m_translation_context, m_rule_to_action))
+    m_datalog_program(create_datalog_program(task, cost_mode, m_translation_context, m_rule_to_action))
 {
     // std::cout << m_datalog_program.get_program() << std::endl;
 }

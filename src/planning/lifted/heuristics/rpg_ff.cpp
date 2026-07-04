@@ -33,7 +33,7 @@
 
 namespace tyr::planning
 {
-FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
+FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode) :
     RPGBase<LiftedTag,
             FFRPGHeuristic<LiftedTag>,
             datalog::OrAnnotationPolicy<LiftedTag>,
@@ -41,7 +41,8 @@ FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Executio
             datalog::TerminationPolicy<LiftedTag, datalog::SumAggregation>>(task,
                                                                             std::move(execution_context),
                                                                             datalog::OrAnnotationPolicy<LiftedTag>(),
-                                                                            datalog::AndAnnotationPolicy<LiftedTag, datalog::SumAggregation>()),
+                                                                            datalog::AndAnnotationPolicy<LiftedTag, datalog::SumAggregation>(),
+                                                                            cost_mode),
     m_markings(m_rpg_program.get_datalog_program().get_program().get_predicates<::tyr::formalism::FluentTag>().size()),
     m_function_markings(m_rpg_program.get_datalog_program().get_program().get_functions<::tyr::formalism::FluentTag>().size()),
     m_binding(),
@@ -56,9 +57,9 @@ FFRPGHeuristic<LiftedTag>::FFRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Executio
 {
 }
 
-FFRPGHeuristicPtr<LiftedTag> FFRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context)
+FFRPGHeuristicPtr<LiftedTag> FFRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode)
 {
-    return std::make_shared<FFRPGHeuristic<LiftedTag>>(std::move(task), std::move(execution_context));
+    return std::make_shared<FFRPGHeuristic<LiftedTag>>(std::move(task), std::move(execution_context), cost_mode);
 }
 
 ygg::float_t FFRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state)

@@ -94,8 +94,8 @@ TEST_P(GroundLMCutTest, InitialStateIsFiniteDominatesHMaxAndDoesNotExceedHStar)
     auto successor_generator = p::SuccessorGeneratorFactory<p::GroundTag>().create(ground_task, execution_context, state_repository);
     const auto initial_node = successor_generator->get_initial_node();
 
-    auto hmax = p::MaxRPGHeuristic<p::GroundTag>::create(ground_task, execution_context);
-    auto lmcut = p::LMCutHeuristic<p::GroundTag>::create(ground_task, execution_context);
+    auto hmax = p::MaxRPGHeuristic<p::GroundTag>::create(ground_task, execution_context, p::CostMode::UNIT);
+    auto lmcut = p::LMCutHeuristic<p::GroundTag>::create(ground_task, execution_context, p::CostMode::UNIT);
 
     const auto hmax_value = hmax->evaluate(initial_node.get_state());
     const auto lmcut_value = lmcut->evaluate(initial_node.get_state());

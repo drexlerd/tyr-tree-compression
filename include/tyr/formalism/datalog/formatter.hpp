@@ -627,7 +627,7 @@ struct formatter<ygg::Data<tyr::formalism::datalog::Rule>, char>
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.body);
             os << ygg::print_indent;
-            fmt::print(os, "{}{}\n", "conditional costs = ", value.conditional_costs);
+            fmt::print(os, "{}{}\n", "metric effects = ", value.metric_effects);
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
@@ -654,7 +654,7 @@ struct formatter<tyr::formalism::datalog::RuleView, char>
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.get_body());
             os << ygg::print_indent;
-            fmt::print(os, "{}{}\n", "conditional costs = ", value.get_conditional_costs());
+            fmt::print(os, "{}{}\n", "metric effects = ", value.get_metric_effects());
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
@@ -817,7 +817,7 @@ struct formatter<ygg::Data<tyr::formalism::datalog::GroundRule>, char>
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.body);
             os << ygg::print_indent;
-            fmt::print(os, "{}{}\n", "conditional costs = ", value.conditional_costs);
+            fmt::print(os, "{}{}\n", "metric effects = ", value.metric_effects);
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());
@@ -842,7 +842,7 @@ struct formatter<tyr::formalism::datalog::GroundRuleView, char>
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.get_body());
             os << ygg::print_indent;
-            fmt::print(os, "{}{}\n", "conditional costs = ", value.get_conditional_costs());
+            fmt::print(os, "{}{}\n", "metric effects = ", value.get_metric_effects());
         }
         os << ygg::print_indent << ")";
         return fmt::format_to(ctx.out(), "{}", os.str());

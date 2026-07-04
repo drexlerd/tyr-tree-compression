@@ -20,7 +20,7 @@
 namespace tyr::planning
 {
 
-AddRPGHeuristic<GroundTag>::AddRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context) :
+AddRPGHeuristic<GroundTag>::AddRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode) :
     RPGBase<GroundTag,
             AddRPGHeuristic<GroundTag>,
             datalog::OrAnnotationPolicy<GroundTag>,
@@ -29,13 +29,14 @@ AddRPGHeuristic<GroundTag>::AddRPGHeuristic(TaskPtr<GroundTag> task, ygg::Execut
             datalog::RuleCostOverridePolicy<GroundTag>>(std::move(task),
                                                         std::move(execution_context),
                                                         datalog::OrAnnotationPolicy<GroundTag>(),
-                                                        datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>())
+                                                        datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>(),
+                                                        cost_mode)
 {
 }
 
-AddRPGHeuristicPtr<GroundTag> AddRPGHeuristic<GroundTag>::create(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context)
+AddRPGHeuristicPtr<GroundTag> AddRPGHeuristic<GroundTag>::create(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode)
 {
-    return std::make_shared<AddRPGHeuristic<GroundTag>>(std::move(task), std::move(execution_context));
+    return std::make_shared<AddRPGHeuristic<GroundTag>>(std::move(task), std::move(execution_context), cost_mode);
 }
 
 ygg::float_t AddRPGHeuristic<GroundTag>::extract_cost_and_set_preferred_actions_impl(const StateView<GroundTag>&) { return get_goal_cost(); }

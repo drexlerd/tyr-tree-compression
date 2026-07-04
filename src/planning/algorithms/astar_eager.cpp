@@ -109,7 +109,6 @@ template<TaskKind Kind>
 SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& successor_generator, Heuristic<Kind>& heuristic, const Options<Kind>& options)
 {
     const auto start_node = (options.start_node) ? options.start_node.value() : successor_generator.get_initial_node();
-    heuristic.set_cost_mode(options.action_cost_mode);
     const auto& start_state = start_node.get_state();
     const auto start_state_index = start_state.get_index();
     const auto event_handler = (options.event_handler) ? options.event_handler : DefaultEventHandler<Kind>::create(0);

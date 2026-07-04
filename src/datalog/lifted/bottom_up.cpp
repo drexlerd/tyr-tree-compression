@@ -101,17 +101,19 @@ struct RuleUpdateInput
     Cost current_cost;
     const SelectedPredicateAnnotations<LiftedTag>& program_and_annot;
     const SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot;
+    const FactSets& fact_sets;
     const AndAP& and_ap;
     const CP& cost_policy;
     fd::GrounderContext& solve_context;
     fd::GrounderContext& iteration_context;
 
-    AndAnnotationContext<LiftedTag> make_annotation_context(fd::RuleBindingView rule_binding, Cost rule_cost) const
+    AndAnnotationContext<LiftedTag> make_annotation_context(fd::RuleBindingView rule_binding, Cost metric_effect_cost) const
     {
         return AndAnnotationContext<LiftedTag> { current_cost,
+                                                 {},
                                                  rule,
                                                  rule_binding,
-                                                 rule_cost,
+                                                 metric_effect_cost,
                                                  witness_condition,
                                                  numeric_support_selector,
                                                  numeric_support_selector_workspace,
@@ -132,10 +134,61 @@ static auto make_rule_update_input(const In& in, Out& out, const NumericSupportS
                                                                                                             in.cost_buckets().current_cost(),
                                                                                                             in.and_annot(),
                                                                                                             in.numeric_and_annot(),
+                                                                                                            in.fact_sets(),
                                                                                                             in.and_ap(),
                                                                                                             in.cost_policy(),
                                                                                                             out.ground_context_solve(),
                                                                                                             out.ground_context_iteration() };
+}
+
+inline Cost clamp_metric_delta(ygg::float_t value) noexcept
+{
+    if (!std::isfinite(value))
+        return Cost(0);
+    return Cost(std::max(value, ygg::float_t(0)));
+}
+
+template<f::NumericEffectOpKind Op, AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
+Cost metric_effect_delta(fd::NumericEffectView<Op, f::FluentTag> effect, const RuleUpdateInput<AndAP, CP>& input)
+{
+    const auto rhs = is_valid_binding(effect.get_fexpr(), input.fact_sets, input.solve_context);
+    if (empty(rhs))
+        return std::numeric_limits<Cost>::max();
+
+    if constexpr (std::is_same_v<Op, f::Increase>)
+    {
+        return clamp_metric_delta(lower(rhs));
+    }
+    else if constexpr (std::is_same_v<Op, f::Decrease>)
+    {
+        return Cost(0);
+    }
+    else
+    {
+        const auto lhs = is_valid_binding(effect.get_fterm(), input.fact_sets, input.solve_context);
+        if (empty(lhs))
+            return std::numeric_limits<Cost>::max();
+        const auto next = is_valid_binding(effect, input.fact_sets, input.solve_context);
+        if (empty(next))
+            return std::numeric_limits<Cost>::max();
+        return clamp_metric_delta(lower(next) - upper(lhs));
+    }
+}
+
+template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
+Cost metric_effect_cost(fd::RuleBindingView rule_binding, const RuleUpdateInput<AndAP, CP>& input)
+{
+    auto delta = Cost(0);
+    for (const auto metric_effect : input.rule.get_metric_effects())
+    {
+        const auto effect_delta = ygg::visit([&](auto&& effect) { return metric_effect_delta(effect, input); }, metric_effect.get_variant());
+        if (effect_delta == std::numeric_limits<Cost>::max())
+            return effect_delta;
+        delta += effect_delta;
+    }
+
+    const auto used_cost = input.cost_policy.get_cost(input.rule, rule_binding);
+    return delta <= used_cost ? Cost(0) : delta - used_cost;
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
@@ -144,8 +197,10 @@ static void record_propositional_achiever(fd::AtomView<f::FluentTag> head, const
 {
     const auto program_head = fd::ground_binding(head, input.iteration_context).first;
     const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
-    const auto rule_cost = input.cost_policy.get_cost(input.rule, rule_binding);
-    const auto context = input.make_annotation_context(rule_binding, rule_cost);
+    const auto cost = metric_effect_cost(rule_binding, input);
+    if (cost == std::numeric_limits<Cost>::max())
+        return;
+    const auto context = input.make_annotation_context(rule_binding, cost);
 
     input.and_ap.record_achiever(program_head, context);
 }
@@ -165,8 +220,10 @@ static void insert_propositional_update(fd::AtomView<f::FluentTag> head,
     const auto program_head = fd::ground_binding(head, input.iteration_context).first;
     const auto worker_head = fd::ground_binding(head, input.solve_context).first;
     const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
-    const auto rule_cost = input.cost_policy.get_cost(input.rule, rule_binding);
-    const auto context = input.make_annotation_context(rule_binding, rule_cost);
+    const auto cost = metric_effect_cost(rule_binding, input);
+    if (cost == std::numeric_limits<Cost>::max())
+        return;
+    const auto context = input.make_annotation_context(rule_binding, cost);
 
     input.and_ap.record_achiever(program_head, context);
 
@@ -192,12 +249,14 @@ static void insert_numeric_update(fd::NumericEffectOperatorView<f::FluentTag> he
             const auto program_head = fd::ground(effect.get_fterm(), input.iteration_context).first.get_row();
             const auto worker_head = fd::ground(effect.get_fterm(), input.solve_context).first;
             const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
-            const auto rule_cost = input.cost_policy.get_cost(input.rule, rule_binding);
-            const auto context = input.make_annotation_context(rule_binding, rule_cost);
+            const auto cost = metric_effect_cost(rule_binding, input);
+            if (cost == std::numeric_limits<Cost>::max())
+                return;
+            const auto context = input.make_annotation_context(rule_binding, cost);
 
             input.and_ap.update_annotation(program_head, worker_head.get_row(), interval, context, numeric_and_annot);
 
-            std::get<FunctionHeadIteration>(head_iteration).updates.emplace(worker_head.get_row().get_index().row, interval, input.current_cost + rule_cost);
+            std::get<FunctionHeadIteration>(head_iteration).updates.emplace(worker_head.get_row().get_index().row, interval, input.current_cost + cost);
         },
         head.get_variant());
 }

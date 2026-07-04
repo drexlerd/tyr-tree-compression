@@ -37,7 +37,7 @@ class RPGProgram<LiftedTag>
 public:
     using RuleToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::RuleView, ::tyr::formalism::planning::ActionView>;
 
-    explicit RPGProgram(::tyr::formalism::planning::TaskView task);
+    explicit RPGProgram(::tyr::formalism::planning::TaskView task, CostMode cost_mode = CostMode::GENERAL);
 
     const TranslationContext<LiftedTag>& get_translation_context() const noexcept;
     const RuleToActionMapping& get_rule_to_action_mapping() const noexcept;

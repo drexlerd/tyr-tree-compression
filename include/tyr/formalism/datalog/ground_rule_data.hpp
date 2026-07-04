@@ -22,7 +22,6 @@
 #include "tyr/formalism/datalog/boolean_operator_data.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
-#include "tyr/formalism/datalog/ground_conditional_effect_index.hpp"
 #include "tyr/formalism/datalog/ground_conjunctive_condition_index.hpp"
 #include "tyr/formalism/datalog/ground_literal_index.hpp"
 #include "tyr/formalism/datalog/ground_numeric_effect_operator_data.hpp"
@@ -48,19 +47,19 @@ struct Data<::tyr::formalism::datalog::GroundRule>
     ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::datalog::Rule>> binding;
     ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition> body;
     Head head;
-    ygg::IndexList<::tyr::formalism::datalog::GroundConditionalEffect> conditional_costs;
+    ygg::DataList<::tyr::formalism::datalog::GroundNumericEffectOperator<::tyr::formalism::FluentTag>> metric_effects;
 
     Data() = default;
     Data(ygg::Index<::tyr::formalism::datalog::GroundRule> index,
          ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::datalog::Rule>> binding,
          ygg::Index<::tyr::formalism::datalog::GroundConjunctiveCondition> body,
          Head head,
-         ygg::IndexList<::tyr::formalism::datalog::GroundConditionalEffect> conditional_costs = {}) :
+         ygg::DataList<::tyr::formalism::datalog::GroundNumericEffectOperator<::tyr::formalism::FluentTag>> metric_effects = {}) :
         index(index),
         binding(binding),
         body(body),
         head(head),
-        conditional_costs(std::move(conditional_costs))
+        metric_effects(std::move(metric_effects))
     {
     }
     Data(const Data& other) = default;
@@ -74,10 +73,10 @@ struct Data<::tyr::formalism::datalog::GroundRule>
         ygg::clear(binding);
         ygg::clear(body);
         ygg::clear(head);
-        ygg::clear(conditional_costs);
+        ygg::clear(metric_effects);
     }
 
-    auto cista_members() const noexcept { return std::tie(index, binding, body, head, conditional_costs); }
+    auto cista_members() const noexcept { return std::tie(index, binding, body, head, metric_effects); }
     auto identifying_members() const noexcept { return std::tie(binding); }
 };
 

@@ -21,6 +21,7 @@
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/lifted/policies/aggregation.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <limits>
 #include <optional>
@@ -36,6 +37,9 @@ class NumericSupportSelectorWorkspace;
 
 template<TaskKind Kind>
 struct WitnessAnnotation;
+
+template<TaskKind Kind>
+struct NumericSupport;
 
 template<TaskKind Kind>
 struct BaseAnnotation
@@ -91,6 +95,15 @@ using SelectedFunctionAnnotations = NumericIntervalAnnotations<Kind>;
 
 template<TaskKind Kind>
 struct AndAnnotationContext;
+
+inline ygg::ClosedInterval<ygg::float_t> aggregate_metric_support(ygg::ClosedInterval<ygg::float_t> lhs, ygg::ClosedInterval<ygg::float_t> rhs) noexcept
+{
+    if (empty(lhs))
+        return rhs;
+    if (empty(rhs))
+        return lhs;
+    return ygg::ClosedInterval<ygg::float_t>(std::max(lower(lhs), lower(rhs)), std::max(upper(lhs), upper(rhs)));
+}
 
 template<TaskKind Kind>
 struct CostUpdate

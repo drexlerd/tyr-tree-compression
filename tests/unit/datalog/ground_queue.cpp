@@ -369,7 +369,7 @@ TEST(TyrDatalogGroundQueueTest, DuplicateHeadsDeriveFactOnce)
     EXPECT_EQ(result.statistics.num_facts_derived, 1);
 }
 
-TEST(TyrDatalogGroundQueueTest, GroundCostOverrideAnnotatesDerivedFact)
+TEST(TyrDatalogGroundQueueTest, GroundUsedCostOverrideDoesNotCreateMetricEffectCost)
 {
     auto fixture = GroundQueueFixture();
     const auto a = fixture.fluent_atom("a");
@@ -403,7 +403,7 @@ TEST(TyrDatalogGroundQueueTest, GroundCostOverrideAnnotatesDerivedFact)
     EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a, b }));
     const auto* annotation = ctx.out().and_annot().find(a);
     ASSERT_NE(annotation, nullptr);
-    EXPECT_EQ(datalog::get_cost(*annotation), 7);
+    EXPECT_EQ(datalog::get_cost(*annotation), 0);
 }
 
 TEST(TyrDatalogGroundQueueTest, GroundTerminationStopsAfterGoalDerived)

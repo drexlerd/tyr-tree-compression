@@ -44,8 +44,6 @@ public:
 
     virtual ygg::float_t evaluate(const Node<Kind>& node) { return evaluate(node.get_state()); }
 
-    virtual void set_cost_mode([[maybe_unused]] CostMode mode) {}
-
     virtual const ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>>& get_preferred_actions()
     {
         static const auto actions = ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> {};

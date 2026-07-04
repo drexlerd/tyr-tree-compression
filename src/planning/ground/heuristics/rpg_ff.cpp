@@ -25,7 +25,7 @@ namespace fd = tyr::formalism::datalog;
 namespace tyr::planning
 {
 
-FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context) :
+FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode) :
     RPGBase<GroundTag,
             FFRPGHeuristic<GroundTag>,
             datalog::OrAnnotationPolicy<GroundTag>,
@@ -34,7 +34,8 @@ FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::Executio
             datalog::RuleCostOverridePolicy<GroundTag>>(task,
                                                         std::move(execution_context),
                                                         datalog::OrAnnotationPolicy<GroundTag>(),
-                                                        datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>()),
+                                                        datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>(),
+                                                        cost_mode),
     m_markings(1),
     m_function_markings(),
     m_numeric_support_selector_workspace(),
@@ -47,9 +48,9 @@ FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::Executio
     m_markings.front().resize(m_rpg_program.get_datalog_program().get_program().get_atoms<f::FluentTag>().size());
 }
 
-FFRPGHeuristicPtr<GroundTag> FFRPGHeuristic<GroundTag>::create(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context)
+FFRPGHeuristicPtr<GroundTag> FFRPGHeuristic<GroundTag>::create(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode)
 {
-    return std::make_shared<FFRPGHeuristic<GroundTag>>(std::move(task), std::move(execution_context));
+    return std::make_shared<FFRPGHeuristic<GroundTag>>(std::move(task), std::move(execution_context), cost_mode);
 }
 
 ygg::float_t FFRPGHeuristic<GroundTag>::extract_cost_and_set_preferred_actions_impl(const StateView<GroundTag>& state)

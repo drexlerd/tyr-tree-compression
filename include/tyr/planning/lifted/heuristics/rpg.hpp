@@ -61,11 +61,16 @@ private:
     constexpr auto& self() { return static_cast<Derived&>(*this); }
 
 public:
-    explicit RPGBase(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, const OrAP& or_ap, const AndAP& and_ap) :
+    explicit RPGBase(TaskPtr<LiftedTag> task,
+                     ygg::ExecutionContextPtr execution_context,
+                     const OrAP& or_ap,
+                     const AndAP& and_ap,
+                     CostMode cost_mode = CostMode::GENERAL) :
         m_task(std::move(task)),
         m_execution_context(std::move(execution_context)),
-        m_rpg_program(m_task->get_task()),
-        m_workspace(m_rpg_program.get_datalog_program(), m_rpg_program.get_const_program_workspace(), or_ap, and_ap, make_termination_policy())
+        m_rpg_program(m_task->get_task(), cost_mode),
+        m_workspace(m_rpg_program.get_datalog_program(), m_rpg_program.get_const_program_workspace(), or_ap, and_ap, make_termination_policy()),
+        m_cost_mode(cost_mode)
     {
         m_workspace.tp.set_goals(m_rpg_program.get_goal());
     }
@@ -254,6 +259,7 @@ protected:
     RPGProgram<LiftedTag> m_rpg_program;
 
     datalog::ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP> m_workspace;
+    CostMode m_cost_mode;
 };
 
 }

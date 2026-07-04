@@ -33,17 +33,41 @@ namespace tyr::datalog
 {
 
 template<>
+struct NumericSupport<GroundTag>
+{
+    ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term;
+    ygg::ClosedInterval<ygg::float_t> interval;
+    Cost cost;
+
+    auto get_term() const noexcept { return term; }
+    auto get_interval() const noexcept { return interval; }
+    auto get_cost() const noexcept { return cost; }
+
+    auto identifying_members() const noexcept { return std::make_tuple(term, lower(interval), upper(interval)); }
+};
+
+template<>
 struct WitnessAnnotation<GroundTag>
 {
     using Metric = ygg::ClosedInterval<ygg::float_t>;
+    using NumericSupports = std::vector<NumericSupport<GroundTag>>;
 
     WitnessAnnotation(::tyr::formalism::datalog::GroundRuleView rule_, Cost cost_) : rule(rule_), metric(), cost(cost_) {}
 
     WitnessAnnotation(::tyr::formalism::datalog::GroundRuleView rule_, Metric metric_, Cost cost_) : rule(rule_), metric(metric_), cost(cost_) {}
 
+    WitnessAnnotation(::tyr::formalism::datalog::GroundRuleView rule_, Metric metric_, Cost cost_, NumericSupports numeric_supports_) :
+        rule(rule_),
+        metric(metric_),
+        cost(cost_),
+        numeric_supports(std::move(numeric_supports_))
+    {
+    }
+
     auto get_rule() const noexcept { return rule; }
     auto get_metric() const noexcept { return metric; }
     auto get_cost() const noexcept { return cost; }
+    const auto& get_numeric_supports() const noexcept { return numeric_supports; }
 
     auto identifying_members() const noexcept { return std::tie(rule); }
 
@@ -51,6 +75,7 @@ private:
     ::tyr::formalism::datalog::GroundRuleView rule;
     Metric metric;
     Cost cost;
+    NumericSupports numeric_supports;
 };
 
 template<>
@@ -168,9 +193,10 @@ private:
 template<>
 struct AndAnnotationContext<GroundTag>
 {
+    ygg::ClosedInterval<ygg::float_t> metric;
     Cost current_cost;
+    std::vector<NumericSupport<GroundTag>> numeric_supports;
     ::tyr::formalism::datalog::GroundRuleView rule;
-    Cost rule_cost;
     const SelectedPredicateAnnotations<GroundTag>& program_and_annot;
 };
 

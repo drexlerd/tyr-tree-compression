@@ -19,8 +19,6 @@
 #define TYR_FORMALISM_DATALOG_GROUNDER_HPP_
 
 #include "tyr/analysis/declarations.hpp"
-#include <yggdrasil/core/itertools.hpp>
-#include <yggdrasil/containers/tuple.hpp>
 #include "tyr/formalism/datalog/builder.hpp"
 #include "tyr/formalism/datalog/canonicalization.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -30,6 +28,9 @@
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/datalog/views.hpp"
 #include "tyr/formalism/declarations.hpp"
+
+#include <yggdrasil/containers/tuple.hpp>
+#include <yggdrasil/core/itertools.hpp>
 
 namespace tyr::formalism::datalog
 {
@@ -352,6 +353,8 @@ inline std::pair<GroundRuleView, bool> ground(RuleView element, GrounderContext&
                 static_assert(ygg::dependent_false<Alternative>::value, "Missing case");
         },
         element.get_head());
+    for (const auto metric_effect : element.get_metric_effects())
+        rule.metric_effects.push_back(ground(metric_effect, context));
 
     // Canonicalize and Serialize
     canonicalize(rule);

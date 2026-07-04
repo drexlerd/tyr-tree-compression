@@ -17,37 +17,74 @@
 
 #include "tyr/planning/lifted/heuristics/lmcut.hpp"
 
+#include <algorithm>
 #include <limits>
+#include <ranges>
+#include <type_traits>
+#include <variant>
+
+#include <yggdrasil/containers/variant.hpp>
 
 namespace tyr::planning
 {
+namespace
+{
+namespace f = ::tyr::formalism;
+namespace fd = ::tyr::formalism::datalog;
 
-LMCutHeuristic<LiftedTag>::LMCutHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
+template<typename Head>
+bool is_numeric_head(const Head&) noexcept
+{
+    return false;
+}
+
+bool is_numeric_head(fd::NumericEffectOperatorView<f::FluentTag>) noexcept
+{
+    return true;
+}
+
+bool has_numeric_relaxation_content(fd::ProgramView<LiftedTag> program)
+{
+    for (const auto rule : program.get_rules())
+    {
+        if (!rule.get_body().get_numeric_constraints().empty())
+            return true;
+
+        if (ygg::visit([](auto&& head) { return is_numeric_head(head); }, rule.get_head()))
+            return true;
+    }
+
+    return false;
+}
+
+}
+
+LMCutHeuristic<LiftedTag>::LMCutHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode) :
     Base(task,
          std::move(execution_context),
          datalog::OrAnnotationPolicy<LiftedTag>(),
-         datalog::AchieverAndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>()),
+         datalog::AchieverAndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>(),
+         cost_mode),
     m_residual_costs(),
     m_goal_zone(),
+    m_numeric_goal_zone(),
     m_before_goal_zone(),
+    m_numeric_before_goal_zone(),
     m_not_before_goal_zone(),
+    m_numeric_not_before_goal_zone(),
     m_cut(),
     m_max_precondition_buffers(),
     m_max_precondition_depth(0)
 {
 }
 
-LMCutHeuristicPtr<LiftedTag> LMCutHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context)
+LMCutHeuristicPtr<LiftedTag> LMCutHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode)
 {
-    return std::make_shared<LMCutHeuristic<LiftedTag>>(std::move(task), std::move(execution_context));
+    return std::make_shared<LMCutHeuristic<LiftedTag>>(std::move(task), std::move(execution_context), cost_mode);
 }
 
 ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& state)
 {
-    const auto& program = m_rpg_program.get_datalog_program().get_program();
-    if (!program.get_functions<::tyr::formalism::FluentTag>().empty())
-        return Base::evaluate(state);
-
     auto value = datalog::Cost(0);
     m_residual_costs.clear();
 
@@ -56,6 +93,9 @@ ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& sta
         apply_residual_costs();
         const auto hmax = Base::evaluate(state);
         if (hmax == std::numeric_limits<ygg::float_t>::infinity())
+            return hmax;
+
+        if (has_numeric_relaxation_content(m_rpg_program.get_datalog_program().get_program()))
             return hmax;
 
         const auto hmax_cost = datalog::Cost(hmax);
@@ -92,10 +132,22 @@ void LMCutHeuristic<LiftedTag>::apply_residual_costs()
 {
     m_workspace.clear_costs();
     for (const auto& [action_binding, cost] : m_residual_costs)
-        set_action_binding_cost(action_binding, cost);
+        set_action_binding_cost(action_binding, datalog::Cost(1) - cost);
 }
 
-const std::vector<LMCutHeuristic<LiftedTag>::PredicateBinding>&
+datalog::Cost LMCutHeuristic<LiftedTag>::get_numeric_cost(NumericNode node) const noexcept
+{
+    const auto* annotation = m_workspace.numeric_and_annot.find(node.binding, node.interval);
+    return annotation ? datalog::get_cost(*annotation) : datalog::Cost(0);
+}
+
+const datalog::WitnessAnnotation<LiftedTag>* LMCutHeuristic<LiftedTag>::get_numeric_witness(NumericNode node) const noexcept
+{
+    const auto* annotation = m_workspace.numeric_and_annot.find(node.binding, node.interval);
+    return annotation ? std::get_if<datalog::WitnessAnnotation<LiftedTag>>(annotation) : nullptr;
+}
+
+const std::vector<LMCutHeuristic<LiftedTag>::Precondition>&
 LMCutHeuristic<LiftedTag>::get_witness_max_preconditions(const datalog::WitnessAnnotation<LiftedTag>& witness)
 {
     if (m_max_precondition_depth == m_max_precondition_buffers.size())
@@ -114,8 +166,13 @@ LMCutHeuristic<LiftedTag>::get_witness_max_preconditions(const datalog::WitnessA
                                   [&](const auto precondition)
                                   {
                                       if (get_binding_cost(precondition) == body_cost)
-                                          result.push_back(precondition);
+                                          result.emplace_back(precondition);
                                   });
+
+    for (const auto& support : witness.get_numeric_supports())
+        if (support.get_cost() == body_cost)
+            result.emplace_back(NumericNode { support.get_binding(), support.get_interval() });
+
     return result;
 }
 
@@ -123,6 +180,11 @@ void LMCutHeuristic<LiftedTag>::release_witness_max_preconditions()
 {
     assert(m_max_precondition_depth > 0);
     --m_max_precondition_depth;
+}
+
+void LMCutHeuristic<LiftedTag>::mark_goal_zone(Precondition precondition)
+{
+    std::visit([&](auto node) { mark_goal_zone(node); }, precondition);
 }
 
 void LMCutHeuristic<LiftedTag>::mark_goal_zone(PredicateBinding binding)
@@ -142,10 +204,34 @@ void LMCutHeuristic<LiftedTag>::mark_goal_zone(PredicateBinding binding)
                               return;
 
                           const auto& preconditions = get_witness_max_preconditions(witness);
-                          for (const auto precondition : preconditions)
+                          for (const auto& precondition : preconditions)
                               mark_goal_zone(precondition);
                           release_witness_max_preconditions();
                       });
+}
+
+void LMCutHeuristic<LiftedTag>::mark_goal_zone(NumericNode node)
+{
+    if (!m_numeric_goal_zone.insert(node).second)
+        return;
+
+    const auto* witness = get_numeric_witness(node);
+    if (!witness || witness->get_cost() != get_numeric_cost(node))
+        return;
+
+    const auto action_binding = get_action_binding(*witness);
+    if (action_binding && get_residual_cost(*action_binding) > 0)
+        return;
+
+    const auto& preconditions = get_witness_max_preconditions(*witness);
+    for (const auto& precondition : preconditions)
+        mark_goal_zone(precondition);
+    release_witness_max_preconditions();
+}
+
+bool LMCutHeuristic<LiftedTag>::is_before_goal_zone(Precondition precondition)
+{
+    return std::visit([&](auto node) { return is_before_goal_zone(node); }, precondition);
 }
 
 bool LMCutHeuristic<LiftedTag>::is_before_goal_zone(PredicateBinding binding)
@@ -189,11 +275,48 @@ bool LMCutHeuristic<LiftedTag>::is_before_goal_zone(PredicateBinding binding)
     return false;
 }
 
+bool LMCutHeuristic<LiftedTag>::is_before_goal_zone(NumericNode node)
+{
+    if (m_numeric_goal_zone.contains(node))
+        return false;
+    if (m_numeric_before_goal_zone.contains(node))
+        return true;
+    if (m_numeric_not_before_goal_zone.contains(node))
+        return false;
+
+    m_numeric_not_before_goal_zone.insert(node);
+
+    auto before = false;
+    const auto* witness = get_numeric_witness(node);
+    if (witness && witness->get_cost() == get_numeric_cost(node))
+    {
+        const auto& preconditions = get_witness_max_preconditions(*witness);
+        before = preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
+        release_witness_max_preconditions();
+    }
+    else
+    {
+        before = true;
+    }
+
+    if (before)
+    {
+        m_numeric_not_before_goal_zone.erase(node);
+        m_numeric_before_goal_zone.insert(node);
+        return true;
+    }
+
+    return false;
+}
+
 void LMCutHeuristic<LiftedTag>::extract_cut()
 {
     m_goal_zone.clear();
+    m_numeric_goal_zone.clear();
     m_before_goal_zone.clear();
+    m_numeric_before_goal_zone.clear();
     m_not_before_goal_zone.clear();
+    m_numeric_not_before_goal_zone.clear();
     m_cut.clear();
 
     const auto goal_cost = get_goal_cost();
@@ -207,7 +330,32 @@ void LMCutHeuristic<LiftedTag>::extract_cut()
                 break;
             }
         }
+
+        auto selection_workspace = datalog::NumericSupportSelectorWorkspace {};
+        for (const auto constraint : goal->get_numeric_constraints())
+        {
+            if (m_workspace.numeric_support_selector->get_constraint_cost(constraint, selection_workspace, datalog::MaxAggregation {}) != goal_cost)
+                continue;
+
+            for (const auto& entry : selection_workspace.selection)
+                if (entry.cost == goal_cost)
+                    mark_goal_zone(NumericNode { entry.binding, entry.interval });
+        }
     }
+
+    auto inspect_witness = [&](const auto& witness)
+    {
+        const auto action_binding = get_action_binding(witness);
+        if (!action_binding || get_residual_cost(*action_binding) == 0)
+            return;
+
+        const auto& preconditions = get_witness_max_preconditions(witness);
+        const auto crosses_cut = preconditions.empty()
+                                 || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
+        release_witness_max_preconditions();
+        if (crosses_cut)
+            m_cut.insert(*action_binding);
+    };
 
     for (const auto binding : m_goal_zone)
     {
@@ -215,22 +363,14 @@ void LMCutHeuristic<LiftedTag>::extract_cut()
         for_each_achiever(binding,
                           [&](const auto& witness)
                           {
-                              if (witness.get_cost() != binding_cost)
-                                  return;
-
-                              const auto action_binding = get_action_binding(witness);
-                              if (!action_binding || get_residual_cost(*action_binding) == 0)
-                                  return;
-
-                              const auto& preconditions = get_witness_max_preconditions(witness);
-                              const auto crosses_cut =
-                                  preconditions.empty()
-                                  || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
-                              release_witness_max_preconditions();
-                              if (crosses_cut)
-                                  m_cut.insert(*action_binding);
+                              if (witness.get_cost() == binding_cost)
+                                  inspect_witness(witness);
                           });
     }
+
+    for (const auto& node : m_numeric_goal_zone)
+        if (const auto* witness = get_numeric_witness(node); witness && witness->get_cost() == get_numeric_cost(node))
+            inspect_witness(*witness);
 }
 
 }

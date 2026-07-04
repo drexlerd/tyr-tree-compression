@@ -38,12 +38,6 @@ namespace tyr::planning
 
 void bind_module_definitions(nb::module_& m)
 {
-    auto ground_module = m.def_submodule("ground");
-    bind_ground_module_definitions(ground_module);
-
-    auto lifted_module = m.def_submodule("lifted");
-    bind_lifted_module_definitions(lifted_module);
-
     /**
      * SearchStatus
      */
@@ -64,7 +58,13 @@ void bind_module_definitions(nb::module_& m)
      * CostMode
      */
 
-    nb::enum_<CostMode>(m, "CostMode").value("UNIT", CostMode::UNIT).value("GENERAL", CostMode::GENERAL).export_values();
+    nb::enum_<CostMode>(m, "CostMode").value("UNIT", CostMode::UNIT).value("GENERAL", CostMode::GENERAL);
+
+    auto ground_module = m.def_submodule("ground");
+    bind_ground_module_definitions(ground_module);
+
+    auto lifted_module = m.def_submodule("lifted");
+    bind_lifted_module_definitions(lifted_module);
 
     /**
      * Statistics

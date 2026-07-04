@@ -25,10 +25,23 @@
 #include "tyr/planning/lifted/heuristics/rpg.hpp"
 
 #include <deque>
+#include <tuple>
+#include <variant>
 #include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::planning
 {
+
+struct LiftedLMCutNumericNode
+{
+    ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding;
+    ygg::ClosedInterval<ygg::float_t> interval;
+
+    auto identifying_members() const noexcept { return std::make_tuple(binding, lower(interval), upper(interval)); }
+};
 
 template<>
 class LMCutHeuristic<LiftedTag> :
@@ -47,9 +60,9 @@ public:
                          datalog::TerminationPolicy<LiftedTag, datalog::MaxAggregation>,
                          datalog::RuleCostOverridePolicy<LiftedTag>>;
 
-    LMCutHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context);
+    LMCutHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode = CostMode::GENERAL);
 
-    static LMCutHeuristicPtr<LiftedTag> create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context);
+    static LMCutHeuristicPtr<LiftedTag> create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode = CostMode::GENERAL);
 
     ygg::float_t evaluate(const StateView<LiftedTag>& state) override;
 
@@ -59,21 +72,33 @@ private:
     using ActionBinding = ::tyr::formalism::planning::ActionBindingView;
     using PredicateBinding = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
 
+    using NumericNode = LiftedLMCutNumericNode;
+    using Precondition = std::variant<PredicateBinding, NumericNode>;
+
     datalog::Cost get_residual_cost(ActionBinding action_binding) const;
     void set_residual_cost(ActionBinding action_binding, datalog::Cost cost);
     void apply_residual_costs();
-    const std::vector<PredicateBinding>& get_witness_max_preconditions(const datalog::WitnessAnnotation<LiftedTag>& witness);
+    datalog::Cost get_numeric_cost(NumericNode node) const noexcept;
+    const datalog::WitnessAnnotation<LiftedTag>* get_numeric_witness(NumericNode node) const noexcept;
+    const std::vector<Precondition>& get_witness_max_preconditions(const datalog::WitnessAnnotation<LiftedTag>& witness);
     void release_witness_max_preconditions();
     void mark_goal_zone(PredicateBinding binding);
+    void mark_goal_zone(NumericNode node);
+    void mark_goal_zone(Precondition precondition);
     bool is_before_goal_zone(PredicateBinding binding);
+    bool is_before_goal_zone(NumericNode node);
+    bool is_before_goal_zone(Precondition precondition);
     void extract_cut();
 
     ygg::UnorderedMap<ActionBinding, datalog::Cost> m_residual_costs;
     ygg::UnorderedSet<PredicateBinding> m_goal_zone;
+    ygg::UnorderedSet<NumericNode> m_numeric_goal_zone;
     ygg::UnorderedSet<PredicateBinding> m_before_goal_zone;
+    ygg::UnorderedSet<NumericNode> m_numeric_before_goal_zone;
     ygg::UnorderedSet<PredicateBinding> m_not_before_goal_zone;
+    ygg::UnorderedSet<NumericNode> m_numeric_not_before_goal_zone;
     ygg::UnorderedSet<ActionBinding> m_cut;
-    std::deque<std::vector<PredicateBinding>> m_max_precondition_buffers;
+    std::deque<std::vector<Precondition>> m_max_precondition_buffers;
     size_t m_max_precondition_depth;
 };
 

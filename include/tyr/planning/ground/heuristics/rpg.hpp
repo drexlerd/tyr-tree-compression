@@ -61,12 +61,15 @@ private:
     constexpr auto& self() { return static_cast<Derived&>(*this); }
 
 public:
-    RPGBase(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, const OrAP& or_ap, const AndAP& and_ap);
+    RPGBase(TaskPtr<GroundTag> task,
+            ygg::ExecutionContextPtr execution_context,
+            const OrAP& or_ap,
+            const AndAP& and_ap,
+            CostMode cost_mode = CostMode::GENERAL);
 
     void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) override;
 
     ygg::float_t evaluate(const StateView<GroundTag>& state) override;
-    void set_cost_mode(CostMode mode) override;
 
     const auto& get_workspace() const noexcept { return m_workspace; }
     const auto& get_rpg_program() const noexcept { return m_rpg_program; }
@@ -101,14 +104,15 @@ template<typename Derived,
 RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::RPGBase(TaskPtr<GroundTag> task,
                                                           ygg::ExecutionContextPtr execution_context,
                                                           const OrAP& or_ap,
-                                                          const AndAP& and_ap) :
+                                                          const AndAP& and_ap,
+                                                          CostMode cost_mode) :
     m_task(std::move(task)),
     m_execution_context(std::move(execution_context)),
-    m_rpg_program(m_task->get_task()),
+    m_rpg_program(m_task->get_task(), cost_mode),
     m_action_binding_to_ground_action(),
     m_workspace(m_rpg_program.get_datalog_program().get_const_program_workspace(), or_ap, and_ap, make_termination_policy()),
     m_queue_workspace(m_rpg_program.get_datalog_program().get_program()),
-    m_cost_mode(CostMode::UNIT)
+    m_cost_mode(cost_mode)
 {
     for (const auto action : m_task->get_task().get_ground_actions())
         m_action_binding_to_ground_action.emplace(action.get_row(), action);
@@ -152,93 +156,6 @@ void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::set_goal(::tyr::formalism
     m_workspace.tp.set_goals(repository.get_or_create(condition).first);
 }
 
-namespace details
-{
-struct GroundActionCostEvaluationContext
-{
-    const StateView<GroundTag>& state;
-};
-
-inline ygg::float_t evaluate_action_cost_expression(ygg::float_t value, const GroundActionCostEvaluationContext&) { return value; }
-
-template<::tyr::formalism::ArithmeticOpKind Op>
-ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundUnaryOperatorView<Op> expression,
-                                             const GroundActionCostEvaluationContext& context)
-{
-    return ::tyr::formalism::apply(Op {}, evaluate_action_cost_expression(expression.get_arg(), context));
-}
-
-template<::tyr::formalism::ArithmeticOpKind Op>
-ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundBinaryOperatorView<Op> expression,
-                                             const GroundActionCostEvaluationContext& context)
-{
-    return ::tyr::formalism::apply(Op {},
-                                   evaluate_action_cost_expression(expression.get_lhs(), context),
-                                   evaluate_action_cost_expression(expression.get_rhs(), context));
-}
-
-template<::tyr::formalism::ArithmeticOpKind Op>
-ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundMultiOperatorView<Op> expression,
-                                             const GroundActionCostEvaluationContext& context)
-{
-    auto value = (std::same_as<Op, ::tyr::formalism::Add>) ? ygg::float_t(0) : ygg::float_t(1);
-    for (const auto arg : expression.get_args())
-        value = ::tyr::formalism::apply(Op {}, value, evaluate_action_cost_expression(arg, context));
-    return value;
-}
-
-inline ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::StaticTag> term,
-                                                    const GroundActionCostEvaluationContext& context)
-{
-    return context.state.get(term);
-}
-
-inline ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
-                                                    const GroundActionCostEvaluationContext& context)
-{
-    return context.state.get(term);
-}
-
-inline ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundFunctionTermView<::tyr::formalism::AuxiliaryTag>,
-                                                    const GroundActionCostEvaluationContext&)
-{
-    return std::numeric_limits<ygg::float_t>::quiet_NaN();
-}
-
-inline ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundFunctionExpressionView expression,
-                                                    const GroundActionCostEvaluationContext& context)
-{
-    return visit([&](auto&& arg) { return evaluate_action_cost_expression(arg, context); }, expression.get_variant());
-}
-
-inline ygg::float_t evaluate_action_cost_expression(::tyr::formalism::planning::GroundArithmeticOperatorView expression,
-                                                    const GroundActionCostEvaluationContext& context)
-{
-    return visit([&](auto&& arg) { return evaluate_action_cost_expression(arg, context); }, expression.get_variant());
-}
-
-template<::tyr::formalism::NumericEffectOpKind Op>
-ygg::float_t evaluate_auxiliary_action_cost(::tyr::formalism::planning::GroundNumericEffectView<Op, ::tyr::formalism::AuxiliaryTag> effect,
-                                            const GroundActionCostEvaluationContext& context)
-{
-    const auto value = evaluate_action_cost_expression(effect.get_fexpr(), context);
-    if constexpr (std::same_as<Op, ::tyr::formalism::Assign> || std::same_as<Op, ::tyr::formalism::Increase>)
-        return value;
-    else if constexpr (std::same_as<Op, ::tyr::formalism::Decrease>)
-        return -value;
-    else
-        return std::numeric_limits<ygg::float_t>::quiet_NaN();
-}
-
-inline datalog::Cost to_datalog_cost(ygg::float_t value)
-{
-    value = ygg::FloatTolerance<ygg::float_t>::canonicalize(value);
-    if (!std::isfinite(value))
-        return datalog::Cost(0);
-    return datalog::Cost(std::max(value, ygg::float_t(0)));
-}
-}
-
 template<typename Derived,
          datalog::OrAnnotationPolicyConcept<GroundTag> OrAP,
          datalog::AndAnnotationPolicyConcept<GroundTag> AndAP,
@@ -247,16 +164,6 @@ template<typename Derived,
 ygg::float_t RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::evaluate(const StateView<GroundTag>& state)
 {
     return evaluate_impl(state, true);
-}
-
-template<typename Derived,
-         datalog::OrAnnotationPolicyConcept<GroundTag> OrAP,
-         datalog::AndAnnotationPolicyConcept<GroundTag> AndAP,
-         datalog::TerminationPolicyConcept<GroundTag> TP,
-         datalog::RuleCostPolicyConcept<GroundTag> CP>
-void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::set_cost_mode(CostMode mode)
-{
-    m_cost_mode = mode;
 }
 
 template<typename Derived,
@@ -276,7 +183,8 @@ ygg::float_t RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::evaluate_impl(con
             m_workspace.facts.fluent_atoms.insert(p2d.fluent_to_fluent_atom.at(*atom));
 
     for (const auto& [fterm, value] : state.get_fluent_fterm_values_view())
-        m_workspace.facts.fluent_fterm_intervals.insert_or_assign(p2d.fluent_to_fluent_fterm.at(fterm), ygg::ClosedInterval<ygg::float_t>(value, value));
+        if (const auto it = p2d.fluent_to_fluent_fterm.find(fterm); it != p2d.fluent_to_fluent_fterm.end())
+            m_workspace.facts.fluent_fterm_intervals.insert_or_assign(it->second, ygg::ClosedInterval<ygg::float_t>(value, value));
 
     auto ctx = datalog::ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>(m_workspace,
                                                                                 m_queue_workspace,
@@ -295,29 +203,9 @@ template<typename Derived,
          datalog::AndAnnotationPolicyConcept<GroundTag> AndAP,
          datalog::TerminationPolicyConcept<GroundTag> TP,
          datalog::RuleCostPolicyConcept<GroundTag> CP>
-void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::initialize_rule_costs(const StateView<GroundTag>& state)
+void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::initialize_rule_costs(const StateView<GroundTag>&)
 {
     m_workspace.clear_costs();
-
-    const auto& rule_to_action = m_rpg_program.get_rule_to_action_mapping();
-    for (const auto& [rule, action] : rule_to_action)
-        m_workspace.cost_policy.set_cost(rule, datalog::Cost(1));
-
-    const auto metric = m_rpg_program.get_datalog_program().get_program().get_metric();
-    if (m_cost_mode == CostMode::UNIT || !metric)
-        return;
-
-    const auto& rule_to_effect = m_rpg_program.get_rule_to_conditional_effect_mapping();
-    const auto context = details::GroundActionCostEvaluationContext { state };
-    for (const auto& [rule, cond_eff] : rule_to_effect)
-    {
-        if (const auto auxiliary_effect = cond_eff.get_effect().get_auxiliary_numeric_effect())
-        {
-            const auto cost =
-                visit([&](auto effect) { return details::evaluate_auxiliary_action_cost(effect, context); }, auxiliary_effect.value().get_variant());
-            m_workspace.cost_policy.set_cost(rule, details::to_datalog_cost(cost));
-        }
-    }
 }
 
 template<typename Derived,

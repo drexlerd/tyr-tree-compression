@@ -21,7 +21,6 @@
 #include "tyr/formalism/binding_view.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_view.hpp"
-#include "tyr/formalism/datalog/ground_conditional_effect_view.hpp"
 #include "tyr/formalism/datalog/ground_conjunctive_condition_view.hpp"
 #include "tyr/formalism/datalog/ground_numeric_effect_operator_view.hpp"
 #include "tyr/formalism/datalog/ground_rule_index.hpp"
@@ -55,7 +54,7 @@ public:
     auto get_key() const noexcept { return get_row().get_key(); }
     auto get_body() const noexcept { return ygg::make_view(get_data().body, *m_context); }
     auto get_head() const noexcept { return ygg::make_view(get_data().head, *m_context); }
-    auto get_conditional_costs() const noexcept { return ygg::make_view(get_data().conditional_costs, *m_context); }
+    auto get_metric_effects() const noexcept { return ygg::make_view(get_data().metric_effects, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

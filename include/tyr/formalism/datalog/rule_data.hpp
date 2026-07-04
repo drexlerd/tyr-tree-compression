@@ -19,7 +19,6 @@
 #define TYR_FORMALISM_DATALOG_RULE_DATA_HPP_
 
 #include "tyr/formalism/datalog/atom_index.hpp"
-#include "tyr/formalism/datalog/conditional_effect_index.hpp"
 #include "tyr/formalism/datalog/conjunctive_condition_index.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/numeric_effect_operator_data.hpp"
@@ -44,19 +43,19 @@ struct Data<::tyr::formalism::datalog::Rule>
     ygg::IndexList<::tyr::formalism::Variable> variables;
     ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> body;
     Head head;
-    ygg::IndexList<::tyr::formalism::datalog::ConditionalEffect> conditional_costs;
+    ygg::DataList<::tyr::formalism::datalog::NumericEffectOperator<::tyr::formalism::FluentTag>> metric_effects;
 
     Data() = default;
     Data(ygg::Index<::tyr::formalism::datalog::Rule> index,
          ygg::IndexList<::tyr::formalism::Variable> variables,
          ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> body,
          Head head,
-         ygg::IndexList<::tyr::formalism::datalog::ConditionalEffect> conditional_costs = {}) :
+         ygg::DataList<::tyr::formalism::datalog::NumericEffectOperator<::tyr::formalism::FluentTag>> metric_effects = {}) :
         index(index),
         variables(std::move(variables)),
         body(body),
         head(head),
-        conditional_costs(std::move(conditional_costs))
+        metric_effects(std::move(metric_effects))
     {
     }
     Data(const Data& other) = delete;
@@ -70,11 +69,11 @@ struct Data<::tyr::formalism::datalog::Rule>
         ygg::clear(variables);
         ygg::clear(body);
         ygg::clear(head);
-        ygg::clear(conditional_costs);
+        ygg::clear(metric_effects);
     }
 
-    auto cista_members() const noexcept { return std::tie(index, variables, body, head, conditional_costs); }
-    auto identifying_members() const noexcept { return std::tie(variables, body, head, conditional_costs); }
+    auto cista_members() const noexcept { return std::tie(index, variables, body, head, metric_effects); }
+    auto identifying_members() const noexcept { return std::tie(variables, body, head, metric_effects); }
 };
 
 static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::Rule>);

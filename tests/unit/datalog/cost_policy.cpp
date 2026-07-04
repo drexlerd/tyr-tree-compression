@@ -82,7 +82,7 @@ TEST(TyrDatalogCostPolicyTest, AnnotationStoresMetricAndCost)
     EXPECT_DOUBLE_EQ(d::get_cost(annotation), 7.5);
 }
 
-TEST(TyrDatalogCostPolicyTest, RuleCostPolicyLiftedDefaultsToUnit)
+TEST(TyrDatalogCostPolicyTest, RuleCostPolicyLiftedDefaultsToZero)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
@@ -90,10 +90,10 @@ TEST(TyrDatalogCostPolicyTest, RuleCostPolicyLiftedDefaultsToUnit)
 
     const auto policy = d::RuleCostPolicy<LiftedTag>();
 
-    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 1);
+    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 0);
 }
 
-TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedDefaultsToUnit)
+TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedDefaultsToZero)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
@@ -101,7 +101,7 @@ TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedDefaultsToUnit)
 
     const auto policy = d::RuleCostOverridePolicy<LiftedTag>();
 
-    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 1);
+    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 0);
 }
 
 TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesExactOverride)

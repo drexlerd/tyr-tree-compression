@@ -137,7 +137,9 @@ Cost fetch_current_best_cost(::tyr::formalism::datalog::PredicateBindingView<::t
 template<typename AggregationFunction>
 std::optional<WitnessAnnotation<LiftedTag>> try_ground_witness(const AndAnnotationContext<LiftedTag>& context)
 {
+    auto body_metric = ygg::ClosedInterval<ygg::float_t>();
     auto body_cost = AggregationFunction::identity();
+    auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
 
     for (const auto literal : context.witness_condition.get_literals<::tyr::formalism::FluentTag>())
     {
@@ -146,9 +148,12 @@ std::optional<WitnessAnnotation<LiftedTag>> try_ground_witness(const AndAnnotati
         const auto [program_binding, inserted] = ::tyr::formalism::datalog::ground_binding(literal.get_atom(), context.iteration_context);
         assert(!inserted);  ///< must exist in program because the precondition is applicable in program fact set.
 
-        const auto program_binding_cost = fetch_annotation_cost(program_binding, context.program_and_annot);
+        const auto* annotation = context.program_and_annot.find(program_binding);
+        assert(annotation && "applicable lifted rule has a positive fluent body atom without an annotation");
+        const auto program_binding_cost = get_cost(*annotation);
         assert(program_binding_cost != std::numeric_limits<Cost>::max());
 
+        body_metric = aggregate_metric_support(body_metric, get_metric(*annotation));
         body_cost = AggregationFunction()(body_cost, program_binding_cost);
     }
 
@@ -162,18 +167,31 @@ std::optional<WitnessAnnotation<LiftedTag>> try_ground_witness(const AndAnnotati
         if (constraint_cost == std::numeric_limits<Cost>::max())
             return std::nullopt;
 
+        for (const auto& entry : context.numeric_support_selector_workspace.selection)
+        {
+            if (entry.annotation)
+                body_metric = aggregate_metric_support(body_metric, get_metric(entry.annotation->annotation));
+            numeric_supports.push_back(NumericSupport<LiftedTag> { entry.binding, entry.interval, entry.cost });
+        }
+
         body_cost = AggregationFunction()(body_cost, constraint_cost);
     }
 
     body_cost = std::max(body_cost, context.current_cost);
 
-    return WitnessAnnotation<LiftedTag>(context.rule_binding, body_cost + context.rule_cost);
+    if (context.metric_effect_cost != Cost(0))
+        body_metric = empty(body_metric) ?
+                          ygg::ClosedInterval<ygg::float_t>(context.metric_effect_cost, context.metric_effect_cost) :
+                          ygg::ClosedInterval<ygg::float_t>(lower(body_metric) + context.metric_effect_cost, upper(body_metric) + context.metric_effect_cost);
+
+    numeric_supports.insert(numeric_supports.end(), context.numeric_supports.begin(), context.numeric_supports.end());
+    return WitnessAnnotation<LiftedTag>(context.rule_binding, body_metric, body_cost + context.metric_effect_cost, std::move(numeric_supports));
 }
 
 template<typename AggregationFunction>
 std::optional<WitnessAnnotation<LiftedTag>> try_ground_better_witness(Cost best_cost, const AndAnnotationContext<LiftedTag>& context)
 {
-    if (best_cost <= AggregationFunction::identity() + context.rule_cost)
+    if (best_cost <= AggregationFunction::identity() + context.metric_effect_cost)
         return std::nullopt;
 
     const auto witness = try_ground_witness<AggregationFunction>(context);
@@ -195,7 +213,7 @@ void AndAnnotationPolicy<LiftedTag, AggregationFunction>::update_annotation(
     const auto best_global_cost = fetch_annotation_cost(program_head, context.program_and_annot);
     const auto best_local_cost = fetch_current_best_cost(delta_head, delta_and_annot);
     const auto best_cost = std::min(best_global_cost, best_local_cost);
-    const auto cur_cost_lower_bound = context.current_cost + context.rule_cost;
+    const auto cur_cost_lower_bound = context.current_cost + context.metric_effect_cost;
 
     if (best_cost <= cur_cost_lower_bound)
         return;  ///< No local or global improvement
@@ -217,7 +235,7 @@ void AndAnnotationPolicy<LiftedTag, AggregationFunction>::update_annotation(
     SelectedFunctionAnnotations<LiftedTag>& delta_numeric_and_annot) const
 {
     const auto best_cost = std::numeric_limits<Cost>::max();
-    const auto cur_cost_lower_bound = context.current_cost + context.rule_cost;
+    const auto cur_cost_lower_bound = context.current_cost + context.metric_effect_cost;
 
     if (best_cost <= cur_cost_lower_bound)
         return;

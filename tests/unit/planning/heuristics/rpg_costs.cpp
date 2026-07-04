@@ -69,20 +69,20 @@ public:
     ygg::float_t extract_cost_and_set_preferred_actions_impl(const p::StateView<p::LiftedTag>&) { return 0; }
 };
 
-size_t count_rules_with_conditional_costs(const p::RPGProgram<p::LiftedTag>& program)
+size_t count_rules_with_metric_effects(const p::RPGProgram<p::LiftedTag>& program)
 {
     size_t result = 0;
     for (const auto rule : program.get_datalog_program().get_program().get_rules())
-        if (!rule.get_conditional_costs().empty())
+        if (!rule.get_metric_effects().empty())
             ++result;
     return result;
 }
 
-size_t count_rules_with_conditional_costs(const p::RPGProgram<p::GroundTag>& program)
+size_t count_rules_with_metric_effects(const p::RPGProgram<p::GroundTag>& program)
 {
     size_t result = 0;
     for (const auto rule : program.get_datalog_program().get_program().get_ground_rules())
-        if (!rule.get_conditional_costs().empty())
+        if (!rule.get_metric_effects().empty())
             ++result;
     return result;
 }
@@ -135,7 +135,7 @@ TEST(TyrPlanningRPGCostsTest, ActionBindingCostOverridesAllRPGRuleBindingsForAct
     EXPECT_EQ(heuristic.get_workspace().cost_policy.get_num_prefix_costs(), expected_num_rules);
 }
 
-TEST(TyrPlanningRPGCostsTest, LiftedRPGConditionalCostsAreMetricFiltered)
+TEST(TyrPlanningRPGCostsTest, LiftedRPGMetricEffectsAreMetricFiltered)
 {
     const auto root = std::filesystem::path(ROOT_DIR);
     const auto task = fp::Parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
@@ -148,19 +148,15 @@ TEST(TyrPlanningRPGCostsTest, LiftedRPGConditionalCostsAreMetricFiltered)
     for (const auto fterm : metric_fterms)
         metric_functions.insert(fterm.get_function());
 
-    ASSERT_GT(count_rules_with_conditional_costs(program), 0);
+    ASSERT_GT(count_rules_with_metric_effects(program), 0);
     for (const auto rule : program.get_datalog_program().get_program().get_rules())
     {
-        for (const auto conditional_cost : rule.get_conditional_costs())
-        {
-            ASSERT_FALSE(conditional_cost.get_effect().get_numeric_effects().empty());
-            for (const auto numeric_effect : conditional_cost.get_effect().get_numeric_effects())
-                EXPECT_TRUE(targets_function(numeric_effect, metric_functions));
-        }
+        for (const auto metric_effect : rule.get_metric_effects())
+            EXPECT_TRUE(targets_function(metric_effect, metric_functions));
     }
 }
 
-TEST(TyrPlanningRPGCostsTest, GroundRPGConditionalCostsAreMetricFiltered)
+TEST(TyrPlanningRPGCostsTest, GroundRPGMetricEffectsAreMetricFiltered)
 {
     const auto root = std::filesystem::path(ROOT_DIR);
     auto lifted_task = p::Task<p::LiftedTag>(fp::Parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
@@ -173,15 +169,11 @@ TEST(TyrPlanningRPGCostsTest, GroundRPGConditionalCostsAreMetricFiltered)
     auto metric_fterms = ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>> {};
     fd::collect_fterms(program.get_datalog_program().get_program().get_metric().value().get_fexpr(), metric_fterms);
 
-    ASSERT_GT(count_rules_with_conditional_costs(program), 0);
+    ASSERT_GT(count_rules_with_metric_effects(program), 0);
     for (const auto rule : program.get_datalog_program().get_program().get_ground_rules())
     {
-        for (const auto conditional_cost : rule.get_conditional_costs())
-        {
-            ASSERT_FALSE(conditional_cost.get_effect().get_numeric_effects().empty());
-            for (const auto numeric_effect : conditional_cost.get_effect().get_numeric_effects())
-                EXPECT_TRUE(targets_fterm(numeric_effect, metric_fterms));
-        }
+        for (const auto metric_effect : rule.get_metric_effects())
+            EXPECT_TRUE(targets_fterm(metric_effect, metric_fterms));
     }
 }
 

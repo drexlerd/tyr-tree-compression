@@ -36,14 +36,10 @@ class RPGProgram<GroundTag>
 {
 public:
     using RuleToActionMapping = ygg::UnorderedMap<::tyr::formalism::datalog::GroundRuleView, ::tyr::formalism::planning::GroundActionView>;
-    using RuleToConditionalEffectMapping =
-        ygg::UnorderedMap<::tyr::formalism::datalog::GroundRuleView, ::tyr::formalism::planning::GroundConditionalEffectView>;
-
-    explicit RPGProgram(::tyr::formalism::planning::FDRTaskView task);
+    explicit RPGProgram(::tyr::formalism::planning::FDRTaskView task, CostMode cost_mode = CostMode::GENERAL);
 
     const TranslationContext<GroundTag>& get_translation_context() const noexcept;
     const RuleToActionMapping& get_rule_to_action_mapping() const noexcept;
-    const RuleToConditionalEffectMapping& get_rule_to_conditional_effect_mapping() const noexcept;
     ::tyr::formalism::datalog::ProgramView<GroundTag> get_program() const noexcept;
     datalog::Program<GroundTag>& get_datalog_program() noexcept;
     const datalog::Program<GroundTag>& get_datalog_program() const noexcept;
@@ -52,7 +48,6 @@ public:
 private:
     TranslationContext<GroundTag> m_translation_context;
     RuleToActionMapping m_rule_to_action;
-    RuleToConditionalEffectMapping m_rule_to_conditional_effect;
     datalog::Program<GroundTag> m_datalog_program;
 };
 

@@ -19,7 +19,6 @@
 #define TYR_FORMALISM_DATALOG_RULE_VIEW_HPP_
 
 #include "tyr/formalism/datalog/atom_view.hpp"
-#include "tyr/formalism/datalog/conditional_effect_view.hpp"
 #include "tyr/formalism/datalog/conjunctive_condition_view.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/numeric_effect_operator_view.hpp"
@@ -52,7 +51,7 @@ public:
     auto get_variables() const noexcept { return ygg::make_view(get_data().variables, *m_context); }
     auto get_body() const noexcept { return ygg::make_view(get_data().body, *m_context); }
     auto get_head() const noexcept { return ygg::make_view(get_data().head, *m_context); }
-    auto get_conditional_costs() const noexcept { return ygg::make_view(get_data().conditional_costs, *m_context); }
+    auto get_metric_effects() const noexcept { return ygg::make_view(get_data().metric_effects, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

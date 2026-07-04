@@ -91,8 +91,8 @@ TEST_P(LMCutTest, InitialStateIsFiniteAndDominatesHMax)
     auto successor_generator = p::SuccessorGeneratorFactory<p::LiftedTag>().create(task, execution_context, state_repository);
     const auto initial_node = successor_generator->get_initial_node();
 
-    auto hmax = p::MaxRPGHeuristic<p::LiftedTag>::create(task, execution_context);
-    auto lmcut = p::LMCutHeuristic<p::LiftedTag>::create(task, execution_context);
+    auto hmax = p::MaxRPGHeuristic<p::LiftedTag>::create(task, execution_context, p::CostMode::UNIT);
+    auto lmcut = p::LMCutHeuristic<p::LiftedTag>::create(task, execution_context, p::CostMode::UNIT);
 
     const auto hmax_value = hmax->evaluate(initial_node.get_state());
     const auto lmcut_value = lmcut->evaluate(initial_node.get_state());

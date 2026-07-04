@@ -33,18 +33,45 @@ namespace tyr::datalog
 {
 
 template<>
+struct NumericSupport<LiftedTag>
+{
+    ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding;
+    ygg::ClosedInterval<ygg::float_t> interval;
+    Cost cost;
+
+    auto get_binding() const noexcept { return binding; }
+    auto get_interval() const noexcept { return interval; }
+    auto get_cost() const noexcept { return cost; }
+
+    auto identifying_members() const noexcept { return std::make_tuple(binding, lower(interval), upper(interval)); }
+};
+
+template<>
 struct WitnessAnnotation<LiftedTag>
 {
 public:
     using Metric = ygg::ClosedInterval<ygg::float_t>;
+    using NumericSupports = std::vector<NumericSupport<LiftedTag>>;
 
     WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Cost cost) : m_rule_row(rule_row), m_metric(), m_cost(cost) {}
 
-    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Metric metric, Cost cost) : m_rule_row(rule_row), m_metric(metric), m_cost(cost) {}
+    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Metric metric, Cost cost) :
+        m_rule_row(rule_row), m_metric(metric), m_cost(cost)
+    {
+    }
+
+    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Metric metric, Cost cost, NumericSupports numeric_supports) :
+        m_rule_row(rule_row),
+        m_metric(metric),
+        m_cost(cost),
+        m_numeric_supports(std::move(numeric_supports))
+    {
+    }
 
     auto get_rule_row() const noexcept { return m_rule_row; }
     auto get_metric() const noexcept { return m_metric; }
     auto get_cost() const noexcept { return m_cost; }
+    const auto& get_numeric_supports() const noexcept { return m_numeric_supports; }
 
     auto identifying_members() const noexcept { return std::tie(m_rule_row); }
 
@@ -52,6 +79,7 @@ private:
     ::tyr::formalism::datalog::RuleBindingView m_rule_row;
     Metric m_metric;
     Cost m_cost;
+    NumericSupports m_numeric_supports;
 };
 
 template<>
@@ -189,9 +217,10 @@ template<>
 struct AndAnnotationContext<LiftedTag>
 {
     Cost current_cost;
+    std::vector<NumericSupport<LiftedTag>> numeric_supports;
     ::tyr::formalism::datalog::RuleView rule;
     ::tyr::formalism::datalog::RuleBindingView rule_binding;
-    Cost rule_cost;
+    Cost metric_effect_cost;
     ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition;
     const NumericSupportSelector& numeric_support_selector;
     NumericSupportSelectorWorkspace& numeric_support_selector_workspace;

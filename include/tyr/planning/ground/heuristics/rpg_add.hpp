@@ -37,9 +37,9 @@ class AddRPGHeuristic<GroundTag> :
                    datalog::RuleCostOverridePolicy<GroundTag>>
 {
 public:
-    AddRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context);
+    AddRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode = CostMode::GENERAL);
 
-    static AddRPGHeuristicPtr<GroundTag> create(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context);
+    static AddRPGHeuristicPtr<GroundTag> create(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode = CostMode::GENERAL);
 
     ygg::float_t extract_cost_and_set_preferred_actions_impl(const StateView<GroundTag>& state);
 };

@@ -111,13 +111,13 @@ int main(int argc, char** argv)
             else if (heuristic_type == "goal_count")
                 heuristic = planning::GoalCountHeuristic<planning::LiftedTag>::create(lifted_task);
             else if (heuristic_type == "rpg_add")
-                heuristic = planning::AddRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context);
+                heuristic = planning::AddRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
             else if (heuristic_type == "rpg_max")
-                heuristic = planning::MaxRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context);
+                heuristic = planning::MaxRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
             else if (heuristic_type == "rpg_ff")
-                heuristic = planning::FFRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context);
+                heuristic = planning::FFRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
             else if (heuristic_type == "lmcut")
-                heuristic = planning::LMCutHeuristic<planning::LiftedTag>::create(lifted_task, execution_context);
+                heuristic = planning::LMCutHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
             else
                 throw std::invalid_argument("The heuristic is not implemented.");
 
@@ -174,13 +174,13 @@ int main(int argc, char** argv)
                 else if (heuristic_type == "goal_count")
                     heuristic = planning::GoalCountHeuristic<planning::GroundTag>::create(ground_task);
                 else if (heuristic_type == "rpg_add")
-                    heuristic = planning::AddRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context);
+                    heuristic = planning::AddRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
                 else if (heuristic_type == "rpg_max")
-                    heuristic = planning::MaxRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context);
+                    heuristic = planning::MaxRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
                 else if (heuristic_type == "rpg_ff")
-                    heuristic = planning::FFRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context);
+                    heuristic = planning::FFRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
                 else if (heuristic_type == "lmcut")
-                    heuristic = planning::LMCutHeuristic<planning::GroundTag>::create(ground_task, execution_context);
+                    heuristic = planning::LMCutHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
                 else
                     throw std::invalid_argument("The heuristic is not implemented.");
 

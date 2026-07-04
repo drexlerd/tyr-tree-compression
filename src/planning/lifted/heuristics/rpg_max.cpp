@@ -25,7 +25,7 @@
 namespace tyr::planning
 {
 
-MaxRPGHeuristic<LiftedTag>::MaxRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context) :
+MaxRPGHeuristic<LiftedTag>::MaxRPGHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode) :
     RPGBase<LiftedTag,
             MaxRPGHeuristic<LiftedTag>,
             datalog::OrAnnotationPolicy<LiftedTag>,
@@ -33,13 +33,14 @@ MaxRPGHeuristic<LiftedTag>::MaxRPGHeuristic(TaskPtr<LiftedTag> task, ygg::Execut
             datalog::TerminationPolicy<LiftedTag, datalog::MaxAggregation>>(task,
                                                                             std::move(execution_context),
                                                                             datalog::OrAnnotationPolicy<LiftedTag>(),
-                                                                            datalog::AndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>())
+                                                                            datalog::AndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>(),
+                                                                            cost_mode)
 {
 }
 
-MaxRPGHeuristicPtr<LiftedTag> MaxRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context)
+MaxRPGHeuristicPtr<LiftedTag> MaxRPGHeuristic<LiftedTag>::create(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode)
 {
-    return std::make_shared<MaxRPGHeuristic<LiftedTag>>(std::move(task), std::move(execution_context));
+    return std::make_shared<MaxRPGHeuristic<LiftedTag>>(std::move(task), std::move(execution_context), cost_mode);
 }
 
 ygg::float_t MaxRPGHeuristic<LiftedTag>::extract_cost_and_set_preferred_actions_impl(const StateView<LiftedTag>& state)
