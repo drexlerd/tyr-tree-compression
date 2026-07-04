@@ -56,7 +56,7 @@ void bind_term(nb::module_& m, const std::string& name)
     using V = TermView;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def("get_variant", &V::get_variant);
+                   .def("get_variant", &V::get_variant, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -68,7 +68,7 @@ void bind_relation_binding(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("get_relation", &V::get_relation)
+                   .def("get_relation", &V::get_relation, nb::keep_alive<0, 1>())
                    .def("get_objects", &V::get_objects, nb::rv_policy::reference_internal)
                    .def("get_key", &V::get_key);
     add_print(cls);
@@ -83,7 +83,6 @@ void bind_predicate(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_name", &V::get_name)
-                   .def("__len__", &V::get_arity)
                    .def("get_arity", &V::get_arity);
     add_print(cls);
     add_hash(cls);
@@ -97,8 +96,7 @@ void bind_atom(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_predicate", &V::get_predicate, nb::keep_alive<0, 1>())
-                   .def("__len__", [](const V& self) { return self.get_terms().size(); })
-                   .def("get_terms", &V::get_terms);
+                   .def("get_terms", &V::get_terms, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -111,7 +109,6 @@ void bind_ground_atom(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_predicate", &V::get_predicate, nb::keep_alive<0, 1>())
-                   .def("__len__", [](const V& self) { return self.get_objects().size(); })
                    .def("get_objects", &V::get_objects, nb::rv_policy::reference_internal)
                    .def("get_key", &V::get_key);
     add_print(cls);
@@ -151,9 +148,8 @@ void bind_fdr_variable(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("__len__", &V::get_domain_size)
                    .def("get_domain_size", &V::get_domain_size)
-                   .def("get_atoms", &V::get_atoms);
+                   .def("get_atoms", &V::get_atoms, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -180,7 +176,6 @@ void bind_function(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_name", &V::get_name)
-                   .def("__len__", &V::get_arity)
                    .def("get_arity", &V::get_arity);
     add_print(cls);
     add_hash(cls);
@@ -194,8 +189,7 @@ void bind_function_term(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_function", &V::get_function, nb::keep_alive<0, 1>())
-                   .def("__len__", [](const V& self) { return self.get_terms().size(); })
-                   .def("get_terms", &V::get_terms);
+                   .def("get_terms", &V::get_terms, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -208,7 +202,6 @@ void bind_ground_function_term(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_function", &V::get_function, nb::keep_alive<0, 1>())
-                   .def("__len__", [](const V& self) { return self.get_objects().size(); })
                    .def("get_objects", &V::get_objects, nb::rv_policy::reference_internal)
                    .def("get_key", &V::get_key);
     add_print(cls);
@@ -260,7 +253,7 @@ void bind_numeric_effect_operator(nb::module_& m, const std::string& name)
     using V = NumericEffectOperatorView<T>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def("get_variant", &V::get_variant);
+                   .def("get_variant", &V::get_variant, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -271,7 +264,7 @@ void bind_ground_numeric_effect_operator(nb::module_& m, const std::string& name
     using V = GroundNumericEffectOperatorView<T>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def("get_variant", &V::get_variant);
+                   .def("get_variant", &V::get_variant, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -281,7 +274,7 @@ void bind_function_expression(nb::module_& m, const std::string& name)
     using V = FunctionExpressionView;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def("get_variant", &V::get_variant);
+                   .def("get_variant", &V::get_variant, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -292,12 +285,11 @@ void bind_conjunctive_condition(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("get_variables", &V::get_variables)
-                   .def("__len__", &V::get_arity)
+                   .def("get_variables", &V::get_variables, nb::rv_policy::reference_internal)
                    .def("get_arity", &V::get_arity)
-                   .def("get_static_literals", &V::get_literals<StaticTag>)
-                   .def("get_fluent_literals", &V::get_literals<FluentTag>)
-                   .def("get_derived_literals", &V::get_literals<DerivedTag>)
+                   .def("get_static_literals", &V::get_literals<StaticTag>, nb::rv_policy::reference_internal)
+                   .def("get_fluent_literals", &V::get_literals<FluentTag>, nb::rv_policy::reference_internal)
+                   .def("get_derived_literals", &V::get_literals<DerivedTag>, nb::rv_policy::reference_internal)
                    .def("get_numeric_constraints", &V::get_numeric_constraints, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
@@ -309,9 +301,9 @@ void bind_conjunctive_effect(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("get_literals", &V::get_literals)
-                   .def("get_numeric_effects", &V::get_numeric_effects)
-                   .def("get_auxiliary_numeric_effect", &V::get_auxiliary_numeric_effect);
+                   .def("get_literals", &V::get_literals, nb::rv_policy::reference_internal)
+                   .def("get_numeric_effects", &V::get_numeric_effects, nb::rv_policy::reference_internal)
+                   .def("get_auxiliary_numeric_effect", &V::get_auxiliary_numeric_effect, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -322,8 +314,7 @@ void bind_conditional_effect(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("get_variables", &V::get_variables)
-                   .def("__len__", &V::get_arity)
+                   .def("get_variables", &V::get_variables, nb::rv_policy::reference_internal)
                    .def("get_arity", &V::get_arity)
                    .def("get_condition", &V::get_condition, nb::keep_alive<0, 1>())
                    .def("get_effect", &V::get_effect, nb::keep_alive<0, 1>());
@@ -339,11 +330,10 @@ void bind_action(nb::module_& m, const std::string& name)
                    .def("get_index", &V::get_index)
                    .def("get_name", &V::get_name)
                    .def("get_original_arity", &V::get_original_arity)
-                   .def("__len__", &V::get_arity)
                    .def("get_arity", &V::get_arity)
-                   .def("get_variables", &V::get_variables)
+                   .def("get_variables", &V::get_variables, nb::rv_policy::reference_internal)
                    .def("get_condition", &V::get_condition, nb::keep_alive<0, 1>())
-                   .def("get_effects", &V::get_effects);
+                   .def("get_effects", &V::get_effects, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -354,9 +344,8 @@ void bind_axiom(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("__len__", &V::get_arity)
                    .def("get_arity", &V::get_arity)
-                   .def("get_variables", &V::get_variables)
+                   .def("get_variables", &V::get_variables, nb::rv_policy::reference_internal)
                    .def("get_body", &V::get_body, nb::keep_alive<0, 1>())
                    .def("get_head", &V::get_head, nb::keep_alive<0, 1>());
     add_print(cls);
@@ -368,7 +357,7 @@ void bind_ground_function_expression(nb::module_& m, const std::string& name)
     using V = GroundFunctionExpressionView;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def("get_variant", &V::get_variant);
+                   .def("get_variant", &V::get_variant, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -394,10 +383,10 @@ void bind_ground_conjunctive_effect(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("get_add_facts", &V::get_facts<PositiveTag>)
-                   .def("get_del_facts", &V::get_facts<NegativeTag>)
-                   .def("get_numeric_effects", &V::get_numeric_effects)
-                   .def("get_auxiliary_numeric_effect", &V::get_auxiliary_numeric_effect);
+                   .def("get_add_facts", &V::get_facts<PositiveTag>, nb::rv_policy::reference_internal)
+                   .def("get_del_facts", &V::get_facts<NegativeTag>, nb::rv_policy::reference_internal)
+                   .def("get_numeric_effects", &V::get_numeric_effects, nb::rv_policy::reference_internal)
+                   .def("get_auxiliary_numeric_effect", &V::get_auxiliary_numeric_effect, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -421,11 +410,11 @@ void bind_ground_action(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_action", &V::get_action, nb::keep_alive<0, 1>())
-                   .def("__len__", [](const V& self) { return self.get_objects().size(); })
+                   .def("get_row", &V::get_row, nb::keep_alive<0, 1>())
                    .def("get_objects", &V::get_objects, nb::rv_policy::reference_internal)
                    .def("get_key", &V::get_key)
                    .def("get_condition", &V::get_condition, nb::keep_alive<0, 1>())
-                   .def("get_effects", &V::get_effects);
+                   .def("get_effects", &V::get_effects, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -437,7 +426,7 @@ void bind_ground_axiom(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_axiom", &V::get_axiom, nb::keep_alive<0, 1>())
-                   .def("__len__", [](const V& self) { return self.get_objects().size(); })
+                   .def("get_row", &V::get_row, nb::keep_alive<0, 1>())
                    .def("get_objects", &V::get_objects, nb::rv_policy::reference_internal)
                    .def("get_key", &V::get_key)
                    .def("get_body", &V::get_body, nb::keep_alive<0, 1>())
@@ -465,14 +454,14 @@ void bind_domain(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
                    .def("get_name", &V::get_name)
-                   .def("get_static_predicates", &V::get_predicates<StaticTag>)
-                   .def("get_fluent_predicates", &V::get_predicates<FluentTag>)
-                   .def("get_derived_predicates", &V::get_predicates<DerivedTag>)
-                   .def("get_static_functions", &V::get_functions<StaticTag>)
-                   .def("get_fluent_functions", &V::get_functions<FluentTag>)
-                   .def("get_auxiliary_function", &V::get_auxiliary_function)
-                   .def("get_constants", &V::get_constants)
-                   .def("get_actions", &V::get_actions)
+                   .def("get_static_predicates", &V::get_predicates<StaticTag>, nb::rv_policy::reference_internal)
+                   .def("get_fluent_predicates", &V::get_predicates<FluentTag>, nb::rv_policy::reference_internal)
+                   .def("get_derived_predicates", &V::get_predicates<DerivedTag>, nb::rv_policy::reference_internal)
+                   .def("get_static_functions", &V::get_functions<StaticTag>, nb::rv_policy::reference_internal)
+                   .def("get_fluent_functions", &V::get_functions<FluentTag>, nb::rv_policy::reference_internal)
+                   .def("get_auxiliary_function", &V::get_auxiliary_function, nb::rv_policy::reference_internal)
+                   .def("get_constants", &V::get_constants, nb::rv_policy::reference_internal)
+                   .def("get_actions", &V::get_actions, nb::rv_policy::reference_internal)
                    .def("get_axioms", &V::get_axioms, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
@@ -486,7 +475,7 @@ void bind_lifted_task(nb::module_& m, const std::string& name)
                    .def("get_index", &V::get_index)
                    .def("get_name", &V::get_name)
                    .def("get_domain", &V::get_domain, nb::keep_alive<0, 1>())
-                   .def("get_derived_predicates", &V::get_derived_predicates)
+                   .def("get_derived_predicates", &V::get_derived_predicates, nb::rv_policy::reference_internal)
                    .def("get_objects", &V::get_objects, nb::rv_policy::reference_internal)
                    .def("get_static_atoms", &V::get_atoms<StaticTag>, nb::rv_policy::reference_internal)
                    .def("get_fluent_atoms", &V::get_atoms<FluentTag>, nb::rv_policy::reference_internal)
@@ -494,7 +483,7 @@ void bind_lifted_task(nb::module_& m, const std::string& name)
                    .def("get_fluent_fterm_values", &V::get_fterm_values<FluentTag>, nb::rv_policy::reference_internal)
                    .def("get_auxiliary_fterm_value", &V::get_auxiliary_fterm_value, nb::rv_policy::reference_internal)
                    .def("get_goal", &V::get_goal, nb::keep_alive<0, 1>())
-                   .def("get_metric", &V::get_metric, nb::keep_alive<0, 1>())
+                   .def("get_metric", &V::get_metric, nb::rv_policy::reference_internal)
                    .def("get_axioms", &V::get_axioms, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
@@ -508,7 +497,7 @@ void bind_ground_task(nb::module_& m, const std::string& name)
                    .def("get_index", &V::get_index)
                    .def("get_name", &V::get_name)
                    .def("get_domain", &V::get_domain, nb::keep_alive<0, 1>())
-                   .def("get_derived_predicates", &V::get_derived_predicates)
+                   .def("get_derived_predicates", &V::get_derived_predicates, nb::rv_policy::reference_internal)
                    .def("get_objects", &V::get_objects, nb::rv_policy::reference_internal)
                    .def("get_static_atoms", &V::get_atoms<StaticTag>, nb::rv_policy::reference_internal)
                    .def("get_fluent_atoms", &V::get_atoms<FluentTag>, nb::rv_policy::reference_internal)
@@ -517,7 +506,7 @@ void bind_ground_task(nb::module_& m, const std::string& name)
                    .def("get_fluent_fterm_values", &V::get_fterm_values<FluentTag>, nb::rv_policy::reference_internal)
                    .def("get_auxiliary_fterm_value", &V::get_auxiliary_fterm_value, nb::rv_policy::reference_internal)
                    .def("get_goal", &V::get_goal, nb::keep_alive<0, 1>())
-                   .def("get_metric", &V::get_metric, nb::keep_alive<0, 1>())
+                   .def("get_metric", &V::get_metric, nb::rv_policy::reference_internal)
                    .def("get_axioms", &V::get_axioms, nb::rv_policy::reference_internal)
                    .def("get_fluent_variables", &V::get_fluent_variables, nb::rv_policy::reference_internal)
                    .def("get_fluent_facts", &V::get_fluent_facts, nb::rv_policy::reference_internal)
@@ -559,7 +548,7 @@ void bind_multi_operator(nb::module_& m, const std::string& name)
 
     auto cls = nb::class_<V>(m, name.c_str())  //
                    .def("get_index", &V::get_index)
-                   .def("get_args", &V::get_args);
+                   .def("get_args", &V::get_args, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -570,7 +559,7 @@ void bind_arithmetic_operator(nb::module_& m, const std::string& name)
     using V = ArithmeticOperatorView<T>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def("get_variant", &V::get_variant);
+                   .def("get_variant", &V::get_variant, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }
@@ -581,7 +570,7 @@ void bind_boolean_operator(nb::module_& m, const std::string& name)
     using V = BooleanOperatorView<T>;
 
     auto cls = nb::class_<V>(m, name.c_str())  //
-                   .def("get_variant", &V::get_variant);
+                   .def("get_variant", &V::get_variant, nb::rv_policy::reference_internal);
     add_print(cls);
     add_hash(cls);
 }

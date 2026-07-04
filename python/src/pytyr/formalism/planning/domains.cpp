@@ -17,13 +17,13 @@
 
 #include "domains.hpp"
 
+#include "pytyr/bindings.hpp"
 #include "tyr/analysis/formatter.hpp"
 
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/vector.h>
-#include "pytyr/bindings.hpp"
-#include <yggdrasil/python/type_casters.hpp>
 #include <tyr/tyr.hpp>
+#include <yggdrasil/python/type_casters.hpp>
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -61,8 +61,11 @@ void bind_conditional_effect_domain_view(nb::module_& m, const char* name)
 
     auto cls = nb::class_<T>(m, name)
                    .def_ro("element", &T::element)
-                   .def_prop_ro("condition_domain", [](const T& self) -> const auto& { return self.payload.condition_domain; })
-                   .def_prop_ro("effect_domain", [](const T& self) -> const auto& { return self.payload.effect_domain; });
+                   .def_prop_ro(
+                       "condition_domain",
+                       [](const T& self) -> const auto& { return self.payload.condition_domain; },
+                       nb::rv_policy::reference_internal)
+                   .def_prop_ro("effect_domain", [](const T& self) -> const auto& { return self.payload.effect_domain; }, nb::rv_policy::reference_internal);
     add_print(cls);
 }
 
@@ -73,8 +76,11 @@ void bind_action_domain_view(nb::module_& m, const char* name)
 
     auto cls = nb::class_<T>(m, name)
                    .def_ro("element", &T::element)
-                   .def_prop_ro("precondition_domain", [](const T& self) -> const auto& { return self.payload.precondition_domain; })
-                   .def_prop_ro("effect_domains", [](const T& self) -> const auto& { return self.payload.effect_domains; });
+                   .def_prop_ro(
+                       "precondition_domain",
+                       [](const T& self) -> const auto& { return self.payload.precondition_domain; },
+                       nb::rv_policy::reference_internal)
+                   .def_prop_ro("effect_domains", [](const T& self) -> const auto& { return self.payload.effect_domains; }, nb::rv_policy::reference_internal);
     add_print(cls);
 }
 

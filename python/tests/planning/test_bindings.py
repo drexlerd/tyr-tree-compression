@@ -71,12 +71,10 @@ def test_planning_statistics_bindings_expose_counters_and_progress_snapshots():
     assert progress_statistics.get_snapshots() == []
     assert progress_statistics.empty()
     assert progress_statistics.size() == 0
-    assert len(progress_statistics) == 0
     progress_statistics.add_snapshot(statistics)
     progress_statistics.add_snap_shot(statistics)
     assert len(progress_statistics.get_snapshots()) == 2
     assert progress_statistics.size() == 2
-    assert len(progress_statistics) == 2
     assert not progress_statistics.empty()
     assert progress_statistics.get_snapshots()[0].get_num_generated() == 0
     assert progress_statistics.get_snapshots()[1].get_num_generated() == 0
@@ -84,7 +82,6 @@ def test_planning_statistics_bindings_expose_counters_and_progress_snapshots():
     assert progress_statistics.get_snapshots() == []
     assert progress_statistics.empty()
     assert progress_statistics.size() == 0
-    assert len(progress_statistics) == 0
 
     progress_statistics = planning.ProgressStatistics()
     progress_statistics.add_snapshot(statistics)
@@ -710,7 +707,6 @@ def test_state_repository_create_state_accepts_state_iterables():
         state_repository = _make_state_repository(task_module, task)
 
         assert state_repository.num_states() == 0
-        assert len(state_repository) == 0
         assert state_repository.memory_usage() >= 0
 
         initial_state = state_repository.get_initial_state()
@@ -735,7 +731,6 @@ def test_state_repository_create_state_accepts_state_iterables():
         assert value_recreated_state == initial_state
         assert value_recreated_state.get_index() == initial_state.get_index()
         assert state_repository.num_states() == 1
-        assert len(state_repository) == 1
 
 
 def test_planning_state_node_and_plan_repr_matches_str():
@@ -756,7 +751,7 @@ def test_planning_state_node_and_plan_repr_matches_str():
         assert repr(node) == str(node)
         assert repr(labeled_node) == str(labeled_node)
         assert repr(plan) == str(plan)
-        assert len(plan) == plan.get_length() == 0
+        assert plan.get_length() == 0
         assert plan.empty()
 
 
@@ -812,8 +807,7 @@ def test_lifted_successor_generator_exposes_action_binding_api():
     binding_successor = successor_generator.get_successor_node(start_node, binding)
     ground_action_successor = successor_generator.get_successor_node(start_node, ground_action)
 
-    assert len(ground_action) == len(list(ground_action.get_objects()))
-    assert len(ground_action) == ground_action.get_action().get_arity()
+    assert ground_action.get_action().get_arity() == len(list(ground_action.get_objects()))
     assert binding_successor == ground_action_successor
     assert any(
         labeled_successor.label == ground_action and labeled_successor.node == binding_successor
@@ -842,7 +836,6 @@ def test_labeled_node_is_constructible_for_plan_construction():
         plan = task_module.Plan(start_node, [labeled_node])
 
         assert plan.get_length() == 1
-        assert len(plan) == 1
         assert not plan.empty()
         assert plan.get_cost() == labeled_node.node.get_metric()
         assert plan.get_start_node() == start_node

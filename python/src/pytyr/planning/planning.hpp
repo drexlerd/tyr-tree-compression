@@ -203,7 +203,6 @@ void bind_plan(nb::module_& m, const std::string& name)
                    .def("get_start_node", &T::get_start_node, nb::rv_policy::copy)
                    .def("get_labeled_succ_nodes", &T::get_labeled_succ_nodes, nb::rv_policy::copy)
                    .def("get_cost", &T::get_cost)
-                   .def("__len__", &T::get_length)
                    .def("get_length", &T::get_length)
                    .def("empty", &T::empty);
     add_print(cls);
@@ -227,7 +226,6 @@ void bind_state_repository(nb::module_& m, const std::string& name)
         .def("get_index", &T::get_index)
         .def("get_initial_state", &T::get_initial_state, nb::rv_policy::move)
         .def("get_registered_state", &T::get_registered_state, nb::rv_policy::move, "state_index"_a)
-        .def("__len__", &T::num_states)
         .def("num_states", &T::num_states)
         .def("memory_usage", &T::memory_usage)
         .def("create_state",

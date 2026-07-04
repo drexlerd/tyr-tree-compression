@@ -64,10 +64,7 @@ void bind_module_definitions(nb::module_& m)
      * ActionCostMode
      */
 
-    nb::enum_<ActionCostMode>(m, "ActionCostMode")
-        .value("UNIT", ActionCostMode::UNIT)
-        .value("GENERAL", ActionCostMode::GENERAL)
-        .export_values();
+    nb::enum_<ActionCostMode>(m, "ActionCostMode").value("UNIT", ActionCostMode::UNIT).value("GENERAL", ActionCostMode::GENERAL).export_values();
 
     /**
      * Statistics
@@ -105,7 +102,6 @@ void bind_module_definitions(nb::module_& m)
                                        .def("add_snap_shot", &ProgressStatistics::add_snap_shot, "statistics"_a)
                                        .def("clear", &ProgressStatistics::clear)
                                        .def("empty", &ProgressStatistics::empty)
-                                       .def("__len__", &ProgressStatistics::size)
                                        .def("size", &ProgressStatistics::size)
                                        .def("get_snapshots", &ProgressStatistics::get_snapshots, nb::rv_policy::copy);
     add_print(progress_statistics_cls);

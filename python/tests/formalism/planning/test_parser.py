@@ -75,9 +75,6 @@ def test_parsed_domain_exposes_symbol_metadata():
 
     for _, _, arity in static_predicates + fluent_predicates:
         assert isinstance(arity, int)
-    for predicate in [*domain.get_static_predicates(), *domain.get_fluent_predicates()]:
-        assert len(predicate) == predicate.get_arity()
-
     assert static_predicates == [
         (0, "ball", 1),
         (1, "gripper", 1),
@@ -139,8 +136,7 @@ def test_parsed_task_exposes_domain_action_and_goal_views():
     assert len(static_atoms) == 12
     assert len(fluent_atoms) == 5
     for atom in [*static_atoms, *fluent_atoms]:
-        assert len(atom) == len(list(atom.get_objects()))
-        assert len(atom) == atom.get_predicate().get_arity()
+        assert atom.get_predicate().get_arity() == len(list(atom.get_objects()))
     assert list(task.get_static_fterm_values()) == []
     assert list(task.get_fluent_fterm_values()) == []
     assert list(task.get_axioms()) == []
@@ -168,18 +164,15 @@ def test_parsed_task_exposes_domain_action_and_goal_views():
 
         assert action.get_original_arity() == original_arity
         assert action.get_arity() == arity
-        assert len(action) == arity
         assert len(list(action.get_variables())) == arity
         assert len(list(action.get_effects())) == 1
         assert condition.get_arity() == arity
-        assert len(condition) == arity
         assert len(list(condition.get_variables())) == arity
         assert len(static_literals) == num_static_literals
         assert len(fluent_literals) == num_fluent_literals
         for literal in [*static_literals, *fluent_literals]:
             atom = literal.get_atom()
-            assert len(atom) == len(list(atom.get_terms()))
-            assert len(atom) == atom.get_predicate().get_arity()
+            assert atom.get_predicate().get_arity() == len(list(atom.get_terms()))
         assert list(condition.get_derived_literals()) == []
         assert list(condition.get_numeric_constraints()) == []
 
@@ -202,7 +195,7 @@ def test_fdr_context_exposes_variables_and_fact_metadata():
 
     assert variables
     assert set(fluent_atoms) <= set(variable_atoms)
-    assert all(len(variable) == variable.get_domain_size() for variable in variables)
+    assert all(variable.get_domain_size() >= len(list(variable.get_atoms())) for variable in variables)
     assert sum(variable.get_domain_size() - 1 for variable in variables) >= len(fluent_atoms)
 
     for atom in fluent_atoms:

@@ -304,7 +304,7 @@ void bind_module_definitions(nb::module_& m)
                       { return std::make_shared<FDRContext>(ground_mutex_groups, std::move(repository)); }),
              "ground_mutex_groups"_a,
              "repository"_a)
-        .def("get_fact", nb::overload_cast<GroundAtomView<FluentTag>>(&FDRContext::get_fact_view), "atom"_a, nb::rv_policy::reference_internal)
+        .def("get_fact", nb::overload_cast<GroundAtomView<FluentTag>>(&FDRContext::get_fact_view), "atom"_a, nb::keep_alive<0, 1>())
         .def("get_variables", &FDRContext::get_variables, nb::rv_policy::reference_internal);
 
     /**
@@ -330,8 +330,8 @@ void bind_module_definitions(nb::module_& m)
             .def("get_task", &PlanningTask::get_task, nb::keep_alive<0, 1>())
             .def("get_repository", &PlanningTask::get_repository)
             .def("get_fdr_context", &PlanningTask::get_fdr_context, nb::rv_policy::reference_internal)
-            .def("get_domain", &PlanningTask::get_domain, nb::keep_alive<0, 1>())
-            .def("get_variable_domains", &PlanningTask::get_variable_domains_view, nb::keep_alive<0, 1>());
+            .def("get_domain", &PlanningTask::get_domain, nb::rv_policy::reference_internal)
+            .def("get_variable_domains", &PlanningTask::get_variable_domains_view, nb::rv_policy::reference_internal);
     }
 
     {
@@ -339,7 +339,7 @@ void bind_module_definitions(nb::module_& m)
             .def("get_task", &PlanningFDRTask::get_task, nb::keep_alive<0, 1>())
             .def("get_repository", &PlanningFDRTask::get_repository)
             .def("get_fdr_context", &PlanningFDRTask::get_fdr_context, nb::rv_policy::reference_internal)
-            .def("get_domain", &PlanningFDRTask::get_domain, nb::keep_alive<0, 1>());
+            .def("get_domain", &PlanningFDRTask::get_domain, nb::rv_policy::reference_internal);
     }
 }
 
