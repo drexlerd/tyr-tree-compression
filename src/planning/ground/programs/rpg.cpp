@@ -19,10 +19,14 @@
 
 #include "../../programs/common.hpp"
 #include "tyr/formalism/datalog/builder.hpp"
+#include "tyr/formalism/datalog/expression_properties.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/planning/merge_datalog.hpp"
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
+
+#include <optional>
+#include <yggdrasil/containers/unordered_set.hpp>
 
 namespace f = tyr::formalism;
 namespace d = tyr::datalog;
@@ -33,6 +37,21 @@ namespace tyr::planning
 {
 namespace
 {
+using MetricGroundFunctionTermSet = ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>;
+
+bool targets_metric_fterm(fp::GroundNumericEffectOperatorView<f::FluentTag> effect,
+                          const MetricGroundFunctionTermSet& metric_fterms,
+                          fp::MergeDatalogContext& context)
+{
+    return ygg::visit(
+        [&](auto&& arg)
+        {
+            const auto fterm = merge_p2d(arg.get_fterm(), context).first;
+            return metric_fterms.find(fterm) != metric_fterms.end();
+        },
+        effect.get_variant());
+}
+
 struct GroundProgramBuildContext
 {
     using StaticPredicateMapping = ygg::UnorderedMap<fp::PredicateView<f::StaticTag>, fd::PredicateView<f::StaticTag>>;
@@ -47,7 +66,7 @@ struct GroundProgramBuildContext
     GroundProgramBuildContext(fd::Repository& repository) : builder(), merge_context(builder, repository), program() { program.clear(); }
 };
 
-fd::RuleBindingView create_rule_binding(GroundProgramBuildContext& context, d::Cost cost)
+fd::RuleBindingView create_rule_binding(GroundProgramBuildContext& context)
 {
     auto predicate_ptr = context.builder.get_builder<f::Predicate<f::FluentTag>>();
     auto& predicate = *predicate_ptr;
@@ -76,7 +95,6 @@ fd::RuleBindingView create_rule_binding(GroundProgramBuildContext& context, d::C
     rule.clear();
     rule.body = new_condition.get_index();
     rule.head = new_atom.get_index();
-    rule.cost = cost;
     canonicalize(rule);
     const auto new_rule = context.merge_context.destination.get_or_create(rule).first;
 
@@ -187,15 +205,66 @@ fd::GroundConjunctiveConditionView create_delete_free_effect_condition(fd::Groun
     return context.merge_context.destination.get_or_create(result).first;
 }
 
-fd::GroundRuleView
-create_ground_atom_rule(fd::GroundConjunctiveConditionView body, fd::GroundAtomView<f::FluentTag> head, GroundProgramBuildContext& context, d::Cost cost)
+auto create_conditional_cost(fp::GroundActionView action,
+                             fp::GroundConditionalEffectView cond_eff,
+                             fd::GroundAtomView<f::FluentTag> applicability_atom,
+                             const MetricGroundFunctionTermSet& metric_fterms,
+                             TranslationContext<GroundTag>& translation_context,
+                             GroundProgramBuildContext& context)
+{
+    auto conj_effect_ptr = context.builder.get_builder<fd::GroundConjunctiveEffect>();
+    auto& conj_effect = *conj_effect_ptr;
+    conj_effect.clear();
+
+    for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
+        if (targets_metric_fterm(numeric_effect, metric_fterms, context.merge_context))
+            conj_effect.numeric_effects.push_back(fp::merge_p2d(numeric_effect, context.merge_context));
+
+    if (conj_effect.numeric_effects.empty())
+        return std::optional<fd::GroundConditionalEffectView> {};
+
+    canonicalize(conj_effect);
+    const auto effect = context.merge_context.destination.get_or_create(conj_effect).first;
+
+    auto cond_eff_ptr = context.builder.get_builder<fd::GroundConditionalEffect>();
+    auto& result = *cond_eff_ptr;
+    result.clear();
+    result.condition =
+        create_delete_free_effect_condition(applicability_atom, action.get_condition(), cond_eff.get_condition(), translation_context, context).get_index();
+    result.effect = effect.get_index();
+    canonicalize(result);
+    return std::optional<fd::GroundConditionalEffectView> { context.merge_context.destination.get_or_create(result).first };
+}
+
+ygg::IndexList<fd::GroundConditionalEffect> create_conditional_costs(fp::GroundActionView action,
+                                                                     fd::GroundAtomView<f::FluentTag> applicability_atom,
+                                                                     const MetricGroundFunctionTermSet& metric_fterms,
+                                                                     TranslationContext<GroundTag>& translation_context,
+                                                                     GroundProgramBuildContext& context)
+{
+    auto result = ygg::IndexList<fd::GroundConditionalEffect> {};
+    if (metric_fterms.empty())
+        return result;
+
+    for (const auto cond_eff : action.get_effects())
+        if (const auto conditional_cost = create_conditional_cost(action, cond_eff, applicability_atom, metric_fterms, translation_context, context))
+            result.push_back(conditional_cost->get_index());
+
+    return result;
+}
+
+fd::GroundRuleView create_ground_atom_rule(fd::GroundConjunctiveConditionView body,
+                                           fd::GroundAtomView<f::FluentTag> head,
+                                           GroundProgramBuildContext& context,
+                                           ygg::IndexList<fd::GroundConditionalEffect> conditional_costs = {})
 {
     auto rule_ptr = context.builder.get_builder<fd::GroundRule>();
     auto& rule = *rule_ptr;
     rule.clear();
-    rule.binding = create_rule_binding(context, cost).get_index();
+    rule.binding = create_rule_binding(context).get_index();
     rule.body = body.get_index();
     rule.head = head.get_index();
+    rule.conditional_costs = std::move(conditional_costs);
     canonicalize(rule);
     return context.merge_context.destination.get_or_create(rule).first;
 }
@@ -203,14 +272,15 @@ create_ground_atom_rule(fd::GroundConjunctiveConditionView body, fd::GroundAtomV
 fd::GroundRuleView create_ground_numeric_effect_rule(fd::GroundConjunctiveConditionView body,
                                                      fp::GroundNumericEffectOperatorView<f::FluentTag> head,
                                                      GroundProgramBuildContext& context,
-                                                     d::Cost cost)
+                                                     ygg::IndexList<fd::GroundConditionalEffect> conditional_costs = {})
 {
     auto rule_ptr = context.builder.get_builder<fd::GroundRule>();
     auto& rule = *rule_ptr;
     rule.clear();
-    rule.binding = create_rule_binding(context, cost).get_index();
+    rule.binding = create_rule_binding(context).get_index();
     rule.body = body.get_index();
     rule.head = fp::merge_p2d(head, context.merge_context);
+    rule.conditional_costs = std::move(conditional_costs);
     canonicalize(rule);
     return context.merge_context.destination.get_or_create(rule).first;
 }
@@ -220,7 +290,7 @@ fd::GroundRuleView create_applicability_rule(fp::GroundActionView action,
                                              TranslationContext<GroundTag>& translation_context,
                                              GroundProgramBuildContext& context)
 {
-    return create_ground_atom_rule(create_delete_free_condition(action.get_condition(), translation_context, context), applicability_atom, context, d::Cost(0));
+    return create_ground_atom_rule(create_delete_free_condition(action.get_condition(), translation_context, context), applicability_atom, context);
 }
 
 fd::ProgramView<GroundTag> finish_program(GroundProgramBuildContext& context)
@@ -231,6 +301,7 @@ fd::ProgramView<GroundTag> finish_program(GroundProgramBuildContext& context)
 
 void translate_action_to_delete_free_rules(fp::GroundActionView action,
                                            ygg::Data<fd::GroundProgram>& program,
+                                           const MetricGroundFunctionTermSet& metric_fterms,
                                            TranslationContext<GroundTag>& translation_context,
                                            GroundProgramBuildContext& context,
                                            RPGProgram<GroundTag>::RuleToActionMapping& rule_to_action,
@@ -239,6 +310,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
     const auto applicability_atom = create_applicability_atom(action, context);
     const auto applicability_rule = create_applicability_rule(action, applicability_atom, translation_context, context);
     program.ground_rules.push_back(applicability_rule.get_index());
+    const auto conditional_costs = create_conditional_costs(action, applicability_atom, metric_fterms, translation_context, context);
 
     for (const auto cond_eff : action.get_effects())
     {
@@ -249,7 +321,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
         {
             if (const auto literal = fp::merge_p2d(fact, true, translation_context.p2d.fluent_to_fluent_atom, context.fluent_predicates, context.merge_context))
             {
-                const auto rule = create_ground_atom_rule(body, literal->get_atom(), context, d::Cost(1));
+                const auto rule = create_ground_atom_rule(body, literal->get_atom(), context, conditional_costs);
                 program.ground_rules.push_back(rule.get_index());
                 rule_to_action.emplace(rule, action);
                 rule_to_conditional_effect.emplace(rule, cond_eff);
@@ -258,7 +330,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
 
         for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
         {
-            const auto rule = create_ground_numeric_effect_rule(body, numeric_effect, context, d::Cost(1));
+            const auto rule = create_ground_numeric_effect_rule(body, numeric_effect, context, conditional_costs);
             program.ground_rules.push_back(rule.get_index());
             rule_to_action.emplace(rule, action);
             rule_to_conditional_effect.emplace(rule, cond_eff);
@@ -339,11 +411,16 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
     }
 
     context.program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).get_index();
+    auto metric_fterms = MetricGroundFunctionTermSet {};
     if (task.get_metric())
-        program.metric = create_metric(task.get_metric().value(), context).get_index();
+    {
+        const auto metric = create_metric(task.get_metric().value(), context);
+        program.metric = metric.get_index();
+        fd::collect_fterms(metric.get_fexpr(), metric_fterms);
+    }
 
     for (const auto action : task.get_ground_actions())
-        translate_action_to_delete_free_rules(action, program, translation_context, context, mapping, rule_to_conditional_effect);
+        translate_action_to_delete_free_rules(action, program, metric_fterms, translation_context, context, mapping, rule_to_conditional_effect);
 
     return finish_program(context);
 }

@@ -52,7 +52,6 @@ public:
     auto get_variables() const noexcept { return ygg::make_view(get_data().variables, *m_context); }
     auto get_body() const noexcept { return ygg::make_view(get_data().body, *m_context); }
     auto get_head() const noexcept { return ygg::make_view(get_data().head, *m_context); }
-    auto get_cost() const noexcept { return get_data().cost; }
     auto get_conditional_costs() const noexcept { return ygg::make_view(get_data().conditional_costs, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }

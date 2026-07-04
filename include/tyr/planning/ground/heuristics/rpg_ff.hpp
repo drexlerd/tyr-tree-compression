@@ -19,6 +19,7 @@
 #define TYR_PLANNING_GROUND_HEURISTICS_RPG_FF_HPP_
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
+#include "tyr/datalog/ground/policies/cost.hpp"
 #include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/ground/policies/termination.hpp"
 #include "tyr/planning/ground/heuristics/rpg.hpp"
@@ -37,7 +38,8 @@ class FFRPGHeuristic<GroundTag> :
                    FFRPGHeuristic<GroundTag>,
                    datalog::OrAnnotationPolicy<GroundTag>,
                    datalog::AndAnnotationPolicy<GroundTag, datalog::SumAggregation>,
-                   datalog::TerminationPolicy<GroundTag, datalog::SumAggregation>>
+                   datalog::TerminationPolicy<GroundTag, datalog::SumAggregation>,
+                   datalog::RuleCostOverridePolicy<GroundTag>>
 {
 public:
     FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context);

@@ -41,16 +41,28 @@ template<TaskKind Kind>
 struct BaseAnnotation
 {
 public:
-    explicit BaseAnnotation(Cost cost = Cost(0)) : m_cost(cost) {}
+    using Metric = ygg::ClosedInterval<ygg::float_t>;
 
+    BaseAnnotation() : m_metric(), m_cost(Cost(0)) {}
+    explicit BaseAnnotation(Cost cost) : m_metric(), m_cost(cost) {}
+    BaseAnnotation(Metric metric, Cost cost) : m_metric(metric), m_cost(cost) {}
+
+    auto get_metric() const noexcept { return m_metric; }
     auto get_cost() const noexcept { return m_cost; }
 
 private:
+    Metric m_metric;
     Cost m_cost;
 };
 
 template<TaskKind Kind>
 using Annotation = std::variant<BaseAnnotation<Kind>, WitnessAnnotation<Kind>>;
+
+template<TaskKind Kind>
+inline auto get_metric(const Annotation<Kind>& annotation) noexcept
+{
+    return std::visit([](const auto& value) { return value.get_metric(); }, annotation);
+}
 
 template<TaskKind Kind>
 inline Cost get_cost(const Annotation<Kind>& annotation) noexcept

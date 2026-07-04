@@ -350,7 +350,6 @@ TEST(TyrTests, TyrDatalogGroundViewsExposeBindingObjects)
     rule_builder.variables.clear();
     rule_builder.body = lifted_condition.get_index();
     rule_builder.head = lifted_atom.get_index();
-    rule_builder.cost = 1;
     canonicalize(rule_builder);
     const auto [rule, rule_success] = repository.get_or_create(rule_builder);
     ASSERT_TRUE(rule_success);

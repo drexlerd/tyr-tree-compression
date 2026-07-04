@@ -44,7 +44,6 @@ struct Data<::tyr::formalism::datalog::Rule>
     ygg::IndexList<::tyr::formalism::Variable> variables;
     ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> body;
     Head head;
-    ygg::uint_t cost;
     ygg::IndexList<::tyr::formalism::datalog::ConditionalEffect> conditional_costs;
 
     Data() = default;
@@ -52,13 +51,11 @@ struct Data<::tyr::formalism::datalog::Rule>
          ygg::IndexList<::tyr::formalism::Variable> variables,
          ygg::Index<::tyr::formalism::datalog::ConjunctiveCondition> body,
          Head head,
-         ygg::uint_t cost,
          ygg::IndexList<::tyr::formalism::datalog::ConditionalEffect> conditional_costs = {}) :
         index(index),
         variables(std::move(variables)),
         body(body),
         head(head),
-        cost(cost),
         conditional_costs(std::move(conditional_costs))
     {
     }
@@ -73,12 +70,11 @@ struct Data<::tyr::formalism::datalog::Rule>
         ygg::clear(variables);
         ygg::clear(body);
         ygg::clear(head);
-        ygg::clear(cost);
         ygg::clear(conditional_costs);
     }
 
-    auto cista_members() const noexcept { return std::tie(index, variables, body, head, cost, conditional_costs); }
-    auto identifying_members() const noexcept { return std::tie(variables, body, head, cost, conditional_costs); }
+    auto cista_members() const noexcept { return std::tie(index, variables, body, head, conditional_costs); }
+    auto identifying_members() const noexcept { return std::tie(variables, body, head, conditional_costs); }
 };
 
 static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::datalog::Rule>);

@@ -95,10 +95,10 @@ datalog::Cost LMCutHeuristic<GroundTag>::get_residual_cost(Rule rule) const
     const auto& mapping = m_rpg_program.get_rule_to_conditional_effect_mapping();
     const auto mapping_it = mapping.find(rule);
     if (mapping_it == mapping.end())
-        return rule.get_rule().get_cost();
+        return m_workspace.cost_policy.get_cost(rule);
 
     const auto cost_it = m_residual_costs.find(mapping_it->second);
-    return cost_it == m_residual_costs.end() ? rule.get_rule().get_cost() : cost_it->second;
+    return cost_it == m_residual_costs.end() ? m_workspace.cost_policy.get_cost(rule) : cost_it->second;
 }
 
 void LMCutHeuristic<GroundTag>::set_residual_cost(Rule rule, datalog::Cost cost)

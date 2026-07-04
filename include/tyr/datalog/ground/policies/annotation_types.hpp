@@ -35,15 +35,21 @@ namespace tyr::datalog
 template<>
 struct WitnessAnnotation<GroundTag>
 {
-    WitnessAnnotation(::tyr::formalism::datalog::GroundRuleView rule_, Cost cost_) : rule(rule_), cost(cost_) {}
+    using Metric = ygg::ClosedInterval<ygg::float_t>;
+
+    WitnessAnnotation(::tyr::formalism::datalog::GroundRuleView rule_, Cost cost_) : rule(rule_), metric(), cost(cost_) {}
+
+    WitnessAnnotation(::tyr::formalism::datalog::GroundRuleView rule_, Metric metric_, Cost cost_) : rule(rule_), metric(metric_), cost(cost_) {}
 
     auto get_rule() const noexcept { return rule; }
+    auto get_metric() const noexcept { return metric; }
     auto get_cost() const noexcept { return cost; }
 
     auto identifying_members() const noexcept { return std::tie(rule); }
 
 private:
     ::tyr::formalism::datalog::GroundRuleView rule;
+    Metric metric;
     Cost cost;
 };
 

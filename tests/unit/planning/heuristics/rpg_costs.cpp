@@ -18,8 +18,11 @@
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/cost.hpp"
 #include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/formalism/datalog/expression_properties.hpp"
 #include "tyr/formalism/formalism.hpp"
+#include "tyr/planning/ground/programs/rpg.hpp"
 #include "tyr/planning/lifted/heuristics/rpg.hpp"
+#include "tyr/planning/lifted/programs/rpg.hpp"
 #include "tyr/planning/planning.hpp"
 
 #include <algorithm>
@@ -27,9 +30,11 @@
 #include <gtest/gtest.h>
 #include <optional>
 #include <vector>
+#include <yggdrasil/containers/unordered_set.hpp>
 
 namespace d = tyr::datalog;
 namespace f = tyr::formalism;
+namespace fd = tyr::formalism::datalog;
 namespace fp = tyr::formalism::planning;
 namespace p = tyr::planning;
 
@@ -63,6 +68,34 @@ public:
 
     ygg::float_t extract_cost_and_set_preferred_actions_impl(const p::StateView<p::LiftedTag>&) { return 0; }
 };
+
+size_t count_rules_with_conditional_costs(const p::RPGProgram<p::LiftedTag>& program)
+{
+    size_t result = 0;
+    for (const auto rule : program.get_datalog_program().get_program().get_rules())
+        if (!rule.get_conditional_costs().empty())
+            ++result;
+    return result;
+}
+
+size_t count_rules_with_conditional_costs(const p::RPGProgram<p::GroundTag>& program)
+{
+    size_t result = 0;
+    for (const auto rule : program.get_datalog_program().get_program().get_ground_rules())
+        if (!rule.get_conditional_costs().empty())
+            ++result;
+    return result;
+}
+
+bool targets_function(fd::NumericEffectOperatorView<f::FluentTag> effect, const ygg::UnorderedSet<fd::FunctionView<f::FluentTag>>& functions)
+{
+    return ygg::visit([&](auto&& arg) { return functions.find(arg.get_fterm().get_function()) != functions.end(); }, effect.get_variant());
+}
+
+bool targets_fterm(fd::GroundNumericEffectOperatorView<f::FluentTag> effect, const ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>& fterms)
+{
+    return ygg::visit([&](auto&& arg) { return fterms.find(arg.get_fterm()) != fterms.end(); }, effect.get_variant());
+}
 
 size_t count_rules_for_action(const TestCostAdaptedMaxRPG& heuristic, fp::ActionView action)
 {
@@ -100,6 +133,56 @@ TEST(TyrPlanningRPGCostsTest, ActionBindingCostOverridesAllRPGRuleBindingsForAct
     const auto expected_num_rules = count_rules_for_action(heuristic, selected_binding->get_relation());
     EXPECT_TRUE(heuristic.get_workspace().cost_policy.get_costs().empty());
     EXPECT_EQ(heuristic.get_workspace().cost_policy.get_num_prefix_costs(), expected_num_rules);
+}
+
+TEST(TyrPlanningRPGCostsTest, LiftedRPGConditionalCostsAreMetricFiltered)
+{
+    const auto root = std::filesystem::path(ROOT_DIR);
+    const auto task = fp::Parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
+                          .parse_task(root / "data/planning-benchmarks/tests/numeric/delivery/test-1.pddl");
+    auto program = p::RPGProgram<p::LiftedTag>(task.get_task());
+
+    auto metric_fterms = ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>> {};
+    fd::collect_fterms(program.get_datalog_program().get_program().get_metric().value().get_fexpr(), metric_fterms);
+    auto metric_functions = ygg::UnorderedSet<fd::FunctionView<f::FluentTag>> {};
+    for (const auto fterm : metric_fterms)
+        metric_functions.insert(fterm.get_function());
+
+    ASSERT_GT(count_rules_with_conditional_costs(program), 0);
+    for (const auto rule : program.get_datalog_program().get_program().get_rules())
+    {
+        for (const auto conditional_cost : rule.get_conditional_costs())
+        {
+            ASSERT_FALSE(conditional_cost.get_effect().get_numeric_effects().empty());
+            for (const auto numeric_effect : conditional_cost.get_effect().get_numeric_effects())
+                EXPECT_TRUE(targets_function(numeric_effect, metric_functions));
+        }
+    }
+}
+
+TEST(TyrPlanningRPGCostsTest, GroundRPGConditionalCostsAreMetricFiltered)
+{
+    const auto root = std::filesystem::path(ROOT_DIR);
+    auto lifted_task = p::Task<p::LiftedTag>(fp::Parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
+                                                 .parse_task(root / "data/planning-benchmarks/tests/numeric/delivery/test-1.pddl"));
+    auto execution_context = ygg::ExecutionContext::create(1);
+    auto ground_task = lifted_task.instantiate_ground_task(*execution_context).task;
+    ASSERT_NE(ground_task, nullptr);
+
+    auto program = p::RPGProgram<p::GroundTag>(ground_task->get_task());
+    auto metric_fterms = ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>> {};
+    fd::collect_fterms(program.get_datalog_program().get_program().get_metric().value().get_fexpr(), metric_fterms);
+
+    ASSERT_GT(count_rules_with_conditional_costs(program), 0);
+    for (const auto rule : program.get_datalog_program().get_program().get_ground_rules())
+    {
+        for (const auto conditional_cost : rule.get_conditional_costs())
+        {
+            ASSERT_FALSE(conditional_cost.get_effect().get_numeric_effects().empty());
+            for (const auto numeric_effect : conditional_cost.get_effect().get_numeric_effects())
+                EXPECT_TRUE(targets_fterm(numeric_effect, metric_fterms));
+        }
+    }
 }
 
 }

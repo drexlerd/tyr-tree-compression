@@ -19,6 +19,7 @@
 #define TYR_PLANNING_GROUND_HEURISTICS_RPG_MAX_HPP_
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
+#include "tyr/datalog/ground/policies/cost.hpp"
 #include "tyr/datalog/ground/policies/termination.hpp"
 #include "tyr/planning/ground/heuristics/rpg.hpp"
 #include "tyr/planning/heuristics/rpg_max.hpp"
@@ -32,7 +33,8 @@ class MaxRPGHeuristic<GroundTag> :
                    MaxRPGHeuristic<GroundTag>,
                    datalog::OrAnnotationPolicy<GroundTag>,
                    datalog::AndAnnotationPolicy<GroundTag, datalog::MaxAggregation>,
-                   datalog::TerminationPolicy<GroundTag, datalog::MaxAggregation>>
+                   datalog::TerminationPolicy<GroundTag, datalog::MaxAggregation>,
+                   datalog::RuleCostOverridePolicy<GroundTag>>
 {
 public:
     MaxRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context);

@@ -36,7 +36,7 @@ struct RuleBindingFixture
     fd::RuleBindingView binding;
 };
 
-RuleBindingFixture make_nullary_rule_binding(fd::Repository& repository, d::Cost rule_cost)
+RuleBindingFixture make_nullary_rule_binding(fd::Repository& repository)
 {
     auto predicate_builder = ygg::Data<f::Predicate<f::FluentTag>>();
     predicate_builder.name = "p";
@@ -59,7 +59,6 @@ RuleBindingFixture make_nullary_rule_binding(fd::Repository& repository, d::Cost
     auto rule_builder = ygg::Data<fd::Rule>();
     rule_builder.body = condition.get_index();
     rule_builder.head = atom.get_index();
-    rule_builder.cost = rule_cost;
     canonicalize(rule_builder);
     const auto [rule, rule_success] = repository.get_or_create(rule_builder);
     EXPECT_TRUE(rule_success);
@@ -74,33 +73,42 @@ RuleBindingFixture make_nullary_rule_binding(fd::Repository& repository, d::Cost
 }
 }
 
-TEST(TyrDatalogCostPolicyTest, RuleCostPolicyLiftedUsesRuleCost)
+TEST(TyrDatalogCostPolicyTest, AnnotationStoresMetricAndCost)
+{
+    const auto metric = ygg::ClosedInterval<ygg::float_t>(2.5, 4.5);
+    const auto annotation = d::Annotation<LiftedTag>(d::BaseAnnotation<LiftedTag>(metric, d::Cost(7.5)));
+
+    EXPECT_EQ(d::get_metric(annotation), metric);
+    EXPECT_DOUBLE_EQ(d::get_cost(annotation), 7.5);
+}
+
+TEST(TyrDatalogCostPolicyTest, RuleCostPolicyLiftedDefaultsToUnit)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
-    const auto fixture = make_nullary_rule_binding(repository, 7);
+    const auto fixture = make_nullary_rule_binding(repository);
 
     const auto policy = d::RuleCostPolicy<LiftedTag>();
 
-    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 7);
+    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 1);
 }
 
-TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedFallsBackToRuleCost)
+TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedDefaultsToUnit)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
-    const auto fixture = make_nullary_rule_binding(repository, 7);
+    const auto fixture = make_nullary_rule_binding(repository);
 
     const auto policy = d::RuleCostOverridePolicy<LiftedTag>();
 
-    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 7);
+    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 1);
 }
 
 TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesExactOverride)
 {
     auto factory = fd::RepositoryFactory();
     auto repository = factory.create();
-    const auto fixture = make_nullary_rule_binding(repository, 7);
+    const auto fixture = make_nullary_rule_binding(repository);
 
     auto policy = d::RuleCostOverridePolicy<LiftedTag>();
     policy.set_cost(fixture.binding, 3);
@@ -113,8 +121,8 @@ TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesEquivalentOverrid
     auto factory = fd::RepositoryFactory();
     auto first_repository = factory.create();
     auto second_repository = factory.create();
-    const auto first_fixture = make_nullary_rule_binding(first_repository, 7);
-    const auto second_fixture = make_nullary_rule_binding(second_repository, 7);
+    const auto first_fixture = make_nullary_rule_binding(first_repository);
+    const auto second_fixture = make_nullary_rule_binding(second_repository);
 
     auto policy = d::RuleCostOverridePolicy<LiftedTag>();
     policy.set_cost(first_fixture.binding, 3);

@@ -627,8 +627,6 @@ struct formatter<ygg::Data<tyr::formalism::datalog::Rule>, char>
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.body);
             os << ygg::print_indent;
-            fmt::print(os, "{}{}\n", "cost = ", value.cost);
-            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "conditional costs = ", value.conditional_costs);
         }
         os << ygg::print_indent << ")";
@@ -655,8 +653,6 @@ struct formatter<tyr::formalism::datalog::RuleView, char>
             fmt::print(os, "{}{}\n", "head = ", value.get_head());
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "body = ", value.get_body());
-            os << ygg::print_indent;
-            fmt::print(os, "{}{}\n", "cost = ", value.get_cost());
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "conditional costs = ", value.get_conditional_costs());
         }

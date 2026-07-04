@@ -59,8 +59,9 @@ CostUpdate<LiftedTag> update_min_cost(Cost& cost, Cost candidate)
     return CostUpdate<LiftedTag>(old_cost, cost);
 }
 
-std::optional<WitnessAnnotation<LiftedTag>> fetch_best_head_witness_cost(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                                                              const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot)
+std::optional<WitnessAnnotation<LiftedTag>>
+fetch_best_head_witness_cost(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+                             const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot)
 {
     if (const auto* annotation = delta_and_annot.find(delta_head))
         if (const auto* witness = std::get_if<WitnessAnnotation<LiftedTag>>(annotation))
@@ -69,12 +70,12 @@ std::optional<WitnessAnnotation<LiftedTag>> fetch_best_head_witness_cost(::tyr::
     return std::nullopt;  // No witness available (not derived yet / skipped / not tracked) -> no update from AND side
 }
 
-ygg::uint_t fetch_annotation_cost(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> binding,
-                                  const SelectedPredicateAnnotations<LiftedTag>& annotations)
+Cost fetch_annotation_cost(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> binding,
+                           const SelectedPredicateAnnotations<LiftedTag>& annotations)
 {
     if (const auto* annotation = annotations.find(binding))
         return get_cost(*annotation);
-    return std::numeric_limits<ygg::uint_t>::max();
+    return std::numeric_limits<Cost>::max();
 }
 
 }
@@ -92,10 +93,11 @@ void OrAnnotationPolicy<LiftedTag>::initialize_annotation(::tyr::formalism::data
     program_numeric_and_annot.insert(program_head, interval, BaseAnnotation<LiftedTag>(Cost(0)));
 }
 
-CostUpdate<LiftedTag> OrAnnotationPolicy<LiftedTag>::update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                                                            ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                                                            const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
-                                                            SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const
+CostUpdate<LiftedTag>
+OrAnnotationPolicy<LiftedTag>::update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
+                                                 ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+                                                 const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
+                                                 SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const
 {
     // Fast path 1: already optimal
     auto old_cost = fetch_annotation_cost(program_head, program_and_annot);
@@ -126,8 +128,8 @@ CostUpdate<LiftedTag> OrAnnotationPolicy<LiftedTag>::update_annotation(::tyr::fo
 namespace
 {
 
-ygg::uint_t fetch_current_best_cost(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                                    const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot)
+Cost fetch_current_best_cost(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+                             const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot)
 {
     return fetch_annotation_cost(delta_head, delta_and_annot);
 }
@@ -145,7 +147,7 @@ std::optional<WitnessAnnotation<LiftedTag>> try_ground_witness(const AndAnnotati
         assert(!inserted);  ///< must exist in program because the precondition is applicable in program fact set.
 
         const auto program_binding_cost = fetch_annotation_cost(program_binding, context.program_and_annot);
-        assert(program_binding_cost != std::numeric_limits<ygg::uint_t>::max());
+        assert(program_binding_cost != std::numeric_limits<Cost>::max());
 
         body_cost = AggregationFunction()(body_cost, program_binding_cost);
     }
@@ -169,7 +171,7 @@ std::optional<WitnessAnnotation<LiftedTag>> try_ground_witness(const AndAnnotati
 }
 
 template<typename AggregationFunction>
-std::optional<WitnessAnnotation<LiftedTag>> try_ground_better_witness(ygg::uint_t best_cost, const AndAnnotationContext<LiftedTag>& context)
+std::optional<WitnessAnnotation<LiftedTag>> try_ground_better_witness(Cost best_cost, const AndAnnotationContext<LiftedTag>& context)
 {
     if (best_cost <= AggregationFunction::identity() + context.rule_cost)
         return std::nullopt;
@@ -214,7 +216,7 @@ void AndAnnotationPolicy<LiftedTag, AggregationFunction>::update_annotation(
     const AndAnnotationContext<LiftedTag>& context,
     SelectedFunctionAnnotations<LiftedTag>& delta_numeric_and_annot) const
 {
-    const auto best_cost = std::numeric_limits<ygg::uint_t>::max();
+    const auto best_cost = std::numeric_limits<Cost>::max();
     const auto cur_cost_lower_bound = context.current_cost + context.rule_cost;
 
     if (best_cost <= cur_cost_lower_bound)
@@ -246,7 +248,8 @@ AchieverAndAnnotationPolicy<LiftedTag, AggregationFunction>::find_achievers(Pred
 }
 
 template<typename AggregationFunction>
-void AchieverAndAnnotationPolicy<LiftedTag, AggregationFunction>::record_achiever(PredicateBinding program_head, const AndAnnotationContext<LiftedTag>& context) const
+void AchieverAndAnnotationPolicy<LiftedTag, AggregationFunction>::record_achiever(PredicateBinding program_head,
+                                                                                  const AndAnnotationContext<LiftedTag>& context) const
 {
     const auto witness = try_ground_witness<AggregationFunction>(context);
     if (witness)

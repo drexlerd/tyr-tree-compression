@@ -235,7 +235,7 @@ inline datalog::Cost to_datalog_cost(ygg::float_t value)
     value = ygg::FloatTolerance<ygg::float_t>::canonicalize(value);
     if (!std::isfinite(value))
         return datalog::Cost(0);
-    return datalog::Cost(std::floor(std::max(value, ygg::float_t(0))));
+    return datalog::Cost(std::max(value, ygg::float_t(0)));
 }
 }
 
@@ -298,6 +298,10 @@ template<typename Derived,
 void RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::initialize_rule_costs(const StateView<GroundTag>& state)
 {
     m_workspace.clear_costs();
+
+    const auto& rule_to_action = m_rpg_program.get_rule_to_action_mapping();
+    for (const auto& [rule, action] : rule_to_action)
+        m_workspace.cost_policy.set_cost(rule, datalog::Cost(1));
 
     const auto metric = m_rpg_program.get_datalog_program().get_program().get_metric();
     if (m_cost_mode == CostMode::UNIT || !metric)

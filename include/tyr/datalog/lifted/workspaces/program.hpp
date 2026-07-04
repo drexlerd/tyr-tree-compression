@@ -34,6 +34,7 @@
 #include "tyr/formalism/planning/builder.hpp"
 
 #include <chrono>
+#include <map>
 #include <oneapi/tbb/enumerable_thread_specific.h>
 #include <optional>
 #include <tuple>
@@ -52,7 +53,7 @@ public:
     using FunctionViewType = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
     using PredicateBucket = ygg::UnorderedSet<PredicateViewType>;
     using FunctionBucket = ygg::UnorderedMap<FunctionViewType, ygg::ClosedInterval<ygg::float_t>>;
-    using Cost = ygg::uint_t;
+    using Cost = datalog::Cost;
 
     struct Bucket
     {
@@ -69,29 +70,22 @@ public:
         [[nodiscard]] size_t size() const noexcept { return predicates.size() + functions.size(); }
     };
 
-    CostBuckets() : m_buckets(1), m_current(0), m_total_size(0) {}
+    CostBuckets() : m_current(Cost(0)), m_total_size(0) {}
 
     void clear() noexcept
     {
-        for (auto& b : m_buckets)
-            b.clear();
+        m_buckets.clear();
         m_total_size = 0;
-        m_current = 0;
+        m_current = Cost(0);
     }
 
     [[nodiscard]] Cost current_cost() const noexcept { return m_current; }
     [[nodiscard]] bool empty() const noexcept { return m_total_size == 0; }
 
-    void resize_to_fit(Cost c)
-    {
-        if (c >= m_buckets.size())
-            m_buckets.resize(static_cast<size_t>(c) + 1);
-    }
-
     bool insert(Cost c, PredicateViewType a)
     {
-        resize_to_fit(c);
-        const auto [it, inserted] = m_buckets[c].predicates.insert(a);
+        auto& bucket = m_buckets[c];
+        const auto [it, inserted] = bucket.predicates.insert(a);
         if (inserted)
             ++m_total_size;
         return inserted;
@@ -99,8 +93,6 @@ public:
 
     bool insert(Cost c, FunctionViewType f, ygg::ClosedInterval<ygg::float_t> interval)
     {
-        resize_to_fit(c);
-
         auto& bucket = m_buckets[c].functions;
         auto [it, inserted] = bucket.emplace(f, interval);
 
@@ -118,11 +110,15 @@ public:
 
     bool erase(Cost c, PredicateViewType a)
     {
-        if (c >= m_buckets.size())
+        const auto it = m_buckets.find(c);
+        if (it == m_buckets.end())
             return false;
-        const auto erased = m_buckets[c].predicates.erase(a) > 0;
+
+        const auto erased = it->second.predicates.erase(a) > 0;
         if (erased)
             --m_total_size;
+        if (it->second.empty())
+            m_buckets.erase(it);
         return erased;
     }
 
@@ -135,38 +131,38 @@ public:
 
     void clear_current()
     {
-        if (m_current >= m_buckets.size())
+        const auto it = m_buckets.find(m_current);
+        if (it == m_buckets.end())
             return;
-        m_total_size -= m_buckets[m_current].size();
-        m_buckets[m_current].clear();
+        m_total_size -= it->second.size();
+        m_buckets.erase(it);
     }
 
     bool advance_to_next_nonempty()
     {
-        while (m_current < m_buckets.size() && m_buckets[m_current].empty())
-            ++m_current;
-        return m_current < m_buckets.size();
+        if (m_buckets.empty())
+            return false;
+        m_current = m_buckets.begin()->first;
+        return true;
     }
 
     const PredicateBucket& get_current_bucket() const
     {
         static const PredicateBucket kEmpty {};
-        if (m_current >= m_buckets.size())
-            return kEmpty;
-        return m_buckets[m_current].predicates;
+        const auto it = m_buckets.find(m_current);
+        return it == m_buckets.end() ? kEmpty : it->second.predicates;
     }
 
     const FunctionBucket& get_current_function_bucket() const
     {
         static const FunctionBucket kEmpty {};
-        if (m_current >= m_buckets.size())
-            return kEmpty;
-        return m_buckets[m_current].functions;
+        const auto it = m_buckets.find(m_current);
+        return it == m_buckets.end() ? kEmpty : it->second.functions;
     }
 
 private:
-    std::vector<Bucket> m_buckets;
-    ygg::uint_t m_current = 0;
+    std::map<Cost, Bucket> m_buckets;
+    Cost m_current = Cost(0);
     size_t m_total_size = 0;
 };
 

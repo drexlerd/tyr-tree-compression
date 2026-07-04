@@ -34,7 +34,7 @@ template<>
 class RuleCostPolicy<LiftedTag>
 {
 public:
-    Cost get_cost(::tyr::formalism::datalog::RuleView rule, ::tyr::formalism::datalog::RuleBindingView) const noexcept { return rule.get_cost(); }
+    Cost get_cost(::tyr::formalism::datalog::RuleView, ::tyr::formalism::datalog::RuleBindingView) const noexcept { return Cost(1); }
     void clear() noexcept {}
     void set_cost(::tyr::formalism::datalog::RuleBindingView, Cost) noexcept {}
 };
@@ -54,7 +54,7 @@ public:
             return it->second;
         if (const auto* cost = find_prefix_override(rule_binding))
             return *cost;
-        return rule.get_cost();
+        return Cost(1);
     }
 
     void clear() noexcept

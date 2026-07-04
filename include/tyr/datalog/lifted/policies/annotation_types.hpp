@@ -36,15 +36,21 @@ template<>
 struct WitnessAnnotation<LiftedTag>
 {
 public:
-    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Cost cost) : m_rule_row(rule_row), m_cost(cost) {}
+    using Metric = ygg::ClosedInterval<ygg::float_t>;
+
+    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Cost cost) : m_rule_row(rule_row), m_metric(), m_cost(cost) {}
+
+    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Metric metric, Cost cost) : m_rule_row(rule_row), m_metric(metric), m_cost(cost) {}
 
     auto get_rule_row() const noexcept { return m_rule_row; }
+    auto get_metric() const noexcept { return m_metric; }
     auto get_cost() const noexcept { return m_cost; }
 
     auto identifying_members() const noexcept { return std::tie(m_rule_row); }
 
 private:
     ::tyr::formalism::datalog::RuleBindingView m_rule_row;
+    Metric m_metric;
     Cost m_cost;
 };
 
@@ -182,7 +188,7 @@ private:
 template<>
 struct AndAnnotationContext<LiftedTag>
 {
-    ygg::uint_t current_cost;
+    Cost current_cost;
     ::tyr::formalism::datalog::RuleView rule;
     ::tyr::formalism::datalog::RuleBindingView rule_binding;
     Cost rule_cost;

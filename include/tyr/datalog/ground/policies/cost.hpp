@@ -31,7 +31,7 @@ template<>
 class RuleCostPolicy<GroundTag>
 {
 public:
-    Cost get_cost(::tyr::formalism::datalog::GroundRuleView rule) const noexcept { return rule.get_rule().get_cost(); }
+    Cost get_cost(::tyr::formalism::datalog::GroundRuleView) const noexcept { return Cost(0); }
     void clear() noexcept {}
     void set_cost(::tyr::formalism::datalog::GroundRuleView, Cost) noexcept {}
 };
@@ -49,7 +49,7 @@ public:
     {
         if (const auto it = costs.find(rule); it != costs.end())
             return it->second;
-        return rule.get_rule().get_cost();
+        return Cost(0);
     }
 
     void clear() noexcept { costs.clear(); }

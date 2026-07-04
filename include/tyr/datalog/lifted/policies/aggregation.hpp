@@ -23,7 +23,7 @@
 
 namespace tyr::datalog
 {
-using Cost = ygg::uint_t;
+using Cost = ygg::float_t;
 
 struct SumAggregation
 {
