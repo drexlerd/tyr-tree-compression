@@ -28,6 +28,7 @@
 #include "tyr/formalism/planning/repository.hpp"
 #include "tyr/formalism/planning/views.hpp"
 
+#include <algorithm>
 #include <optional>
 #include <stdexcept>
 #include <yggdrasil/containers/unordered_set.hpp>
@@ -55,6 +56,13 @@ bool targets_metric_function(fp::NumericEffectOperatorView<T> effect, const Metr
         effect.get_variant());
 }
 
+void append_variable(fp::VariableView variable, fp::MergeDatalogContext& context, ygg::Data<fd::ConjunctiveCondition>& conj_cond)
+{
+    const auto index = merge_p2d(variable, context).first.get_index();
+    if (std::ranges::find(conj_cond.variables, index) == conj_cond.variables.end())
+        conj_cond.variables.push_back(index);
+}
+
 void fill_delete_free_condition(fp::ActionView action,
                                 fp::ConditionalEffectView cond_eff,
                                 TranslationContext<LiftedTag>& translation_context,
@@ -63,7 +71,7 @@ void fill_delete_free_condition(fp::ActionView action,
 {
     // Action parameter may get deleted.
     for (const auto& variable : action.get_variables())
-        conj_cond.variables.push_back(merge_p2d(variable, context).first.get_index());
+        append_variable(variable, context, conj_cond);
     for (const auto literal : action.get_condition().get_literals<::tyr::formalism::StaticTag>())
         conj_cond.static_literals.push_back(merge_p2d(literal, translation_context.p2d.static_to_static_predicate, context).first.get_index());
     for (const auto literal : action.get_condition().get_literals<::tyr::formalism::FluentTag>())
@@ -73,7 +81,7 @@ void fill_delete_free_condition(fp::ActionView action,
         conj_cond.numeric_constraints.push_back(merge_p2d(numeric_constraint, context));
 
     for (const auto variable : cond_eff.get_variables())
-        conj_cond.variables.push_back(merge_p2d(variable, context).first.get_index());
+        append_variable(variable, context, conj_cond);
     for (const auto literal : cond_eff.get_condition().template get_literals<::tyr::formalism::StaticTag>())
         conj_cond.static_literals.push_back(merge_p2d(literal, translation_context.p2d.static_to_static_predicate, context).first.get_index());
     for (const auto literal : cond_eff.get_condition().template get_literals<::tyr::formalism::FluentTag>())

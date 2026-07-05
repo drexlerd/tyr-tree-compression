@@ -77,10 +77,22 @@ public:
 
     void set_goal(::tyr::formalism::planning::GroundConjunctiveConditionView goal) override
     {
+        namespace fd = ::tyr::formalism::datalog;
         auto merge_context = ::tyr::formalism::planning::MergeDatalogContext { m_workspace.datalog_builder, m_workspace.workspace_repository };
+        auto condition_ptr = m_workspace.datalog_builder.template get_builder<fd::GroundConjunctiveCondition>();
+        auto& condition = *condition_ptr;
+        condition.clear();
+
         const auto& p2d = m_rpg_program.get_translation_context().p2d;
-        m_workspace.tp.set_goals(
-            ::tyr::formalism::planning::merge_p2d(goal, p2d.fluent_to_fluent_predicate, p2d.derived_to_fluent_predicate, merge_context).first);
+        for (const auto fact : goal.template get_facts<::tyr::formalism::PositiveTag>())
+            if (const auto literal = ::tyr::formalism::planning::merge_p2d(fact, true, p2d.fluent_to_fluent_predicate, merge_context))
+                condition.fluent_literals.push_back(literal->get_index());
+
+        for (const auto numeric_constraint : goal.get_numeric_constraints())
+            condition.numeric_constraints.push_back(::tyr::formalism::planning::merge_p2d(numeric_constraint, merge_context));
+
+        fd::canonicalize(condition);
+        m_workspace.tp.set_goals(m_workspace.workspace_repository.get_or_create(condition).first);
     }
 
     ygg::float_t evaluate(const StateView<LiftedTag>& state) override
