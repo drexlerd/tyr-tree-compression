@@ -322,19 +322,35 @@ static void insert_numeric_update(fd::NumericEffectOperatorView<f::FluentTag> he
             const auto program_head = fd::ground(effect.get_fterm(), input.iteration_context).first.get_row();
             const auto worker_head = fd::ground(effect.get_fterm(), input.solve_context).first;
             const auto rule_binding = fd::ground_binding(input.rule, input.solve_context).first;
-            const auto metric_cost = metric_effect_cost(rule_binding, input);
-            if (metric_cost == std::numeric_limits<Cost>::max())
+            const auto rem_rule_cost = metric_effect_cost(rule_binding, input);
+            if (rem_rule_cost == std::numeric_limits<Cost>::max())
                 return;
-            const auto used_transition_cost = input.cost_policy.get_cost(rule_binding, program_head, interval);
-            const auto cost = used_transition_cost >= metric_cost ? Cost(0) : metric_cost - used_transition_cost;
+
+            // A zero-cost rule that strictly grows a bound can be repeated for free, so the growing
+            // bound diverges (fact intervals are hull-monotone and the rule refires on all cliques).
+            // Widening to the exact limit immediately keeps the cost-bucket fixpoint terminating.
+            auto effect_interval = interval;
+            if (rem_rule_cost == Cost(0))
+            {
+                const auto current = fact_sets.get<f::FluentTag>().function[program_head];
+                if (!empty(current))
+                {
+                    const auto lo = lower(effect_interval) < lower(current) ? -std::numeric_limits<ygg::float_t>::infinity() : lower(effect_interval);
+                    const auto hi = upper(effect_interval) > upper(current) ? std::numeric_limits<ygg::float_t>::infinity() : upper(effect_interval);
+                    effect_interval = ygg::ClosedInterval<ygg::float_t>(lo, hi);
+                }
+            }
+
+            const auto used_transition_cost = input.cost_policy.get_cost(rule_binding, program_head, effect_interval);
+            const auto cost = used_transition_cost >= rem_rule_cost ? Cost(0) : rem_rule_cost - used_transition_cost;
             auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
             if (!collect_metric_effect_supports(input, numeric_supports) || !collect_numeric_head_supports(effect, program_head, input, numeric_supports))
                 return;
             const auto context = input.make_annotation_context(rule_binding, cost, std::move(numeric_supports));
 
-            input.and_ap.update_annotation(program_head, worker_head.get_row(), interval, context, numeric_and_annot);
+            input.and_ap.update_annotation(program_head, worker_head.get_row(), effect_interval, context, numeric_and_annot);
 
-            std::get<FunctionHeadIteration>(head_iteration).updates.emplace(worker_head.get_row().get_index().row, interval, input.current_cost + cost);
+            std::get<FunctionHeadIteration>(head_iteration).updates.emplace(worker_head.get_row().get_index().row, effect_interval, input.current_cost + cost);
         },
         head.get_variant());
 }

@@ -784,7 +784,7 @@ bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
     if (empty(rhs))
         return false;
 
-    const auto interval = apply_numeric_effect(Op {}, lhs, rhs);
+    auto interval = apply_numeric_effect(Op {}, lhs, rhs);
     if (empty(interval))
         return false;
 
@@ -796,6 +796,21 @@ bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
     const auto generated_cost = aggregate_numeric_effect_rule_cost(rule, effect, ctx, annotation_selection);
     if (generated_cost == std::numeric_limits<Cost>::max())
         return false;
+
+    // A zero-cost rule that strictly grows a bound can be repeated for free, so the growing
+    // bound diverges (fact intervals are hull-monotone and the rule stays enabled).
+    // Widening to the exact limit immediately keeps the Dijkstra queue terminating.
+    if (!empty(current))
+    {
+        auto metric_selection = std::vector<NumericSelectionEntry> {};
+        const auto rem_rule_cost = aggregate_metric_effect_cost(rule, ctx, metric_selection);
+        if (rem_rule_cost == Cost(0))
+        {
+            const auto lo = lower(interval) < lower(current) ? -std::numeric_limits<ygg::float_t>::infinity() : lower(interval);
+            const auto hi = upper(interval) > upper(current) ? std::numeric_limits<ygg::float_t>::infinity() : upper(interval);
+            interval = ygg::ClosedInterval<ygg::float_t>(lo, hi);
+        }
+    }
 
     const auto used_transition_cost = ctx.out().cost_policy().get_cost(rule, effect.get_fterm(), interval);
     const auto transition_cost = used_transition_cost >= generated_cost ? Cost(0) : generated_cost - used_transition_cost;
