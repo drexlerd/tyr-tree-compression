@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <string>
@@ -76,7 +78,7 @@ TEST_P(GroundTaskTest, StateViewsUseRepositoryContextForIdentity)
 {
     const auto& param = GetParam();
     auto execution_context = ygg::ExecutionContext(1);
-    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+    auto ground_task = p::Task<p::LiftedTag>(make_test_parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
 
     auto shared_execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::GroundTag>();
@@ -112,7 +114,7 @@ TEST_P(GroundTaskTest, StateViewsFromIndependentFactoriesUseDeterministicFactory
 {
     const auto& param = GetParam();
     auto execution_context = ygg::ExecutionContext(1);
-    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+    auto ground_task = p::Task<p::LiftedTag>(make_test_parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
 
     auto shared_execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::GroundTag>();
@@ -139,7 +141,7 @@ TEST_P(GroundTaskTest, CreateStateOverloadsCanonicalizeToSameRegisteredState)
 {
     const auto& param = GetParam();
     auto execution_context = ygg::ExecutionContext(1);
-    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+    auto ground_task = p::Task<p::LiftedTag>(make_test_parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
 
     auto shared_execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(ground_task, shared_execution_context);
@@ -177,7 +179,7 @@ TEST_P(GroundTaskTest, LabeledSuccessorOutputBufferIsReplaced)
 {
     const auto& param = GetParam();
     auto execution_context = ygg::ExecutionContext(1);
-    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+    auto ground_task = p::Task<p::LiftedTag>(make_test_parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
 
     auto successor_execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(ground_task, successor_execution_context);
@@ -201,7 +203,7 @@ TEST_P(GroundTaskTest, HasExpectedGroundTaskAndSuccessorCounts)
 {
     const auto& param = GetParam();
     auto execution_context = ygg::ExecutionContext(1);
-    auto ground_task = p::Task<p::LiftedTag>(fp::Parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
+    auto ground_task = p::Task<p::LiftedTag>(make_test_parser(param.domain_file).parse_task(param.task_file)).instantiate_ground_task(execution_context).task;
 
     EXPECT_EQ(ground_task->get_num_atoms<f::FluentTag>(), param.expected_fluent_atoms);
     EXPECT_EQ(ground_task->get_num_atoms<f::DerivedTag>(), param.expected_derived_atoms);

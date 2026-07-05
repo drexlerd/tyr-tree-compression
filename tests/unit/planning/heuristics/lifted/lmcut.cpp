@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include "tyr/formalism/formalism.hpp"
 #include "tyr/planning/planning.hpp"
 
@@ -131,7 +133,7 @@ bool should_check(const LMCutCase::Expectations& expectations) { return expectat
 TEST_P(LMCutTest, InitialStateIsFiniteAndDominatesHMax)
 {
     const auto& test_case = GetParam();
-    auto task = p::Task<p::LiftedTag>::create(fp::Parser(test_case.domain_file).parse_task(test_case.task_file));
+    auto task = p::Task<p::LiftedTag>::create(make_test_parser(test_case.domain_file).parse_task(test_case.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(task, axiom_evaluator);

@@ -18,7 +18,6 @@
 #ifndef TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 #define TYR_FORMALISM_DATALOG_FORMATTER_HPP_
 
-#include "tyr/config.hpp"
 #include "tyr/formalism/datalog/datas.hpp"
 #include "tyr/formalism/datalog/variable_dependency_graph.hpp"
 #include "tyr/formalism/datalog/views.hpp"
@@ -32,7 +31,6 @@
 #include <yggdrasil/formatting/cista_formatters.hpp>
 #include <yggdrasil/io/iostream.hpp>
 
-#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -1014,5 +1012,4 @@ struct formatter<tyr::formalism::datalog::ProgramView<tyr::GroundTag>, char>
 };
 
 }  // namespace fmt
-#endif
 #endif

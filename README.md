@@ -153,7 +153,6 @@ CMake options:
 | `TYR_BUILD_EXECUTABLES` | `OFF` | Build Tyr executables. |
 | `TYR_BUILD_PROFILING` | `OFF` | Build Tyr profiling targets. |
 | `TYR_BUILD_PYTYR` | `OFF` | Build `pytyr` Python bindings. |
-| `TYR_ENABLE_FMT_FORMATTERS` | `ON` | Enable the public `fmt::formatter` specializations of Tyr, Loki, and yggdrasil (`TYR_`/`LOKI_`/`YGG_ENABLE_FMT_FORMATTERS` macros, all default-on in the headers). |
 | `TYR_HEADER_INSTANTIATION` | `OFF` | Enable stronger inlining at higher compile-time cost. |
 | `TYR_ENABLE_INNER_PARALLELISM` | `OFF` | Enable inner rule parallelism. |
 | `TYR_USE_LLD` | `ON` | Use LLVM `lld` when available. |

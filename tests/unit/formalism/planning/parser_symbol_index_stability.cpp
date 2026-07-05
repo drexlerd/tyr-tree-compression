@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <ostream>
@@ -58,7 +60,7 @@ std::vector<ParserSymbolIndexStabilityCase> load_cases()
     return result;
 }
 
-fp::PlanningTask parse_task(const ParserSymbolIndexStabilityCase& test_case) { return fp::Parser(test_case.domain_file).parse_task(test_case.task_file); }
+fp::PlanningTask parse_task(const ParserSymbolIndexStabilityCase& test_case) { return make_test_parser(test_case.domain_file).parse_task(test_case.task_file); }
 
 template<std::ranges::random_access_range Range>
 void expect_same_index_names(const Range& first, const Range& second, std::string_view label)

@@ -198,7 +198,7 @@
             "expected_fluent_atoms": 50,
             "expected_derived_atoms": 21,
             "expected_actions": 34,
-            "expected_axioms": 30,
+            "expected_axioms": 34,
             "expected_successors": 2
         },
         {

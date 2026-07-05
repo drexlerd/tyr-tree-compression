@@ -32,9 +32,7 @@
 #include <sstream>
 #include <vector>
 
-#include "tyr/config.hpp"
 
-#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -513,6 +511,5 @@ struct formatter<tyr::analysis::TaskVariableDomainsView, char>
 };
 
 }  // namespace fmt
-#endif
 
 #endif

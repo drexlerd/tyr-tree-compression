@@ -283,7 +283,7 @@ std::optional<fp::GroundConjunctiveEffectView> ground_pruned(fp::ConjunctiveEffe
         conj_eff.auxiliary_numeric_effect = ground(element.get_auxiliary_numeric_effect().value(), context);
 
     // Prune no-op effects
-    if (conj_eff.add_facts.empty() && conj_eff.del_facts.empty() && conj_eff.numeric_effects.empty())
+    if (conj_eff.add_facts.empty() && conj_eff.del_facts.empty() && conj_eff.numeric_effects.empty() && !conj_eff.auxiliary_numeric_effect)
         return std::nullopt;  // no-op
 
     // Canonicalize and Serialize

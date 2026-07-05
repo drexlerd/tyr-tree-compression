@@ -123,7 +123,7 @@
             "name": "Philosophers",
             "domain_file": "tests/classical/philosophers/domain.pddl",
             "task_file": "tests/classical/philosophers/test-1.pddl",
-            "expected_status": "EXHAUSTED",
+            "expected_status": "SOLVED",
             "expected_maximum_effective_width": 2
         },
         {

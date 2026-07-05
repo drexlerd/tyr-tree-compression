@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <string>
@@ -77,9 +79,9 @@ SearchSummary run_blind_astar(const fs::path& domain_filepath, const fs::path& p
 
     TaskPtr task;
     if constexpr (std::same_as<Kind, p::GroundTag>)
-        task = p::Task<p::LiftedTag>(fp::Parser(domain_filepath).parse_task(problem_filepath)).instantiate_ground_task(*execution_context).task;
+        task = p::Task<p::LiftedTag>(make_test_parser(domain_filepath).parse_task(problem_filepath)).instantiate_ground_task(*execution_context).task;
     else if constexpr (std::same_as<Kind, p::LiftedTag>)
-        task = p::Task<p::LiftedTag>::create(fp::Parser(domain_filepath).parse_task(problem_filepath));
+        task = p::Task<p::LiftedTag>::create(make_test_parser(domain_filepath).parse_task(problem_filepath));
     else
         static_assert(ygg::dependent_false<Kind>::value, "Missing case");
 

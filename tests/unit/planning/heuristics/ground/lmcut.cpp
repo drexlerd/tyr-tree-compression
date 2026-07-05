@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include "tyr/formalism/formalism.hpp"
 #include "tyr/planning/planning.hpp"
 
@@ -131,7 +133,7 @@ bool should_check(const GroundLMCutCase::Expectations& expectations) { return ex
 TEST_P(GroundLMCutTest, InitialStateIsFiniteDominatesHMaxAndDoesNotExceedHStar)
 {
     const auto& test_case = GetParam();
-    auto lifted_task = p::Task<p::LiftedTag>(fp::Parser(test_case.domain_file).parse_task(test_case.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>(make_test_parser(test_case.domain_file).parse_task(test_case.task_file));
     auto grounding_context = ygg::ExecutionContext(1);
     auto ground_task = lifted_task.instantiate_ground_task(grounding_context).task;
 

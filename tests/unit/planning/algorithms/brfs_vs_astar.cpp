@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <tyr/formalism/formalism.hpp>
@@ -62,7 +64,7 @@ std::vector<BrfsCase> load_cases()
 GroundSearchContext create_ground_context(const std::filesystem::path& domain_file, const std::filesystem::path& task_file)
 {
     auto execution_context = ygg::ExecutionContext::create(1);
-    auto task = p::Task<p::LiftedTag>(fp::Parser(domain_file).parse_task(task_file)).instantiate_ground_task(*execution_context).task;
+    auto task = p::Task<p::LiftedTag>(make_test_parser(domain_file).parse_task(task_file)).instantiate_ground_task(*execution_context).task;
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::GroundTag>().create(task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::GroundTag>().create(task, axiom_evaluator);
     auto successor_generator = p::SuccessorGeneratorFactory<p::GroundTag>().create(task, execution_context, state_repository);

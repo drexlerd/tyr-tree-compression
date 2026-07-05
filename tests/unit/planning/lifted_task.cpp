@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include <algorithm>
 #include <filesystem>
 #include <gtest/gtest.h>
@@ -129,7 +131,7 @@ bool are_same_binding(fp::ActionBindingView lhs, const ygg::Data<::tyr::formalis
 
 void expect_action_binding_apis_match_ground_actions(const LiftedSuccessorCountCase& test_case)
 {
-    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(test_case.domain_file).parse_task(test_case.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>::create(make_test_parser(test_case.domain_file).parse_task(test_case.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
@@ -185,7 +187,7 @@ TEST(LiftedTaskGrounderResultTest, DefaultConstructionRepresentsExplicitFailure)
 TEST_P(LiftedTaskSuccessorCountTest, InitialNodeHasExpectedSuccessorCount)
 {
     const auto& param = GetParam();
-    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>::create(make_test_parser(param.domain_file).parse_task(param.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
@@ -199,7 +201,7 @@ TEST_P(LiftedTaskSuccessorCountTest, ActionBindingApisMatchGroundActions) { expe
 TEST_P(LiftedTaskSuccessorCountTest, CreateStateOverloadsCanonicalizeToSameRegisteredState)
 {
     const auto& param = GetParam();
-    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>::create(make_test_parser(param.domain_file).parse_task(param.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
@@ -235,7 +237,7 @@ TEST_P(LiftedTaskSuccessorCountTest, CreateStateOverloadsCanonicalizeToSameRegis
 TEST_P(LiftedTaskSuccessorCountTest, LabeledSuccessorOutputBufferIsReplaced)
 {
     const auto& param = GetParam();
-    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>::create(make_test_parser(param.domain_file).parse_task(param.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
@@ -257,7 +259,7 @@ TEST_P(LiftedTaskSuccessorCountTest, LabeledSuccessorOutputBufferIsReplaced)
 TEST_P(LiftedTaskSuccessorCountTest, ApplicableActionBindingOutputBufferIsReplaced)
 {
     const auto& param = GetParam();
-    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>::create(make_test_parser(param.domain_file).parse_task(param.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(lifted_task, execution_context);
     auto state_repository = p::StateRepositoryFactory<p::LiftedTag>().create(lifted_task, axiom_evaluator);
@@ -279,7 +281,7 @@ TEST_P(LiftedTaskSuccessorCountTest, ApplicableActionBindingOutputBufferIsReplac
 TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryContextForIdentity)
 {
     const auto& param = GetParam();
-    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>::create(make_test_parser(param.domain_file).parse_task(param.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::LiftedTag>();
     auto state_repository_factory = p::StateRepositoryFactory<p::LiftedTag>();
@@ -313,7 +315,7 @@ TEST_P(LiftedTaskSuccessorCountTest, StateViewsUseRepositoryContextForIdentity)
 TEST_P(LiftedTaskSuccessorCountTest, StateViewsFromIndependentFactoriesUseDeterministicFactoryLocalIdentity)
 {
     const auto& param = GetParam();
-    auto lifted_task = p::Task<p::LiftedTag>::create(fp::Parser(param.domain_file).parse_task(param.task_file));
+    auto lifted_task = p::Task<p::LiftedTag>::create(make_test_parser(param.domain_file).parse_task(param.task_file));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator_factory = p::AxiomEvaluatorFactory<p::LiftedTag>();
     auto first_state_repository_factory = p::StateRepositoryFactory<p::LiftedTag>();

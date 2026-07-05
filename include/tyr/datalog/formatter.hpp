@@ -18,7 +18,6 @@
 #ifndef TYR_DATALOG_FORMATTER_HPP_
 #define TYR_DATALOG_FORMATTER_HPP_
 
-#include "tyr/config.hpp"
 #include "tyr/datalog/lifted/assignment.hpp"
 #include "tyr/datalog/lifted/consistency_graph.hpp"
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
@@ -39,7 +38,6 @@
 #include <yggdrasil/formatting/dynamic_bitset_formatters.hpp>
 #include <yggdrasil/io/iostream.hpp>
 
-#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -474,6 +472,5 @@ struct formatter<tyr::datalog::AggregatedRuleWorkerStatistics, char>
 };
 
 }  // namespace fmt
-#endif
 
 #endif

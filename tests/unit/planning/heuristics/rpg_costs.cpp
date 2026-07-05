@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/cost.hpp"
 #include "tyr/datalog/lifted/policies/termination.hpp"
@@ -106,7 +108,7 @@ size_t count_rules_for_action(const TestCostAdaptedMaxRPG& heuristic, fp::Action
 TEST(TyrPlanningRPGCostsTest, ActionBindingCostOverridesAllRPGRuleBindingsForAction)
 {
     const auto root = std::filesystem::path(ROOT_DIR);
-    auto task = p::Task<p::LiftedTag>::create(fp::Parser(root / "data/planning-benchmarks/tests/classical/blocks_3/domain.pddl")
+    auto task = p::Task<p::LiftedTag>::create(make_test_parser(root / "data/planning-benchmarks/tests/classical/blocks_3/domain.pddl")
                                                   .parse_task(root / "data/planning-benchmarks/tests/classical/blocks_3/test-1.pddl"));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto axiom_evaluator = p::AxiomEvaluatorFactory<p::LiftedTag>().create(task, execution_context);
@@ -138,7 +140,7 @@ TEST(TyrPlanningRPGCostsTest, ActionBindingCostOverridesAllRPGRuleBindingsForAct
 TEST(TyrPlanningRPGCostsTest, LiftedRPGMetricEffectsAreMetricFiltered)
 {
     const auto root = std::filesystem::path(ROOT_DIR);
-    const auto task = fp::Parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
+    const auto task = make_test_parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
                           .parse_task(root / "data/planning-benchmarks/tests/numeric/delivery/test-1.pddl");
     auto program = p::RPGProgram<p::LiftedTag>(task.get_task());
 
@@ -159,7 +161,7 @@ TEST(TyrPlanningRPGCostsTest, LiftedRPGMetricEffectsAreMetricFiltered)
 TEST(TyrPlanningRPGCostsTest, GroundRPGMetricEffectsAreMetricFiltered)
 {
     const auto root = std::filesystem::path(ROOT_DIR);
-    auto lifted_task = p::Task<p::LiftedTag>(fp::Parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
+    auto lifted_task = p::Task<p::LiftedTag>(make_test_parser(root / "data/planning-benchmarks/tests/numeric/delivery/domain.pddl")
                                                  .parse_task(root / "data/planning-benchmarks/tests/numeric/delivery/test-1.pddl"));
     auto execution_context = ygg::ExecutionContext::create(1);
     auto ground_task = lifted_task.instantiate_ground_task(*execution_context).task;

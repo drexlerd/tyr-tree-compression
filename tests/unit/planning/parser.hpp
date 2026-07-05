@@ -15,11 +15,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_CONFIG_HPP_
-#define TYR_CONFIG_HPP_
+#ifndef TYR_TESTS_PLANNING_PARSER_HPP_
+#define TYR_TESTS_PLANNING_PARSER_HPP_
 
-#ifndef TYR_ENABLE_FMT_FORMATTERS
-#define TYR_ENABLE_FMT_FORMATTERS 1
-#endif
+#include "tyr/formalism/planning/parser.hpp"
+
+#include <filesystem>
+
+namespace tyr::tests
+{
+
+inline ::tyr::formalism::planning::Parser make_test_parser(const std::filesystem::path& domain_file,
+                                                           const loki::ParserOptions& parser_options = loki::ParserOptions())
+{
+    return ::tyr::formalism::planning::Parser(domain_file, parser_options);
+}
+
+}
 
 #endif

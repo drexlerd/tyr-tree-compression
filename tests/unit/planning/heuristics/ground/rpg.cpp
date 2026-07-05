@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include "tyr/formalism/formalism.hpp"
 #include "tyr/planning/planning.hpp"
 
@@ -31,7 +33,7 @@ namespace tyr::tests
 TEST(TyrPlanningGroundRPGHeuristics, InitialStateIsFiniteOnBlocks3)
 {
     const auto root = std::filesystem::path(ROOT_DIR);
-    auto lifted_task = p::Task<p::LiftedTag>(fp::Parser(root / "data/planning-benchmarks/tests/classical/blocks_3/domain.pddl")
+    auto lifted_task = p::Task<p::LiftedTag>(make_test_parser(root / "data/planning-benchmarks/tests/classical/blocks_3/domain.pddl")
                                                  .parse_task(root / "data/planning-benchmarks/tests/classical/blocks_3/test-1.pddl"));
     auto grounding_context = ygg::ExecutionContext(1);
     auto ground_task = lifted_task.instantiate_ground_task(grounding_context).task;

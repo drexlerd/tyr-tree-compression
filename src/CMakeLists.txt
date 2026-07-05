@@ -174,8 +174,8 @@ target_link_libraries(core
     valla::core
     fmt::fmt-header-only
     gtl::gtl
-  PRIVATE
     loki::parsers
+  PRIVATE
     Threads::Threads
 )
 

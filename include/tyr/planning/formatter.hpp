@@ -18,7 +18,6 @@
 #ifndef TYR_PLANNING_FORMATTER_HPP_
 #define TYR_PLANNING_FORMATTER_HPP_
 
-#include "tyr/config.hpp"
 #include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/planning/algorithms/iw/statistics.hpp"
 #include "tyr/planning/algorithms/siw/statistics.hpp"
@@ -36,7 +35,6 @@
 #include <yggdrasil/core/chrono.hpp>
 #include <yggdrasil/formatting/cista_formatters.hpp>
 
-#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -324,6 +322,5 @@ struct formatter<tyr::planning::Plan<Kind>, char>
 };
 
 }  // namespace fmt
-#endif
 
 #endif

@@ -30,9 +30,7 @@
 #include <ostream>
 #include <sstream>
 
-#include "tyr/config.hpp"
 
-#if TYR_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -67,6 +65,5 @@ struct formatter<tyr::formalism::planning::invariant::Invariant, char>
 };
 
 }
-#endif
 
 #endif

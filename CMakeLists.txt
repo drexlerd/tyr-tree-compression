@@ -25,12 +25,7 @@ if(TYR_ENABLE_INNER_PARALLELISM)
     add_compile_definitions(TYR_ENABLE_INNER_PARALLELISM)
 endif()
 
-option(TYR_ENABLE_FMT_FORMATTERS "Enable Tyr's public fmt::formatter specializations." ON)
-if(TYR_ENABLE_FMT_FORMATTERS)
-    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=1 LOKI_ENABLE_FMT_FORMATTERS=1 YGG_ENABLE_FMT_FORMATTERS=1)
-else()
-    add_compile_definitions(TYR_ENABLE_FMT_FORMATTERS=0 LOKI_ENABLE_FMT_FORMATTERS=0 YGG_ENABLE_FMT_FORMATTERS=0)
-endif()
+add_compile_definitions(YGG_ENABLE_FMT_FORMATTERS=1)
 
 option(TYR_USE_LLD "Use LLVM lld linker when available" ON)
 

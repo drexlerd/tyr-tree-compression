@@ -34,8 +34,13 @@ namespace tyr::formalism::planning
 class Parser
 {
 public:
-    Parser(const fs::path& domain_filepath, const loki::ParserOptions& options = loki::ParserOptions());
-    Parser(const std::string& domain_description, const fs::path& domain_filepath, const loki::ParserOptions& options = loki::ParserOptions());
+    Parser(const fs::path& domain_filepath,
+           const loki::ParserOptions& options = loki::ParserOptions(),
+           const loki::TranslatorOptions& translator_options = loki::TranslatorOptions());
+    Parser(const std::string& domain_description,
+           const fs::path& domain_filepath,
+           const loki::ParserOptions& options = loki::ParserOptions(),
+           const loki::TranslatorOptions& translator_options = loki::TranslatorOptions());
 
     PlanningTask parse_task(const fs::path& task_filepath, const loki::ParserOptions& options = loki::ParserOptions());
     PlanningTask parse_task(const std::string& task_description, const fs::path& task_filepath, const loki::ParserOptions& options = loki::ParserOptions());
@@ -44,6 +49,7 @@ public:
 
 private:
     loki::Parser m_loki_parser;
+    loki::TranslatorOptions m_loki_translator_options;
     loki::DomainTranslationResult m_loki_domain_translation_result;
 
     PlanningDomain m_domain;

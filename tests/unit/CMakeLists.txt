@@ -10,6 +10,7 @@ endif()
 function(add_gtest test_name source_file)
     add_executable(${test_name} ${source_file} main.cpp)
     target_link_libraries(${test_name} PRIVATE tyr::core TBB::tbb GTest::gtest)
+    target_include_directories(${test_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     add_test(NAME ${test_name} COMMAND ${test_name})
 endfunction()
 

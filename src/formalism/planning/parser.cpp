@@ -22,11 +22,18 @@
 namespace tyr::formalism::planning
 {
 
-Parser::Parser(const fs::path& domain_filepath, const loki::ParserOptions& options) : Parser(loki::semantic::read_file(domain_filepath), domain_filepath, options) {}
+Parser::Parser(const fs::path& domain_filepath, const loki::ParserOptions& options, const loki::TranslatorOptions& translator_options) :
+    Parser(loki::semantic::read_file(domain_filepath), domain_filepath, options, translator_options)
+{
+}
 
-Parser::Parser(const std::string& domain_description, const fs::path& domain_filepath, const loki::ParserOptions& options) :
+Parser::Parser(const std::string& domain_description,
+               const fs::path& domain_filepath,
+               const loki::ParserOptions& options,
+               const loki::TranslatorOptions& translator_options) :
     m_loki_parser(domain_description, options),
-    m_loki_domain_translation_result(loki::translate(m_loki_parser.get_domain())),
+    m_loki_translator_options(translator_options),
+    m_loki_domain_translation_result(loki::translate(m_loki_parser.get_domain(), m_loki_translator_options)),
     m_domain(LokiToTyrTranslator().translate(m_loki_domain_translation_result.get_translated_domain()))
 {
 }
@@ -41,7 +48,7 @@ PlanningTask Parser::parse_task(const std::string& task_description, const fs::p
     static_cast<void>(task_filepath);
     static_cast<void>(options);
     return LokiToTyrTranslator().translate(
-        loki::translate(m_loki_parser.parse_task(task_description), m_loki_domain_translation_result).get_translated_task(),
+        loki::translate(m_loki_parser.parse_task(task_description), m_loki_domain_translation_result, m_loki_translator_options).get_translated_task(),
         m_domain);
 }
 

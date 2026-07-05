@@ -7,8 +7,6 @@
             "task_file": "tests/classical/airport/test-1.pddl",
             "hmax_unit": 8,
             "hlmcut_unit": 8,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
             "hstar_unit": 8
         },
         {
@@ -17,8 +15,6 @@
             "task_file": "tests/classical/assembly/test-1.pddl",
             "hmax_unit": 1,
             "hlmcut_unit": 1,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
             "hstar_unit": 1
         },
         {
@@ -37,8 +33,8 @@
             "task_file": "tests/classical/blocks_3/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -47,8 +43,8 @@
             "task_file": "tests/classical/blocks_4/test-1.pddl",
             "hmax_unit": 2,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 2,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -57,8 +53,8 @@
             "task_file": "tests/classical/childsnack/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -67,8 +63,8 @@
             "task_file": "tests/classical/delivery/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -77,8 +73,8 @@
             "task_file": "tests/classical/driverlog/test-1.pddl",
             "hmax_unit": 4,
             "hlmcut_unit": 4,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 4,
+            "hlmcut_general": 4,
             "hstar_unit": 9
         },
         {
@@ -87,8 +83,8 @@
             "task_file": "tests/classical/ferry/test-1.pddl",
             "hmax_unit": 2,
             "hlmcut_unit": 4,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 2,
+            "hlmcut_general": 4,
             "hstar_unit": 7
         },
         {
@@ -97,8 +93,8 @@
             "task_file": "tests/classical/grid/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -107,8 +103,8 @@
             "task_file": "tests/classical/gripper/test-1.pddl",
             "hmax_unit": 2,
             "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 2,
+            "hlmcut_general": 2,
             "hstar_unit": 3
         },
         {
@@ -117,8 +113,8 @@
             "task_file": "tests/classical/hiking/test-1.pddl",
             "hmax_unit": 2,
             "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 2,
+            "hlmcut_general": 2,
             "hstar_unit": 4
         },
         {
@@ -127,8 +123,8 @@
             "task_file": "tests/classical/logistics/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -137,8 +133,8 @@
             "task_file": "tests/classical/miconic/test-1.pddl",
             "hmax_unit": 2,
             "hlmcut_unit": 4,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 2,
+            "hlmcut_general": 4,
             "hstar_unit": 5
         },
         {
@@ -147,8 +143,6 @@
             "task_file": "tests/classical/miconic-fulladl/test-1.pddl",
             "hmax_unit": 0,
             "hlmcut_unit": 0,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
             "hstar_unit": 7
         },
         {
@@ -157,8 +151,6 @@
             "task_file": "tests/classical/miconic-simpleadl/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
             "hstar_unit": 4
         },
         {
@@ -167,8 +159,8 @@
             "task_file": "tests/classical/pathways/test-1.pddl",
             "hmax_unit": 4,
             "hlmcut_unit": 4,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 4,
+            "hlmcut_general": 4,
             "hstar_unit": 6
         },
         {
@@ -186,8 +178,6 @@
             "task_file": "tests/classical/psr-middle/test-1.pddl",
             "hmax_unit": 0,
             "hlmcut_unit": 0,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
             "hstar_unit": 4
         },
         {
@@ -195,9 +185,7 @@
             "domain_file": "tests/classical/pushworld/domain.pddl",
             "task_file": "tests/classical/pushworld/test-1.pddl",
             "hmax_unit": 11,
-            "hlmcut_unit": 11,
-            "hmax_general": 0,
-            "hlmcut_general": 0
+            "hlmcut_unit": 11
         },
         {
             "name": "Reward",
@@ -205,8 +193,8 @@
             "task_file": "tests/classical/reward/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 4,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 4,
             "hstar_unit": 4
         },
         {
@@ -215,8 +203,8 @@
             "task_file": "tests/classical/rovers/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -225,8 +213,8 @@
             "task_file": "tests/classical/satellite/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 5,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 5,
             "hstar_unit": 7
         },
         {
@@ -235,8 +223,6 @@
             "task_file": "tests/classical/schedule/test-1.pddl",
             "hmax_unit": 1,
             "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
             "hstar_unit": 2
         },
         {
@@ -245,8 +231,8 @@
             "task_file": "tests/classical/sokoban/test-1.pddl",
             "hmax_unit": 14,
             "hlmcut_unit": 25,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 14,
+            "hlmcut_general": 25,
             "hstar_unit": 34
         },
         {
@@ -255,8 +241,8 @@
             "task_file": "tests/classical/spanner/test-1.pddl",
             "hmax_unit": 3,
             "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 3,
+            "hlmcut_general": 3,
             "hstar_unit": 4
         },
         {
@@ -265,8 +251,8 @@
             "task_file": "tests/classical/visitall/test-1.pddl",
             "hmax_unit": 4,
             "hlmcut_unit": 6,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 4,
+            "hlmcut_general": 6,
             "hstar_unit": 8
         },
         {
@@ -285,8 +271,8 @@
             "task_file": "tests/numeric/refuel/test-1.pddl",
             "hmax_unit": 5,
             "hlmcut_unit": 5,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
+            "hmax_general": 5,
+            "hlmcut_general": 5,
             "hstar_unit": 5
         },
         {

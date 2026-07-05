@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "planning/parser.hpp"
+
 #include <yggdrasil/serialization/json.hpp>
 #include <yggdrasil/serialization/json_suite.hpp>
 #include "tyr/formalism/formalism.hpp"
@@ -93,7 +95,7 @@ TEST(TyrTests, TyrFormalismPlanningInvariantsSynthesis)
 
         SCOPED_TRACE(name);
 
-        auto lifted_task = fp::Parser(ygg::common::suite_path(suite_object, ygg::common::as_string(case_object, "domain_file", "case")))
+        auto lifted_task = make_test_parser(ygg::common::suite_path(suite_object, ygg::common::as_string(case_object, "domain_file", "case")))
                                .parse_task(ygg::common::suite_path(suite_object, ygg::common::as_string(case_object, "task_file", "case")));
         auto& repository = *lifted_task.get_repository();
 
