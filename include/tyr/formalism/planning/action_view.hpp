@@ -18,13 +18,14 @@
 #ifndef TYR_FORMALISM_PLANNING_ACTION_VIEW_HPP_
 #define TYR_FORMALISM_PLANNING_ACTION_VIEW_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/containers/vector.hpp>
 #include "tyr/formalism/planning/action_index.hpp"
 #include "tyr/formalism/planning/conditional_effect_view.hpp"
 #include "tyr/formalism/planning/conjunctive_condition_view.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/variable_view.hpp"
+
+#include <yggdrasil/containers/vector.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace ygg
 {
@@ -46,6 +47,7 @@ public:
 
     auto get_index() const noexcept { return m_handle; }
     const auto& get_name() const noexcept { return get_data().name; }
+    const auto& get_original_name() const noexcept { return get_data().original_name; }
     auto get_original_arity() const noexcept { return get_data().original_arity; }
     auto get_arity() const noexcept { return get_variables().size(); }
     auto get_variables() const noexcept { return ygg::make_view(get_data().variables, *m_context); }

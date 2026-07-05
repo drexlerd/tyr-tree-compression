@@ -18,9 +18,6 @@
 #ifndef TYR_SRC_FORMALISM_PLANNING_LOKI_TO_TYR_HPP_
 #define TYR_SRC_FORMALISM_PLANNING_LOKI_TO_TYR_HPP_
 
-#include <yggdrasil/containers/optional.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/canonicalization.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
@@ -34,7 +31,11 @@
 #include <loki/loki.hpp>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <variant>
+#include <yggdrasil/containers/optional.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace tyr::formalism::planning
 {
@@ -207,13 +208,16 @@ private:
 
     FunctionTermViewVariant translate_lifted(loki::formalism::FunctionTermView element, Builder& builder, Repository& context);
 
-    ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>> translate_lifted(loki::formalism::ConditionNumericConstraintView element, Builder& builder, Repository& context);
+    ygg::Data<BooleanOperator<ygg::Data<FunctionExpression>>>
+    translate_lifted(loki::formalism::ConditionNumericConstraintView element, Builder& builder, Repository& context);
 
-    ygg::Index<ConjunctiveCondition> translate_lifted(loki::formalism::ConditionView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
+    ygg::Index<ConjunctiveCondition>
+    translate_lifted(loki::formalism::ConditionView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
 
     NumericEffectViewVariant translate_lifted(loki::formalism::EffectNumericView element, Builder& builder, Repository& context);
 
-    ygg::IndexList<ConditionalEffect> translate_lifted(loki::formalism::EffectView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
+    ygg::IndexList<ConditionalEffect>
+    translate_lifted(loki::formalism::EffectView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context);
 
     ygg::Index<Action> translate_lifted(loki::formalism::ActionView element, Builder& builder, Repository& context);
 
@@ -261,9 +265,11 @@ private:
 
     GroundFunctionTermValueViewVariant translate_grounded(loki::formalism::InitialFunctionValueView element, Builder& builder, Repository& context);
 
-    ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>> translate_grounded(loki::formalism::ConditionNumericConstraintView element, Builder& builder, Repository& context);
+    ygg::Data<BooleanOperator<ygg::Data<GroundFunctionExpression>>>
+    translate_grounded(loki::formalism::ConditionNumericConstraintView element, Builder& builder, Repository& context);
 
-    ygg::Index<GroundConjunctiveCondition> translate_grounded(loki::formalism::ConditionView element, Builder& builder, Repository& context, FDRContext& fdr_context);
+    ygg::Index<GroundConjunctiveCondition>
+    translate_grounded(loki::formalism::ConditionView element, Builder& builder, Repository& context, FDRContext& fdr_context);
 
     ygg::Index<Metric> translate_grounded(loki::formalism::MetricView element, Builder& builder, Repository& context);
 

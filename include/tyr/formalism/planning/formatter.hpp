@@ -1137,6 +1137,8 @@ struct formatter<tyr::formalism::planning::ActionView, char>
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "name = ", value.get_name());
             os << ygg::print_indent;
+            fmt::print(os, "{}{}\n", "original name = ", value.get_original_name());
+            os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "variables = ", value.get_variables());
             os << ygg::print_indent;
             fmt::print(os, "{}{}\n", "condition = ", value.get_condition());
@@ -1204,7 +1206,7 @@ struct formatter<std::pair<tyr::formalism::planning::GroundActionView, tyr::form
     template<typename FormatContext>
     auto format(const std::pair<tyr::formalism::planning::GroundActionView, tyr::formalism::planning::PlanFormatting>& value, FormatContext& ctx) const
     {
-        auto out = fmt::format_to(ctx.out(), "({}", value.first.get_action().get_name());
+        auto out = fmt::format_to(ctx.out(), "({}", value.first.get_action().get_original_name());
         for (size_t i = 0; i < value.first.get_action().get_original_arity(); ++i)
         {
             out = fmt::format_to(out, " {}", value.first.get_objects()[i]);

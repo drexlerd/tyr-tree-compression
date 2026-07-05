@@ -107,9 +107,8 @@ struct RuleUpdateInput
     fd::GrounderContext& solve_context;
     fd::GrounderContext& iteration_context;
 
-    AndAnnotationContext<LiftedTag> make_annotation_context(fd::RuleBindingView rule_binding,
-                                                             Cost metric_effect_cost,
-                                                             std::vector<NumericSupport<LiftedTag>> numeric_supports = {}) const
+    AndAnnotationContext<LiftedTag>
+    make_annotation_context(fd::RuleBindingView rule_binding, Cost metric_effect_cost, std::vector<NumericSupport<LiftedTag>> numeric_supports = {}) const
     {
         return AndAnnotationContext<LiftedTag> { current_cost,
                                                  std::move(numeric_supports),
@@ -191,7 +190,8 @@ static bool collect_expression_supports(fd::FunctionExpressionView expression,
                                         std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
 {
     const auto ground_expression = fd::ground(expression, input.iteration_context);
-    const auto value = input.numeric_support_selector.evaluate_effect_expression(ygg::make_view(ground_expression, input.iteration_context.destination), selection);
+    const auto value =
+        input.numeric_support_selector.evaluate_effect_expression(ygg::make_view(ground_expression, input.iteration_context.destination), selection);
     if (empty(value))
         return false;
 
@@ -492,7 +492,8 @@ void process_clique(RuleWorkerExecutionContext<OrAP, AndAP, TP, CP>& wrctx,
                 if (!dynamically_applicable)
                     return;
 
-                assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
+                if (!is_valid_binding(in.cws_rule().get_rule().get_body(), in.fact_sets(), out.ground_context_iteration()))
+                    return;
 
                 insert_numeric_update(head, in.fact_sets(), input, out.head(), out.numeric_and_annot());
             }

@@ -18,24 +18,25 @@
 #ifndef TYR_FORMALISM_PLANNING_ACTION_DATA_HPP_
 #define TYR_FORMALISM_PLANNING_ACTION_DATA_HPP_
 
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
 #include "tyr/formalism/planning/action_index.hpp"
 #include "tyr/formalism/planning/conditional_effect_index.hpp"
 #include "tyr/formalism/planning/conjunctive_condition_index.hpp"
 #include "tyr/formalism/planning/declarations.hpp"
 #include "tyr/formalism/variable_index.hpp"
 
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+
 namespace ygg
 {
 using namespace ::tyr;
-
 
 template<>
 struct Data<::tyr::formalism::planning::Action>
 {
     ygg::Index<::tyr::formalism::planning::Action> index;
     ::cista::offset::string name;
+    ::cista::offset::string original_name;
     ygg::uint_t original_arity;
     ygg::IndexList<::tyr::formalism::Variable> variables;
     ygg::Index<::tyr::formalism::planning::ConjunctiveCondition> condition;
@@ -49,6 +50,22 @@ struct Data<::tyr::formalism::planning::Action>
          ygg::IndexList<::tyr::formalism::planning::ConditionalEffect> effects_) :
         index(),
         name(std::move(name_)),
+        original_name(name),
+        original_arity(original_arity_),
+        variables(std::move(variables_)),
+        condition(condition_),
+        effects(std::move(effects_))
+    {
+    }
+    Data(::cista::offset::string name_,
+         ::cista::offset::string original_name_,
+         ygg::uint_t original_arity_,
+         ygg::IndexList<::tyr::formalism::Variable> variables_,
+         ygg::Index<::tyr::formalism::planning::ConjunctiveCondition> condition_,
+         ygg::IndexList<::tyr::formalism::planning::ConditionalEffect> effects_) :
+        index(),
+        name(std::move(name_)),
+        original_name(std::move(original_name_)),
         original_arity(original_arity_),
         variables(std::move(variables_)),
         condition(condition_),
@@ -62,8 +79,19 @@ struct Data<::tyr::formalism::planning::Action>
          const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Variable>, C>>& variables_,
          ::ygg::View<ygg::Index<::tyr::formalism::planning::ConjunctiveCondition>, C> condition_,
          const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::ConditionalEffect>, C>>& effects_) :
+        Data(name_, name_, original_arity_, variables_, condition_, effects_)
+    {
+    }
+    template<typename C>
+    Data(const std::string& name_,
+         const std::string& original_name_,
+         ygg::uint_t original_arity_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::Variable>, C>>& variables_,
+         ::ygg::View<ygg::Index<::tyr::formalism::planning::ConjunctiveCondition>, C> condition_,
+         const std::vector<::ygg::View<ygg::Index<::tyr::formalism::planning::ConditionalEffect>, C>>& effects_) :
         index(),
         name(name_),
+        original_name(original_name_),
         original_arity(original_arity_),
         variables(),
         condition(),
@@ -82,13 +110,14 @@ struct Data<::tyr::formalism::planning::Action>
     {
         ygg::clear(index);
         ygg::clear(name);
+        ygg::clear(original_name);
         ygg::clear(variables);
         ygg::clear(condition);
         ygg::clear(effects);
     }
 
-    auto cista_members() const noexcept { return std::tie(index, name, variables, original_arity, condition, effects); }
-    auto identifying_members() const noexcept { return std::tie(name, variables, original_arity, condition, effects); }
+    auto cista_members() const noexcept { return std::tie(index, name, original_name, variables, original_arity, condition, effects); }
+    auto identifying_members() const noexcept { return std::tie(original_name, variables, original_arity, condition, effects); }
 };
 
 static_assert(!ygg::uses_trivial_storage_v<::tyr::formalism::planning::Action>);
@@ -99,6 +128,5 @@ namespace tyr::formalism::planning
 {
 using ActionData = ygg::Data<Action>;
 }
-
 
 #endif

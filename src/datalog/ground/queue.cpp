@@ -118,10 +118,50 @@ ygg::ClosedInterval<ygg::float_t> find_interval(const Facts& facts, fd::GroundFu
 using Metric = ygg::ClosedInterval<ygg::float_t>;
 using NumericSelectionEntry = GroundNumericSupportSelectorWorkspace::SelectionEntry;
 
-void append_numeric_supports(std::vector<NumericSupport<GroundTag>>& supports, const std::vector<NumericSelectionEntry>& selection)
+template<OrAnnotationPolicyConcept<GroundTag> OrAP,
+         AndAnnotationPolicyConcept<GroundTag> AndAP,
+         TerminationPolicyConcept<GroundTag> TP,
+         RuleCostPolicyConcept<GroundTag> CP>
+void append_numeric_supports(std::vector<NumericSupport<GroundTag>>& supports,
+                             const std::vector<NumericSelectionEntry>& selection,
+                             const GroundCtx<OrAP, AndAP, TP, CP>& ctx)
 {
     for (const auto& entry : selection)
-        supports.push_back(NumericSupport<GroundTag> { entry.term, entry.interval, entry.cost });
+    {
+        if (entry.annotation)
+        {
+            supports.push_back(NumericSupport<GroundTag> { entry.term, entry.interval, entry.cost });
+            continue;
+        }
+
+        const auto relation_it = ctx.out().numeric_and_annot().partitions().find(entry.term.get_function());
+        if (relation_it == ctx.out().numeric_and_annot().partitions().end())
+        {
+            supports.push_back(NumericSupport<GroundTag> { entry.term, entry.interval, entry.cost });
+            continue;
+        }
+
+        const auto term_it = relation_it->second.find(entry.term.get_index());
+        if (term_it == relation_it->second.end())
+        {
+            supports.push_back(NumericSupport<GroundTag> { entry.term, entry.interval, entry.cost });
+            continue;
+        }
+
+        auto expanded = false;
+        const auto current = find_interval(ctx.out().facts(), entry.term);
+        for (const auto& candidate : term_it->second)
+        {
+            if (get_cost(candidate.annotation) <= entry.cost && subset(candidate.interval, entry.interval) && subset(candidate.interval, current))
+            {
+                supports.push_back(NumericSupport<GroundTag> { entry.term, candidate.interval, get_cost(candidate.annotation) });
+                expanded = true;
+            }
+        }
+
+        if (!expanded)
+            supports.push_back(NumericSupport<GroundTag> { entry.term, entry.interval, entry.cost });
+    }
 }
 
 template<typename Op>
@@ -707,8 +747,8 @@ void update_numeric_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
         metric = add_metric_delta<AndAP>(metric, aggregate_metric_effect_cost(rule, ctx, metric_selection));
         metric = aggregate_numeric_selection_metric(metric, metric_selection, ctx);
         auto numeric_supports = std::vector<NumericSupport<GroundTag>> {};
-        append_numeric_supports(numeric_supports, selection);
-        append_numeric_supports(numeric_supports, metric_selection);
+        append_numeric_supports(numeric_supports, selection, ctx);
+        append_numeric_supports(numeric_supports, metric_selection, ctx);
         const auto context = GroundAndAnnotationContext { metric, cost, std::move(numeric_supports), rule, ctx.out().and_annot() };
         ctx.out().and_ap().update_annotation(term, interval, context, delta_annotation);
 
@@ -725,7 +765,6 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
 bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
                             fd::GroundRuleView rule,
                             fd::GroundNumericEffectView<Op, f::FluentTag> effect,
-                            Cost effect_cost,
                             PendingNumericBuckets& pending_numeric)
 {
     auto selector = make_numeric_support_selector<AndAP>(ctx);
@@ -753,13 +792,18 @@ bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
     if (!empty(current) && subset(interval, current))
         return false;
 
+    auto annotation_selection = std::vector<NumericSelectionEntry> {};
+    const auto generated_cost = aggregate_numeric_effect_rule_cost(rule, effect, ctx, annotation_selection);
+    if (generated_cost == std::numeric_limits<Cost>::max())
+        return false;
+
     const auto used_transition_cost = ctx.out().cost_policy().get_cost(rule, effect.get_fterm(), interval);
-    const auto transition_cost = used_transition_cost >= effect_cost ? Cost(0) : effect_cost - used_transition_cost;
+    const auto transition_cost = used_transition_cost >= generated_cost ? Cost(0) : generated_cost - used_transition_cost;
 
     if (!pending_numeric.insert(transition_cost, effect.get_fterm(), interval))
         return false;
 
-    update_numeric_annotation(ctx, rule, effect.get_fterm(), interval, transition_cost, selection);
+    update_numeric_annotation(ctx, rule, effect.get_fterm(), interval, transition_cost, annotation_selection);
     return true;
 }
 
@@ -791,7 +835,7 @@ update_fact_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView r
         auto selection = std::vector<NumericSelectionEntry> {};
         for (const auto numeric_constraint : rule.get_body().get_numeric_constraints())
             if (selector.get_constraint_cost(numeric_constraint, selection, typename std::decay_t<decltype(AndAP::agg)> {}) != std::numeric_limits<Cost>::max())
-                append_numeric_supports(numeric_supports, selection);
+                append_numeric_supports(numeric_supports, selection, ctx);
 
         auto metric_selection = std::vector<NumericSelectionEntry> {};
         const auto metric_cost = aggregate_metric_effect_cost(rule, ctx, metric_selection);
@@ -799,7 +843,7 @@ update_fact_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView r
         {
             metric = add_metric_delta<AndAP>(metric, metric_cost);
             metric = aggregate_numeric_selection_metric(metric, metric_selection, ctx);
-            append_numeric_supports(numeric_supports, metric_selection);
+            append_numeric_supports(numeric_supports, metric_selection, ctx);
         }
     }
     const auto context = GroundAndAnnotationContext { metric, cost, std::move(numeric_supports), rule, out.and_annot() };
@@ -847,7 +891,7 @@ bool fire_rule(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule, Cos
             }
             else if constexpr (std::is_same_v<Head, fd::GroundNumericEffectOperatorView<f::FluentTag>>)
             {
-                ygg::visit([&](auto&& effect) { enqueue_numeric_effect(ctx, rule, effect, cost, pending_numeric); }, head.get_variant());
+                ygg::visit([&](auto&& effect) { enqueue_numeric_effect(ctx, rule, effect, pending_numeric); }, head.get_variant());
             }
         },
         rule.get_head());
@@ -913,8 +957,6 @@ bool process_rule_frontier(GroundCtx<OrAP, AndAP, TP, CP>& ctx, PendingNumericBu
         if (fire_rule(ctx, entry->rule, entry->cost, pending_numeric))
             return true;
 
-        if (pending_numeric.min_cost() == cost)
-            return false;
     }
 
     return false;

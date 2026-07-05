@@ -21,8 +21,8 @@
 
 #include <algorithm>
 #include <functional>
-#include <variant>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 namespace tyr::formalism::planning
@@ -187,7 +187,6 @@ void LokiToTyrTranslator::prepare(loki::formalism::TaskView problem)
     prepare(problem.get_metric());
     prepare(problem.get_predicates());
     prepare(problem.get_axioms());
-
 }
 
 /**
@@ -375,12 +374,14 @@ LiteralViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::Litera
         atom_view_variant);
 }
 
-ygg::Data<FunctionExpression> LokiToTyrTranslator::translate_lifted(loki::formalism::FunctionExpressionNumberView element, Builder& builder, Repository& context)
+ygg::Data<FunctionExpression>
+LokiToTyrTranslator::translate_lifted(loki::formalism::FunctionExpressionNumberView element, Builder& builder, Repository& context)
 {
     return ygg::Data<FunctionExpression>(ygg::float_t(element.get_value()));
 }
 
-ygg::Data<FunctionExpression> LokiToTyrTranslator::translate_lifted(loki::formalism::BinaryFunctionExpressionView element, Builder& builder, Repository& context)
+ygg::Data<FunctionExpression>
+LokiToTyrTranslator::translate_lifted(loki::formalism::BinaryFunctionExpressionView element, Builder& builder, Repository& context)
 {
     auto build_binary_op = [&](auto op_tag) -> ygg::Data<FunctionExpression>
     {
@@ -740,10 +741,10 @@ ygg::IndexList<ConditionalEffect>
 LokiToTyrTranslator::translate_lifted(loki::formalism::EffectView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context)
 {
     using ConditionalEffectData = ygg::UnorderedMap<ygg::Index<ConjunctiveCondition>,
-                                               std::tuple<ygg::IndexList<Variable>,
-                                                          ygg::IndexList<Literal<FluentTag>>,
-                                                          ygg::DataList<NumericEffectOperator<FluentTag>>,
-                                                          ::cista::optional<ygg::Data<NumericEffectOperator<AuxiliaryTag>>>>>;
+                                                    std::tuple<ygg::IndexList<Variable>,
+                                                               ygg::IndexList<Literal<FluentTag>>,
+                                                               ygg::DataList<NumericEffectOperator<FluentTag>>,
+                                                               ::cista::optional<ygg::Data<NumericEffectOperator<AuxiliaryTag>>>>>;
 
     const auto translate_effect_func = [&](loki::formalism::EffectView effect, ConditionalEffectData& ref_conditional_effect_data)
     {
@@ -936,7 +937,8 @@ ygg::Index<Action> LokiToTyrTranslator::translate_lifted(loki::formalism::Action
     auto& action = *action_ptr;
     action.clear();
     action.original_arity = element.get_parameters().size();
-    action.name = element.get_name();
+    action.name = std::string(element.get_name());
+    action.original_name = std::string(element.get_original_name());
 
     // 1. Translate conditions
     auto parameters = translate_common(element.get_parameters(), builder, context);
@@ -1062,7 +1064,8 @@ GroundAtomViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism::A
         predicate_view_variant);
 }
 
-GroundAtomOrFactViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism::AtomView element, Builder& builder, Repository& context, FDRContext& fdr_context)
+GroundAtomOrFactViewVariant
+LokiToTyrTranslator::translate_grounded(loki::formalism::AtomView element, Builder& builder, Repository& context, FDRContext& fdr_context)
 {
     auto atom_variant = translate_grounded(element, builder, context);
 
@@ -1115,7 +1118,8 @@ GroundLiteralViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism
         atom_view_variant);
 }
 
-GroundLiteralOrFactViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism::LiteralView element, Builder& builder, Repository& context, FDRContext& fdr_context)
+GroundLiteralOrFactViewVariant
+LokiToTyrTranslator::translate_grounded(loki::formalism::LiteralView element, Builder& builder, Repository& context, FDRContext& fdr_context)
 {
     auto literal_view_variant = translate_grounded(element, builder, context);
 
@@ -1135,12 +1139,14 @@ GroundLiteralOrFactViewVariant LokiToTyrTranslator::translate_grounded(loki::for
         literal_view_variant);
 }
 
-ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki::formalism::FunctionExpressionNumberView element, Builder& builder, Repository& context)
+ygg::Data<GroundFunctionExpression>
+LokiToTyrTranslator::translate_grounded(loki::formalism::FunctionExpressionNumberView element, Builder& builder, Repository& context)
 {
     return ygg::Data<GroundFunctionExpression>(ygg::float_t(element.get_value()));
 }
 
-ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki::formalism::BinaryFunctionExpressionView element, Builder& builder, Repository& context)
+ygg::Data<GroundFunctionExpression>
+LokiToTyrTranslator::translate_grounded(loki::formalism::BinaryFunctionExpressionView element, Builder& builder, Repository& context)
 {
     auto build_binary_op = [&](auto op_tag) -> ygg::Data<GroundFunctionExpression>
     {
@@ -1152,7 +1158,8 @@ ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki
         binary.lhs = translate_grounded(element.get_left(), builder, context);
         binary.rhs = translate_grounded(element.get_right(), builder, context);
         canonicalize(binary);
-        return ygg::Data<GroundFunctionExpression>(ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>(context.get_or_create(binary).first.get_index()));
+        return ygg::Data<GroundFunctionExpression>(
+            ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>(context.get_or_create(binary).first.get_index()));
     };
 
     switch (element.get_operator())
@@ -1170,7 +1177,8 @@ ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki
     }
 }
 
-ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki::formalism::MultiFunctionExpressionView element, Builder& builder, Repository& context)
+ygg::Data<GroundFunctionExpression>
+LokiToTyrTranslator::translate_grounded(loki::formalism::MultiFunctionExpressionView element, Builder& builder, Repository& context)
 {
     auto build_multi_op = [&](auto op_tag) -> ygg::Data<GroundFunctionExpression>
     {
@@ -1181,7 +1189,8 @@ ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki
         multi.clear();
         multi.args = translate_grounded(element.get_expressions(), builder, context);
         canonicalize(multi);
-        return ygg::Data<GroundFunctionExpression>(ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>(context.get_or_create(multi).first.get_index()));
+        return ygg::Data<GroundFunctionExpression>(
+            ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>(context.get_or_create(multi).first.get_index()));
     };
 
     switch (element.get_operator())
@@ -1195,17 +1204,20 @@ ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki
     }
 }
 
-ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki::formalism::UnaryFunctionExpressionView element, Builder& builder, Repository& context)
+ygg::Data<GroundFunctionExpression>
+LokiToTyrTranslator::translate_grounded(loki::formalism::UnaryFunctionExpressionView element, Builder& builder, Repository& context)
 {
     auto minus_ptr = builder.template get_builder<UnaryOperator<Sub, ygg::Data<GroundFunctionExpression>>>();
     auto& minus = *minus_ptr;
     minus.clear();
     minus.arg = translate_grounded(element.get_expression(), builder, context);
     canonicalize(minus);
-    return ygg::Data<GroundFunctionExpression>(ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>(context.get_or_create(minus).first.get_index()));
+    return ygg::Data<GroundFunctionExpression>(
+        ygg::Data<ArithmeticOperator<ygg::Data<GroundFunctionExpression>>>(context.get_or_create(minus).first.get_index()));
 }
 
-ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki::formalism::FunctionExpressionView element, Builder& builder, Repository& context)
+ygg::Data<GroundFunctionExpression>
+LokiToTyrTranslator::translate_grounded(loki::formalism::FunctionExpressionView element, Builder& builder, Repository& context)
 {
     return ygg::visit(
         [&](auto&& arg) -> ygg::Data<GroundFunctionExpression>
@@ -1214,12 +1226,8 @@ ygg::Data<GroundFunctionExpression> LokiToTyrTranslator::translate_grounded(loki
             if constexpr (std::is_same_v<T, loki::formalism::FunctionTermView>)
             {
                 const auto fterm_view_variant = translate_grounded(arg, builder, context);
-                return std::visit(
-                    [](auto&& fterm) -> ygg::Data<GroundFunctionExpression>
-                    {
-                        return ygg::Data<GroundFunctionExpression>(fterm.get_index());
-                    },
-                    fterm_view_variant);
+                return std::visit([](auto&& fterm) -> ygg::Data<GroundFunctionExpression> { return ygg::Data<GroundFunctionExpression>(fterm.get_index()); },
+                                  fterm_view_variant);
             }
             else
             {
@@ -1261,7 +1269,8 @@ GroundFunctionTermViewVariant LokiToTyrTranslator::translate_grounded(loki::form
         function_view_variant);
 }
 
-GroundFunctionTermValueViewVariant LokiToTyrTranslator::translate_grounded(loki::formalism::InitialFunctionValueView element, Builder& builder, Repository& context)
+GroundFunctionTermValueViewVariant
+LokiToTyrTranslator::translate_grounded(loki::formalism::InitialFunctionValueView element, Builder& builder, Repository& context)
 {
     auto fterm_view_variant = translate_grounded(element.get_function(), builder, context);
 
@@ -1599,7 +1608,6 @@ PlanningTask LokiToTyrTranslator::translate(const loki::formalism::TaskView& ele
 
     /* Objects section */
     task.objects = translate_common(element.get_objects(), builder, *task_context);
-
 
     /* Initial section */
     const auto func_insert_ground_atom = [&](GroundLiteralOrFactViewVariant literal_or_fact_view_variant,

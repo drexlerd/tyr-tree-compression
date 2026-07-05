@@ -40,14 +40,13 @@ namespace
 {
 using MetricGroundFunctionTermSet = ygg::UnorderedSet<fd::GroundFunctionTermView<f::FluentTag>>;
 
-bool targets_metric_fterm(fp::GroundNumericEffectOperatorView<f::FluentTag> effect,
-                          const MetricGroundFunctionTermSet& metric_fterms,
-                          fp::MergeDatalogContext& context)
+template<f::FactKind T>
+bool targets_metric_fterm(fp::GroundNumericEffectOperatorView<T> effect, const MetricGroundFunctionTermSet& metric_fterms, fp::MergeDatalogContext& context)
 {
     return ygg::visit(
         [&](auto&& arg)
         {
-            const auto fterm = merge_p2d(arg.get_fterm(), context).first;
+            const auto fterm = merge_p2d<T, f::FluentTag>(arg.get_fterm(), context).first;
             return metric_fterms.find(fterm) != metric_fterms.end();
         },
         effect.get_variant());
@@ -183,6 +182,16 @@ fd::MetricView create_metric(fp::MetricView metric, GroundProgramBuildContext& c
     return context.merge_context.destination.get_or_create(result).first;
 }
 
+fd::MetricView create_metric(fd::GroundFunctionTermView<f::FluentTag> term, GroundProgramBuildContext& context)
+{
+    auto metric_ptr = context.builder.get_builder<fd::Metric>();
+    auto& result = *metric_ptr;
+    result.clear();
+    result.fexpr = ygg::Data<fd::GroundFunctionExpression>(term.get_index());
+    canonicalize(result);
+    return context.merge_context.destination.get_or_create(result).first;
+}
+
 fd::GroundConjunctiveConditionView
 create_delete_free_goal(fp::GroundConjunctiveConditionView goal, TranslationContext<GroundTag>& translation_context, GroundProgramBuildContext& context)
 {
@@ -190,7 +199,6 @@ create_delete_free_goal(fp::GroundConjunctiveConditionView goal, TranslationCont
 }
 
 fd::GroundConjunctiveConditionView create_delete_free_effect_condition(fd::GroundAtomView<f::FluentTag> applicability_atom,
-                                                                       fp::GroundConjunctiveConditionView action_condition,
                                                                        fp::GroundConjunctiveConditionView effect_condition,
                                                                        TranslationContext<GroundTag>& translation_context,
                                                                        GroundProgramBuildContext& context)
@@ -199,9 +207,21 @@ fd::GroundConjunctiveConditionView create_delete_free_effect_condition(fd::Groun
     auto& result = *condition_ptr;
     result.clear();
     fill_delete_free_condition(effect_condition, translation_context, context, result);
-    for (const auto numeric_constraint : action_condition.get_numeric_constraints())
-        result.numeric_constraints.push_back(fp::merge_p2d(numeric_constraint, context.merge_context));
     result.fluent_literals.push_back(create_positive_literal(applicability_atom, context).get_index());
+    canonicalize(result);
+    return context.merge_context.destination.get_or_create(result).first;
+}
+
+fd::GroundConjunctiveConditionView create_delete_free_numeric_effect_condition(fp::GroundConjunctiveConditionView action_condition,
+                                                                               fp::GroundConjunctiveConditionView effect_condition,
+                                                                               TranslationContext<GroundTag>& translation_context,
+                                                                               GroundProgramBuildContext& context)
+{
+    auto condition_ptr = context.builder.get_builder<fd::GroundConjunctiveCondition>();
+    auto& result = *condition_ptr;
+    result.clear();
+    fill_delete_free_condition(action_condition, translation_context, context, result);
+    fill_delete_free_condition(effect_condition, translation_context, context, result);
     canonicalize(result);
     return context.merge_context.destination.get_or_create(result).first;
 }
@@ -285,6 +305,10 @@ create_metric_effects(fp::GroundActionView action,
         for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
             if (targets_metric_fterm(numeric_effect, metric_fterms, context.merge_context))
                 result.push_back(fp::merge_p2d(numeric_effect, context.merge_context));
+
+        if (const auto auxiliary_numeric_effect = cond_eff.get_effect().get_auxiliary_numeric_effect())
+            if (targets_metric_fterm(auxiliary_numeric_effect.value(), metric_fterms, context.merge_context))
+                result.push_back(fp::merge_p2d<f::AuxiliaryTag, f::FluentTag>(auxiliary_numeric_effect.value(), context.merge_context));
     }
 
     return result;
@@ -352,8 +376,7 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
 
     for (const auto cond_eff : action.get_effects())
     {
-        const auto body =
-            create_delete_free_effect_condition(applicability_atom, action.get_condition(), cond_eff.get_condition(), translation_context, context);
+        const auto body = create_delete_free_effect_condition(applicability_atom, cond_eff.get_condition(), translation_context, context);
 
         for (const auto fact : cond_eff.get_effect().get_facts<f::PositiveTag>())
         {
@@ -365,9 +388,10 @@ void translate_action_to_delete_free_rules(fp::GroundActionView action,
             }
         }
 
+        const auto numeric_body = create_delete_free_numeric_effect_condition(action.get_condition(), cond_eff.get_condition(), translation_context, context);
         for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
         {
-            const auto rule = create_ground_numeric_effect_rule(body, numeric_effect, context, metric_effects);
+            const auto rule = create_ground_numeric_effect_rule(numeric_body, numeric_effect, context, metric_effects);
             program.ground_rules.push_back(rule.get_index());
             rule_to_action.emplace(rule, action);
         }
@@ -401,6 +425,8 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
         program.static_functions.push_back(fp::merge_p2d(function, merge_context).first.get_index());
     for (const auto function : task.get_domain().get_functions<f::FluentTag>())
         program.fluent_functions.push_back(fp::merge_p2d(function, merge_context).first.get_index());
+    if (const auto function = task.get_domain().get_auxiliary_function())
+        program.fluent_functions.push_back(fp::merge_p2d<f::AuxiliaryTag, f::FluentTag>(function.value(), merge_context).first.get_index());
 
     for (const auto object : task.get_domain().get_constants())
         program.objects.push_back(fp::merge_p2d(object, merge_context).first.get_index());
@@ -445,6 +471,11 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
         translation_context.d2p.fluent_to_fluent_fterm.emplace(new_fterm_value.get_fterm(), fterm_value.get_fterm());
         program.fluent_fterm_values.push_back(new_fterm_value.get_index());
     }
+    if (const auto fterm_value = task.get_auxiliary_fterm_value())
+    {
+        const auto new_fterm_value = fp::merge_p2d<f::AuxiliaryTag, f::FluentTag>(fterm_value.value(), merge_context).first;
+        program.fluent_fterm_values.push_back(new_fterm_value.get_index());
+    }
 
     context.program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).get_index();
     auto metric_fterms = MetricGroundFunctionTermSet {};
@@ -452,6 +483,13 @@ fd::ProgramView<GroundTag> create_rpg_ground_program(fp::FDRTaskView task,
     if (cost_mode == CostMode::UNIT)
     {
         unit_metric_effects = create_unit_metric(context);
+    }
+    else if (task.get_auxiliary_fterm_value())
+    {
+        const auto fterm_value = fp::merge_p2d<f::AuxiliaryTag, f::FluentTag>(task.get_auxiliary_fterm_value().value(), merge_context).first;
+        const auto metric = create_metric(fterm_value.get_fterm(), context);
+        program.metric = metric.get_index();
+        metric_fterms.insert(fterm_value.get_fterm());
     }
     else if (task.get_metric())
     {

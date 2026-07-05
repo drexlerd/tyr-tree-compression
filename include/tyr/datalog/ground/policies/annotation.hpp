@@ -152,7 +152,7 @@ public:
 
     void record_achiever(Atom program_head, const GroundAndAnnotationContext& context) const
     {
-        achievers[program_head.get_index()].emplace_back(context.rule, context.metric, context.current_cost);
+        achievers[program_head.get_index()].emplace_back(context.rule, context.metric, context.current_cost, context.numeric_supports);
     }
 
 private:

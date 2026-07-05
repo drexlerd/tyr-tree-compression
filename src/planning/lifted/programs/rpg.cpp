@@ -43,12 +43,13 @@ namespace
 {
 using MetricFunctionSet = ygg::UnorderedSet<fd::FunctionView<f::FluentTag>>;
 
-bool targets_metric_function(fp::NumericEffectOperatorView<f::FluentTag> effect, const MetricFunctionSet& metric_functions, fp::MergeDatalogContext& context)
+template<f::FactKind T>
+bool targets_metric_function(fp::NumericEffectOperatorView<T> effect, const MetricFunctionSet& metric_functions, fp::MergeDatalogContext& context)
 {
     return ygg::visit(
         [&](auto&& arg)
         {
-            const auto fterm = merge_p2d(arg.get_fterm(), context).first;
+            const auto fterm = merge_p2d<T, f::FluentTag>(arg.get_fterm(), context).first;
             return metric_functions.find(fterm.get_function()) != metric_functions.end();
         },
         effect.get_variant());
@@ -88,6 +89,16 @@ fd::MetricView create_metric(fp::MetricView metric, fp::MergeDatalogContext& con
     auto& result = *metric_ptr;
     result.clear();
     result.fexpr = fp::merge_p2d(metric.get_fexpr(), context);
+    canonicalize(result);
+    return context.destination.get_or_create(result).first;
+}
+
+fd::MetricView create_metric(fd::GroundFunctionTermView<f::FluentTag> term, fp::MergeDatalogContext& context)
+{
+    auto metric_ptr = context.builder.get_builder<fd::Metric>();
+    auto& result = *metric_ptr;
+    result.clear();
+    result.fexpr = ygg::Data<fd::GroundFunctionExpression>(term.get_index());
     canonicalize(result);
     return context.destination.get_or_create(result).first;
 }
@@ -195,6 +206,10 @@ ygg::DataList<fd::NumericEffectOperator<f::FluentTag>> create_metric_effects(fp:
         for (const auto numeric_effect : cond_eff.get_effect().get_numeric_effects())
             if (targets_metric_function(numeric_effect, metric_functions, context))
                 result.push_back(merge_p2d(numeric_effect, context));
+
+        if (const auto auxiliary_numeric_effect = cond_eff.get_effect().get_auxiliary_numeric_effect())
+            if (targets_metric_function(auxiliary_numeric_effect.value(), metric_functions, context))
+                result.push_back(merge_p2d<f::AuxiliaryTag, f::FluentTag>(auxiliary_numeric_effect.value(), context));
     }
 
     return result;
@@ -323,6 +338,8 @@ auto create_program(fp::TaskView task,
         program.static_functions.push_back(fp::merge_p2d(function, context).first.get_index());
     for (const auto function : task.get_domain().get_functions<f::FluentTag>())
         program.fluent_functions.push_back(fp::merge_p2d(function, context).first.get_index());
+    if (const auto function = task.get_domain().get_auxiliary_function())
+        program.fluent_functions.push_back(fp::merge_p2d<f::AuxiliaryTag, f::FluentTag>(function.value(), context).first.get_index());
 
     for (const auto object : task.get_domain().get_constants())
         program.objects.push_back(fp::merge_p2d(object, context).first.get_index());
@@ -338,6 +355,8 @@ auto create_program(fp::TaskView task,
         program.static_fterm_values.push_back(fp::merge_p2d(fterm_value, context).first.get_index());
     for (const auto fterm_value : task.get_fterm_values<f::FluentTag>())
         program.fluent_fterm_values.push_back(fp::merge_p2d(fterm_value, context).first.get_index());
+    if (const auto fterm_value = task.get_auxiliary_fterm_value())
+        program.fluent_fterm_values.push_back(fp::merge_p2d<f::AuxiliaryTag, f::FluentTag>(fterm_value.value(), context).first.get_index());
 
     program.goal = create_delete_free_goal(task.get_goal(), translation_context, context).first.get_index();
     auto metric_functions = MetricFunctionSet {};
@@ -345,6 +364,13 @@ auto create_program(fp::TaskView task,
     if (cost_mode == CostMode::UNIT)
     {
         unit_metric_effects = create_unit_metric(program, context);
+    }
+    else if (task.get_auxiliary_fterm_value())
+    {
+        const auto fterm_value = fp::merge_p2d<f::AuxiliaryTag, f::FluentTag>(task.get_auxiliary_fterm_value().value(), context).first;
+        const auto metric = create_metric(fterm_value.get_fterm(), context);
+        program.metric = metric.get_index();
+        metric_functions.insert(fterm_value.get_fterm().get_function());
     }
     else if (task.get_metric())
     {

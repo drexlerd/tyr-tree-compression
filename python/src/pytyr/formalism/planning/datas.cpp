@@ -305,6 +305,18 @@ void bind_action_data(nb::module_& m, const std::string& name)
                         "original_arity"_a,
                         "variables"_a,
                         "condition"_a,
+                        "effects"_a)
+                   .def(nb::init<const std::string&,
+                                 const std::string&,
+                                 ygg::uint_t,
+                                 const VariableViewList&,
+                                 ConjunctiveConditionView,
+                                 const ConditionalEffectViewList&>(),
+                        "name"_a,
+                        "original_name"_a,
+                        "original_arity"_a,
+                        "variables"_a,
+                        "condition"_a,
                         "effects"_a);
     ygg::add_print(cls);
     ygg::add_hash(cls);
