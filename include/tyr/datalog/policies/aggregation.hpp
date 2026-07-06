@@ -15,10 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_SOLVER_POLICIES_AGGREGATION_HPP_
-#define TYR_SOLVER_POLICIES_AGGREGATION_HPP_
+#ifndef TYR_DATALOG_POLICIES_AGGREGATION_HPP_
+#define TYR_DATALOG_POLICIES_AGGREGATION_HPP_
 
 #include <algorithm>
+#include <cmath>
 #include <yggdrasil/core/config.hpp>
 
 namespace tyr::datalog
@@ -36,6 +37,17 @@ struct MaxAggregation
     static constexpr Cost identity() noexcept { return Cost(0); }
     constexpr Cost operator()(Cost acc, Cost x) const noexcept { return std::max(acc, x); }
 };
+
+/// Clamp a metric delta to a finite nonnegative cost.
+inline Cost clamp_metric_delta(ygg::float_t value) noexcept
+{
+    if (!std::isfinite(value))
+        return Cost(0);
+    return Cost(std::max(value, ygg::float_t(0)));
+}
+
+/// The part of `total` not yet covered by `used` (saturating at zero).
+inline Cost reduce_cost(Cost total, Cost used) noexcept { return used >= total ? Cost(0) : total - used; }
 
 }
 

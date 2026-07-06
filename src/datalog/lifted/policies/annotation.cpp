@@ -17,7 +17,7 @@
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/builder.hpp"

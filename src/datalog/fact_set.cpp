@@ -105,7 +105,7 @@ bool PredicateFactSet<T>::contains(fd::PredicateBindingView<T> binding) const no
 template<f::FactKind T>
 fd::PredicateBindingForwardRangeView<T> PredicateFactSet<T>::get_bindings() const noexcept
 {
-    return ygg::make_view(f::RelationBindingsForwardRange { m_predicate_index, m_bindings }, m_repository);
+    return ygg::make_view(f::RelationBindingsForwardRange<f::Predicate<T>, std::vector<ygg::Index<f::Row>>> { m_predicate_index, m_bindings }, m_repository);
 }
 
 template class PredicateFactSet<f::StaticTag>;
@@ -338,7 +338,7 @@ const std::vector<ygg::uint_t>& FunctionFactSet<T>::get_remap() const noexcept
 template<f::FactKind T>
 fd::FunctionBindingRandomAccessRangeView<T> FunctionFactSet<T>::get_bindings() const noexcept
 {
-    return ygg::make_view(f::RelationBindingsRandomAccessRange { m_function_index, m_bindings }, m_repository);
+    return ygg::make_view(f::RelationBindingsRandomAccessRange<f::Function<T>, std::vector<ygg::Index<f::Row>>> { m_function_index, m_bindings }, m_repository);
 }
 
 template<f::FactKind T>

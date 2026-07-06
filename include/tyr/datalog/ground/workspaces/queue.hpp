@@ -18,7 +18,7 @@
 #ifndef TYR_DATALOG_GROUND_WORKSPACES_QUEUE_HPP_
 #define TYR_DATALOG_GROUND_WORKSPACES_QUEUE_HPP_
 
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/workspaces/queue.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 

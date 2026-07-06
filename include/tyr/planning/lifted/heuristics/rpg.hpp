@@ -69,7 +69,7 @@ public:
         m_task(std::move(task)),
         m_execution_context(std::move(execution_context)),
         m_rpg_program(m_task->get_task(), cost_mode),
-        m_workspace(m_rpg_program.get_datalog_program(), m_rpg_program.get_const_program_workspace(), or_ap, and_ap, make_termination_policy()),
+        m_workspace(m_rpg_program.get_datalog_program(), m_rpg_program.get_const_program_workspace(), or_ap, and_ap, TP()),
         m_cost_mode(cost_mode)
     {
         m_workspace.tp.set_goals(m_rpg_program.get_goal());
@@ -251,18 +251,6 @@ public:
             for (const auto& worker : ws_rule->worker)
                 rule_worker_statistics.push_back(worker.solve.statistics);
         fmt::print(std::cout, "{}\n", datalog::compute_aggregated_rule_worker_statistics(rule_worker_statistics));
-    }
-
-private:
-    TP make_termination_policy() const
-    {
-        if constexpr (std::constructible_from<TP,
-                                              ::tyr::formalism::datalog::PredicateListView<::tyr::formalism::FluentTag>,
-                                              const ::tyr::formalism::datalog::Repository&>)
-            return TP(m_rpg_program.get_datalog_program().get_program().template get_predicates<::tyr::formalism::FluentTag>(),
-                      m_rpg_program.get_datalog_program().get_workspace_repository());
-        else
-            return TP();
     }
 
 protected:

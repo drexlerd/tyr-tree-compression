@@ -148,8 +148,9 @@ template<NumericEffectOpKind Op, FactKind T_SRC, FactKind T_DST = T_SRC>
     requires((std::same_as<T_SRC, FluentTag> || std::same_as<T_SRC, AuxiliaryTag>) && std::same_as<T_DST, FluentTag>)
 std::pair<::tyr::formalism::datalog::NumericEffectView<Op, T_DST>, bool> merge_p2d(NumericEffectView<Op, T_SRC> element, MergeDatalogContext& context);
 
-template<FactKind T_SRC, FactKind T_DST = T_SRC>
-    requires((std::same_as<T_SRC, FluentTag> || std::same_as<T_SRC, AuxiliaryTag>) && std::same_as<T_DST, FluentTag>)
+template<FactKind T_SRC,
+         FactKind T_DST = T_SRC,
+         typename = std::enable_if_t<(std::same_as<T_SRC, FluentTag> || std::same_as<T_SRC, AuxiliaryTag>) && std::same_as<T_DST, FluentTag>>>
 ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T_DST>> merge_p2d(NumericEffectOperatorView<T_SRC> element, MergeDatalogContext& context);
 
 ygg::Data<::tyr::formalism::datalog::FunctionExpression> merge_p2d(FunctionExpressionView element, MergeDatalogContext& context);
@@ -161,8 +162,9 @@ template<NumericEffectOpKind Op, FactKind T_SRC, FactKind T_DST = T_SRC>
 std::pair<::tyr::formalism::datalog::GroundNumericEffectView<Op, T_DST>, bool> merge_p2d(GroundNumericEffectView<Op, T_SRC> element,
                                                                                          MergeDatalogContext& context);
 
-template<FactKind T_SRC, FactKind T_DST = T_SRC>
-    requires((std::same_as<T_SRC, FluentTag> || std::same_as<T_SRC, AuxiliaryTag>) && std::same_as<T_DST, FluentTag>)
+template<FactKind T_SRC,
+         FactKind T_DST = T_SRC,
+         typename = std::enable_if_t<(std::same_as<T_SRC, FluentTag> || std::same_as<T_SRC, AuxiliaryTag>) && std::same_as<T_DST, FluentTag>>>
 ygg::Data<::tyr::formalism::datalog::GroundNumericEffectOperator<T_DST>> merge_p2d(GroundNumericEffectOperatorView<T_SRC> element,
                                                                                    MergeDatalogContext& context);
 
@@ -581,8 +583,7 @@ std::pair<::tyr::formalism::datalog::NumericEffectView<Op, T_DST>, bool> merge_p
     return merge_numeric_effect_as<Op, Op, T_SRC, T_DST>(element, context);
 }
 
-template<FactKind T_SRC, FactKind T_DST>
-    requires((std::same_as<T_SRC, FluentTag> || std::same_as<T_SRC, AuxiliaryTag>) && std::same_as<T_DST, FluentTag>)
+template<FactKind T_SRC, FactKind T_DST, typename>
 ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T_DST>> merge_p2d(NumericEffectOperatorView<T_SRC> element, MergeDatalogContext& context)
 {
     using OperatorData = ygg::Data<::tyr::formalism::datalog::NumericEffectOperator<T_DST>>;
@@ -633,8 +634,7 @@ std::pair<::tyr::formalism::datalog::GroundNumericEffectView<Op, T_DST>, bool> m
     return merge_ground_numeric_effect_as<Op, Op, T_SRC, T_DST>(element, context);
 }
 
-template<FactKind T_SRC, FactKind T_DST>
-    requires((std::same_as<T_SRC, FluentTag> || std::same_as<T_SRC, AuxiliaryTag>) && std::same_as<T_DST, FluentTag>)
+template<FactKind T_SRC, FactKind T_DST, typename>
 ygg::Data<::tyr::formalism::datalog::GroundNumericEffectOperator<T_DST>> merge_p2d(GroundNumericEffectOperatorView<T_SRC> element, MergeDatalogContext& context)
 {
     using OperatorData = ygg::Data<::tyr::formalism::datalog::GroundNumericEffectOperator<T_DST>>;

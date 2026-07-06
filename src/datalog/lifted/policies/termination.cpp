@@ -19,7 +19,7 @@
 
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/ground_atom_index.hpp"
@@ -32,16 +32,6 @@
 
 namespace tyr::datalog
 {
-template<typename AggregationFunction>
-TerminationPolicy<LiftedTag, AggregationFunction>::TerminationPolicy(
-    ::tyr::formalism::datalog::PredicateListView<::tyr::formalism::FluentTag> fluent_predicates,
-    const ::tyr::formalism::datalog::Repository& repository) :
-    goal(std::nullopt),
-    numeric_support_selector_workspace(),
-    agg()
-{
-}
-
 template<typename AggregationFunction>
 void TerminationPolicy<LiftedTag, AggregationFunction>::set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals)
 {
@@ -71,10 +61,14 @@ Cost TerminationPolicy<LiftedTag, AggregationFunction>::get_total_cost(const Fac
 
     for (const auto literal : goal->get_literals<::tyr::formalism::FluentTag>())
     {
-        assert(literal.get_polarity());
+        if (!literal.get_polarity())
+            continue;
 
         const auto* annotation = and_annot.find(literal.get_atom().get_row());
         assert(annotation);
+        if (!annotation)
+            return std::numeric_limits<Cost>::max();
+
         const auto binding_cost = get_cost(*annotation);
         if (binding_cost == std::numeric_limits<Cost>::max())
             return std::numeric_limits<Cost>::max();

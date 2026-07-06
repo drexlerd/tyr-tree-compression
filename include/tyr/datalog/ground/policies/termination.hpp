@@ -21,7 +21,7 @@
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 
 #include <cassert>

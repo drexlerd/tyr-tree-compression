@@ -19,7 +19,7 @@
 #define TYR_DATALOG_POLICIES_ANNOTATION_TYPES_HPP_
 
 #include "tyr/datalog/declarations.hpp"
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 
 #include <algorithm>
 #include <cassert>

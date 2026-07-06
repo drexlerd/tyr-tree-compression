@@ -19,7 +19,7 @@
 #define TYR_SOLVER_POLICIES_TERMINATION_HPP_
 
 #include "tyr/datalog/declarations.hpp"
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
@@ -58,8 +58,7 @@ template<typename AggregationFunction>
 class TerminationPolicy<LiftedTag, AggregationFunction>
 {
 public:
-    TerminationPolicy(::tyr::formalism::datalog::PredicateListView<::tyr::formalism::FluentTag> fluent_predicates,
-                      const ::tyr::formalism::datalog::Repository& repository);
+    TerminationPolicy() = default;
 
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals);
 

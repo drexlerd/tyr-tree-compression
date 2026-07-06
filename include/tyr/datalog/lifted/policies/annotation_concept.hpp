@@ -18,7 +18,7 @@
 #ifndef TYR_SOLVER_POLICIES_ANNOTATION_CONCEPT_HPP_
 #define TYR_SOLVER_POLICIES_ANNOTATION_CONCEPT_HPP_
 
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
 #include "tyr/declarations.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"

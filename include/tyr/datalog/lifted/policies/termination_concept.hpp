@@ -19,7 +19,7 @@
 #define TYR_SOLVER_POLICIES_TERMINATION_CONCEPT_HPP_
 
 #include "tyr/datalog/fact_sets.hpp"
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
 #include "tyr/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"

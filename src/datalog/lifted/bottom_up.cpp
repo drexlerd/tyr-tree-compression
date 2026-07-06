@@ -21,10 +21,11 @@
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/formatter.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
+#include "tyr/datalog/numeric_utils.hpp"
 #include "tyr/datalog/lifted/assignment_sets.hpp"
 #include "tyr/datalog/lifted/consistency_graph.hpp"
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/datalog/lifted/policies/termination.hpp"
@@ -43,12 +44,10 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <cmath>
 #include <fmt/ostream.h>
 #include <iostream>
 #include <memory>
 #include <oneapi/tbb/parallel_for_each.h>
-#include <oneapi/tbb/parallel_invoke.h>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
@@ -142,38 +141,13 @@ static auto make_rule_update_input(const In& in, Out& out, const NumericSupportS
                                                                                                             out.ground_context_iteration() };
 }
 
-inline Cost clamp_metric_delta(ygg::float_t value) noexcept
-{
-    if (!std::isfinite(value))
-        return Cost(0);
-    return Cost(std::max(value, ygg::float_t(0)));
-}
-
 template<f::NumericEffectOpKind Op, AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
 Cost metric_effect_delta(fd::NumericEffectView<Op, f::FluentTag> effect, const RuleUpdateInput<AndAP, CP>& input)
 {
-    const auto rhs = is_valid_binding(effect.get_fexpr(), input.fact_sets, input.solve_context);
-    if (empty(rhs))
-        return std::numeric_limits<Cost>::max();
-
-    if constexpr (std::is_same_v<Op, f::Increase>)
-    {
-        return clamp_metric_delta(lower(rhs));
-    }
-    else if constexpr (std::is_same_v<Op, f::Decrease>)
-    {
-        return Cost(0);
-    }
-    else
-    {
-        const auto lhs = is_valid_binding(effect.get_fterm(), input.fact_sets, input.solve_context);
-        if (empty(lhs))
-            return std::numeric_limits<Cost>::max();
-        const auto next = is_valid_binding(effect, input.fact_sets, input.solve_context);
-        if (empty(next))
-            return std::numeric_limits<Cost>::max();
-        return clamp_metric_delta(lower(next) - upper(lhs));
-    }
+    return metric_effect_delta(
+        Op {},
+        [&] { return is_valid_binding(effect.get_fterm(), input.fact_sets, input.solve_context); },
+        [&] { return is_valid_binding(effect.get_fexpr(), input.fact_sets, input.solve_context); });
 }
 
 static void append_numeric_supports(const std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection,
@@ -254,8 +228,7 @@ Cost metric_effect_cost(fd::RuleBindingView rule_binding, const RuleUpdateInput<
         delta += effect_delta;
     }
 
-    const auto used_cost = input.cost_policy.get_cost(input.rule, rule_binding);
-    return delta <= used_cost ? Cost(0) : delta - used_cost;
+    return reduce_cost(delta, input.cost_policy.get_cost(input.rule, rule_binding));
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
@@ -326,23 +299,10 @@ static void insert_numeric_update(fd::NumericEffectOperatorView<f::FluentTag> he
             if (rem_rule_cost == std::numeric_limits<Cost>::max())
                 return;
 
-            // A zero-cost rule that strictly grows a bound can be repeated for free, so the growing
-            // bound diverges (fact intervals are hull-monotone and the rule refires on all cliques).
-            // Widening to the exact limit immediately keeps the cost-bucket fixpoint terminating.
-            auto effect_interval = interval;
-            if (rem_rule_cost == Cost(0))
-            {
-                const auto current = fact_sets.get<f::FluentTag>().function[program_head];
-                if (!empty(current))
-                {
-                    const auto lo = lower(effect_interval) < lower(current) ? -std::numeric_limits<ygg::float_t>::infinity() : lower(effect_interval);
-                    const auto hi = upper(effect_interval) > upper(current) ? std::numeric_limits<ygg::float_t>::infinity() : upper(effect_interval);
-                    effect_interval = ygg::ClosedInterval<ygg::float_t>(lo, hi);
-                }
-            }
+            const auto effect_interval =
+                rem_rule_cost == Cost(0) ? widen_free_growth(interval, fact_sets.get<f::FluentTag>().function[program_head]) : interval;
 
-            const auto used_transition_cost = input.cost_policy.get_cost(rule_binding, program_head, effect_interval);
-            const auto cost = used_transition_cost >= rem_rule_cost ? Cost(0) : rem_rule_cost - used_transition_cost;
+            const auto cost = reduce_cost(rem_rule_cost, input.cost_policy.get_cost(rule_binding, program_head, effect_interval));
             auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
             if (!collect_metric_effect_supports(input, numeric_supports) || !collect_numeric_head_supports(effect, program_head, input, numeric_supports))
                 return;
@@ -537,71 +497,6 @@ void generate_general_case(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx)
             kpkc_algorithm.for_each_new_k_clique(std::forward<decltype(callback)>(callback), workspace);
     };
 
-#ifdef TYR_ENABLE_INNER_PARALLELISM
-
-    const auto& in = rctx.in();
-
-    constexpr size_t PAR_THRESHOLD = 1024;
-
-    const auto arena_conc = static_cast<size_t>(oneapi::tbb::this_task_arena::max_concurrency());
-
-    const auto& delta_edges = kpkc_algorithm.get_delta_edges();
-
-    // Decide whether we want to trigger the parallel loop.
-    // Seeding from edges in first iteration is wasteful.
-    // We could seed from all vertices in a partition instead.
-    const bool do_parallel_inner =
-        false && kpkc_algorithm.get_iteration() > 1 && (in.cws_rule().get_rule().get_arity() > 2) && (delta_edges.size() >= PAR_THRESHOLD) && (arena_conc >= 2);
-
-    if (do_parallel_inner)
-    {
-        // A very basic version which works well on rovers-large-simple.
-
-        auto run_stripe = [&](size_t tid, size_t num_stripes)
-        {
-            auto wrctx = rctx.get_rule_worker_execution_context();
-            const auto& numeric_support_selector = wrctx.in().numeric_support_selector();
-            auto& out = wrctx.out();
-            auto& ws = out.kpkc_workspace();
-            ++out.statistics().num_executions;
-
-            for (size_t e = tid; e < delta_edges.size(); e += num_stripes)
-            {
-                const auto& edge = delta_edges[e];
-                if (!kpkc_algorithm.seed_from_anchor(edge, ws))
-                    continue;
-
-                kpkc_algorithm.template complete_from_seed<kpkc::Edge>([&](auto&& clique) { process_clique(wrctx, numeric_support_selector, clique, true); },
-                                                                       0,
-                                                                       ws);
-            }
-        };
-
-        oneapi::tbb::parallel_invoke([&] { run_stripe(0, 2); }, [&] { run_stripe(1, 2); });
-    }
-    else
-    {
-        auto wrctx = rctx.get_rule_worker_execution_context();
-        const auto& numeric_support_selector = wrctx.in().numeric_support_selector();
-        auto& out = wrctx.out();
-        auto& kpkc_workspace = out.kpkc_workspace();
-        ++out.statistics().num_executions;
-
-        visit(
-            [&](auto&& head)
-            {
-                using Head = std::decay_t<decltype(head)>;
-                for_each_relevant_clique(
-                    head,
-                    [&](auto&& clique)
-                    { process_clique(wrctx, numeric_support_selector, clique, !std::is_same_v<Head, fd::NumericEffectOperatorView<f::FluentTag>>); },
-                    kpkc_workspace);
-            },
-            rctx.in().cws_rule().get_rule().get_head());
-    }
-
-#else
-
     auto wrctx = rctx.get_rule_worker_execution_context();
     const auto& numeric_support_selector = wrctx.in().numeric_support_selector();
     auto& out = wrctx.out();
@@ -619,8 +514,6 @@ void generate_general_case(RuleExecutionContext<OrAP, AndAP, TP, CP>& rctx)
                 kpkc_workspace);
         },
         rctx.in().cws_rule().get_rule().get_head());
-
-#endif
 }
 
 template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
@@ -724,166 +617,171 @@ template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
          AndAnnotationPolicyConcept<LiftedTag> AndAP,
          TerminationPolicyConcept<LiftedTag> TP,
          RuleCostPolicyConcept<LiftedTag> CP>
+/// Parallel phase: recheck pending rule bindings and generate new ground witnesses for all active rules.
+void run_active_rules(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
+{
+    auto& program_out = ctx.out().program();
+    const auto& active_rules = ctx.out().scheduler().get_active_rules();
+
+    const auto program_stopwatch = ygg::StopwatchScope(program_out.statistics().parallel_time);
+
+    oneapi::tbb::parallel_for_each(active_rules.begin(),
+                                   active_rules.end(),
+                                   [&](auto&& rule_index)
+                                   {
+                                       auto rctx = ctx.get_rule_execution_context(rule_index);
+                                       auto& rule_out = rctx.out();
+
+                                       const auto total_time = ygg::StopwatchScope(rule_out.statistics().total_time);
+                                       ++rule_out.statistics().num_executions;
+
+                                       rctx.clear_iteration();  ///< Clear iteration before process_pending_rule_bindings/generate
+
+                                       {
+                                           const auto initialize_time = ygg::StopwatchScope(rule_out.statistics().initialize_time);
+
+                                           rctx.initialize();  ///< Initialize before process_pending_rule_bindings/generate
+                                       }
+
+                                       {
+                                           const auto process_pending_time = ygg::StopwatchScope(rule_out.statistics().process_pending_time);
+
+                                           process_pending_rule_bindings(rctx);
+                                       }
+
+                                       {
+                                           const auto process_generate_time = ygg::StopwatchScope(rule_out.statistics().process_generate_time);
+
+                                           generate(rctx);
+                                       }
+                                   });
+}
+
+template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
+         AndAnnotationPolicyConcept<LiftedTag> AndAP,
+         TerminationPolicyConcept<LiftedTag> TP,
+         RuleCostPolicyConcept<LiftedTag> CP>
+/// Sequential phase: merge worker heads and annotations into the program and bucket them by cost.
+void merge_worker_results(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
+{
+    auto& program_out = ctx.out().program();
+    auto& cost_buckets = program_out.cost_buckets();
+
+    for (const auto rule_index : ctx.out().scheduler().get_active_rules())
+    {
+        const auto i = ygg::uint_t(rule_index);
+        auto merge_context = fd::MergeContext { program_out.datalog_builder(), program_out.workspace_repository() };
+        const auto& ws_rule = program_out.rules()[i];
+
+        for (const auto& worker : ws_rule->worker)
+        {
+            std::visit(
+                [&](const auto& head_iteration)
+                {
+                    using HeadIteration = std::decay_t<decltype(head_iteration)>;
+
+                    if constexpr (std::is_same_v<HeadIteration, PredicateHeadIteration>)
+                    {
+                        for (const auto worker_head_index : head_iteration.rows)
+                        {
+                            const auto worker_head =
+                                ygg::make_view(ygg::Index<f::RelationBinding<f::Predicate<f::FluentTag>>> { head_iteration.relation, worker_head_index },
+                                               worker.solve.program_overlay_repository);
+
+                            const auto program_head = fd::merge_d2d(worker_head, merge_context).first;
+
+                            const auto cost_update =
+                                program_out.or_ap().update_annotation(program_head, worker_head, worker.iteration.and_annot, program_out.and_annot());
+
+                            cost_buckets.update(cost_update, program_head);
+                        }
+                    }
+                    else
+                    {
+                        for (const auto& update : head_iteration.updates)
+                        {
+                            const auto worker_head =
+                                ygg::make_view(ygg::Index<f::RelationBinding<f::Function<f::FluentTag>>> { head_iteration.relation, update.row },
+                                               worker.solve.program_overlay_repository);
+
+                            const auto program_head = fd::merge_d2d(worker_head, merge_context).first;
+                            const auto* worker_annotation = worker.iteration.numeric_and_annot.find(worker_head, update.interval);
+                            if (worker_annotation)
+                                program_out.numeric_and_annot().insert(program_head, update.interval, *worker_annotation);
+
+                            cost_buckets.insert(update.cost, program_head, update.interval);
+                        }
+                    }
+                },
+                worker.iteration.head);
+        }
+    }
+}
+
+template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
+         AndAnnotationPolicyConcept<LiftedTag> AndAP,
+         TerminationPolicyConcept<LiftedTag> TP,
+         RuleCostPolicyConcept<LiftedTag> CP>
+/// Commit the cheapest bucket: insert its heads into the fact and assignment sets and notify the scheduler.
+void commit_current_bucket(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
+{
+    auto& program_out = ctx.out().program();
+    auto& scheduler = ctx.out().scheduler();
+    auto& facts = program_out.facts();
+    auto& cost_buckets = program_out.cost_buckets();
+
+    for (const auto head : cost_buckets.get_current_bucket())
+    {
+        if (facts.fact_sets.predicate.insert(head))
+        {
+            scheduler.on_generate(head.get_index().relation);
+            facts.assignment_sets.predicate.insert(head);
+        }
+    }
+
+    for (const auto& [head, interval] : cost_buckets.get_current_function_bucket())
+    {
+        if (facts.fact_sets.function.insert(head, interval))
+        {
+            scheduler.on_generate(head.get_index().relation);
+            facts.assignment_sets.function.insert(head, interval);
+        }
+    }
+
+    program_out.rebuild_numeric_support_selector(ctx.in().program().facts().fact_sets);
+}
+
+template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
+         AndAnnotationPolicyConcept<LiftedTag> AndAP,
+         TerminationPolicyConcept<LiftedTag> TP,
+         RuleCostPolicyConcept<LiftedTag> CP>
 void solve_bottom_up_for_stratum(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
 {
     auto& out = ctx.out();
     auto& scheduler = out.scheduler();
     auto& program_out = out.program();
-    auto& facts = program_out.facts();
     auto& cost_buckets = program_out.cost_buckets();
-    auto& tp = program_out.tp();
 
     scheduler.activate_all();
-
     cost_buckets.clear();
 
     while (true)
     {
-        // Check whether min cost for goal was proven.
-        if (tp.check(FactSets { ctx.in().program().facts().fact_sets, facts.fact_sets }))
-        {
+        // Facts are committed in cost order, so the goal cost is proven minimal once the goal holds.
+        if (program_out.tp().check(FactSets { ctx.in().program().facts().fact_sets, program_out.facts().fact_sets }))
             return;
-        }
 
         scheduler.on_start_iteration();
 
-        const auto& active_rules = scheduler.get_active_rules();
+        run_active_rules(ctx);
 
-        /**
-         * Parallel process pending applicability checks and generate ground witnesses.
-         */
+        cost_buckets.clear_current();  ///< Clear before merging to avoid handling current heads twice.
+        merge_worker_results(ctx);
 
-        {
-            const auto program_stopwatch = ygg::StopwatchScope(program_out.statistics().parallel_time);
+        if (!cost_buckets.advance_to_next_nonempty())
+            return;  ///< All reachable heads are committed.
 
-            oneapi::tbb::parallel_for_each(active_rules.begin(),
-                                           active_rules.end(),
-                                           [&](auto&& rule_index)
-                                           {
-                                               // std::cout << ygg::make_view(rule_index, ws.repository) << std::endl;
-
-                                               auto rctx = ctx.get_rule_execution_context(rule_index);
-                                               auto& rule_out = rctx.out();
-
-                                               const auto total_time = ygg::StopwatchScope(rule_out.statistics().total_time);
-                                               ++rule_out.statistics().num_executions;
-
-                                               rctx.clear_iteration();  ///< Clear iteration before process_pending_rule_bindings/generate
-
-                                               {
-                                                   const auto initialize_time = ygg::StopwatchScope(rule_out.statistics().initialize_time);
-
-                                                   rctx.initialize();  ///< Initialize before process_pending_rule_bindings/generate
-                                               }
-
-                                               {
-                                                   const auto process_pending_time = ygg::StopwatchScope(rule_out.statistics().process_pending_time);
-
-                                                   process_pending_rule_bindings(rctx);
-                                               }
-
-                                               {
-                                                   const auto process_generate_time = ygg::StopwatchScope(rule_out.statistics().process_generate_time);
-
-                                                   generate(rctx);
-                                               }
-                                           });
-        }
-
-        // Clear current bucket to avoid duplicate handling
-        cost_buckets.clear_current();
-
-        /**
-         * Sequential merge results from workers into program
-         */
-
-        {
-            for (const auto rule_index : active_rules)
-            {
-                const auto i = ygg::uint_t(rule_index);
-                auto merge_context = fd::MergeContext { program_out.datalog_builder(), program_out.workspace_repository() };
-                const auto& ws_rule = program_out.rules()[i];
-
-                for (const auto& worker : ws_rule->worker)
-                {
-                    std::visit(
-                        [&](const auto& head_iteration)
-                        {
-                            using HeadIteration = std::decay_t<decltype(head_iteration)>;
-
-                            if constexpr (std::is_same_v<HeadIteration, PredicateHeadIteration>)
-                            {
-                                for (const auto worker_head_index : head_iteration.rows)
-                                {
-                                    const auto worker_head = ygg::make_view(
-                                        ygg::Index<f::RelationBinding<f::Predicate<f::FluentTag>>> { head_iteration.relation, worker_head_index },
-                                        worker.solve.program_overlay_repository);
-
-                                    // Merge head from delta into the program
-                                    const auto program_head = fd::merge_d2d(worker_head, merge_context).first;
-
-                                    // Update annotation
-                                    const auto cost_update =
-                                        program_out.or_ap().update_annotation(program_head, worker_head, worker.iteration.and_annot, program_out.and_annot());
-
-                                    cost_buckets.update(cost_update, program_head);
-                                }
-                            }
-                            else
-                            {
-                                for (const auto& update : head_iteration.updates)
-                                {
-                                    const auto worker_head =
-                                        ygg::make_view(ygg::Index<f::RelationBinding<f::Function<f::FluentTag>>> { head_iteration.relation, update.row },
-                                                       worker.solve.program_overlay_repository);
-
-                                    const auto program_head = fd::merge_d2d(worker_head, merge_context).first;
-                                    const auto* worker_annotation = worker.iteration.numeric_and_annot.find(worker_head, update.interval);
-                                    if (worker_annotation)
-                                        program_out.numeric_and_annot().insert(program_head, update.interval, *worker_annotation);
-
-                                    cost_buckets.insert(update.cost, program_head, update.interval);
-                                }
-                            }
-                        },
-                        worker.iteration.head);
-                }
-            }
-
-            if (!cost_buckets.advance_to_next_nonempty())
-                return;  // Terminate if no-nonempty bucket was found.
-
-            // Insert next bucket heads into fact and assignment sets + trigger scheduler.
-            for (const auto head : cost_buckets.get_current_bucket())
-            {
-                // Update fact sets
-                const auto changed = facts.fact_sets.predicate.insert(head);
-                if (changed)
-                {
-                    // Notify scheduler
-                    scheduler.on_generate(head.get_index().relation);
-
-                    // Update assignment sets
-                    facts.assignment_sets.predicate.insert(head);
-                }
-            }
-
-            for (const auto& [head, interval] : cost_buckets.get_current_function_bucket())
-            {
-                // Update fact sets
-                const auto changed = facts.fact_sets.function.insert(head, interval);
-                if (changed)
-                {
-                    // Notify scheduler
-                    scheduler.on_generate(head.get_index().relation);
-
-                    // Update assignment sets
-                    facts.assignment_sets.function.insert(head, interval);
-                }
-            }
-
-            program_out.rebuild_numeric_support_selector(ctx.in().program().facts().fact_sets);
-        }
+        commit_current_bucket(ctx);
 
         scheduler.on_finish_iteration();
     }

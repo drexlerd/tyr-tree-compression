@@ -19,6 +19,7 @@
 #define TYR_DATALOG_APPLICABILITY_HPP_
 
 #include "tyr/datalog/fact_sets.hpp"
+#include "tyr/datalog/numeric_utils.hpp"
 #include "tyr/formalism/arithmetic_operator_utils.hpp"
 #include "tyr/formalism/boolean_operator_utils.hpp"
 #include "tyr/formalism/datalog/builder.hpp"
@@ -356,27 +357,6 @@ is_valid_binding(::tyr::formalism::datalog::ConjunctiveConditionView element, co
            && is_valid_binding(element.get_numeric_constraints(), fact_sets, context);
 }
 
-namespace details
-{
-template<typename Op>
-ygg::ClosedInterval<ygg::float_t> apply_numeric_effect(Op, ygg::ClosedInterval<ygg::float_t> lhs, ygg::ClosedInterval<ygg::float_t> rhs)
-{
-    if constexpr (std::is_same_v<Op, ::tyr::formalism::Assign>)
-        return rhs;
-    else if constexpr (std::is_same_v<Op, ::tyr::formalism::Increase>)
-        return lhs + rhs;
-    else if constexpr (std::is_same_v<Op, ::tyr::formalism::Decrease>)
-        return lhs - rhs;
-    else if constexpr (std::is_same_v<Op, ::tyr::formalism::ScaleUp>)
-        return lhs * rhs;
-    else if constexpr (std::is_same_v<Op, ::tyr::formalism::ScaleDown>)
-        return lhs / rhs;
-    else
-        static_assert(ygg::dependent_false<Op>::value, "Missing case");
-}
-
-}
-
 template<::tyr::formalism::NumericEffectOpKind Op, ::tyr::formalism::FactKind T>
 ygg::ClosedInterval<ygg::float_t>
 is_valid_binding(::tyr::formalism::datalog::NumericEffectView<Op, T> element, const FactSets& fact_sets, ::tyr::formalism::datalog::GrounderContext& context)
@@ -395,7 +375,7 @@ is_valid_binding(::tyr::formalism::datalog::NumericEffectView<Op, T> element, co
         if (empty(lhs))
             return {};
 
-        return details::apply_numeric_effect(Op {}, lhs, rhs);
+        return apply_numeric_effect(Op {}, lhs, rhs);
     }
 }
 

@@ -19,7 +19,7 @@
 #define TYR_SOLVER_POLICIES_ANNOTATION_HPP_
 
 #include "tyr/datalog/declarations.hpp"
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"

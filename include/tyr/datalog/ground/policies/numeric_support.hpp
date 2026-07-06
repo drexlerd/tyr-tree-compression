@@ -20,9 +20,9 @@
 
 #include "tyr/datalog/ground/policies/annotation_types.hpp"
 #include "tyr/datalog/ground/workspaces/facts.hpp"
+#include "tyr/datalog/policies/numeric_support_core.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
-#include <algorithm>
 #include <limits>
 #include <vector>
 #include <yggdrasil/core/closed_interval.hpp>
@@ -49,26 +49,38 @@ public:
     std::vector<SelectionEntry> selection;
 };
 
-class GroundNumericSupportSelector
+class GroundNumericSupportSelector : public NumericSupportSelectorCore<GroundNumericSupportSelector,
+                                                                       ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
+                                                                       GroundNumericSupportSelectorWorkspace::SelectionEntry>
 {
 public:
+    using Key = ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>;
+    using SelectionEntry = GroundNumericSupportSelectorWorkspace::SelectionEntry;
+    using Core = NumericSupportSelectorCore<GroundNumericSupportSelector, Key, SelectionEntry>;
+
     GroundNumericSupportSelector(const FactsWorkspace<GroundTag>& facts,
                                  const NumericIntervalAnnotations<GroundTag>& annotations,
                                  bool initial_intervals_cost_zero = false);
 
-    ygg::ClosedInterval<ygg::float_t> select_fluent_interval(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
-                                                             std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
+    /**
+     * Storage accessors for the shared core.
+     */
 
-    ygg::ClosedInterval<ygg::float_t> evaluate_effect_expression(::tyr::formalism::datalog::GroundFunctionExpressionView expression,
-                                                                 std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
+    static Key key_of(const SelectionEntry& entry) noexcept { return entry.term; }
+    Key fluent_key(Key term) const noexcept { return term; }
+    ygg::ClosedInterval<ygg::float_t> lookup_static(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::StaticTag> term) const;
+    ygg::ClosedInterval<ygg::float_t> current_interval(Key key) const;
+    const NumericIntervalAnnotations<GroundTag>::Entries* find_entries(Key key) const;
+    bool keys_equal(Key lhs, Key rhs) const noexcept { return lhs.get_index() == rhs.get_index(); }
+    /// Runs without annotations price initial intervals at zero instead of treating them as unreachable.
+    Cost missing_entries_cost() const noexcept { return m_initial_intervals_cost_zero ? Cost(0) : std::numeric_limits<Cost>::max(); }
 
-    template<typename AggregationFunction>
-    Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
-                             std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection,
-                             AggregationFunction agg) const
-    {
-        return get_greedy_support_cost(selection, agg, [&](auto& selected) { return is_supported(constraint, selected); });
-    }
+    /**
+     * Workspace-based conveniences on top of the shared core.
+     */
+
+    using Core::get_constraint_cost;
+    using Core::for_each_constraint_support;
 
     template<typename AggregationFunction>
     Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint, AggregationFunction agg) const
@@ -91,89 +103,14 @@ public:
                                      AggregationFunction agg,
                                      Callback callback) const
     {
-        const auto cost = get_constraint_cost(constraint, workspace, agg);
-        if (cost == std::numeric_limits<Cost>::max())
-            return cost;
-
-        for (const auto& entry : workspace.selection)
-        {
-            if (entry.annotation)
-            {
-                callback(entry.term, entry.interval, entry.annotation->annotation);
-                continue;
-            }
-
-            const auto* entries = find_entries(entry.term);
-            if (!entries)
-                continue;
-
-            for (const auto& candidate : *entries)
-                if (is_available(entry.term, candidate.interval) && get_cost(candidate.annotation) <= entry.cost && subset(candidate.interval, entry.interval))
-                    callback(entry.term, candidate.interval, candidate.annotation);
-        }
-
-        return cost;
+        return for_each_constraint_support(constraint, workspace.selection, agg, callback);
     }
 
 private:
-    template<typename AggregationFunction, typename IsSupported>
-    Cost get_greedy_support_cost(std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection,
-                                 AggregationFunction agg,
-                                 IsSupported is_supported) const
-    {
-        selection.clear();
-        if (!is_supported(selection))
-            return std::numeric_limits<Cost>::max();
-
-        std::sort(selection.begin(), selection.end());
-        for (size_t pos = 0; pos < selection.size(); ++pos)
-        {
-            const auto term = selection[pos].term;
-            const auto* entries = find_entries(term);
-            if (!entries)
-                continue;
-
-            const auto end = std::upper_bound(entries->begin(),
-                                              entries->end(),
-                                              selection[pos].cost,
-                                              [](Cost cost, const auto& entry) { return cost < get_cost(entry.annotation); });
-
-            for (auto it = entries->begin(); it != end; ++it)
-            {
-                if (!is_available(term, it->interval))
-                    continue;
-
-                const auto old_entry = selection[pos];
-                selection[pos] = GroundNumericSupportSelectorWorkspace::SelectionEntry { term, it->interval, &*it, get_cost(it->annotation) };
-                if (is_supported(selection))
-                    break;
-                selection[pos] = old_entry;
-            }
-        }
-
-        auto cost = AggregationFunction::identity();
-        for (const auto& entry : selection)
-            cost = agg(cost, entry.cost);
-        return cost;
-    }
-
-    bool is_supported(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
-                      std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
-
-    const NumericIntervalAnnotations<GroundTag>::Entries*
-    find_entries(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term) const;
-    ygg::ClosedInterval<ygg::float_t> current_interval(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term) const;
-    Cost get_current_interval_cost(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
-                                   ygg::ClosedInterval<ygg::float_t> current) const;
-    bool is_available(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term, ygg::ClosedInterval<ygg::float_t> interval) const;
-    GroundNumericSupportSelectorWorkspace::SelectionEntry*
-    find_selection_entry(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
-                         std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry>& selection) const;
-
     const FactsWorkspace<GroundTag>& m_facts;
     const NumericIntervalAnnotations<GroundTag>& m_annotations;
     bool m_initial_intervals_cost_zero;
-    mutable std::vector<GroundNumericSupportSelectorWorkspace::SelectionEntry> m_selection;
+    mutable std::vector<SelectionEntry> m_selection;
 };
 
 }

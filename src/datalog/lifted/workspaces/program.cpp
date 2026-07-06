@@ -17,7 +17,7 @@
 
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 
-#include "tyr/datalog/lifted/policies/aggregation.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/termination.hpp"
 #include "tyr/datalog/lifted/programs/program.hpp"
