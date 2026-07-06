@@ -289,7 +289,14 @@ private:
             return std::numeric_limits<Cost>::max();
 
         // Refine cheaper function supports first. Annotation entries for each key are already sorted by cost.
-        std::sort(selection.begin(), selection.end());
+        // stable_sort: entries are inserted in deterministic evaluation order, so stability makes the
+        // tie order (and hence lmcut tie-breaking) identical across standard library implementations
+        // (std::sort permutes equal-cost entries differently on libstdc++ vs libc++, which made lmcut
+        // values differ between Linux and macOS). The tie order is otherwise arbitrary: any tie-breaking
+        // stays admissible, so a future refinement may spend ties on higher estimates instead, e.g.,
+        // preferring tighter candidate intervals here or higher-residual witnesses on cost ties in
+        // update_annotation.
+        std::stable_sort(selection.begin(), selection.end());
 
         for (size_t pos = 0; pos < selection.size(); ++pos)
         {
