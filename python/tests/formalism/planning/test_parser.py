@@ -82,9 +82,11 @@ def test_parsed_domain_exposes_symbol_metadata():
         (3, "object", 1),
         (4, "room", 1),
     ]
+    # Order follows loki's canonical predicate order (sorted by rendered PDDL text since pypddl 1.0.17),
+    # so "(at ?b ?r)" sorts before "(at-robby ?r)".
     assert fluent_predicates == [
-        (0, "at-robby", 1),
-        (1, "at", 2),
+        (0, "at", 2),
+        (1, "at-robby", 1),
         (2, "carry", 2),
         (3, "free", 1),
     ]
