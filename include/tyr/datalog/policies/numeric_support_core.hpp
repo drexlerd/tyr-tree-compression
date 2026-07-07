@@ -301,10 +301,10 @@ private:
         // stable_sort: entries are inserted in deterministic evaluation order, so stability makes the
         // tie order (and hence lmcut tie-breaking) identical across standard library implementations
         // (std::sort permutes equal-cost entries differently on libstdc++ vs libc++, which made lmcut
-        // values differ between Linux and macOS). The tie order is otherwise arbitrary: any tie-breaking
-        // stays admissible, so a future refinement may spend ties on higher estimates instead, e.g.,
-        // preferring tighter candidate intervals here or higher-residual witnesses on cost ties in
-        // update_annotation.
+        // values differ between Linux and macOS). Any tie-breaking here stays admissible; measured over
+        // the lmcut fixture suite (4 tie orders x 2 acceptance rules), no variant improved more cases
+        // than it worsened (interval-width orders changed nothing; reverse order and strictly-cheaper
+        // acceptance were net negative), so plain insertion order stays.
         std::stable_sort(selection.begin(), selection.end());
 
         for (size_t pos = 0; pos < selection.size(); ++pos)

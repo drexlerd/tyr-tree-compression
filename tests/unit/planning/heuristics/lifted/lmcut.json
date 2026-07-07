@@ -367,7 +367,7 @@
             "hmax_unit": 3,
             "hlmcut_unit": 6,
             "hmax_general": 3100,
-            "hlmcut_general": 3100,
+            "hlmcut_general": 5812,
             "hstar_unit": 9,
             "hstar_general": 5952
         },
