@@ -443,7 +443,9 @@ static std::optional<StackEntry<Tag>> try_create_atom_stack_entry(ygg::Index<::t
         return polarity ? 0 : 1;  // true first, then false
     };
 
-    std::sort(base.elements.begin(),
+    // stable_sort: the comparator has ties, and unstable sorts permute them differently across
+    // standard library implementations (libstdc++ vs libc++).
+    std::stable_sort(base.elements.begin(),
               base.elements.end(),
               [&](auto&& lhs, auto&& rhs)
               {
@@ -486,7 +488,9 @@ static std::optional<StackEntry<Tag>> try_create_variable_stack_entry(ygg::Index
         return ygg::uint_t(value);
     };
 
-    std::sort(base.elements.begin(),
+    // stable_sort: the comparator has ties, and unstable sorts permute them differently across
+    // standard library implementations (libstdc++ vs libc++).
+    std::stable_sort(base.elements.begin(),
               base.elements.end(),
               [&](auto&& lhs, auto&& rhs)
               {
@@ -530,7 +534,9 @@ static std::optional<StackEntry<Tag>> try_create_negative_fact_stack_entry(ygg::
 {
     assert(!base.elements.empty());
 
-    std::sort(base.elements.begin(),
+    // stable_sort: the comparator has ties, and unstable sorts permute them differently across
+    // standard library implementations (libstdc++ vs libc++).
+    std::stable_sort(base.elements.begin(),
               base.elements.end(),
               [&](auto&& lhs, auto&& rhs)
               {
@@ -560,7 +566,9 @@ static std::optional<StackEntry<Tag>> try_create_constraint_stack_entry(
 {
     assert(!base.elements.empty());
 
-    std::sort(base.elements.begin(),
+    // stable_sort: the comparator has ties, and unstable sorts permute them differently across
+    // standard library implementations (libstdc++ vs libc++).
+    std::stable_sort(base.elements.begin(),
               base.elements.end(),
               [&](auto&& lhs, auto&& rhs)
               {
@@ -684,7 +692,25 @@ MatchTree<Tag>::MatchTree(ygg::IndexList<Tag> elements_, const ::tyr::formalism:
 
     std::vector<std::pair<PreconditionVariant, ygg::IndexList<Tag>>> sorted_preconditions(occurrences.begin(), occurrences.end());
 
-    std::sort(sorted_preconditions.begin(), sorted_preconditions.end(), [](const auto& a, const auto& b) { return a.second.size() > b.second.size(); });
+    // Total order (occurrence count, then canonical precondition key): sorted_preconditions is built
+    // from unordered-map iteration and feeds the tree construction, so ties must not be broken by the
+    // container's iteration order or the standard library's unstable sort.
+    const auto precondition_less = [](const PreconditionVariant& lhs, const PreconditionVariant& rhs)
+    {
+        if (lhs.index() != rhs.index())
+            return lhs.index() < rhs.index();
+        return std::visit([&](const auto& lhs_alt)
+                          { return ygg::Less<std::decay_t<decltype(lhs_alt)>> {}(lhs_alt, std::get<std::decay_t<decltype(lhs_alt)>>(rhs)); },
+                          lhs);
+    };
+    std::sort(sorted_preconditions.begin(),
+              sorted_preconditions.end(),
+              [&](const auto& a, const auto& b)
+              {
+                  if (a.second.size() != b.second.size())
+                      return a.second.size() > b.second.size();
+                  return precondition_less(a.first, b.first);
+              });
 
     // std::cout << details << std::endl;
     // std::cout << sorted_preconditions << std::endl;

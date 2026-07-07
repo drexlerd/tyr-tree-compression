@@ -114,9 +114,13 @@ inline void process_effects(fp::ActionView action,
 
                     for (const auto numeric_effect : effect.get_numeric_effects())
                         visit(
-                            [&](auto&& arg) {
-                                succ_unpacked_state.set(ground(arg.get_fterm(), grounder_context).first.get_index(),
-                                                        evaluate(numeric_effect, applicability_context));
+                            [&](auto&& arg)
+                            {
+                                // Sequenced: both grounding and evaluation mutate the grounder context, and argument
+                                // evaluation order is unspecified (gcc and clang disagree). Evaluating first preserves
+                                // the historical gcc (right-to-left) index assignment order.
+                                const auto value = evaluate(numeric_effect, applicability_context);
+                                succ_unpacked_state.set(ground(arg.get_fterm(), grounder_context).first.get_index(), value);
                             },
                             numeric_effect.get_variant());
 

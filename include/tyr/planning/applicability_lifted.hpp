@@ -174,13 +174,21 @@ ygg::float_t evaluate(::tyr::formalism::planning::LiftedUnaryOperatorView<O> ele
 template<::tyr::formalism::ArithmeticOpKind O>
 ygg::float_t evaluate(::tyr::formalism::planning::LiftedBinaryOperatorView<O> element, const ApplicabilityContext& context)
 {
-    return ::tyr::formalism::apply(O {}, evaluate(element.get_lhs(), context), evaluate(element.get_rhs(), context));
+    // Sequenced: evaluation grounds subterms (mutating the context), and argument evaluation order
+    // is unspecified (gcc and clang disagree). rhs-first preserves the historical gcc order.
+    const auto rhs = evaluate(element.get_rhs(), context);
+    const auto lhs = evaluate(element.get_lhs(), context);
+    return ::tyr::formalism::apply(O {}, lhs, rhs);
 }
 
 template<::tyr::formalism::BooleanOpKind O>
 bool evaluate(::tyr::formalism::planning::LiftedBinaryOperatorView<O> element, const ApplicabilityContext& context)
 {
-    return ::tyr::formalism::apply(O {}, evaluate(element.get_lhs(), context), evaluate(element.get_rhs(), context));
+    // Sequenced: evaluation grounds subterms (mutating the context), and argument evaluation order
+    // is unspecified (gcc and clang disagree). rhs-first preserves the historical gcc order.
+    const auto rhs = evaluate(element.get_rhs(), context);
+    const auto lhs = evaluate(element.get_lhs(), context);
+    return ::tyr::formalism::apply(O {}, lhs, rhs);
 }
 
 template<::tyr::formalism::ArithmeticOpKind O>
@@ -235,7 +243,10 @@ inline bool evaluate(::tyr::formalism::planning::LiftedBooleanOperatorView eleme
 template<::tyr::formalism::NumericEffectOpKind Op, ::tyr::formalism::FactKind T>
 ygg::float_t evaluate(::tyr::formalism::planning::NumericEffectView<Op, T> element, const ApplicabilityContext& context)
 {
-    return ::tyr::formalism::planning::apply(Op {}, evaluate(element.get_fterm(), context), evaluate(element.get_fexpr(), context));
+    // Sequenced for the same reason as the arithmetic binary operator above.
+    const auto fexpr_value = evaluate(element.get_fexpr(), context);
+    const auto fterm_value = evaluate(element.get_fterm(), context);
+    return ::tyr::formalism::planning::apply(Op {}, fterm_value, fexpr_value);
 }
 
 template<::tyr::formalism::FactKind T>
