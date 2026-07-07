@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cstdlib>
 #include "tyr/planning/lifted/heuristics/lmcut.hpp"
 
 #include <algorithm>
@@ -84,6 +85,9 @@ LMCutHeuristicPtr<LiftedTag> LMCutHeuristic<LiftedTag>::create(TaskPtr<LiftedTag
 
 ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& state)
 {
+    // Set TYR_LMCUT_TRACE=1 to print one line per lmcut round (cross-platform divergence diagnosis).
+    const bool trace = std::getenv("TYR_LMCUT_TRACE") != nullptr;
+    auto trace_round = int(0);
     auto value = datalog::Cost(0);
     m_use_expanded_edges = needs_expanded_lmcut(m_rpg_program.get_datalog_program().get_program());
     m_residual_costs.clear();
@@ -98,6 +102,8 @@ ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& sta
             return hmax;
 
         const auto hmax_cost = datalog::Cost(hmax);
+        if (trace)
+            fmt::print(stderr, "TYR_LMCUT_TRACE lifted round={} hmax={} value={}\n", trace_round++, hmax, double(value));
         if (hmax_cost == 0)
             return ygg::float_t(value);
 
@@ -114,6 +120,15 @@ ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& sta
                 cut_cost = std::min(cut_cost, residual);
 
             assert(cut_cost > 0 && cut_cost != std::numeric_limits<datalog::Cost>::max());
+
+            if (trace)
+                fmt::print(stderr,
+                           "TYR_LMCUT_TRACE lifted   cut rule_edges={} numeric_edges={} cut_cost={} goal_zone={} numeric_goal_zone={}\n",
+                           m_rule_cut.size(),
+                           m_numeric_cut.size(),
+                           double(cut_cost),
+                           m_goal_zone.size(),
+                           m_numeric_goal_zone.size());
 
             value += cut_cost;
             for (const auto& [edge, _] : m_rule_cut)
