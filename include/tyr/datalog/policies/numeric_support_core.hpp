@@ -84,7 +84,13 @@ ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundUnaryOperatorView<O> expres
 template<f::ArithmeticOpKind O, typename Selector>
 ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundBinaryOperatorView<O> expression, const Selector& selector, Selection<Selector>& selection)
 {
-    return f::apply(O {}, evaluate(expression.get_lhs(), selector, selection), evaluate(expression.get_rhs(), selector, selection));
+    // Sequence the operand evaluations: they append to selection, and function argument evaluation
+    // order is unspecified (gcc and clang disagree), which would make the support selection order
+    // and hence lmcut tie-breaking compiler-dependent. rhs-first preserves the historical order the
+    // fixtures were generated with (and the higher lmcut estimate on the observed instances).
+    const auto rhs = evaluate(expression.get_rhs(), selector, selection);
+    const auto lhs = evaluate(expression.get_lhs(), selector, selection);
+    return f::apply(O {}, lhs, rhs);
 }
 
 template<f::ArithmeticOpKind O, typename Selector>
@@ -102,7 +108,10 @@ ygg::ClosedInterval<ygg::float_t> evaluate(fd::GroundMultiOperatorView<O> expres
 template<f::BooleanOpKind O, typename Selector>
 bool evaluate(fd::GroundBinaryOperatorView<O> expression, const Selector& selector, Selection<Selector>& selection)
 {
-    return f::apply_existential(O {}, evaluate(expression.get_lhs(), selector, selection), evaluate(expression.get_rhs(), selector, selection));
+    // Sequenced for the same reason as the arithmetic binary operator above.
+    const auto rhs = evaluate(expression.get_rhs(), selector, selection);
+    const auto lhs = evaluate(expression.get_lhs(), selector, selection);
+    return f::apply_existential(O {}, lhs, rhs);
 }
 
 template<typename Selector>

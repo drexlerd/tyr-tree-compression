@@ -270,7 +270,13 @@ template<::tyr::formalism::ArithmeticOpKind O>
 ygg::ClosedInterval<ygg::float_t>
 is_valid_binding(::tyr::formalism::datalog::LiftedBinaryOperatorView<O> element, const FactSets& fact_sets, ::tyr::formalism::datalog::GrounderContext& context)
 {
-    return ::tyr::formalism::apply(O {}, is_valid_binding(element.get_lhs(), fact_sets, context), is_valid_binding(element.get_rhs(), fact_sets, context));
+    // Sequence the operand evaluations: grounding mutates the context, and function argument
+    // evaluation order is unspecified (gcc and clang disagree), which would make repository index
+    // assignment compiler-dependent. rhs-first preserves the historical order the fixtures were
+    // generated with.
+    const auto rhs = is_valid_binding(element.get_rhs(), fact_sets, context);
+    const auto lhs = is_valid_binding(element.get_lhs(), fact_sets, context);
+    return ::tyr::formalism::apply(O {}, lhs, rhs);
 }
 
 template<::tyr::formalism::BooleanOpKind O>
@@ -278,9 +284,10 @@ bool is_valid_binding(::tyr::formalism::datalog::LiftedBinaryOperatorView<O> ele
                       const FactSets& fact_sets,
                       ::tyr::formalism::datalog::GrounderContext& context)
 {
-    return ::tyr::formalism::apply_existential(O {},
-                                               is_valid_binding(element.get_lhs(), fact_sets, context),
-                                               is_valid_binding(element.get_rhs(), fact_sets, context));
+    // Sequenced for the same reason as the arithmetic binary operator above.
+    const auto rhs = is_valid_binding(element.get_rhs(), fact_sets, context);
+    const auto lhs = is_valid_binding(element.get_lhs(), fact_sets, context);
+    return ::tyr::formalism::apply_existential(O {}, lhs, rhs);
 }
 
 template<::tyr::formalism::ArithmeticOpKind O>
