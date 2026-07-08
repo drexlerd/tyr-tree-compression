@@ -362,6 +362,8 @@ template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
 const std::vector<::tyr::formalism::datalog::RuleBindingView>& RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::get_sorted_pending_rule_bindings()
 {
     pending_rule_binding_scratch.assign(pending_rule_bindings.begin(), pending_rule_bindings.end());
+    // DeltaKPKC emits canonical bindings within a worker. This sort only stabilizes unordered
+    // worker-merge traversal, so RuleBindingView identity is sufficient and avoids object lookup.
     std::sort(pending_rule_binding_scratch.begin(), pending_rule_binding_scratch.end(), ygg::Less<::tyr::formalism::datalog::RuleBindingView> {});
     return pending_rule_binding_scratch;
 }

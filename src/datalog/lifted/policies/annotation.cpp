@@ -123,9 +123,10 @@ OrAnnotationPolicy<LiftedTag>::update_annotation(::tyr::formalism::datalog::Pred
     }
     else if (witness.get_cost() == old_cost)
     {
-        // Canonical equal-cost tie-break: the lexicographically smallest rule binding wins, so the
-        // stored witness is independent of the platform-unspecified worker-merge order. A
-        // BaseAnnotation incumbent (initial fact) always wins its tie.
+        // DeltaKPKC emits canonical bindings within a worker. RuleBindingView identity is enough
+        // to stabilize the remaining worker-merge order without dereferencing objects through a
+        // possibly different repository layer. A BaseAnnotation incumbent (initial fact) always
+        // wins its tie.
         const auto* incumbent = program_and_annot.find(program_head);
         const auto* incumbent_witness = incumbent ? std::get_if<WitnessAnnotation<LiftedTag>>(incumbent) : nullptr;
         if (incumbent_witness && ygg::Less<::tyr::formalism::datalog::RuleBindingView> {}(witness.get_rule_row(), incumbent_witness->get_rule_row()))
@@ -247,9 +248,10 @@ void AndAnnotationPolicy<LiftedTag, AggregationFunction>::update_annotation(
         return;  ///< No local or global improvement or tie
 
     // Canonical equal-cost tie-break: the lexicographically smallest rule binding wins, making the kept
-    // witness independent of the platform-unspecified rule processing order. Ties are decided on the
-    // rule binding before paying for witness grounding; a BaseAnnotation incumbent (initial fact)
-    // always wins its tie.
+    // witness independent of the platform-unspecified rule processing order. DeltaKPKC emits
+    // canonical bindings within a worker, so RuleBindingView identity is sufficient here and avoids
+    // dereferencing objects through a possibly different repository layer. A BaseAnnotation
+    // incumbent (initial fact) always wins its tie.
     const auto wins_tie = [&]()
     {
         const auto* incumbent = best_local_cost <= best_global_cost ? delta_and_annot.find(delta_head) : context.program_and_annot.find(program_head);

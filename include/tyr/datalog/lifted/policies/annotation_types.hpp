@@ -197,6 +197,8 @@ public:
             const auto* rhs_witness = std::get_if<WitnessAnnotation<LiftedTag>>(&rhs.annotation);
             if (!lhs_witness || !rhs_witness)
                 return !lhs_witness && rhs_witness;  ///< BaseAnnotation (initial fact) sorts first
+            // DeltaKPKC already canonicalizes worker output; identity ordering only stabilizes ties
+            // without dereferencing through a possibly different repository layer.
             return ygg::Less<::tyr::formalism::datalog::RuleBindingView> {}(lhs_witness->get_rule_row(), rhs_witness->get_rule_row());
         };
 
