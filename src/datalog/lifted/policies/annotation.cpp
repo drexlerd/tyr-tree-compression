@@ -32,6 +32,8 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
+#include <fmt/format.h>
 #include <concepts>
 #include <limits>
 #include <optional>
@@ -271,7 +273,18 @@ void AchieverAndAnnotationPolicy<LiftedTag, AggregationFunction>::record_achieve
 {
     const auto witness = try_ground_witness<AggregationFunction>(context);
     if (witness)
+    {
+        // TYR_LMCUT_TRACE: stream of recorded witnesses (head identity + cost in hexfloat) so a
+        // cross-platform diff pinpoints the first divergent rule firing during the fixpoint.
+        static const bool trace = std::getenv("TYR_LMCUT_TRACE") != nullptr;
+        if (trace)
+            fmt::print(stderr,
+                       "TYR_LMCUT_TRACE record rel={} row={} cost={:a}\n",
+                       program_head.get_index().relation.get_value(),
+                       program_head.get_index().row.get_value(),
+                       double(witness->get_cost()));
         m_achievers[program_head.get_index()].push_back(*witness);
+    }
 }
 
 template class AndAnnotationPolicy<LiftedTag, SumAggregation>;
