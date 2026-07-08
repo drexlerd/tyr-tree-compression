@@ -21,11 +21,9 @@
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/formatter.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
-#include "tyr/datalog/numeric_utils.hpp"
 #include "tyr/datalog/lifted/assignment_sets.hpp"
 #include "tyr/datalog/lifted/consistency_graph.hpp"
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
-#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/datalog/lifted/policies/termination.hpp"
@@ -33,6 +31,8 @@
 #include "tyr/datalog/lifted/workspaces/facts.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/datalog/lifted/workspaces/rule.hpp"
+#include "tyr/datalog/numeric_utils.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/declarations.hpp"
 #include "tyr/formalism/datalog/conjunctive_condition_view.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -741,7 +741,14 @@ void commit_current_bucket(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
     auto& facts = program_out.facts();
     auto& cost_buckets = program_out.cost_buckets();
 
+    auto& predicate_heads = program_out.predicate_bucket_scratch();
+    predicate_heads.clear();
+    predicate_heads.reserve(cost_buckets.get_current_bucket().size());
     for (const auto head : cost_buckets.get_current_bucket())
+        predicate_heads.push_back(head);
+    std::sort(predicate_heads.begin(), predicate_heads.end(), [](const auto lhs, const auto rhs) { return ygg::Less<> {}(lhs.get_key(), rhs.get_key()); });
+
+    for (const auto head : predicate_heads)
     {
         if (facts.fact_sets.predicate.insert(head))
         {
@@ -750,7 +757,25 @@ void commit_current_bucket(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
         }
     }
 
+    auto& function_heads = program_out.function_bucket_scratch();
+    function_heads.clear();
+    function_heads.reserve(cost_buckets.get_current_function_bucket().size());
     for (const auto& [head, interval] : cost_buckets.get_current_function_bucket())
+        function_heads.emplace_back(head, interval);
+    std::sort(function_heads.begin(),
+              function_heads.end(),
+              [](const auto& lhs, const auto& rhs)
+              {
+                  if (ygg::Less<> {}(lhs.first.get_key(), rhs.first.get_key()))
+                      return true;
+                  if (ygg::Less<> {}(rhs.first.get_key(), lhs.first.get_key()))
+                      return false;
+                  if (lower(lhs.second) != lower(rhs.second))
+                      return lower(lhs.second) < lower(rhs.second);
+                  return upper(lhs.second) < upper(rhs.second);
+              });
+
+    for (const auto& [head, interval] : function_heads)
     {
         if (facts.fact_sets.function.insert(head, interval))
         {

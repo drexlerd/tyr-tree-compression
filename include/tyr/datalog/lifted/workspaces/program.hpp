@@ -38,6 +38,7 @@
 #include <oneapi/tbb/enumerable_thread_specific.h>
 #include <optional>
 #include <tuple>
+#include <utility>
 #include <vector>
 #include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
@@ -198,6 +199,9 @@ struct ProgramWorkspace<LiftedTag>
         RuleSchedulerStrata schedulers;
 
         CostBuckets cost_buckets;
+        std::vector<::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>> predicate_bucket_scratch;
+        std::vector<std::pair<::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>, ygg::ClosedInterval<ygg::float_t>>>
+            function_bucket_scratch;
 
         ProgramStatistics statistics;
 

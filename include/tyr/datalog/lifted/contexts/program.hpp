@@ -89,6 +89,8 @@ struct ProgramExecutionContext<LiftedTag, OrAP, AndAP, TP, CP>
         const auto& schedulers() const noexcept { return m_ws.schedulers; }
         auto& cost_buckets() noexcept { return m_ws.cost_buckets; }
         const auto& cost_buckets() const noexcept { return m_ws.cost_buckets; }
+        auto& predicate_bucket_scratch() noexcept { return m_ws.predicate_bucket_scratch; }
+        auto& function_bucket_scratch() noexcept { return m_ws.function_bucket_scratch; }
         auto& statistics() noexcept { return m_ws.statistics; }
         const auto& statistics() const noexcept { return m_ws.statistics; }
 
