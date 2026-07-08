@@ -683,7 +683,14 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
 
     auto inspect_rule_witness = [&](const auto& witness)
     {
-        if (!get_action_binding(witness))
+        const auto has_action_binding = static_cast<bool>(get_action_binding(witness));
+        if (trace)
+            fmt::print(stderr,
+                       "TYR_LMCUT_TRACE lifted     inspect has_action_binding={} witness_cost={:a} body_cost={:a}\n",
+                       has_action_binding,
+                       double(witness.get_cost()),
+                       double(get_witness_body_cost(witness)));
+        if (!has_action_binding)
             return;
         const auto edge = make_rule_edge(witness);
         const auto residual = get_witness_edge_residual_cost(witness);
@@ -694,6 +701,8 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
         const auto crosses_cut =
             preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
         release_witness_max_preconditions();
+        if (trace)
+            fmt::print(stderr, "TYR_LMCUT_TRACE lifted     inspect residual={:a} npre={} crosses={}\n", double(residual), preconditions.size(), crosses_cut);
         if (crosses_cut)
         {
             const auto [it, inserted] = m_rule_cut.emplace(edge, residual);
@@ -728,9 +737,13 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
     for (const auto binding : m_goal_zone)
     {
         const auto binding_cost = get_binding_cost(binding);
+        if (trace)
+            fmt::print(stderr, "TYR_LMCUT_TRACE lifted   zone binding_cost={:a}\n", double(binding_cost));
         for_each_achiever(binding,
                           [&](const auto& witness)
                           {
+                              if (trace)
+                                  fmt::print(stderr, "TYR_LMCUT_TRACE lifted     achiever witness_cost={:a}\n", double(witness.get_cost()));
                               if (witness.get_cost() == binding_cost)
                                   inspect_rule_witness(witness);
                           });
