@@ -682,7 +682,7 @@ void merge_worker_results(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
         for (auto& worker : ws_rule->worker)
         {
             std::visit(
-                [&](const auto& head_iteration)
+                [&](auto& head_iteration)
                 {
                     using HeadIteration = std::decay_t<decltype(head_iteration)>;
 

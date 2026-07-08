@@ -113,18 +113,7 @@ struct FunctionHeadIteration
     const std::vector<FunctionHeadUpdate>& get_sorted_updates()
     {
         sorted_updates.assign(updates.begin(), updates.end());
-        std::sort(sorted_updates.begin(),
-                  sorted_updates.end(),
-                  [](const auto& lhs, const auto& rhs)
-                  {
-                      if (lhs.row != rhs.row)
-                          return lhs.row < rhs.row;
-                      if (lower(lhs.interval) != lower(rhs.interval))
-                          return lower(lhs.interval) < lower(rhs.interval);
-                      if (upper(lhs.interval) != upper(rhs.interval))
-                          return upper(lhs.interval) < upper(rhs.interval);
-                      return lhs.cost < rhs.cost;
-                  });
+        std::sort(sorted_updates.begin(), sorted_updates.end(), ygg::Less<FunctionHeadUpdate> {});
         return sorted_updates;
     }
 };
