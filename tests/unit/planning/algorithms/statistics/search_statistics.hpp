@@ -88,9 +88,13 @@ void expect_statistics(const SearchStatistics& expected, const planning::Statist
 
     ASSERT_EQ(result.plan.has_value(), expected.plan_length.has_value());
     if (expected.plan_length)
+    {
         EXPECT_EQ(result.plan->get_length(), *expected.plan_length);
+    }
     if (expected.plan_cost)
-        EXPECT_EQ(result.plan->get_cost(), *expected.plan_cost);
+    {
+        EXPECT_DOUBLE_EQ(static_cast<double>(result.plan->get_cost()), static_cast<double>(*expected.plan_cost));
+    }
 }
 
 inline planning::SearchStatus parse_search_status(const std::string& status)

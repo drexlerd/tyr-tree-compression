@@ -86,8 +86,8 @@
                 "plan_cost": 4
             },
             "lifted": {
-                "num_generated": 24,
-                "num_expanded": 20,
+                "num_generated": 22,
+                "num_expanded": 17,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -107,7 +107,7 @@
                 "plan_cost": 4
             },
             "lifted": {
-                "num_generated": 9,
+                "num_generated": 10,
                 "num_expanded": 7,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -149,8 +149,8 @@
                 "plan_cost": 4
             },
             "lifted": {
-                "num_generated": 9,
-                "num_expanded": 7,
+                "num_generated": 7,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -233,8 +233,8 @@
                 "plan_cost": 3
             },
             "lifted": {
-                "num_generated": 12,
-                "num_expanded": 7,
+                "num_generated": 15,
+                "num_expanded": 11,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -380,8 +380,8 @@
                 "plan_cost": 6
             },
             "lifted": {
-                "num_generated": 5123,
-                "num_expanded": 4334,
+                "num_generated": 5151,
+                "num_expanded": 4395,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 6,
@@ -422,8 +422,8 @@
                 "plan_cost": 4
             },
             "lifted": {
-                "num_generated": 351,
-                "num_expanded": 77,
+                "num_generated": 309,
+                "num_expanded": 62,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -494,8 +494,8 @@
                 "plan_cost": 7
             },
             "lifted": {
-                "num_generated": 108,
-                "num_expanded": 48,
+                "num_generated": 109,
+                "num_expanded": 49,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -587,8 +587,8 @@
                 "plan_cost": 8
             },
             "lifted": {
-                "num_generated": 42,
-                "num_expanded": 36,
+                "num_generated": 47,
+                "num_expanded": 41,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 8,
@@ -608,8 +608,8 @@
                 "plan_cost": 9
             },
             "lifted": {
-                "num_generated": 11212,
-                "num_expanded": 7444,
+                "num_generated": 11057,
+                "num_expanded": 7295,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
@@ -629,8 +629,8 @@
                 "plan_cost": 5
             },
             "lifted": {
-                "num_generated": 204,
-                "num_expanded": 71,
+                "num_generated": 252,
+                "num_expanded": 93,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
@@ -672,7 +672,7 @@
             },
             "lifted": {
                 "num_generated": 333,
-                "num_expanded": 314,
+                "num_expanded": 312,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 10,
@@ -692,8 +692,8 @@
                 "plan_cost": 7
             },
             "lifted": {
-                "num_generated": 379,
-                "num_expanded": 227,
+                "num_generated": 488,
+                "num_expanded": 288,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -734,8 +734,8 @@
                 "plan_cost": 2
             },
             "lifted": {
-                "num_generated": 58,
-                "num_expanded": 4,
+                "num_generated": 25,
+                "num_expanded": 2,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -776,8 +776,8 @@
                 "plan_cost": 3
             },
             "lifted": {
-                "num_generated": 490,
-                "num_expanded": 85,
+                "num_generated": 549,
+                "num_expanded": 96,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -818,7 +818,7 @@
                 "plan_cost": 1
             },
             "lifted": {
-                "num_generated": 2,
+                "num_generated": 1,
                 "num_expanded": 1,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -839,8 +839,8 @@
                 "plan_cost": 8
             },
             "lifted": {
-                "num_generated": 6188,
-                "num_expanded": 3839,
+                "num_generated": 5817,
+                "num_expanded": 3474,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 8,
@@ -944,7 +944,7 @@
                 "plan_cost": 2
             },
             "lifted": {
-                "num_generated": 51,
+                "num_generated": 49,
                 "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -965,7 +965,7 @@
                 "plan_cost": 4
             },
             "lifted": {
-                "num_generated": 2912,
+                "num_generated": 2913,
                 "num_expanded": 890,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -986,8 +986,8 @@
                 "plan_cost": 2
             },
             "lifted": {
-                "num_generated": 47,
-                "num_expanded": 3,
+                "num_generated": 152,
+                "num_expanded": 17,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -1070,8 +1070,8 @@
                 "plan_cost": 3
             },
             "lifted": {
-                "num_generated": 655,
-                "num_expanded": 132,
+                "num_generated": 647,
+                "num_expanded": 128,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,

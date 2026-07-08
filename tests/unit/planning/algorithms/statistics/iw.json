@@ -65,8 +65,8 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 4,
                 "expected_solution_arity": 2,
-                "num_generated": 31,
-                "num_expanded": 30,
+                "num_generated": 30,
+                "num_expanded": 28,
                 "num_deadends": 0,
                 "num_pruned": 11
             }
@@ -88,7 +88,7 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 4,
                 "expected_solution_arity": 2,
-                "num_generated": 19,
+                "num_generated": 20,
                 "num_expanded": 19,
                 "num_deadends": 0,
                 "num_pruned": 7
@@ -153,8 +153,8 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 4,
                 "expected_solution_arity": 2,
-                "num_generated": 15,
-                "num_expanded": 15,
+                "num_generated": 13,
+                "num_expanded": 14,
                 "num_deadends": 0,
                 "num_pruned": 4
             }
@@ -218,10 +218,10 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 3,
                 "expected_solution_arity": 2,
-                "num_generated": 22,
-                "num_expanded": 19,
+                "num_generated": 23,
+                "num_expanded": 23,
                 "num_deadends": 0,
-                "num_pruned": 12
+                "num_pruned": 14
             }
         },
         {
@@ -371,10 +371,10 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 6,
                 "expected_solution_arity": 2,
-                "num_generated": 709,
-                "num_expanded": 604,
+                "num_generated": 727,
+                "num_expanded": 605,
                 "num_deadends": 0,
-                "num_pruned": 4433
+                "num_pruned": 4431
             }
         },
         {
@@ -478,8 +478,8 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 7,
                 "expected_solution_arity": 2,
-                "num_generated": 53,
-                "num_expanded": 45,
+                "num_generated": 54,
+                "num_expanded": 46,
                 "num_deadends": 0,
                 "num_pruned": 52
             }
@@ -501,10 +501,10 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 2,
                 "expected_solution_arity": 2,
-                "num_generated": 264,
-                "num_expanded": 91,
+                "num_generated": 277,
+                "num_expanded": 93,
                 "num_deadends": 0,
-                "num_pruned": 977
+                "num_pruned": 988
             }
         },
         {
@@ -570,10 +570,10 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 8,
                 "expected_solution_arity": 2,
-                "num_generated": 39,
-                "num_expanded": 39,
+                "num_generated": 41,
+                "num_expanded": 41,
                 "num_deadends": 0,
-                "num_pruned": 19
+                "num_pruned": 21
             }
         },
         {
@@ -592,7 +592,7 @@
                 "num_generated": 265,
                 "num_expanded": 268,
                 "num_deadends": 0,
-                "num_pruned": 1021
+                "num_pruned": 1015
             }
         },
         {
@@ -745,10 +745,10 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 3,
                 "expected_solution_arity": 2,
-                "num_generated": 279,
-                "num_expanded": 133,
+                "num_generated": 293,
+                "num_expanded": 144,
                 "num_deadends": 0,
-                "num_pruned": 693
+                "num_pruned": 739
             }
         },
         {
@@ -787,7 +787,7 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 1,
                 "expected_solution_arity": 0,
-                "num_generated": 2,
+                "num_generated": 1,
                 "num_expanded": 1,
                 "num_deadends": 0,
                 "num_pruned": 0
@@ -924,10 +924,10 @@
                 "expected_status": "SOLVED",
                 "expected_plan_length": 4,
                 "expected_solution_arity": 2,
-                "num_generated": 80,
-                "num_expanded": 64,
+                "num_generated": 74,
+                "num_expanded": 61,
                 "num_deadends": 0,
-                "num_pruned": 930
+                "num_pruned": 881
             }
         },
         {

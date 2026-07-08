@@ -134,7 +134,7 @@
             },
             "lifted_hmax": {
                 "num_generated": 120,
-                "num_expanded": 89,
+                "num_expanded": 86,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
@@ -149,15 +149,15 @@
                 "plan_cost": 29
             },
             "lifted_hff": {
-                "num_generated": 107,
-                "num_expanded": 77,
+                "num_generated": 121,
+                "num_expanded": 84,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
                 "plan_cost": 29
             },
             "lifted_hlmcut": {
-                "num_generated": 116,
+                "num_generated": 117,
                 "num_expanded": 73,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -1300,8 +1300,8 @@
                 "plan_cost": 6
             },
             "lifted_hmax": {
-                "num_generated": 583,
-                "num_expanded": 51,
+                "num_generated": 984,
+                "num_expanded": 130,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 6,
@@ -1324,8 +1324,8 @@
                 "plan_cost": 6
             },
             "lifted_hlmcut": {
-                "num_generated": 583,
-                "num_expanded": 51,
+                "num_generated": 984,
+                "num_expanded": 130,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 6,
@@ -1688,8 +1688,8 @@
                 "plan_cost": 7
             },
             "lifted_hmax": {
-                "num_generated": 50,
-                "num_expanded": 22,
+                "num_generated": 43,
+                "num_expanded": 19,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -1998,8 +1998,8 @@
                 "plan_cost": 8
             },
             "lifted_hmax": {
-                "num_generated": 31,
-                "num_expanded": 22,
+                "num_generated": 30,
+                "num_expanded": 21,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 8,
@@ -2067,7 +2067,7 @@
                 "plan_cost": 170
             },
             "lifted_blind": {
-                "num_generated": 14204,
+                "num_generated": 14209,
                 "num_expanded": 10685,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2075,7 +2075,7 @@
                 "plan_cost": 170
             },
             "lifted_hadd": {
-                "num_generated": 430,
+                "num_generated": 428,
                 "num_expanded": 87,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2142,7 +2142,7 @@
                 "plan_cost": 5
             },
             "lifted_hmax": {
-                "num_generated": 73,
+                "num_generated": 72,
                 "num_expanded": 21,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2150,7 +2150,7 @@
                 "plan_cost": 5
             },
             "lifted_hadd": {
-                "num_generated": 49,
+                "num_generated": 43,
                 "num_expanded": 10,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2166,7 +2166,7 @@
                 "plan_cost": 5
             },
             "lifted_hlmcut": {
-                "num_generated": 73,
+                "num_generated": 72,
                 "num_expanded": 21,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2397,7 +2397,7 @@
                 "plan_cost": 1833
             },
             "lifted_hmax": {
-                "num_generated": 269,
+                "num_generated": 268,
                 "num_expanded": 105,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2474,19 +2474,19 @@
                 "plan_cost": 5952
             },
             "lifted_blind": {
-                "num_generated": 381,
-                "num_expanded": 196,
+                "num_generated": 398,
+                "num_expanded": 203,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 5952
             },
             "lifted_hmax": {
-                "num_generated": 97,
-                "num_expanded": 37,
+                "num_generated": 106,
+                "num_expanded": 40,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 9,
+                "plan_length": 10,
                 "plan_cost": 5952
             },
             "lifted_hadd": {
@@ -2668,8 +2668,8 @@
                 "plan_cost": 12
             },
             "lifted_hff": {
-                "num_generated": 2386,
-                "num_expanded": 1737,
+                "num_generated": 2968,
+                "num_expanded": 2242,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 12,
@@ -2737,16 +2737,16 @@
                 "plan_cost": 7
             },
             "lifted_hmax": {
-                "num_generated": 115,
-                "num_expanded": 9,
+                "num_generated": 136,
+                "num_expanded": 11,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
                 "plan_cost": 7
             },
             "lifted_hadd": {
-                "num_generated": 73,
-                "num_expanded": 5,
+                "num_generated": 86,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -2761,8 +2761,8 @@
                 "plan_cost": 7
             },
             "lifted_hlmcut": {
-                "num_generated": 115,
-                "num_expanded": 9,
+                "num_generated": 136,
+                "num_expanded": 11,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -3464,8 +3464,8 @@
                 "plan_cost": 4
             },
             "lifted_hff": {
-                "num_generated": 88,
-                "num_expanded": 4,
+                "num_generated": 109,
+                "num_expanded": 5,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -3610,43 +3610,43 @@
                 "plan_cost": 0
             },
             "lifted_blind": {
-                "num_generated": 646,
-                "num_expanded": 106,
+                "num_generated": 458,
+                "num_expanded": 70,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 11,
+                "plan_length": 9,
                 "plan_cost": 0
             },
             "lifted_hmax": {
-                "num_generated": 699,
-                "num_expanded": 118,
+                "num_generated": 456,
+                "num_expanded": 69,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 12,
+                "plan_length": 9,
                 "plan_cost": 0
             },
             "lifted_hadd": {
-                "num_generated": 699,
-                "num_expanded": 118,
+                "num_generated": 456,
+                "num_expanded": 69,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 12,
+                "plan_length": 9,
                 "plan_cost": 0
             },
             "lifted_hff": {
-                "num_generated": 44,
-                "num_expanded": 6,
+                "num_generated": 51,
+                "num_expanded": 7,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 0
             },
             "lifted_hlmcut": {
-                "num_generated": 699,
-                "num_expanded": 118,
+                "num_generated": 456,
+                "num_expanded": 69,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 12,
+                "plan_length": 9,
                 "plan_cost": 0
             }
         },
@@ -3719,8 +3719,8 @@
                 "plan_cost": 2
             },
             "lifted_hff": {
-                "num_generated": 60,
-                "num_expanded": 5,
+                "num_generated": 78,
+                "num_expanded": 7,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -3889,8 +3889,8 @@
                 "plan_cost": 3
             },
             "lifted_hff": {
-                "num_generated": 317,
-                "num_expanded": 34,
+                "num_generated": 200,
+                "num_expanded": 21,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
