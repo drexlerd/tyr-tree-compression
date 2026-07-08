@@ -640,11 +640,18 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
     m_rule_cut.clear();
     m_numeric_cut.clear();
 
+    // TYR_LMCUT_TRACE: the goal-zone seeding below matches recomputed costs against goal_cost with
+    // exact floating-point equality; hexfloat output makes a single-ulp cross-platform mismatch visible.
+    const bool trace = std::getenv("TYR_LMCUT_TRACE") != nullptr;
     const auto goal_cost = get_goal_cost();
+    if (trace)
+        fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed goal_cost={:a} expanded=1\n", double(goal_cost));
     if (const auto& goal = m_workspace.tp.get_goal())
     {
         for (const auto literal : goal->get_literals<::tyr::formalism::FluentTag>())
         {
+            if (trace && literal.get_polarity())
+                fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed literal binding_cost={:a}\n", double(get_binding_cost(literal.get_atom().get_row())));
             if (literal.get_polarity() && get_binding_cost(literal.get_atom().get_row()) == goal_cost)
             {
                 mark_goal_zone(literal.get_atom().get_row());
@@ -655,14 +662,24 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
         auto selection_workspace = datalog::NumericSupportSelectorWorkspace {};
         for (const auto constraint : goal->get_numeric_constraints())
         {
-            if (m_workspace.numeric_support_selector->get_constraint_cost(constraint, selection_workspace, datalog::MaxAggregation {}) != goal_cost)
+            const auto constraint_cost =
+                m_workspace.numeric_support_selector->get_constraint_cost(constraint, selection_workspace, datalog::MaxAggregation {});
+            if (trace)
+                fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed constraint_cost={:a}\n", double(constraint_cost));
+            if (constraint_cost != goal_cost)
                 continue;
 
             for (const auto& entry : selection_workspace.selection)
+            {
+                if (trace)
+                    fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed entry_cost={:a}\n", double(entry.cost));
                 if (entry.cost == goal_cost)
                     mark_goal_zone(NumericNode { entry.binding, entry.interval });
+            }
         }
     }
+    if (trace)
+        fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed goal_zone={} numeric_goal_zone={}\n", m_goal_zone.size(), m_numeric_goal_zone.size());
 
     auto inspect_rule_witness = [&](const auto& witness)
     {
