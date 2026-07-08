@@ -88,19 +88,20 @@ static SearchNode<Kind>& get_or_create_search_node(ygg::Index<State<Kind>> state
 template<TaskKind Kind>
 struct QueueEntry
 {
-    using KeyType = std::tuple<ygg::float_t, SearchNodeStatus>;
+    using KeyType = std::tuple<ygg::float_t, SearchNodeStatus, ygg::uint_t>;
     using ItemType = std::tuple<ygg::float_t, ygg::Index<State<Kind>>>;
 
     ygg::float_t f_value;
     ygg::Index<State<Kind>> state;
     SearchNodeStatus status;
+    ygg::uint_t step;
 
-    KeyType get_key() const { return std::make_tuple(f_value, status); }
+    KeyType get_key() const { return std::make_tuple(f_value, status, step); }
     ItemType get_item() const { return std::make_tuple(f_value, state); }
 };
 
-static_assert(sizeof(QueueEntry<LiftedTag>) == 16);
-static_assert(sizeof(QueueEntry<GroundTag>) == 16);
+static_assert(sizeof(QueueEntry<LiftedTag>) == 24);
+static_assert(sizeof(QueueEntry<GroundTag>) == 24);
 
 template<TaskKind Kind>
 using Queue = PriorityQueue<QueueEntry<Kind>>;
@@ -117,6 +118,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
     auto rng = std::mt19937_64(options.random_seed);
     auto& state_repository = *successor_generator.get_state_repository();
 
+    auto step = ygg::uint_t(0);
     auto result = SearchResult<Kind>();
     auto search_nodes = SearchNodeVector<Kind>();
     auto openlist = Queue<Kind>();
@@ -179,7 +181,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
     auto labeled_succ_nodes = std::vector<LabeledNode<Kind>> {};
     auto f_value = start_f_value;
-    openlist.insert(QueueEntry { start_f_value, start_state_index, start_search_node.status });
+    openlist.insert(QueueEntry { start_f_value, start_state_index, start_search_node.status, step++ });
 
     auto stopwatch = options.max_time ? std::optional<ygg::CountdownWatch>(options.max_time.value()) : std::nullopt;
 
@@ -312,7 +314,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
                 event_handler->on_generate_node_relaxed(node, normalized_labeled_succ_node);
 
                 const auto successor_f_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(successor_g_value + successor_h_value);
-                openlist.insert(QueueEntry { successor_f_value, succ_state_index, successor_search_node.status });
+                openlist.insert(QueueEntry { successor_f_value, succ_state_index, successor_search_node.status, step++ });
             }
             else
             {

@@ -157,8 +157,8 @@
                 "plan_cost": 29
             },
             "hmax_unit": {
-                "num_generated": 147,
-                "num_expanded": 105,
+                "num_generated": 153,
+                "num_expanded": 119,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
@@ -166,7 +166,7 @@
             },
             "hmax_general": {
                 "num_generated": 123,
-                "num_expanded": 93,
+                "num_expanded": 99,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
@@ -174,7 +174,7 @@
             },
             "hadd_unit": {
                 "num_generated": 52,
-                "num_expanded": 19,
+                "num_expanded": 20,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 14,
@@ -189,32 +189,32 @@
                 "plan_cost": 32
             },
             "hff_unit": {
-                "num_generated": 76,
-                "num_expanded": 35,
+                "num_generated": 88,
+                "num_expanded": 43,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
                 "plan_cost": 11
             },
             "hff_general": {
-                "num_generated": 97,
-                "num_expanded": 71,
+                "num_generated": 98,
+                "num_expanded": 72,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
                 "plan_cost": 29
             },
             "hlmcut_unit": {
-                "num_generated": 147,
-                "num_expanded": 105,
+                "num_generated": 153,
+                "num_expanded": 119,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
                 "plan_cost": 11
             },
             "hlmcut_general": {
-                "num_generated": 120,
-                "num_expanded": 85,
+                "num_generated": 123,
+                "num_expanded": 95,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 11,
@@ -598,16 +598,16 @@
                 "plan_cost": 9
             },
             "hadd_unit": {
-                "num_generated": 17,
-                "num_expanded": 12,
+                "num_generated": 18,
+                "num_expanded": 13,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 9
             },
             "hadd_general": {
-                "num_generated": 17,
-                "num_expanded": 12,
+                "num_generated": 18,
+                "num_expanded": 13,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
@@ -837,16 +837,16 @@
                 "plan_cost": 3
             },
             "hmax_unit": {
-                "num_generated": 11,
-                "num_expanded": 5,
+                "num_generated": 12,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
                 "plan_cost": 3
             },
             "hmax_general": {
-                "num_generated": 11,
-                "num_expanded": 5,
+                "num_generated": 12,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -885,16 +885,16 @@
                 "plan_cost": 3
             },
             "hlmcut_unit": {
-                "num_generated": 11,
-                "num_expanded": 5,
+                "num_generated": 12,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
                 "plan_cost": 3
             },
             "hlmcut_general": {
-                "num_generated": 11,
-                "num_expanded": 5,
+                "num_generated": 12,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -922,16 +922,16 @@
                 "plan_cost": 4
             },
             "hmax_unit": {
-                "num_generated": 20,
-                "num_expanded": 10,
+                "num_generated": 22,
+                "num_expanded": 12,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
                 "plan_cost": 4
             },
             "hmax_general": {
-                "num_generated": 20,
-                "num_expanded": 10,
+                "num_generated": 22,
+                "num_expanded": 12,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -970,16 +970,16 @@
                 "plan_cost": 4
             },
             "hlmcut_unit": {
-                "num_generated": 20,
-                "num_expanded": 10,
+                "num_generated": 22,
+                "num_expanded": 12,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
                 "plan_cost": 4
             },
             "hlmcut_general": {
-                "num_generated": 20,
-                "num_expanded": 10,
+                "num_generated": 22,
+                "num_expanded": 12,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -1092,16 +1092,16 @@
                 "plan_cost": 5
             },
             "hmax_unit": {
-                "num_generated": 12,
-                "num_expanded": 8,
+                "num_generated": 13,
+                "num_expanded": 9,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hmax_general": {
-                "num_generated": 12,
-                "num_expanded": 8,
+                "num_generated": 13,
+                "num_expanded": 9,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
@@ -1796,16 +1796,16 @@
                 "plan_cost": 7
             },
             "hmax_unit": {
-                "num_generated": 56,
-                "num_expanded": 25,
+                "num_generated": 58,
+                "num_expanded": 26,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
                 "plan_cost": 7
             },
             "hmax_general": {
-                "num_generated": 56,
-                "num_expanded": 25,
+                "num_generated": 58,
+                "num_expanded": 26,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -1924,16 +1924,16 @@
             "domain_file": "tests/classical/sokoban/domain.pddl",
             "task_file": "tests/classical/sokoban/test-1.pddl",
             "hff_unit": {
-                "num_generated": 1036,
-                "num_expanded": 479,
+                "num_generated": 807,
+                "num_expanded": 363,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 38,
                 "plan_cost": 38
             },
             "hff_general": {
-                "num_generated": 1036,
-                "num_expanded": 479,
+                "num_generated": 807,
+                "num_expanded": 363,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 38,
@@ -2056,8 +2056,8 @@
                 "plan_cost": 54
             },
             "hmax_unit": {
-                "num_generated": 73,
-                "num_expanded": 28,
+                "num_generated": 81,
+                "num_expanded": 35,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
@@ -2096,16 +2096,16 @@
                 "plan_cost": 5
             },
             "hff_general": {
-                "num_generated": 117,
-                "num_expanded": 55,
+                "num_generated": 122,
+                "num_expanded": 59,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 54
             },
             "hlmcut_unit": {
-                "num_generated": 30,
-                "num_expanded": 10,
+                "num_generated": 38,
+                "num_expanded": 14,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
@@ -2141,16 +2141,16 @@
                 "plan_cost": 8
             },
             "hmax_unit": {
-                "num_generated": 30,
-                "num_expanded": 21,
+                "num_generated": 31,
+                "num_expanded": 22,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 8,
                 "plan_cost": 8
             },
             "hmax_general": {
-                "num_generated": 30,
-                "num_expanded": 21,
+                "num_generated": 31,
+                "num_expanded": 22,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 8,
@@ -2218,7 +2218,7 @@
                 "plan_cost": 9
             },
             "blind_general": {
-                "num_generated": 14237,
+                "num_generated": 14144,
                 "num_expanded": 10685,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2226,47 +2226,47 @@
                 "plan_cost": 170
             },
             "hmax_unit": {
-                "num_generated": 3057,
-                "num_expanded": 1305,
+                "num_generated": 3766,
+                "num_expanded": 2032,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 9
             },
             "hmax_general": {
-                "num_generated": 2909,
-                "num_expanded": 1267,
+                "num_generated": 3159,
+                "num_expanded": 1488,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 170
             },
             "hadd_unit": {
-                "num_generated": 272,
-                "num_expanded": 62,
+                "num_generated": 506,
+                "num_expanded": 115,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 10,
                 "plan_cost": 10
             },
             "hadd_general": {
-                "num_generated": 427,
-                "num_expanded": 88,
+                "num_generated": 439,
+                "num_expanded": 89,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 10,
                 "plan_cost": 180
             },
             "hff_unit": {
-                "num_generated": 448,
-                "num_expanded": 73,
+                "num_generated": 571,
+                "num_expanded": 95,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 9
             },
             "hff_general": {
-                "num_generated": 4544,
+                "num_generated": 4542,
                 "num_expanded": 2900,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2274,8 +2274,8 @@
                 "plan_cost": 170
             },
             "hlmcut_unit": {
-                "num_generated": 288,
-                "num_expanded": 40,
+                "num_generated": 769,
+                "num_expanded": 129,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
@@ -2306,39 +2306,39 @@
                 "plan_cost": 5
             },
             "hmax_unit": {
-                "num_generated": 149,
-                "num_expanded": 46,
+                "num_generated": 120,
+                "num_expanded": 43,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hmax_general": {
-                "num_generated": 149,
-                "num_expanded": 46,
+                "num_generated": 120,
+                "num_expanded": 43,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hadd_unit": {
-                "num_generated": 41,
-                "num_expanded": 9,
+                "num_generated": 59,
+                "num_expanded": 17,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hadd_general": {
-                "num_generated": 41,
-                "num_expanded": 9,
+                "num_generated": 59,
+                "num_expanded": 17,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hff_unit": {
-                "num_generated": 129,
+                "num_generated": 128,
                 "num_expanded": 39,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2346,7 +2346,7 @@
                 "plan_cost": 5
             },
             "hff_general": {
-                "num_generated": 129,
+                "num_generated": 128,
                 "num_expanded": 39,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2354,16 +2354,16 @@
                 "plan_cost": 5
             },
             "hlmcut_unit": {
-                "num_generated": 143,
-                "num_expanded": 45,
+                "num_generated": 103,
+                "num_expanded": 34,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hlmcut_general": {
-                "num_generated": 143,
-                "num_expanded": 45,
+                "num_generated": 103,
+                "num_expanded": 34,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
@@ -2561,15 +2561,15 @@
                 "plan_cost": 1833
             },
             "hmax_unit": {
-                "num_generated": 307,
-                "num_expanded": 125,
+                "num_generated": 346,
+                "num_expanded": 165,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
                 "plan_cost": 7
             },
             "hmax_general": {
-                "num_generated": 336,
+                "num_generated": 331,
                 "num_expanded": 146,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2577,8 +2577,8 @@
                 "plan_cost": 1833
             },
             "hadd_unit": {
-                "num_generated": 57,
-                "num_expanded": 13,
+                "num_generated": 72,
+                "num_expanded": 17,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -2593,8 +2593,8 @@
                 "plan_cost": 2012.93
             },
             "hff_unit": {
-                "num_generated": 158,
-                "num_expanded": 71,
+                "num_generated": 159,
+                "num_expanded": 74,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -2609,16 +2609,16 @@
                 "plan_cost": 1833
             },
             "hlmcut_unit": {
-                "num_generated": 164,
-                "num_expanded": 68,
+                "num_generated": 249,
+                "num_expanded": 97,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
                 "plan_cost": 7
             },
             "hlmcut_general": {
-                "num_generated": 151,
-                "num_expanded": 57,
+                "num_generated": 156,
+                "num_expanded": 58,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -2638,48 +2638,48 @@
                 "plan_cost": 9
             },
             "blind_general": {
-                "num_generated": 382,
-                "num_expanded": 200,
+                "num_generated": 452,
+                "num_expanded": 252,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 11,
+                "plan_length": 9,
                 "plan_cost": 5952
             },
             "hmax_unit": {
-                "num_generated": 504,
-                "num_expanded": 222,
+                "num_generated": 580,
+                "num_expanded": 278,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 9
             },
             "hmax_general": {
-                "num_generated": 92,
-                "num_expanded": 37,
+                "num_generated": 151,
+                "num_expanded": 66,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 5952
             },
             "hadd_unit": {
-                "num_generated": 41,
-                "num_expanded": 12,
+                "num_generated": 47,
+                "num_expanded": 14,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 9
             },
             "hadd_general": {
-                "num_generated": 49,
-                "num_expanded": 14,
+                "num_generated": 58,
+                "num_expanded": 23,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 5952
             },
             "hff_unit": {
-                "num_generated": 74,
-                "num_expanded": 25,
+                "num_generated": 79,
+                "num_expanded": 27,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
@@ -2694,19 +2694,19 @@
                 "plan_cost": 5952
             },
             "hlmcut_unit": {
-                "num_generated": 140,
-                "num_expanded": 51,
+                "num_generated": 137,
+                "num_expanded": 52,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,
                 "plan_cost": 9
             },
             "hlmcut_general": {
-                "num_generated": 84,
-                "num_expanded": 35,
+                "num_generated": 87,
+                "num_expanded": 36,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 10,
+                "plan_length": 9,
                 "plan_cost": 5952
             }
         },
@@ -2731,8 +2731,8 @@
                 "plan_cost": 2
             },
             "hmax_unit": {
-                "num_generated": 155,
-                "num_expanded": 11,
+                "num_generated": 100,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -2779,8 +2779,8 @@
                 "plan_cost": 2
             },
             "hlmcut_unit": {
-                "num_generated": 155,
-                "num_expanded": 11,
+                "num_generated": 100,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -2816,8 +2816,8 @@
                 "plan_cost": 12
             },
             "hmax_unit": {
-                "num_generated": 2491,
-                "num_expanded": 1668,
+                "num_generated": 2946,
+                "num_expanded": 2134,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 12,
@@ -2832,8 +2832,8 @@
                 "plan_cost": 12
             },
             "hadd_unit": {
-                "num_generated": 808,
-                "num_expanded": 326,
+                "num_generated": 1195,
+                "num_expanded": 555,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 12,
@@ -2848,7 +2848,7 @@
                 "plan_cost": 12
             },
             "hff_unit": {
-                "num_generated": 2991,
+                "num_generated": 2990,
                 "num_expanded": 2203,
                 "num_deadends": 0,
                 "num_pruned": 0,
@@ -2864,8 +2864,8 @@
                 "plan_cost": 12
             },
             "hlmcut_unit": {
-                "num_generated": 2401,
-                "num_expanded": 1510,
+                "num_generated": 2829,
+                "num_expanded": 1963,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 12,
@@ -2901,16 +2901,16 @@
                 "plan_cost": 7
             },
             "hmax_unit": {
-                "num_generated": 92,
-                "num_expanded": 7,
+                "num_generated": 181,
+                "num_expanded": 22,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
                 "plan_cost": 3
             },
             "hmax_general": {
-                "num_generated": 134,
-                "num_expanded": 11,
+                "num_generated": 176,
+                "num_expanded": 18,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -2949,8 +2949,8 @@
                 "plan_cost": 7
             },
             "hlmcut_unit": {
-                "num_generated": 92,
-                "num_expanded": 7,
+                "num_generated": 181,
+                "num_expanded": 22,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
@@ -2986,8 +2986,8 @@
                 "plan_cost": 4
             },
             "hmax_unit": {
-                "num_generated": 37,
-                "num_expanded": 10,
+                "num_generated": 43,
+                "num_expanded": 16,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -3018,24 +3018,24 @@
                 "plan_cost": 4
             },
             "hff_unit": {
-                "num_generated": 25,
-                "num_expanded": 6,
+                "num_generated": 31,
+                "num_expanded": 9,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
                 "plan_cost": 4
             },
             "hff_general": {
-                "num_generated": 25,
-                "num_expanded": 6,
+                "num_generated": 31,
+                "num_expanded": 9,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
                 "plan_cost": 4
             },
             "hlmcut_unit": {
-                "num_generated": 20,
-                "num_expanded": 6,
+                "num_generated": 31,
+                "num_expanded": 9,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -3155,15 +3155,8 @@
                 "plan_length": 8,
                 "plan_cost": 8
             },
-            "hmax_unit": {
-                "num_generated": 1237,
-                "num_expanded": 340,
-                "num_deadends": 0,
-                "num_pruned": 0,
-                "plan_length": 8,
-                "plan_cost": 8
-            },
             "skipped": {
+                "hmax_unit": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hmax_general": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hadd_unit": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hadd_general": "status OUT_OF_TIME within 1.0s/1000000 states",
@@ -3396,16 +3389,16 @@
                 "plan_cost": 2
             },
             "hff_unit": {
-                "num_generated": 22,
-                "num_expanded": 3,
+                "num_generated": 27,
+                "num_expanded": 4,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
                 "plan_cost": 2
             },
             "hff_general": {
-                "num_generated": 22,
-                "num_expanded": 3,
+                "num_generated": 27,
+                "num_expanded": 4,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -3534,8 +3527,8 @@
                 "plan_cost": 2
             },
             "hmax_unit": {
-                "num_generated": 55,
-                "num_expanded": 6,
+                "num_generated": 32,
+                "num_expanded": 3,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -3582,8 +3575,8 @@
                 "plan_cost": 2
             },
             "hlmcut_unit": {
-                "num_generated": 55,
-                "num_expanded": 6,
+                "num_generated": 32,
+                "num_expanded": 3,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -3619,8 +3612,8 @@
                 "plan_cost": 4
             },
             "hmax_unit": {
-                "num_generated": 504,
-                "num_expanded": 50,
+                "num_generated": 538,
+                "num_expanded": 61,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -3667,8 +3660,8 @@
                 "plan_cost": 4
             },
             "hlmcut_unit": {
-                "num_generated": 504,
-                "num_expanded": 50,
+                "num_generated": 538,
+                "num_expanded": 61,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -3781,75 +3774,75 @@
                 "plan_cost": 5
             },
             "blind_general": {
-                "num_generated": 1638,
-                "num_expanded": 620,
+                "num_generated": 1798,
+                "num_expanded": 509,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 13,
+                "plan_length": 5,
                 "plan_cost": 0
             },
             "hmax_unit": {
-                "num_generated": 171,
-                "num_expanded": 26,
+                "num_generated": 477,
+                "num_expanded": 82,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hmax_general": {
-                "num_generated": 1676,
-                "num_expanded": 274,
+                "num_generated": 1798,
+                "num_expanded": 509,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 12,
+                "plan_length": 5,
                 "plan_cost": 0
             },
             "hadd_unit": {
-                "num_generated": 70,
-                "num_expanded": 10,
+                "num_generated": 89,
+                "num_expanded": 13,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hadd_general": {
-                "num_generated": 1676,
-                "num_expanded": 274,
+                "num_generated": 1798,
+                "num_expanded": 509,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 12,
+                "plan_length": 5,
                 "plan_cost": 0
             },
             "hff_unit": {
-                "num_generated": 70,
-                "num_expanded": 10,
+                "num_generated": 89,
+                "num_expanded": 13,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hff_general": {
-                "num_generated": 49,
-                "num_expanded": 6,
+                "num_generated": 54,
+                "num_expanded": 7,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 0
             },
             "hlmcut_unit": {
-                "num_generated": 70,
-                "num_expanded": 10,
+                "num_generated": 89,
+                "num_expanded": 13,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
                 "plan_cost": 5
             },
             "hlmcut_general": {
-                "num_generated": 1676,
-                "num_expanded": 274,
+                "num_generated": 1798,
+                "num_expanded": 509,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 12,
+                "plan_length": 5,
                 "plan_cost": 0
             }
         },
@@ -3906,16 +3899,16 @@
                 "plan_cost": 2
             },
             "hff_unit": {
-                "num_generated": 78,
-                "num_expanded": 7,
+                "num_generated": 69,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
                 "plan_cost": 2
             },
             "hff_general": {
-                "num_generated": 78,
-                "num_expanded": 7,
+                "num_generated": 69,
+                "num_expanded": 6,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -4076,8 +4069,8 @@
                 "plan_cost": 3
             },
             "hff_general": {
-                "num_generated": 259,
-                "num_expanded": 28,
+                "num_generated": 529,
+                "num_expanded": 75,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,
