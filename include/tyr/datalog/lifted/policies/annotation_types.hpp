@@ -45,7 +45,7 @@ struct NumericSupport<LiftedTag>
     auto get_interval() const noexcept { return interval; }
     auto get_cost() const noexcept { return cost; }
 
-    auto identifying_members() const noexcept { return std::make_tuple(binding, lower(interval), upper(interval)); }
+    auto identifying_members() const noexcept { return std::make_tuple(binding, lower(interval), upper(interval), cost); }
 };
 
 template<>
@@ -65,6 +65,7 @@ public:
         m_cost(cost),
         m_numeric_supports(std::move(numeric_supports))
     {
+        std::sort(m_numeric_supports.begin(), m_numeric_supports.end(), ygg::Less<NumericSupport<LiftedTag>> {});
     }
 
     auto get_rule_row() const noexcept { return m_rule_row; }
@@ -72,7 +73,7 @@ public:
     auto get_cost() const noexcept { return m_cost; }
     const auto& get_numeric_supports() const noexcept { return m_numeric_supports; }
 
-    auto identifying_members() const noexcept { return std::tie(m_rule_row); }
+    auto identifying_members() const noexcept { return std::tie(m_rule_row, m_metric, m_cost, m_numeric_supports); }
 
 private:
     ::tyr::formalism::datalog::RuleBindingView m_rule_row;
@@ -180,31 +181,9 @@ public:
         if (empty(interval))
             return;
 
-        // Entries are cost-sorted; equal-cost entries are further ordered canonically (interval bounds,
-        // then witness rule binding) instead of insertion order, so the candidate order downstream
-        // consumers see is independent of the platform-unspecified processing order.
-        const auto less = [](const Entry& lhs, const Entry& rhs)
-        {
-            const auto lhs_cost = get_cost(lhs.annotation);
-            const auto rhs_cost = get_cost(rhs.annotation);
-            if (lhs_cost != rhs_cost)
-                return lhs_cost < rhs_cost;
-            if (lower(lhs.interval) != lower(rhs.interval))
-                return lower(lhs.interval) < lower(rhs.interval);
-            if (upper(lhs.interval) != upper(rhs.interval))
-                return upper(lhs.interval) < upper(rhs.interval);
-            const auto* lhs_witness = std::get_if<WitnessAnnotation<LiftedTag>>(&lhs.annotation);
-            const auto* rhs_witness = std::get_if<WitnessAnnotation<LiftedTag>>(&rhs.annotation);
-            if (!lhs_witness || !rhs_witness)
-                return !lhs_witness && rhs_witness;  ///< BaseAnnotation (initial fact) sorts first
-            // DeltaKPKC already canonicalizes worker output; identity ordering only stabilizes ties
-            // without dereferencing through a possibly different repository layer.
-            return ygg::Less<::tyr::formalism::datalog::RuleBindingView> {}(lhs_witness->get_rule_row(), rhs_witness->get_rule_row());
-        };
-
         auto entry = Entry { interval, std::move(annotation) };
         auto& entries = m_partitions[binding.get_relation()][binding.get_index().row];
-        entries.insert(std::upper_bound(entries.begin(), entries.end(), entry, less), std::move(entry));
+        entries.insert(std::upper_bound(entries.begin(), entries.end(), entry, ygg::Less<Entry> {}), std::move(entry));
         ++m_size;
     }
 

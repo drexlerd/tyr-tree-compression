@@ -2374,7 +2374,7 @@
             },
             "hlmcut_unit": {
                 "num_generated": 44,
-                "num_expanded": 13,
+                "num_expanded": 12,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
@@ -2382,7 +2382,7 @@
             },
             "hlmcut_general": {
                 "num_generated": 44,
-                "num_expanded": 13,
+                "num_expanded": 12,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 5,
@@ -2628,8 +2628,8 @@
                 "plan_cost": 2078.96
             },
             "hlmcut_unit": {
-                "num_generated": 62,
-                "num_expanded": 28,
+                "num_generated": 46,
+                "num_expanded": 25,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 7,
@@ -2875,16 +2875,16 @@
                 "plan_cost": 12
             },
             "hff_general": {
-                "num_generated": 1209,
-                "num_expanded": 704,
+                "num_generated": 489,
+                "num_expanded": 206,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 12,
-                "plan_cost": 12
+                "plan_length": 18,
+                "plan_cost": 18
             },
             "hlmcut_unit": {
-                "num_generated": 659,
-                "num_expanded": 234,
+                "num_generated": 720,
+                "num_expanded": 274,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 12,
@@ -3045,8 +3045,8 @@
                 "plan_cost": 4
             },
             "hff_general": {
-                "num_generated": 19,
-                "num_expanded": 5,
+                "num_generated": 30,
+                "num_expanded": 9,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 4,
@@ -3182,19 +3182,12 @@
                 "plan_length": 12,
                 "plan_cost": 12
             },
-            "hff_general": {
-                "num_generated": 2130,
-                "num_expanded": 664,
-                "num_deadends": 0,
-                "num_pruned": 0,
-                "plan_length": 8,
-                "plan_cost": 8
-            },
             "skipped": {
                 "hmax_general": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hadd_unit": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hadd_general": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hff_unit": "status OUT_OF_TIME within 1.0s/1000000 states",
+                "hff_general": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hlmcut_unit": "status OUT_OF_TIME within 1.0s/1000000 states",
                 "hlmcut_general": "status OUT_OF_TIME within 1.0s/1000000 states"
             }
@@ -3430,8 +3423,8 @@
                 "plan_cost": 2
             },
             "hff_general": {
-                "num_generated": 25,
-                "num_expanded": 4,
+                "num_generated": 14,
+                "num_expanded": 2,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -3935,8 +3928,8 @@
                 "plan_cost": 2
             },
             "hff_general": {
-                "num_generated": 68,
-                "num_expanded": 6,
+                "num_generated": 121,
+                "num_expanded": 11,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 2,
@@ -4105,8 +4098,8 @@
                 "plan_cost": 3
             },
             "hff_general": {
-                "num_generated": 53,
-                "num_expanded": 4,
+                "num_generated": 117,
+                "num_expanded": 10,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 3,

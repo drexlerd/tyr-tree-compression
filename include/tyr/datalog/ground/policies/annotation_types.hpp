@@ -43,7 +43,7 @@ struct NumericSupport<GroundTag>
     auto get_interval() const noexcept { return interval; }
     auto get_cost() const noexcept { return cost; }
 
-    auto identifying_members() const noexcept { return std::make_tuple(term, lower(interval), upper(interval)); }
+    auto identifying_members() const noexcept { return std::make_tuple(term, lower(interval), upper(interval), cost); }
 };
 
 template<>
@@ -62,6 +62,7 @@ struct WitnessAnnotation<GroundTag>
         cost(cost_),
         numeric_supports(std::move(numeric_supports_))
     {
+        std::sort(numeric_supports.begin(), numeric_supports.end(), ygg::Less<NumericSupport<GroundTag>> {});
     }
 
     auto get_rule() const noexcept { return rule; }
@@ -69,7 +70,7 @@ struct WitnessAnnotation<GroundTag>
     auto get_cost() const noexcept { return cost; }
     const auto& get_numeric_supports() const noexcept { return numeric_supports; }
 
-    auto identifying_members() const noexcept { return std::tie(rule); }
+    auto identifying_members() const noexcept { return std::tie(rule, metric, cost, numeric_supports); }
 
 private:
     ::tyr::formalism::datalog::GroundRuleView rule;
@@ -158,10 +159,9 @@ public:
         if (empty(interval))
             return;
 
+        auto entry = Entry { interval, std::move(annotation) };
         auto& entries = m_partitions[binding.get_function()][binding.get_index()];
-        const auto cost = get_cost(annotation);
-        entries.insert(std::upper_bound(entries.begin(), entries.end(), cost, [](Cost lhs, const Entry& rhs) { return lhs < get_cost(rhs.annotation); }),
-                       Entry { interval, std::move(annotation) });
+        entries.insert(std::upper_bound(entries.begin(), entries.end(), entry, ygg::Less<Entry> {}), std::move(entry));
         ++m_size;
     }
 

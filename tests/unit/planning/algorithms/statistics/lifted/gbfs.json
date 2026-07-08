@@ -2622,12 +2622,12 @@
                 "plan_cost": 9
             },
             "hlmcut_general": {
-                "num_generated": 48,
-                "num_expanded": 17,
+                "num_generated": 35,
+                "num_expanded": 18,
                 "num_deadends": 0,
                 "num_pruned": 0,
-                "plan_length": 8,
-                "plan_cost": 2099.98
+                "plan_length": 9,
+                "plan_cost": 2247.89
             }
         },
         {

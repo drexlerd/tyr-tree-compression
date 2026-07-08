@@ -2575,8 +2575,8 @@
                 "plan_cost": 7
             },
             "hlmcut_general": {
-                "num_generated": 125,
-                "num_expanded": 41,
+                "num_generated": 120,
+                "num_expanded": 35,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan_length": 9,

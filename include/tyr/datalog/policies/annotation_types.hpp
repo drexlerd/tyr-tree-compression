@@ -25,9 +25,11 @@
 #include <cassert>
 #include <limits>
 #include <optional>
+#include <tuple>
 #include <variant>
 #include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 
 namespace tyr::datalog
 {
@@ -53,6 +55,8 @@ public:
 
     auto get_metric() const noexcept { return m_metric; }
     auto get_cost() const noexcept { return m_cost; }
+
+    auto identifying_members() const noexcept { return std::tie(m_metric, m_cost); }
 
 private:
     Metric m_metric;
@@ -85,6 +89,8 @@ struct NumericIntervalAnnotation
 {
     ygg::ClosedInterval<ygg::float_t> interval;
     Annotation<Kind> annotation;
+
+    auto identifying_members() const noexcept { return std::make_tuple(get_cost(annotation), interval, annotation); }
 };
 
 template<TaskKind Kind>
