@@ -1,0 +1,1082 @@
+{
+    "prefix": "data/planning-benchmarks",
+    "cases": [
+        {
+            "name": "Agricola",
+            "domain_file": "tests/classical/agricola/domain.pddl",
+            "task_file": "tests/classical/agricola/test-1.pddl",
+            "skipped": {
+                "ground": "status OUT_OF_TIME within 1.0s/1000000 states",
+                "lifted": "status OUT_OF_TIME within 1.0s/1000000 states"
+            }
+        },
+        {
+            "name": "Airport",
+            "domain_file": "tests/classical/airport/domain.pddl",
+            "task_file": "tests/classical/airport/test-1.pddl",
+            "ground": {
+                "num_generated": 20,
+                "num_expanded": 17,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            },
+            "lifted": {
+                "num_generated": 18,
+                "num_expanded": 15,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            }
+        },
+        {
+            "name": "Assembly",
+            "domain_file": "tests/classical/assembly/domain.pddl",
+            "task_file": "tests/classical/assembly/test-1.pddl",
+            "ground": {
+                "num_generated": 1,
+                "num_expanded": 1,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 1,
+                "plan_cost": 1
+            },
+            "lifted": {
+                "num_generated": 1,
+                "num_expanded": 1,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 1,
+                "plan_cost": 1
+            }
+        },
+        {
+            "name": "Barman",
+            "domain_file": "tests/classical/barman/domain.pddl",
+            "task_file": "tests/classical/barman/test-1.pddl",
+            "ground": {
+                "num_generated": 237,
+                "num_expanded": 216,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 11,
+                "plan_cost": 11
+            },
+            "lifted": {
+                "num_generated": 237,
+                "num_expanded": 214,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 11,
+                "plan_cost": 11
+            }
+        },
+        {
+            "name": "Blocks3",
+            "domain_file": "tests/classical/blocks_3/domain.pddl",
+            "task_file": "tests/classical/blocks_3/test-1.pddl",
+            "ground": {
+                "num_generated": 24,
+                "num_expanded": 18,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 24,
+                "num_expanded": 20,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Blocks4",
+            "domain_file": "tests/classical/blocks_4/domain.pddl",
+            "task_file": "tests/classical/blocks_4/test-1.pddl",
+            "ground": {
+                "num_generated": 11,
+                "num_expanded": 8,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 9,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Childsnack",
+            "domain_file": "tests/classical/childsnack/domain.pddl",
+            "task_file": "tests/classical/childsnack/test-1.pddl",
+            "ground": {
+                "num_generated": 6,
+                "num_expanded": 6,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 6,
+                "num_expanded": 6,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Delivery",
+            "domain_file": "tests/classical/delivery/domain.pddl",
+            "task_file": "tests/classical/delivery/test-1.pddl",
+            "ground": {
+                "num_generated": 8,
+                "num_expanded": 6,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 9,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Driverlog",
+            "domain_file": "tests/classical/driverlog/domain.pddl",
+            "task_file": "tests/classical/driverlog/test-1.pddl",
+            "ground": {
+                "num_generated": 23,
+                "num_expanded": 23,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 9,
+                "plan_cost": 9
+            },
+            "lifted": {
+                "num_generated": 23,
+                "num_expanded": 23,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 9,
+                "plan_cost": 9
+            }
+        },
+        {
+            "name": "Ferry",
+            "domain_file": "tests/classical/ferry/domain.pddl",
+            "task_file": "tests/classical/ferry/test-1.pddl",
+            "ground": {
+                "num_generated": 14,
+                "num_expanded": 13,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            },
+            "lifted": {
+                "num_generated": 14,
+                "num_expanded": 13,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            }
+        },
+        {
+            "name": "Grid",
+            "domain_file": "tests/classical/grid/domain.pddl",
+            "task_file": "tests/classical/grid/test-1.pddl",
+            "ground": {
+                "num_generated": 11,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 11,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Gripper",
+            "domain_file": "tests/classical/gripper/domain.pddl",
+            "task_file": "tests/classical/gripper/test-1.pddl",
+            "ground": {
+                "num_generated": 12,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 3,
+                "plan_cost": 3
+            },
+            "lifted": {
+                "num_generated": 12,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 3,
+                "plan_cost": 3
+            }
+        },
+        {
+            "name": "Hiking",
+            "domain_file": "tests/classical/hiking/domain.pddl",
+            "task_file": "tests/classical/hiking/test-1.pddl",
+            "ground": {
+                "num_generated": 24,
+                "num_expanded": 22,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 24,
+                "num_expanded": 22,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Logistics",
+            "domain_file": "tests/classical/logistics/domain.pddl",
+            "task_file": "tests/classical/logistics/test-1.pddl",
+            "ground": {
+                "num_generated": 8,
+                "num_expanded": 8,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 8,
+                "num_expanded": 8,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Miconic",
+            "domain_file": "tests/classical/miconic/domain.pddl",
+            "task_file": "tests/classical/miconic/test-1.pddl",
+            "ground": {
+                "num_generated": 15,
+                "num_expanded": 12,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            },
+            "lifted": {
+                "num_generated": 14,
+                "num_expanded": 11,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            }
+        },
+        {
+            "name": "MiconicFulladl",
+            "domain_file": "tests/classical/miconic-fulladl/domain.pddl",
+            "task_file": "tests/classical/miconic-fulladl/test-1.pddl",
+            "ground": {
+                "num_generated": 45,
+                "num_expanded": 35,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            },
+            "lifted": {
+                "num_generated": 45,
+                "num_expanded": 35,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            }
+        },
+        {
+            "name": "MiconicSimpleadl",
+            "domain_file": "tests/classical/miconic-simpleadl/domain.pddl",
+            "task_file": "tests/classical/miconic-simpleadl/test-1.pddl",
+            "ground": {
+                "num_generated": 4,
+                "num_expanded": 4,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 4,
+                "num_expanded": 4,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Parcprinter",
+            "domain_file": "tests/classical/parcprinter/domain.pddl",
+            "task_file": "tests/classical/parcprinter/test-1.pddl",
+            "ground": {
+                "num_generated": 19,
+                "num_expanded": 16,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            },
+            "lifted": {
+                "num_generated": 23,
+                "num_expanded": 18,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            }
+        },
+        {
+            "name": "Pathways",
+            "domain_file": "tests/classical/pathways/domain.pddl",
+            "task_file": "tests/classical/pathways/test-1.pddl",
+            "ground": {
+                "num_generated": 4900,
+                "num_expanded": 3780,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 6,
+                "plan_cost": 6
+            },
+            "lifted": {
+                "num_generated": 5123,
+                "num_expanded": 4334,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 6,
+                "plan_cost": 6
+            }
+        },
+        {
+            "name": "Philosophers",
+            "domain_file": "tests/classical/philosophers/domain.pddl",
+            "task_file": "tests/classical/philosophers/test-1.pddl",
+            "ground": {
+                "num_generated": 130,
+                "num_expanded": 120,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 18,
+                "plan_cost": 18
+            },
+            "lifted": {
+                "num_generated": 125,
+                "num_expanded": 116,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 18,
+                "plan_cost": 18
+            }
+        },
+        {
+            "name": "PsrMiddle",
+            "domain_file": "tests/classical/psr-middle/domain.pddl",
+            "task_file": "tests/classical/psr-middle/test-1.pddl",
+            "ground": {
+                "num_generated": 284,
+                "num_expanded": 54,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 351,
+                "num_expanded": 77,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Pushworld",
+            "domain_file": "tests/classical/pushworld/domain.pddl",
+            "task_file": "tests/classical/pushworld/test-1.pddl",
+            "skipped": {
+                "ground": "status OUT_OF_TIME within 1.0s/1000000 states",
+                "lifted": "status OUT_OF_TIME within 1.0s/1000000 states"
+            }
+        },
+        {
+            "name": "Reward",
+            "domain_file": "tests/classical/reward/domain.pddl",
+            "task_file": "tests/classical/reward/test-1.pddl",
+            "ground": {
+                "num_generated": 8,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 8,
+                "num_expanded": 7,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Rovers",
+            "domain_file": "tests/classical/rovers/domain.pddl",
+            "task_file": "tests/classical/rovers/test-1.pddl",
+            "ground": {
+                "num_generated": 14,
+                "num_expanded": 10,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 14,
+                "num_expanded": 10,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Satellite",
+            "domain_file": "tests/classical/satellite/domain.pddl",
+            "task_file": "tests/classical/satellite/test-1.pddl",
+            "ground": {
+                "num_generated": 72,
+                "num_expanded": 32,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            },
+            "lifted": {
+                "num_generated": 108,
+                "num_expanded": 48,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            }
+        },
+        {
+            "name": "Schedule",
+            "domain_file": "tests/classical/schedule/domain.pddl",
+            "task_file": "tests/classical/schedule/test-1.pddl",
+            "ground": {
+                "num_generated": 46,
+                "num_expanded": 2,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 368,
+                "num_expanded": 22,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Sokoban",
+            "domain_file": "tests/classical/sokoban/domain.pddl",
+            "task_file": "tests/classical/sokoban/test-1.pddl",
+            "skipped": {
+                "ground": "status OUT_OF_TIME within 1.0s/1000000 states",
+                "lifted": "status OUT_OF_TIME within 1.0s/1000000 states"
+            }
+        },
+        {
+            "name": "Spanner",
+            "domain_file": "tests/classical/spanner/domain.pddl",
+            "task_file": "tests/classical/spanner/test-1.pddl",
+            "ground": {
+                "num_generated": 5,
+                "num_expanded": 5,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 5,
+                "num_expanded": 5,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Transport",
+            "domain_file": "tests/classical/transport/domain.pddl",
+            "task_file": "tests/classical/transport/test-1.pddl",
+            "ground": {
+                "num_generated": 130,
+                "num_expanded": 83,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            },
+            "lifted": {
+                "num_generated": 130,
+                "num_expanded": 83,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            }
+        },
+        {
+            "name": "Visitall",
+            "domain_file": "tests/classical/visitall/domain.pddl",
+            "task_file": "tests/classical/visitall/test-1.pddl",
+            "ground": {
+                "num_generated": 47,
+                "num_expanded": 41,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            },
+            "lifted": {
+                "num_generated": 42,
+                "num_expanded": 36,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            }
+        },
+        {
+            "name": "Woodworking",
+            "domain_file": "tests/classical/woodworking/domain.pddl",
+            "task_file": "tests/classical/woodworking/test-1.pddl",
+            "ground": {
+                "num_generated": 13170,
+                "num_expanded": 9379,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 9,
+                "plan_cost": 9
+            },
+            "lifted": {
+                "num_generated": 11212,
+                "num_expanded": 7444,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 9,
+                "plan_cost": 9
+            }
+        },
+        {
+            "name": "FoCounters",
+            "domain_file": "tests/numeric/fo-counters/domain.pddl",
+            "task_file": "tests/numeric/fo-counters/test-1.pddl",
+            "ground": {
+                "num_generated": 124,
+                "num_expanded": 46,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            },
+            "lifted": {
+                "num_generated": 204,
+                "num_expanded": 71,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            }
+        },
+        {
+            "name": "Refuel",
+            "domain_file": "tests/numeric/refuel/domain.pddl",
+            "task_file": "tests/numeric/refuel/test-1.pddl",
+            "ground": {
+                "num_generated": 5,
+                "num_expanded": 5,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            },
+            "lifted": {
+                "num_generated": 5,
+                "num_expanded": 5,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            }
+        },
+        {
+            "name": "RefuelAdl",
+            "domain_file": "tests/numeric/refuel-adl/domain.pddl",
+            "task_file": "tests/numeric/refuel-adl/test-1.pddl",
+            "ground": {
+                "num_generated": 322,
+                "num_expanded": 294,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 10,
+                "plan_cost": 10
+            },
+            "lifted": {
+                "num_generated": 333,
+                "num_expanded": 314,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 10,
+                "plan_cost": 10
+            }
+        },
+        {
+            "name": "Tpp",
+            "domain_file": "tests/numeric/tpp/domain.pddl",
+            "task_file": "tests/numeric/tpp/test-1.pddl",
+            "ground": {
+                "num_generated": 503,
+                "num_expanded": 308,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            },
+            "lifted": {
+                "num_generated": 379,
+                "num_expanded": 227,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 7,
+                "plan_cost": 7
+            }
+        },
+        {
+            "name": "Zenotravel",
+            "domain_file": "tests/numeric/zenotravel/domain.pddl",
+            "task_file": "tests/numeric/zenotravel/test-1.pddl",
+            "ground": {
+                "num_generated": 1270,
+                "num_expanded": 743,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 9,
+                "plan_cost": 9
+            },
+            "lifted": {
+                "num_generated": 1113,
+                "num_expanded": 642,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 9,
+                "plan_cost": 9
+            }
+        },
+        {
+            "name": "BlockGrouping",
+            "domain_file": "tests/numeric/block-grouping/domain.pddl",
+            "task_file": "tests/numeric/block-grouping/test-1.pddl",
+            "ground": {
+                "num_generated": 91,
+                "num_expanded": 6,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 58,
+                "num_expanded": 4,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Counters",
+            "domain_file": "tests/numeric/counters/domain.pddl",
+            "task_file": "tests/numeric/counters/test-1.pddl",
+            "ground": {
+                "num_generated": 3474,
+                "num_expanded": 2848,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 12,
+                "plan_cost": 12
+            },
+            "lifted": {
+                "num_generated": 3287,
+                "num_expanded": 2654,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 12,
+                "plan_cost": 12
+            }
+        },
+        {
+            "name": "NumericDelivery",
+            "domain_file": "tests/numeric/delivery/domain.pddl",
+            "task_file": "tests/numeric/delivery/test-1.pddl",
+            "ground": {
+                "num_generated": 275,
+                "num_expanded": 44,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 3,
+                "plan_cost": 3
+            },
+            "lifted": {
+                "num_generated": 490,
+                "num_expanded": 85,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 3,
+                "plan_cost": 3
+            }
+        },
+        {
+            "name": "Drone",
+            "domain_file": "tests/numeric/drone/domain.pddl",
+            "task_file": "tests/numeric/drone/test-1.pddl",
+            "ground": {
+                "num_generated": 53,
+                "num_expanded": 24,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 53,
+                "num_expanded": 24,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Expedition",
+            "domain_file": "tests/numeric/expedition/domain.pddl",
+            "task_file": "tests/numeric/expedition/test-1.pddl",
+            "ground": {
+                "num_generated": 5,
+                "num_expanded": 1,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 1,
+                "plan_cost": 1
+            },
+            "lifted": {
+                "num_generated": 2,
+                "num_expanded": 1,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 1,
+                "plan_cost": 1
+            }
+        },
+        {
+            "name": "ExtPlantWatering",
+            "domain_file": "tests/numeric/ext-plant-watering/domain.pddl",
+            "task_file": "tests/numeric/ext-plant-watering/test-1.pddl",
+            "ground": {
+                "num_generated": 6961,
+                "num_expanded": 4391,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            },
+            "lifted": {
+                "num_generated": 6188,
+                "num_expanded": 3839,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 8,
+                "plan_cost": 8
+            }
+        },
+        {
+            "name": "Farmland",
+            "domain_file": "tests/numeric/farmland/domain.pddl",
+            "task_file": "tests/numeric/farmland/test-1.pddl",
+            "ground": {
+                "num_generated": 6,
+                "num_expanded": 3,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 4,
+                "num_expanded": 2,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "FoFarmland",
+            "domain_file": "tests/numeric/fo-farmland/domain.pddl",
+            "task_file": "tests/numeric/fo-farmland/test-1.pddl",
+            "ground": {
+                "num_generated": 7,
+                "num_expanded": 2,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 5,
+                "num_expanded": 2,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "FoSailing",
+            "domain_file": "tests/numeric/fo-sailing/domain.pddl",
+            "task_file": "tests/numeric/fo-sailing/test-1.pddl",
+            "ground": {
+                "num_generated": 26,
+                "num_expanded": 4,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 35,
+                "num_expanded": 5,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Hydropower",
+            "domain_file": "tests/numeric/hydropower/domain.pddl",
+            "task_file": "tests/numeric/hydropower/test-1.pddl",
+            "ground": {
+                "num_generated": 5,
+                "num_expanded": 3,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 6,
+                "num_expanded": 3,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Markettrader",
+            "domain_file": "tests/numeric/markettrader/domain.pddl",
+            "task_file": "tests/numeric/markettrader/test-1.pddl",
+            "ground": {
+                "num_generated": 27,
+                "num_expanded": 3,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 51,
+                "num_expanded": 6,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Mprime",
+            "domain_file": "tests/numeric/mprime/domain.pddl",
+            "task_file": "tests/numeric/mprime/test-1.pddl",
+            "ground": {
+                "num_generated": 2901,
+                "num_expanded": 885,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            },
+            "lifted": {
+                "num_generated": 2912,
+                "num_expanded": 890,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 4,
+                "plan_cost": 4
+            }
+        },
+        {
+            "name": "Pathwaysmetric",
+            "domain_file": "tests/numeric/pathwaysmetric/domain.pddl",
+            "task_file": "tests/numeric/pathwaysmetric/test-1.pddl",
+            "ground": {
+                "num_generated": 17,
+                "num_expanded": 2,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 47,
+                "num_expanded": 3,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Rover",
+            "domain_file": "tests/numeric/rover/domain.pddl",
+            "task_file": "tests/numeric/rover/test-1.pddl",
+            "ground": {
+                "num_generated": 1862,
+                "num_expanded": 554,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            },
+            "lifted": {
+                "num_generated": 1899,
+                "num_expanded": 575,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 5,
+                "plan_cost": 5
+            }
+        },
+        {
+            "name": "Sailing",
+            "domain_file": "tests/numeric/sailing/domain.pddl",
+            "task_file": "tests/numeric/sailing/test-1.pddl",
+            "ground": {
+                "num_generated": 69,
+                "num_expanded": 6,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 69,
+                "num_expanded": 6,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Settersnumeric",
+            "domain_file": "tests/numeric/settersnumeric/domain.pddl",
+            "task_file": "tests/numeric/settersnumeric/test-1.pddl",
+            "ground": {
+                "num_generated": 5,
+                "num_expanded": 2,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            },
+            "lifted": {
+                "num_generated": 5,
+                "num_expanded": 2,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 2,
+                "plan_cost": 2
+            }
+        },
+        {
+            "name": "Sugar",
+            "domain_file": "tests/numeric/sugar/domain.pddl",
+            "task_file": "tests/numeric/sugar/test-1.pddl",
+            "ground": {
+                "num_generated": 601,
+                "num_expanded": 105,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 3,
+                "plan_cost": 3
+            },
+            "lifted": {
+                "num_generated": 655,
+                "num_expanded": 132,
+                "num_deadends": 0,
+                "num_pruned": 0,
+                "plan_length": 3,
+                "plan_cost": 3
+            }
+        }
+    ]
+}

@@ -41,6 +41,7 @@ public:
     virtual void on_end_arity(ygg::uint_t arity, SearchStatus status) = 0;
     virtual void on_end_search(tyr::planning::SearchStatus status) = 0;
     virtual void on_solved(ygg::uint_t arity) = 0;
+    virtual void add_subsearch_statistics(const tyr::planning::Statistics& search_statistics) = 0;
     virtual const tyr::planning::Statistics& get_search_statistics() const = 0;
     virtual const Statistics<Kind>& get_statistics() const = 0;
 };
@@ -105,6 +106,8 @@ public:
         if (verbosity(1))
             self().on_solved_impl(arity);
     }
+
+    void add_subsearch_statistics(const tyr::planning::Statistics& search_statistics) override { m_search_statistics.add(search_statistics); }
 
     const tyr::planning::Statistics& get_search_statistics() const override { return m_search_statistics; }
     const Statistics<Kind>& get_statistics() const override { return m_statistics; }

@@ -59,6 +59,15 @@ public:
     void increment_num_deadends() { ++m_num_deadends; }
     void increment_num_pruned() { ++m_num_pruned; }
 
+    /// Accumulate another search's counters, e.g. per-subsearch statistics of iterated algorithms (timers untouched).
+    void add(const Statistics& other)
+    {
+        m_num_generated += other.m_num_generated;
+        m_num_expanded += other.m_num_expanded;
+        m_num_deadends += other.m_num_deadends;
+        m_num_pruned += other.m_num_pruned;
+    }
+
     void set_search_start_time_point(std::chrono::time_point<std::chrono::high_resolution_clock> time_point) { m_search_start_time_point = time_point; }
     void set_search_end_time_point(std::chrono::time_point<std::chrono::high_resolution_clock> time_point) { m_search_end_time_point = time_point; }
 

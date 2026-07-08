@@ -18,6 +18,7 @@
 #include "tyr/planning/algorithms/iw.hpp"
 
 #include "tyr/planning/algorithms/brfs.hpp"
+#include "tyr/planning/algorithms/brfs/event_handler.hpp"
 #include "tyr/planning/algorithms/concepts.hpp"
 #include "tyr/planning/algorithms/iw/pruning_strategy.hpp"
 #include "tyr/planning/algorithms/strategies/pruning.hpp"
@@ -93,6 +94,8 @@ SearchResult<Kind> find_solution(brfs::Solver<Kind>& brfs_solver, ygg::uint_t ma
         local_brfs_solver.options.shuffle_labeled_succ_nodes = options.shuffle_labeled_succ_nodes;
 
         result = local_brfs_solver.solve();
+        if (local_brfs_solver.options.event_handler)
+            event_handler->add_subsearch_statistics(local_brfs_solver.options.event_handler->get_search_statistics());
         event_handler->on_end_arity(arity, result.status);
 
         if (result.status == SearchStatus::SOLVED)

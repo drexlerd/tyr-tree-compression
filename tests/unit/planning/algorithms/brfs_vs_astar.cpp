@@ -53,7 +53,7 @@ BrfsCase parse_case(const boost::json::object& suite, const boost::json::object&
 
 std::vector<BrfsCase> load_cases()
 {
-    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/algorithms/brfs_vs_blind_astar.json");
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/algorithms/brfs_vs_astar.json");
     const auto& suite_object = ygg::common::as_object(suite, "suite");
     auto result = std::vector<BrfsCase> {};
     for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))

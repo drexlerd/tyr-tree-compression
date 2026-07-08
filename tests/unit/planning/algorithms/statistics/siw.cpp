@@ -1,0 +1,148 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "search_statistics.hpp"
+
+namespace p = tyr::planning;
+
+namespace tyr::tests
+{
+namespace
+{
+struct SiwExpectation
+{
+    std::optional<p::SearchStatus> expected_status;
+    std::optional<ygg::uint_t> expected_maximum_effective_width;
+    std::optional<p::ProgressStatistics::Snapshot> counters;
+};
+
+struct SiwCase
+{
+    std::string name;
+    std::filesystem::path domain_file;
+    std::filesystem::path task_file;
+    ygg::uint_t max_arity;
+    std::vector<std::pair<std::string, SiwExpectation>> configs;
+};
+
+void PrintTo(const SiwCase& test_case, std::ostream* os) { *os << test_case.name << " (" << test_case.task_file << ")"; }
+
+SiwExpectation parse_expectation(const boost::json::object& object)
+{
+    auto result = SiwExpectation {};
+    if (const auto value = ygg::common::find_string(object, "expected_status", "case"))
+        result.expected_status = parse_search_status(*value);
+    if (const auto value = ygg::common::find_uint_t(object, "expected_maximum_effective_width", "case"))
+        result.expected_maximum_effective_width = *value;
+    result.counters = parse_optional_counters(object);
+    return result;
+}
+
+SiwCase parse_case(const boost::json::object& suite, const boost::json::object& object)
+{
+    auto result = SiwCase { ygg::common::as_string(object, "name", "case"),
+                            ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                            ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")),
+                            ygg::common::as_uint_t(suite, "max_arity", "suite"),
+                            {} };
+    for (const auto kind : { "ground", "lifted" })
+        if (const auto* value = object.if_contains(kind))
+            result.configs.emplace_back(kind, parse_expectation(value->as_object()));
+    return result;
+}
+
+std::vector<SiwCase> load_cases()
+{
+    const auto suite = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/planning/algorithms/statistics/siw.json");
+    const auto& suite_object = ygg::common::as_object(suite, "suite");
+    auto result = std::vector<SiwCase> {};
+    for (const auto& case_value : ygg::common::as_array(suite_object, "cases", "suite"))
+        result.push_back(parse_case(suite_object, ygg::common::as_object(case_value, "case")));
+    return result;
+}
+
+template<p::TaskKind Kind>
+void check_expectation(const SiwExpectation& expectation, const SiwCase& test_case)
+{
+    auto context = create_search_context<Kind>(test_case.domain_file, test_case.task_file);
+    auto brfs_solver = p::brfs::Solver<Kind> { context.task, context.successor_generator, p::brfs::Options<Kind> {} };
+    brfs_solver.options.event_handler = p::brfs::DefaultEventHandler<Kind>::create();
+
+    auto iw_solver = p::iw::Solver<Kind> { std::move(brfs_solver), test_case.max_arity, p::iw::Options<Kind> {} };
+    const auto event_handler = p::siw::DefaultEventHandler<Kind>::create();
+
+    auto options = p::siw::Options<Kind> {};
+    options.event_handler = event_handler;
+
+    const auto result = p::siw::find_solution(iw_solver, options);
+
+    const auto maximum_effective_width = event_handler->get_statistics().get_maximum_effective_width();
+    const auto average_effective_width = event_handler->get_statistics().get_average_effective_width();
+    const auto num_solved_subsearches = event_handler->get_statistics().get_num_solved_subsearches();
+
+    if (maximum_effective_width)
+    {
+        EXPECT_TRUE(average_effective_width);
+        EXPECT_GT(num_solved_subsearches, 0);
+        EXPECT_LE(*average_effective_width, static_cast<double>(*maximum_effective_width));
+    }
+    else
+    {
+        EXPECT_FALSE(average_effective_width);
+        EXPECT_EQ(num_solved_subsearches, 0);
+    }
+
+    if (expectation.expected_status)
+    {
+        EXPECT_EQ(result.status, *expectation.expected_status);
+    }
+    if (expectation.expected_maximum_effective_width)
+    {
+        ASSERT_TRUE(maximum_effective_width);
+        EXPECT_EQ(*maximum_effective_width, *expectation.expected_maximum_effective_width);
+    }
+    if (expectation.counters)
+    {
+        expect_counters(*expectation.counters, event_handler->get_search_statistics());
+    }
+}
+}
+
+class SiwStatisticsTest : public ::testing::TestWithParam<SiwCase>
+{
+};
+
+TEST_P(SiwStatisticsTest, MatchesExpectedOutcome)
+{
+    const auto& test_case = GetParam();
+
+    for (const auto& [kind, expectation] : test_case.configs)
+    {
+        SCOPED_TRACE(kind);
+        if (kind == "ground")
+            check_expectation<p::GroundTag>(expectation, test_case);
+        else
+            check_expectation<p::LiftedTag>(expectation, test_case);
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(TyrPlanningSiwStatistics,
+                         SiwStatisticsTest,
+                         ::testing::ValuesIn(load_cases()),
+                         [](const testing::TestParamInfo<SiwCase>& info) { return info.param.name; });
+
+}

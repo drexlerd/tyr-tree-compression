@@ -29,7 +29,7 @@ class PyEventHandler : public EventHandler<Kind>
 public:
     using Base = EventHandler<Kind>;
 
-    NB_TRAMPOLINE(Base, 7);
+    NB_TRAMPOLINE(Base, 8);
 
     void on_start_search() override { NB_OVERRIDE_PURE(on_start_search); }
 
@@ -48,6 +48,8 @@ public:
     void on_end_search(tyr::planning::SearchStatus status) override { NB_OVERRIDE_PURE(on_end_search, status); }
 
     void on_solved(const Plan<Kind>& plan) override { NB_OVERRIDE_PURE(on_solved, plan); }
+
+    const tyr::planning::Statistics& get_search_statistics() const override { NB_OVERRIDE_PURE(get_search_statistics); }
 
     const Statistics<Kind>& get_statistics() const override { NB_OVERRIDE_PURE(get_statistics); }
 };
@@ -117,6 +119,7 @@ void bind_event_handler(nb::module_& m, const std::string& name)
         .def("on_end_subsearch", &T::on_end_subsearch, "subsearch_index"_a, "status"_a)
         .def("on_end_search", &T::on_end_search, "status"_a)
         .def("on_solved", &T::on_solved, "plan"_a)
+        .def("get_search_statistics", &T::get_search_statistics, nb::rv_policy::reference_internal)
         .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal);
 }
 
@@ -127,6 +130,7 @@ void bind_default_event_handler(nb::module_& m, const std::string& name)
 
     nb::class_<T, EventHandler<Kind>>(m, name.c_str())  //
         .def(nb::init<size_t>(), "verbosity"_a = 0)
+        .def("get_search_statistics", &T::get_search_statistics, nb::rv_policy::reference_internal)
         .def("get_statistics", &T::get_statistics, nb::rv_policy::reference_internal);
 }
 
