@@ -546,14 +546,16 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP, CP>& rc
         const auto& numeric_support_selector = in.numeric_support_selector();
         const auto input = make_rule_update_input(in, out, numeric_support_selector);
 
-        for (auto it = out.pending_rule_bindings().begin(); it != out.pending_rule_bindings().end();)
+        auto& pending = out.pending_rule_bindings();
+        for (const auto pending_binding : out.sorted_pending_rule_bindings())
         {
             out.ground_context_solve().binding.clear();
-            for (const auto object : it->get_objects())
+            for (const auto object : pending_binding.get_objects())
                 out.ground_context_solve().binding.push_back(object.get_index());
 
             assert(out.ground_context_solve().binding == out.ground_context_iteration().binding);
 
+            auto erase_pending = false;
             visit(
                 [&](auto&& head)
                 {
@@ -575,17 +577,12 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP, CP>& rc
                                     assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
 
                                     record_propositional_achiever(head, input);
-
-                                    it = out.pending_rule_bindings().erase(it);
-                                }
-                                else
-                                {
-                                    ++it;
+                                    erase_pending = true;
                                 }
                             }
                             else
                             {
-                                it = out.pending_rule_bindings().erase(it);
+                                erase_pending = true;
                             }
                         }
                         else if (is_dynamically_applicable(in.cws_rule().get_nullary_condition(),
@@ -596,12 +593,7 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP, CP>& rc
                             assert(ensure_applicability(in.cws_rule().get_rule(), out.ground_context_iteration(), in.fact_sets()));
 
                             insert_propositional_update(head, input, out.head(), out.and_annot());
-
-                            it = out.pending_rule_bindings().erase(it);
-                        }
-                        else
-                        {
-                            ++it;
+                            erase_pending = true;
                         }
                     }
                     else
@@ -610,6 +602,9 @@ void process_pending_rule_bindings(RuleExecutionContext<OrAP, AndAP, TP, CP>& rc
                     }
                 },
                 in.cws_rule().get_rule().get_head());
+
+            if (erase_pending)
+                pending.erase(pending_binding);
         }
     }
 }
@@ -684,7 +679,7 @@ void merge_worker_results(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
         auto merge_context = fd::MergeContext { program_out.datalog_builder(), program_out.workspace_repository() };
         const auto& ws_rule = program_out.rules()[i];
 
-        for (const auto& worker : ws_rule->worker)
+        for (auto& worker : ws_rule->worker)
         {
             std::visit(
                 [&](const auto& head_iteration)
@@ -693,7 +688,7 @@ void merge_worker_results(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
 
                     if constexpr (std::is_same_v<HeadIteration, PredicateHeadIteration>)
                     {
-                        for (const auto worker_head_index : head_iteration.rows)
+                        for (const auto worker_head_index : head_iteration.get_sorted_rows())
                         {
                             const auto worker_head =
                                 ygg::make_view(ygg::Index<f::RelationBinding<f::Predicate<f::FluentTag>>> { head_iteration.relation, worker_head_index },
@@ -709,7 +704,7 @@ void merge_worker_results(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
                     }
                     else
                     {
-                        for (const auto& update : head_iteration.updates)
+                        for (const auto& update : head_iteration.get_sorted_updates())
                         {
                             const auto worker_head =
                                 ygg::make_view(ygg::Index<f::RelationBinding<f::Function<f::FluentTag>>> { head_iteration.relation, update.row },
@@ -741,14 +736,7 @@ void commit_current_bucket(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
     auto& facts = program_out.facts();
     auto& cost_buckets = program_out.cost_buckets();
 
-    auto& predicate_heads = program_out.predicate_bucket_scratch();
-    predicate_heads.clear();
-    predicate_heads.reserve(cost_buckets.get_current_bucket().size());
-    for (const auto head : cost_buckets.get_current_bucket())
-        predicate_heads.push_back(head);
-    std::sort(predicate_heads.begin(), predicate_heads.end(), [](const auto lhs, const auto rhs) { return ygg::Less<> {}(lhs.get_key(), rhs.get_key()); });
-
-    for (const auto head : predicate_heads)
+    for (const auto head : cost_buckets.get_current_bucket_sorted())
     {
         if (facts.fact_sets.predicate.insert(head))
         {
@@ -757,25 +745,7 @@ void commit_current_bucket(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
         }
     }
 
-    auto& function_heads = program_out.function_bucket_scratch();
-    function_heads.clear();
-    function_heads.reserve(cost_buckets.get_current_function_bucket().size());
-    for (const auto& [head, interval] : cost_buckets.get_current_function_bucket())
-        function_heads.emplace_back(head, interval);
-    std::sort(function_heads.begin(),
-              function_heads.end(),
-              [](const auto& lhs, const auto& rhs)
-              {
-                  if (ygg::Less<> {}(lhs.first.get_key(), rhs.first.get_key()))
-                      return true;
-                  if (ygg::Less<> {}(rhs.first.get_key(), lhs.first.get_key()))
-                      return false;
-                  if (lower(lhs.second) != lower(rhs.second))
-                      return lower(lhs.second) < lower(rhs.second);
-                  return upper(lhs.second) < upper(rhs.second);
-              });
-
-    for (const auto& [head, interval] : function_heads)
+    for (const auto& [head, interval] : cost_buckets.get_current_function_bucket_sorted())
     {
         if (facts.fact_sets.function.insert(head, interval))
         {

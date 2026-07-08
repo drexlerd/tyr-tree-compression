@@ -31,6 +31,7 @@
 #include "tyr/formalism/datalog/views.hpp"
 #include "tyr/formalism/object_index.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -52,12 +53,28 @@ namespace tyr::datalog
 struct PredicateHeadIteration
 {
     ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> relation;
-    ygg::UnorderedSet<ygg::Index<::tyr::formalism::Row>> rows;
+    using Row = ygg::Index<::tyr::formalism::Row>;
+
+    ygg::UnorderedSet<Row> rows;
+    std::vector<Row> sorted_rows;
 
     PredicateHeadIteration() = default;
-    explicit PredicateHeadIteration(ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> relation) : relation(relation), rows() {}
+    explicit PredicateHeadIteration(ygg::Index<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>> relation) : relation(relation), rows(), sorted_rows()
+    {
+    }
 
-    void clear() noexcept { rows.clear(); }
+    void clear() noexcept
+    {
+        rows.clear();
+        sorted_rows.clear();
+    }
+
+    const std::vector<Row>& get_sorted_rows()
+    {
+        sorted_rows.assign(rows.begin(), rows.end());
+        std::sort(sorted_rows.begin(), sorted_rows.end());
+        return sorted_rows;
+    }
 };
 
 struct FunctionHeadUpdate
@@ -77,11 +94,39 @@ struct FunctionHeadIteration
 {
     ygg::Index<::tyr::formalism::Function<::tyr::formalism::FluentTag>> relation;
     ygg::UnorderedSet<FunctionHeadUpdate> updates;
+    std::vector<FunctionHeadUpdate> sorted_updates;
 
     FunctionHeadIteration() = default;
-    explicit FunctionHeadIteration(ygg::Index<::tyr::formalism::Function<::tyr::formalism::FluentTag>> relation) : relation(relation), updates() {}
+    explicit FunctionHeadIteration(ygg::Index<::tyr::formalism::Function<::tyr::formalism::FluentTag>> relation) :
+        relation(relation),
+        updates(),
+        sorted_updates()
+    {
+    }
 
-    void clear() noexcept { updates.clear(); }
+    void clear() noexcept
+    {
+        updates.clear();
+        sorted_updates.clear();
+    }
+
+    const std::vector<FunctionHeadUpdate>& get_sorted_updates()
+    {
+        sorted_updates.assign(updates.begin(), updates.end());
+        std::sort(sorted_updates.begin(),
+                  sorted_updates.end(),
+                  [](const auto& lhs, const auto& rhs)
+                  {
+                      if (lhs.row != rhs.row)
+                          return lhs.row < rhs.row;
+                      if (lower(lhs.interval) != lower(rhs.interval))
+                          return lower(lhs.interval) < lower(rhs.interval);
+                      if (upper(lhs.interval) != upper(rhs.interval))
+                          return upper(lhs.interval) < upper(rhs.interval);
+                      return lhs.cost < rhs.cost;
+                  });
+        return sorted_updates;
+    }
 };
 
 using RuleHeadIteration = std::variant<PredicateHeadIteration, FunctionHeadIteration>;
@@ -155,6 +200,9 @@ struct RuleWorkspace<LiftedTag>
             ygg::UnorderedSet<ygg::IndexList<::tyr::formalism::Object>> seen_bindings_dbg;
 
             ygg::UnorderedSet<::tyr::formalism::datalog::RuleBindingView> pending_rule_bindings;
+            std::vector<::tyr::formalism::datalog::RuleBindingView> pending_rule_binding_scratch;
+
+            const std::vector<::tyr::formalism::datalog::RuleBindingView>& get_sorted_pending_rule_bindings();
 
             NumericSupportSelectorWorkspace numeric_support_selector_workspace;
 
@@ -303,6 +351,7 @@ RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::Solve(::tyr::formalism::datalo
     program_overlay_repository(factory.create(&program_repository)),
     seen_bindings_dbg(),
     pending_rule_bindings(),
+    pending_rule_binding_scratch(),
     numeric_support_selector_workspace(),
     statistics()
 {
@@ -314,8 +363,17 @@ void RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::clear() noexcept
     program_overlay_repository.clear();
     seen_bindings_dbg.clear();
     pending_rule_bindings.clear();
+    pending_rule_binding_scratch.clear();
     numeric_support_selector_workspace.clear();
     and_ap.clear_achievers();
+}
+
+template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
+const std::vector<::tyr::formalism::datalog::RuleBindingView>& RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::get_sorted_pending_rule_bindings()
+{
+    pending_rule_binding_scratch.assign(pending_rule_bindings.begin(), pending_rule_bindings.end());
+    std::sort(pending_rule_binding_scratch.begin(), pending_rule_binding_scratch.end(), canonical_rule_binding_less);
+    return pending_rule_binding_scratch;
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP>

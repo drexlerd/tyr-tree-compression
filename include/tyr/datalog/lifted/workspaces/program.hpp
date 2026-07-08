@@ -33,6 +33,7 @@
 #include "tyr/formalism/datalog/repository.hpp"
 #include "tyr/formalism/planning/builder.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <map>
 #include <oneapi/tbb/enumerable_thread_specific.h>
@@ -54,6 +55,7 @@ public:
     using FunctionViewType = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
     using PredicateBucket = ygg::UnorderedSet<PredicateViewType>;
     using FunctionBucket = ygg::UnorderedMap<FunctionViewType, ygg::ClosedInterval<ygg::float_t>>;
+    using FunctionBucketEntry = std::pair<FunctionViewType, ygg::ClosedInterval<ygg::float_t>>;
     using Cost = datalog::Cost;
 
     struct Bucket
@@ -161,10 +163,44 @@ public:
         return it == m_buckets.end() ? kEmpty : it->second.functions;
     }
 
+    const std::vector<PredicateViewType>& get_current_bucket_sorted()
+    {
+        const auto& bucket = get_current_bucket();
+        m_predicate_bucket_scratch.assign(bucket.begin(), bucket.end());
+        std::sort(m_predicate_bucket_scratch.begin(),
+                  m_predicate_bucket_scratch.end(),
+                  [](const auto lhs, const auto rhs) { return ygg::Less<> {}(lhs.get_key(), rhs.get_key()); });
+        return m_predicate_bucket_scratch;
+    }
+
+    const std::vector<FunctionBucketEntry>& get_current_function_bucket_sorted()
+    {
+        const auto& bucket = get_current_function_bucket();
+        m_function_bucket_scratch.clear();
+        m_function_bucket_scratch.reserve(bucket.size());
+        for (const auto& [head, interval] : bucket)
+            m_function_bucket_scratch.emplace_back(head, interval);
+        std::sort(m_function_bucket_scratch.begin(),
+                  m_function_bucket_scratch.end(),
+                  [](const auto& lhs, const auto& rhs)
+                  {
+                      if (ygg::Less<> {}(lhs.first.get_key(), rhs.first.get_key()))
+                          return true;
+                      if (ygg::Less<> {}(rhs.first.get_key(), lhs.first.get_key()))
+                          return false;
+                      if (lower(lhs.second) != lower(rhs.second))
+                          return lower(lhs.second) < lower(rhs.second);
+                      return upper(lhs.second) < upper(rhs.second);
+                  });
+        return m_function_bucket_scratch;
+    }
+
 private:
     std::map<Cost, Bucket> m_buckets;
     Cost m_current = Cost(0);
     size_t m_total_size = 0;
+    std::vector<PredicateViewType> m_predicate_bucket_scratch;
+    std::vector<FunctionBucketEntry> m_function_bucket_scratch;
 };
 
 template<>
@@ -199,9 +235,6 @@ struct ProgramWorkspace<LiftedTag>
         RuleSchedulerStrata schedulers;
 
         CostBuckets cost_buckets;
-        std::vector<::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>> predicate_bucket_scratch;
-        std::vector<std::pair<::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>, ygg::ClosedInterval<ygg::float_t>>>
-            function_bucket_scratch;
 
         ProgramStatistics statistics;
 
