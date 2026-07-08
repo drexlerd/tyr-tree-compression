@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include "tyr/datalog/lifted/rule_scheduler.hpp"
 
 #include "tyr/formalism/datalog/formatter.hpp"
@@ -71,6 +72,13 @@ void RuleSchedulerStratum::activate_all()
     m_active_rules.clear();
     for (const auto rule : m_rules)
         m_active_rules.insert(rule);
+    rebuild_sorted_active_rules();
+}
+
+void RuleSchedulerStratum::rebuild_sorted_active_rules()
+{
+    m_sorted_active_rules.set(m_active_rules.begin(), m_active_rules.end());
+    std::sort(m_sorted_active_rules.begin(), m_sorted_active_rules.end());
 }
 
 void RuleSchedulerStratum::on_start_iteration() noexcept
@@ -88,6 +96,7 @@ void RuleSchedulerStratum::on_finish_iteration()
     m_active_rules.clear();
     collect_active_rules(m_active_predicates, m_listeners.predicates, m_active_rules);
     collect_active_rules(m_active_functions, m_listeners.functions, m_active_rules);
+    rebuild_sorted_active_rules();
 }
 
 RuleSchedulerStrata create_schedulers(const analysis::RuleStrata& rules,

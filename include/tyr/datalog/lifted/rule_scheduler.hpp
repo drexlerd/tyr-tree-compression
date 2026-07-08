@@ -56,9 +56,15 @@ public:
 
     const ::tyr::formalism::datalog::Repository& get_context() const noexcept { return m_context; }
     const ygg::IndexList<::tyr::formalism::datalog::Rule>& get_rules() const noexcept { return m_rules; }
-    const ygg::UnorderedSet<ygg::Index<::tyr::formalism::datalog::Rule>>& get_active_rules() const noexcept { return m_active_rules; }
+
+    /// Active rules in sorted index order: hash-set iteration order is platform-unspecified, but the
+    /// rule processing order assigns program-repository rows (first-derivation order) that delta
+    /// bitsets are indexed by, so it must be identical on every platform.
+    const ygg::IndexList<::tyr::formalism::datalog::Rule>& get_active_rules() const noexcept { return m_sorted_active_rules; }
 
 private:
+    void rebuild_sorted_active_rules();
+
     const analysis::RuleStratum& m_rules;
     const analysis::ListenerStratum& m_listeners;
     const ::tyr::formalism::datalog::Repository& m_context;
@@ -66,6 +72,7 @@ private:
     boost::dynamic_bitset<> m_active_predicates;
     boost::dynamic_bitset<> m_active_functions;
     ygg::UnorderedSet<ygg::Index<::tyr::formalism::datalog::Rule>> m_active_rules;
+    ygg::IndexList<::tyr::formalism::datalog::Rule> m_sorted_active_rules;
 };
 
 struct RuleSchedulerStrata

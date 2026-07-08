@@ -48,6 +48,7 @@
 #include <iostream>
 #include <memory>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <oneapi/tbb/task_arena.h>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
@@ -625,36 +626,46 @@ void run_active_rules(StratumExecutionContext<OrAP, AndAP, TP, CP>& ctx)
 
     const auto program_stopwatch = ygg::StopwatchScope(program_out.statistics().parallel_time);
 
-    oneapi::tbb::parallel_for_each(active_rules.begin(),
-                                   active_rules.end(),
-                                   [&](auto&& rule_index)
-                                   {
-                                       auto rctx = ctx.get_rule_execution_context(rule_index);
-                                       auto& rule_out = rctx.out();
+    const auto process_rule = [&](auto&& rule_index)
+    {
+        auto rctx = ctx.get_rule_execution_context(rule_index);
+        auto& rule_out = rctx.out();
 
-                                       const auto total_time = ygg::StopwatchScope(rule_out.statistics().total_time);
-                                       ++rule_out.statistics().num_executions;
+        const auto total_time = ygg::StopwatchScope(rule_out.statistics().total_time);
+        ++rule_out.statistics().num_executions;
 
-                                       rctx.clear_iteration();  ///< Clear iteration before process_pending_rule_bindings/generate
+        rctx.clear_iteration();  ///< Clear iteration before process_pending_rule_bindings/generate
 
-                                       {
-                                           const auto initialize_time = ygg::StopwatchScope(rule_out.statistics().initialize_time);
+        {
+            const auto initialize_time = ygg::StopwatchScope(rule_out.statistics().initialize_time);
 
-                                           rctx.initialize();  ///< Initialize before process_pending_rule_bindings/generate
-                                       }
+            rctx.initialize();  ///< Initialize before process_pending_rule_bindings/generate
+        }
 
-                                       {
-                                           const auto process_pending_time = ygg::StopwatchScope(rule_out.statistics().process_pending_time);
+        {
+            const auto process_pending_time = ygg::StopwatchScope(rule_out.statistics().process_pending_time);
 
-                                           process_pending_rule_bindings(rctx);
-                                       }
+            process_pending_rule_bindings(rctx);
+        }
 
-                                       {
-                                           const auto process_generate_time = ygg::StopwatchScope(rule_out.statistics().process_generate_time);
+        {
+            const auto process_generate_time = ygg::StopwatchScope(rule_out.statistics().process_generate_time);
 
-                                           generate(rctx);
-                                       }
-                                   });
+            generate(rctx);
+        }
+    };
+
+    // With a single-threaded arena, run sequentially to pin the execution order to the scheduler's
+    // sorted rule order (TBB task order is unspecified even at concurrency 1).
+    if (oneapi::tbb::this_task_arena::max_concurrency() == 1)
+    {
+        for (const auto rule_index : active_rules)
+            process_rule(rule_index);
+    }
+    else
+    {
+        oneapi::tbb::parallel_for_each(active_rules.begin(), active_rules.end(), process_rule);
+    }
 }
 
 template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
