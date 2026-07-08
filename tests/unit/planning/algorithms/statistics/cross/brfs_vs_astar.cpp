@@ -92,10 +92,10 @@ TEST_P(BrfsVsAstarStatisticsTest, UnitCostPlanLengthMatches)
 {
     const auto& test_case = GetParam();
 
-    ASSERT_EQ(test_case.brfs.plan_length.has_value(), test_case.astar.plan_length.has_value());
-    if (test_case.brfs.plan_length)
+    ASSERT_EQ(test_case.brfs.plan.has_value(), test_case.astar.plan.has_value());
+    if (test_case.brfs.plan)
     {
-        EXPECT_EQ(*test_case.brfs.plan_length, *test_case.astar.plan_length);
+        EXPECT_EQ(test_case.brfs.plan->length, test_case.astar.plan->length);
     }
 }
 

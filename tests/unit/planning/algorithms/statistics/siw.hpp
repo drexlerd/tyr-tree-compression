@@ -23,8 +23,9 @@ namespace tyr::tests
 {
 struct SiwExpectation
 {
-    std::optional<p::SearchStatus> expected_status;
-    std::optional<ygg::uint_t> expected_maximum_effective_width;
+    std::optional<p::SearchStatus> status;
+    std::optional<PlanStatistics> plan;
+    std::optional<ygg::uint_t> maximum_effective_width;
     std::optional<p::ProgressStatistics::Snapshot> counters;
 };
 
@@ -42,10 +43,11 @@ void PrintTo(const SiwCase& test_case, std::ostream* os) { *os << test_case.name
 SiwExpectation parse_expectation(const boost::json::object& object)
 {
     auto result = SiwExpectation {};
-    if (const auto value = ygg::common::find_string(object, "expected_status", "case"))
-        result.expected_status = parse_search_status(*value);
-    if (const auto value = ygg::common::find_uint_t(object, "expected_maximum_effective_width", "case"))
-        result.expected_maximum_effective_width = *value;
+    if (const auto value = ygg::common::find_string(object, "status", "case"))
+        result.status = parse_search_status(*value);
+    result.plan = parse_optional_plan(object);
+    if (const auto value = ygg::common::find_uint_t(object, "maximum_effective_width", "case"))
+        result.maximum_effective_width = *value;
     result.counters = parse_optional_counters(object);
     return result;
 }
@@ -58,7 +60,7 @@ SiwCase parse_case(const boost::json::object& suite, const boost::json::object& 
                             ygg::common::as_uint_t(suite, "max_arity", "suite"),
                             {} };
     for (const auto& [key, value] : object)
-        if (value.is_object() && value.as_object().if_contains("expected_status"))
+        if (value.is_object() && value.as_object().if_contains("status"))
             result.configs.emplace_back(std::string(key), parse_expectation(value.as_object()));
     return result;
 }
@@ -103,14 +105,19 @@ void check_expectation(const SiwExpectation& expectation, const SiwCase& test_ca
         EXPECT_EQ(num_solved_subsearches, 0);
     }
 
-    if (expectation.expected_status)
+    if (expectation.status)
     {
-        EXPECT_EQ(result.status, *expectation.expected_status);
+        EXPECT_EQ(result.status, *expectation.status);
     }
-    if (expectation.expected_maximum_effective_width)
+    if (expectation.plan)
+    {
+        ASSERT_TRUE(result.plan);
+        expect_plan(*expectation.plan, *result.plan);
+    }
+    if (expectation.maximum_effective_width)
     {
         ASSERT_TRUE(maximum_effective_width);
-        EXPECT_EQ(*maximum_effective_width, *expectation.expected_maximum_effective_width);
+        EXPECT_EQ(*maximum_effective_width, *expectation.maximum_effective_width);
     }
     if (expectation.counters)
     {

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Regenerate the siw search-statistics fixture (ground + lifted).
 
-Each per-kind object records the search outcome (expected_status,
-expected_maximum_effective_width) plus the four counters aggregated across subsearches by
-the siw event handler. The suite-level ``max_arity`` is preserved and used for the runs.
+Each per-kind object records the search outcome (status, plan, maximum_effective_width)
+plus the four counters aggregated across subsearches by the siw event handler. The suite-level ``max_arity`` is preserved and used for the runs.
 
 Usage:
     .venv/bin/python tests/unit/planning/algorithms/statistics/generate_siw.py [CASE ...]
@@ -30,6 +29,7 @@ from fixture_generation import (
     generate_main,
     make_context,
     planning_module,
+    plan_of,
 )
 
 FIXTURES: dict[TaskKind, Path] = {
@@ -70,10 +70,14 @@ def run_config(kind: TaskKind,
     if result.status not in RECORDED_STATUSES:
         return f"status {SEARCH_STATUS_NAMES[result.status]} within {MAX_TIME}s/{MAX_NUM_STATES} states"
 
-    config: ConfigResult = {"expected_status": SEARCH_STATUS_NAMES[result.status]}
+    config: ConfigResult = {"status": SEARCH_STATUS_NAMES[result.status]}
     maximum_effective_width = handler.get_statistics().get_maximum_effective_width()
     if maximum_effective_width is not None:
-        config["expected_maximum_effective_width"] = maximum_effective_width
+        config["maximum_effective_width"] = maximum_effective_width
+    plan = result.plan
+    if plan is not None:
+        _KEEPALIVE.append(plan)
+        config["plan"] = plan_of(plan)
     config.update(counters_of(handler.get_search_statistics()))
     return config
 

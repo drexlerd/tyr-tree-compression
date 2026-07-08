@@ -21,7 +21,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Literal, Mapping, NotRequired, Sequence, TypeAlias, TypedDict
+from typing import Callable, Literal, Mapping, Sequence, TypeAlias, TypedDict
 
 from pypddl.formalism import ParserOptions
 from pyyggdrasil.execution import ExecutionContext
@@ -77,8 +77,12 @@ class ConfigStatistics(TypedDict):
     num_expanded: int
     num_deadends: int
     num_pruned: int
-    plan_length: NotRequired[int]
-    plan_cost: NotRequired[JsonNumber]
+
+
+class PlanStatistics(TypedDict):
+    cost: JsonNumber
+    length: int
+    actions: list[str]
 
 
 @dataclass(frozen=True)
@@ -167,6 +171,14 @@ def counters_of(statistics: Statistics) -> ConfigStatistics:
     )
 
 
+def plan_of(plan: object) -> PlanStatistics:
+    return PlanStatistics(
+        cost=as_json_number(float(plan.get_cost())),
+        length=plan.get_length(),
+        actions=[line for line in str(plan).splitlines() if line],
+    )
+
+
 def config_label(heuristic_name: HeuristicName | None, cost_suffix: CostSuffix | None) -> str:
     if heuristic_name is None:
         return "default"
@@ -221,8 +233,7 @@ def run_search_config(
     plan = result.plan
     if plan is not None:
         _KEEPALIVE.append(plan)
-        config["plan_length"] = plan.get_length()
-        config["plan_cost"] = as_json_number(float(plan.get_cost()))
+        config["plan"] = plan_of(plan)
     return config
 
 

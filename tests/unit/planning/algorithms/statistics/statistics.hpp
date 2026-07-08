@@ -29,6 +29,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <tyr/formalism/formalism.hpp>
 #include <tyr/planning/planning.hpp>
 #include <vector>
@@ -38,14 +39,19 @@
 namespace tyr::tests
 {
 
-/// Expected outcome of one search configuration: event-handler counters plus plan length/cost
-/// (absent for configurations that terminated without a plan). Pinning these fixes the exact
-/// search trajectory, making them cross-platform determinism regression tests.
+struct PlanStatistics
+{
+    ygg::float_t cost;
+    uint64_t length;
+    std::vector<std::string> actions;
+};
+
+/// Expected outcome of one search configuration: event-handler counters plus an optional plan.
+/// Pinning these fixes the exact search trajectory, making them cross-platform determinism regression tests.
 struct SearchStatistics
 {
     planning::ProgressStatistics::Snapshot statistics;
-    std::optional<uint64_t> plan_length;
-    std::optional<ygg::float_t> plan_cost;
+    std::optional<PlanStatistics> plan;
 };
 
 /// Parse the four counters from an object that carries them inline (returns nullopt when absent).
@@ -67,18 +73,44 @@ inline void expect_counters(const planning::ProgressStatistics::Snapshot& expect
     EXPECT_EQ(actual.get_num_pruned(), expected.get_num_pruned());
 }
 
+inline std::optional<PlanStatistics> parse_optional_plan(const boost::json::object& object)
+{
+    const auto* value = object.if_contains("plan");
+    if (!value)
+        return std::nullopt;
+
+    const auto& plan = value->as_object();
+    auto actions = std::vector<std::string> {};
+    for (const auto& action : ygg::common::as_array(plan, "actions", "plan"))
+        actions.push_back(boost::json::value_to<std::string>(action));
+
+    return PlanStatistics { boost::json::value_to<ygg::float_t>(plan.at("cost")), boost::json::value_to<uint64_t>(plan.at("length")), std::move(actions) };
+}
+
 inline std::optional<SearchStatistics> parse_optional_statistics(const boost::json::object& object, const char* key)
 {
     const auto* value = object.if_contains(key);
     if (!value)
         return std::nullopt;
     const auto& stats = value->as_object();
-    auto result = SearchStatistics { *parse_optional_counters(stats), std::nullopt, std::nullopt };
-    if (const auto* plan_length = stats.if_contains("plan_length"))
-        result.plan_length = boost::json::value_to<uint64_t>(*plan_length);
-    if (const auto* plan_cost = stats.if_contains("plan_cost"))
-        result.plan_cost = boost::json::value_to<ygg::float_t>(*plan_cost);
+    return SearchStatistics { *parse_optional_counters(stats), parse_optional_plan(stats) };
+}
+
+template<planning::TaskKind Kind>
+std::vector<std::string> plan_actions(const planning::Plan<Kind>& plan)
+{
+    auto result = std::vector<std::string> {};
+    for (const auto& labeled_node : plan.get_labeled_succ_nodes())
+        result.push_back(fmt::format("{}", std::make_pair(labeled_node.label, formalism::planning::PlanFormatting())));
     return result;
+}
+
+template<planning::TaskKind Kind>
+void expect_plan(const PlanStatistics& expected, const planning::Plan<Kind>& actual)
+{
+    EXPECT_EQ(actual.get_length(), expected.length);
+    EXPECT_DOUBLE_EQ(static_cast<double>(actual.get_cost()), static_cast<double>(expected.cost));
+    EXPECT_EQ(plan_actions(actual), expected.actions);
 }
 
 template<planning::TaskKind Kind>
@@ -86,15 +118,9 @@ void expect_statistics(const SearchStatistics& expected, const planning::Statist
 {
     expect_counters(expected.statistics, actual);
 
-    ASSERT_EQ(result.plan.has_value(), expected.plan_length.has_value());
-    if (expected.plan_length)
-    {
-        EXPECT_EQ(result.plan->get_length(), *expected.plan_length);
-    }
-    if (expected.plan_cost)
-    {
-        EXPECT_DOUBLE_EQ(static_cast<double>(result.plan->get_cost()), static_cast<double>(*expected.plan_cost));
-    }
+    ASSERT_EQ(result.plan.has_value(), expected.plan.has_value());
+    if (expected.plan)
+        expect_plan(*expected.plan, *result.plan);
 }
 
 inline planning::SearchStatus parse_search_status(const std::string& status)

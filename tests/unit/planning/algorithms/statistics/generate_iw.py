@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Regenerate the iw search-statistics fixture (ground + lifted).
 
-Each per-kind object records the search outcome (expected_status, expected_plan_length,
-expected_solution_arity) plus the four counters aggregated across width iterations by the
-iw event handler. The suite-level ``max_arity`` is preserved and used for the runs.
+Each per-kind object records the search outcome (status, plan, solution_arity) plus the
+four counters aggregated across width iterations by the iw event handler. The suite-level ``max_arity`` is preserved and used for the runs.
 
 Usage:
     .venv/bin/python tests/unit/planning/algorithms/statistics/generate_iw.py [CASE ...]
@@ -30,6 +29,7 @@ from fixture_generation import (
     generate_main,
     make_context,
     planning_module,
+    plan_of,
 )
 
 FIXTURES: dict[TaskKind, Path] = {
@@ -66,14 +66,14 @@ def run_config(kind: TaskKind,
     if result.status not in RECORDED_STATUSES:
         return f"status {SEARCH_STATUS_NAMES[result.status]} within {MAX_TIME}s/{MAX_NUM_STATES} states"
 
-    config: ConfigResult = {"expected_status": SEARCH_STATUS_NAMES[result.status]}
+    config: ConfigResult = {"status": SEARCH_STATUS_NAMES[result.status]}
     plan = result.plan
     if plan is not None:
         _KEEPALIVE.append(plan)
-        config["expected_plan_length"] = plan.get_length()
+        config["plan"] = plan_of(plan)
     solution_arity = handler.get_statistics().get_solution_arity()
     if solution_arity is not None:
-        config["expected_solution_arity"] = solution_arity
+        config["solution_arity"] = solution_arity
     config.update(counters_of(handler.get_search_statistics()))
     return config
 

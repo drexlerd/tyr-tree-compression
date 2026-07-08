@@ -23,9 +23,9 @@ namespace tyr::tests
 {
 struct IwExpectation
 {
-    std::optional<p::SearchStatus> expected_status;
-    std::optional<ygg::uint_t> expected_plan_length;
-    std::optional<ygg::uint_t> expected_solution_arity;
+    std::optional<p::SearchStatus> status;
+    std::optional<PlanStatistics> plan;
+    std::optional<ygg::uint_t> solution_arity;
     std::optional<p::ProgressStatistics::Snapshot> counters;
 };
 
@@ -43,12 +43,11 @@ void PrintTo(const IwCase& test_case, std::ostream* os) { *os << test_case.name 
 IwExpectation parse_expectation(const boost::json::object& object)
 {
     auto result = IwExpectation {};
-    if (const auto value = ygg::common::find_string(object, "expected_status", "case"))
-        result.expected_status = parse_search_status(*value);
-    if (const auto value = ygg::common::find_uint_t(object, "expected_plan_length", "case"))
-        result.expected_plan_length = *value;
-    if (const auto value = ygg::common::find_uint_t(object, "expected_solution_arity", "case"))
-        result.expected_solution_arity = *value;
+    if (const auto value = ygg::common::find_string(object, "status", "case"))
+        result.status = parse_search_status(*value);
+    result.plan = parse_optional_plan(object);
+    if (const auto value = ygg::common::find_uint_t(object, "solution_arity", "case"))
+        result.solution_arity = *value;
     result.counters = parse_optional_counters(object);
     return result;
 }
@@ -61,7 +60,7 @@ IwCase parse_case(const boost::json::object& suite, const boost::json::object& o
                            ygg::common::as_uint_t(suite, "max_arity", "suite"),
                            {} };
     for (const auto& [key, value] : object)
-        if (value.is_object() && value.as_object().if_contains("expected_status"))
+        if (value.is_object() && value.as_object().if_contains("status"))
             result.configs.emplace_back(std::string(key), parse_expectation(value.as_object()));
     return result;
 }
@@ -102,20 +101,20 @@ void check_expectation(const IwExpectation& expectation, const IwCase& test_case
         EXPECT_FALSE(solution_arity);
     }
 
-    if (expectation.expected_status)
+    if (expectation.status)
     {
-        EXPECT_EQ(result.status, *expectation.expected_status);
+        EXPECT_EQ(result.status, *expectation.status);
     }
-    if (expectation.expected_plan_length)
+    if (expectation.plan)
     {
         ASSERT_TRUE(result.plan);
-        EXPECT_EQ(result.plan->get_length(), *expectation.expected_plan_length);
+        expect_plan(*expectation.plan, *result.plan);
         EXPECT_TRUE(solution_arity);
     }
-    if (expectation.expected_solution_arity)
+    if (expectation.solution_arity)
     {
         ASSERT_TRUE(solution_arity);
-        EXPECT_EQ(*solution_arity, *expectation.expected_solution_arity);
+        EXPECT_EQ(*solution_arity, *expectation.solution_arity);
     }
     if (expectation.counters)
     {
