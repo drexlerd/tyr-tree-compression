@@ -17,8 +17,8 @@
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 
-#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/formalism/binding_index.hpp"
 #include "tyr/formalism/datalog/builder.hpp"
 #include "tyr/formalism/datalog/canonicalization.hpp"
@@ -32,9 +32,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <concepts>
 #include <cstdlib>
 #include <fmt/format.h>
-#include <concepts>
 #include <limits>
 #include <optional>
 #include <tuple>
@@ -128,7 +128,7 @@ OrAnnotationPolicy<LiftedTag>::update_annotation(::tyr::formalism::datalog::Pred
         // BaseAnnotation incumbent (initial fact) always wins its tie.
         const auto* incumbent = program_and_annot.find(program_head);
         const auto* incumbent_witness = incumbent ? std::get_if<WitnessAnnotation<LiftedTag>>(incumbent) : nullptr;
-        if (incumbent_witness && canonical_rule_binding_less(witness.get_rule_row(), incumbent_witness->get_rule_row()))
+        if (incumbent_witness && ygg::Less<::tyr::formalism::datalog::RuleBindingView> {}(witness.get_rule_row(), incumbent_witness->get_rule_row()))
             program_and_annot.insert_or_assign(program_head, Annotation<LiftedTag>(witness));
     }
 
@@ -252,12 +252,11 @@ void AndAnnotationPolicy<LiftedTag, AggregationFunction>::update_annotation(
     // always wins its tie.
     const auto wins_tie = [&]()
     {
-        const auto* incumbent =
-            best_local_cost <= best_global_cost ? delta_and_annot.find(delta_head) : context.program_and_annot.find(program_head);
+        const auto* incumbent = best_local_cost <= best_global_cost ? delta_and_annot.find(delta_head) : context.program_and_annot.find(program_head);
         if (!incumbent)
             return true;
         const auto* incumbent_witness = std::get_if<WitnessAnnotation<LiftedTag>>(incumbent);
-        return incumbent_witness && canonical_rule_binding_less(context.rule_binding, incumbent_witness->get_rule_row());
+        return incumbent_witness && ygg::Less<::tyr::formalism::datalog::RuleBindingView> {}(context.rule_binding, incumbent_witness->get_rule_row());
     };
 
     if (best_cost == cur_cost_lower_bound && !wins_tie())

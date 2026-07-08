@@ -22,14 +22,14 @@
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <algorithm>
-#include <yggdrasil/containers/block_array_ordering.hpp>
-#include <yggdrasil/semantics/comparators.hpp>
 #include <tuple>
 #include <utility>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/containers/block_array_ordering.hpp>
 #include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 
 namespace tyr::datalog
 {
@@ -57,10 +57,7 @@ public:
 
     WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Cost cost) : m_rule_row(rule_row), m_metric(), m_cost(cost) {}
 
-    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Metric metric, Cost cost) :
-        m_rule_row(rule_row), m_metric(metric), m_cost(cost)
-    {
-    }
+    WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Metric metric, Cost cost) : m_rule_row(rule_row), m_metric(metric), m_cost(cost) {}
 
     WitnessAnnotation(::tyr::formalism::datalog::RuleBindingView rule_row, Metric metric, Cost cost, NumericSupports numeric_supports) :
         m_rule_row(rule_row),
@@ -83,15 +80,6 @@ private:
     Cost m_cost;
     NumericSupports m_numeric_supports;
 };
-
-/// Canonical order over rule bindings by content key (relation, then object indices). Not ygg::Less on
-/// the binding views themselves: binding-view identity compares repository-local rows, which are assigned
-/// in processing order — exactly the platform-unspecified order that equal-cost witness ties must not
-/// depend on.
-inline bool canonical_rule_binding_less(::tyr::formalism::datalog::RuleBindingView lhs, ::tyr::formalism::datalog::RuleBindingView rhs)
-{
-    return ygg::Less<> {}(lhs.get_key(), rhs.get_key());
-}
 
 template<>
 class PredicateAnnotationMap<LiftedTag>
@@ -209,7 +197,7 @@ public:
             const auto* rhs_witness = std::get_if<WitnessAnnotation<LiftedTag>>(&rhs.annotation);
             if (!lhs_witness || !rhs_witness)
                 return !lhs_witness && rhs_witness;  ///< BaseAnnotation (initial fact) sorts first
-            return canonical_rule_binding_less(lhs_witness->get_rule_row(), rhs_witness->get_rule_row());
+            return ygg::Less<::tyr::formalism::datalog::RuleBindingView> {}(lhs_witness->get_rule_row(), rhs_witness->get_rule_row());
         };
 
         auto entry = Entry { interval, std::move(annotation) };

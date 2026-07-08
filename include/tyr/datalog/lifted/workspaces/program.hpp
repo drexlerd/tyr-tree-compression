@@ -42,6 +42,7 @@
 #include <utility>
 #include <vector>
 #include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
 #include <yggdrasil/semantics/hash.hpp>
 
@@ -167,9 +168,7 @@ public:
     {
         const auto& bucket = get_current_bucket();
         m_predicate_bucket_scratch.assign(bucket.begin(), bucket.end());
-        std::sort(m_predicate_bucket_scratch.begin(),
-                  m_predicate_bucket_scratch.end(),
-                  [](const auto lhs, const auto rhs) { return ygg::Less<> {}(lhs.get_key(), rhs.get_key()); });
+        std::sort(m_predicate_bucket_scratch.begin(), m_predicate_bucket_scratch.end(), ygg::Less<PredicateViewType> {});
         return m_predicate_bucket_scratch;
     }
 
@@ -180,18 +179,7 @@ public:
         m_function_bucket_scratch.reserve(bucket.size());
         for (const auto& [head, interval] : bucket)
             m_function_bucket_scratch.emplace_back(head, interval);
-        std::sort(m_function_bucket_scratch.begin(),
-                  m_function_bucket_scratch.end(),
-                  [](const auto& lhs, const auto& rhs)
-                  {
-                      if (ygg::Less<> {}(lhs.first.get_key(), rhs.first.get_key()))
-                          return true;
-                      if (ygg::Less<> {}(rhs.first.get_key(), lhs.first.get_key()))
-                          return false;
-                      if (lower(lhs.second) != lower(rhs.second))
-                          return lower(lhs.second) < lower(rhs.second);
-                      return upper(lhs.second) < upper(rhs.second);
-                  });
+        std::sort(m_function_bucket_scratch.begin(), m_function_bucket_scratch.end(), ygg::Less<FunctionBucketEntry> {});
         return m_function_bucket_scratch;
     }
 

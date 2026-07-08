@@ -44,6 +44,7 @@
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
 #include <yggdrasil/core/closed_interval.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
 #include <yggdrasil/semantics/hash.hpp>
 
@@ -361,7 +362,7 @@ template<AndAnnotationPolicyConcept<LiftedTag> AndAP>
 const std::vector<::tyr::formalism::datalog::RuleBindingView>& RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::get_sorted_pending_rule_bindings()
 {
     pending_rule_binding_scratch.assign(pending_rule_bindings.begin(), pending_rule_bindings.end());
-    std::sort(pending_rule_binding_scratch.begin(), pending_rule_binding_scratch.end(), canonical_rule_binding_less);
+    std::sort(pending_rule_binding_scratch.begin(), pending_rule_binding_scratch.end(), ygg::Less<::tyr::formalism::datalog::RuleBindingView> {});
     return pending_rule_binding_scratch;
 }
 
