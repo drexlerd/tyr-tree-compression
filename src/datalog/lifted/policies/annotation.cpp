@@ -118,7 +118,19 @@ OrAnnotationPolicy<LiftedTag>::update_annotation(::tyr::formalism::datalog::Pred
     const auto cost_update = update_min_cost(or_cost, witness.get_cost());
 
     if (or_cost < old_cost)
+    {
         program_and_annot.insert_or_assign(program_head, Annotation<LiftedTag>(witness));
+    }
+    else if (witness.get_cost() == old_cost)
+    {
+        // Canonical equal-cost tie-break: the lexicographically smallest rule binding wins, so the
+        // stored witness is independent of the platform-unspecified worker-merge order. A
+        // BaseAnnotation incumbent (initial fact) always wins its tie.
+        const auto* incumbent = program_and_annot.find(program_head);
+        const auto* incumbent_witness = incumbent ? std::get_if<WitnessAnnotation<LiftedTag>>(incumbent) : nullptr;
+        if (incumbent_witness && canonical_rule_binding_less(witness.get_rule_row(), incumbent_witness->get_rule_row()))
+            program_and_annot.insert_or_assign(program_head, Annotation<LiftedTag>(witness));
+    }
 
     return cost_update;
 }
@@ -202,6 +214,20 @@ std::optional<WitnessAnnotation<LiftedTag>> try_ground_better_witness(Cost best_
 
     return witness;
 }
+
+/// Like try_ground_better_witness but admits equal-cost witnesses, whose canonical tie-break the caller decides.
+template<typename AggregationFunction>
+std::optional<WitnessAnnotation<LiftedTag>> try_ground_witness_leq(Cost best_cost, const AndAnnotationContext<LiftedTag>& context)
+{
+    if (best_cost < AggregationFunction::identity() + context.metric_effect_cost)
+        return std::nullopt;
+
+    const auto witness = try_ground_witness<AggregationFunction>(context);
+    if (!witness || best_cost < witness->get_cost())
+        return std::nullopt;
+
+    return witness;
+}
 }
 
 template<typename AggregationFunction>
@@ -217,14 +243,34 @@ void AndAnnotationPolicy<LiftedTag, AggregationFunction>::update_annotation(
     const auto best_cost = std::min(best_global_cost, best_local_cost);
     const auto cur_cost_lower_bound = context.current_cost + context.metric_effect_cost;
 
-    if (best_cost <= cur_cost_lower_bound)
-        return;  ///< No local or global improvement
+    if (best_cost < cur_cost_lower_bound)
+        return;  ///< No local or global improvement or tie
 
-    const auto witness = try_ground_better_witness<AggregationFunction>(best_cost, context);
+    // Canonical equal-cost tie-break: the lexicographically smallest rule binding wins, making the kept
+    // witness independent of the platform-unspecified rule processing order. Ties are decided on the
+    // rule binding before paying for witness grounding; a BaseAnnotation incumbent (initial fact)
+    // always wins its tie.
+    const auto wins_tie = [&]()
+    {
+        const auto* incumbent =
+            best_local_cost <= best_global_cost ? delta_and_annot.find(delta_head) : context.program_and_annot.find(program_head);
+        if (!incumbent)
+            return true;
+        const auto* incumbent_witness = std::get_if<WitnessAnnotation<LiftedTag>>(incumbent);
+        return incumbent_witness && canonical_rule_binding_less(context.rule_binding, incumbent_witness->get_rule_row());
+    };
+
+    if (best_cost == cur_cost_lower_bound && !wins_tie())
+        return;  ///< Cannot improve, and loses the tie
+
+    const auto witness = try_ground_witness_leq<AggregationFunction>(best_cost, context);
     if (!witness)
-        return;  ///< No local or global improvement
+        return;  ///< No local or global improvement or tie
 
-    /// Update improved witness and cost annotation
+    if (witness->get_cost() == best_cost && !wins_tie())
+        return;  ///< Grounded into a tie that loses canonically
+
+    /// Update improved or canonically tie-winning witness and cost annotation
     delta_and_annot.insert_or_assign(delta_head, Annotation<LiftedTag>(*witness));
 }
 

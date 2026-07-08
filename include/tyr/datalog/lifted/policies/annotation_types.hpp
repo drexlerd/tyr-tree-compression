@@ -22,6 +22,8 @@
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <algorithm>
+#include <yggdrasil/containers/block_array_ordering.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -81,6 +83,15 @@ private:
     Cost m_cost;
     NumericSupports m_numeric_supports;
 };
+
+/// Canonical order over rule bindings by content key (relation, then object indices). Not ygg::Less on
+/// the binding views themselves: binding-view identity compares repository-local rows, which are assigned
+/// in processing order — exactly the platform-unspecified order that equal-cost witness ties must not
+/// depend on.
+inline bool canonical_rule_binding_less(::tyr::formalism::datalog::RuleBindingView lhs, ::tyr::formalism::datalog::RuleBindingView rhs)
+{
+    return ygg::Less<> {}(lhs.get_key(), rhs.get_key());
+}
 
 template<>
 class PredicateAnnotationMap<LiftedTag>
@@ -181,10 +192,29 @@ public:
         if (empty(interval))
             return;
 
+        // Entries are cost-sorted; equal-cost entries are further ordered canonically (interval bounds,
+        // then witness rule binding) instead of insertion order, so the candidate order downstream
+        // consumers see is independent of the platform-unspecified processing order.
+        const auto less = [](const Entry& lhs, const Entry& rhs)
+        {
+            const auto lhs_cost = get_cost(lhs.annotation);
+            const auto rhs_cost = get_cost(rhs.annotation);
+            if (lhs_cost != rhs_cost)
+                return lhs_cost < rhs_cost;
+            if (lower(lhs.interval) != lower(rhs.interval))
+                return lower(lhs.interval) < lower(rhs.interval);
+            if (upper(lhs.interval) != upper(rhs.interval))
+                return upper(lhs.interval) < upper(rhs.interval);
+            const auto* lhs_witness = std::get_if<WitnessAnnotation<LiftedTag>>(&lhs.annotation);
+            const auto* rhs_witness = std::get_if<WitnessAnnotation<LiftedTag>>(&rhs.annotation);
+            if (!lhs_witness || !rhs_witness)
+                return !lhs_witness && rhs_witness;  ///< BaseAnnotation (initial fact) sorts first
+            return canonical_rule_binding_less(lhs_witness->get_rule_row(), rhs_witness->get_rule_row());
+        };
+
+        auto entry = Entry { interval, std::move(annotation) };
         auto& entries = m_partitions[binding.get_relation()][binding.get_index().row];
-        const auto cost = get_cost(annotation);
-        entries.insert(std::upper_bound(entries.begin(), entries.end(), cost, [](Cost lhs, const Entry& rhs) { return lhs < get_cost(rhs.annotation); }),
-                       Entry { interval, std::move(annotation) });
+        entries.insert(std::upper_bound(entries.begin(), entries.end(), entry, less), std::move(entry));
         ++m_size;
     }
 
