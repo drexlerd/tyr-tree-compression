@@ -20,8 +20,10 @@ from fixture_generation import (
     ROOT,
     SEARCH_STATUS_NAMES,
     _KEEPALIVE,
+    ConfigSpec,
     ConfigResult,
     FixtureCase,
+    CostSuffix,
     HeuristicName,
     TaskKind,
     counters_of,
@@ -30,11 +32,19 @@ from fixture_generation import (
     planning_module,
 )
 
-FIXTURE = ROOT / "tests/unit/planning/algorithms/statistics/iw.json"
-CONFIGS: list[tuple[TaskKind, HeuristicName | None]] = [("ground", None), ("lifted", None)]
+FIXTURES: dict[TaskKind, Path] = {
+    "ground": ROOT / "tests/unit/planning/algorithms/statistics/ground/iw.json",
+    "lifted": ROOT / "tests/unit/planning/algorithms/statistics/lifted/iw.json",
+}
+CONFIGS: list[ConfigSpec] = [(None, None)]
 
 
-def run_config(kind: TaskKind, heuristic_name: HeuristicName | None, domain_file: Path, task_file: Path, suite: FixtureCase) -> ConfigResult | str:
+def run_config(kind: TaskKind,
+               heuristic_name: HeuristicName | None,
+               cost_suffix: CostSuffix | None,
+               domain_file: Path,
+               task_file: Path,
+               suite: FixtureCase) -> ConfigResult | str:
     max_arity = int(suite["max_arity"])
     context = make_context(kind, domain_file, task_file)
     planning = planning_module(context)
@@ -69,4 +79,4 @@ def run_config(kind: TaskKind, heuristic_name: HeuristicName | None, domain_file
 
 
 if __name__ == "__main__":
-    generate_main(Path(__file__).resolve(), FIXTURE, CONFIGS, run_config)
+    generate_main(Path(__file__).resolve(), FIXTURES, CONFIGS, run_config)

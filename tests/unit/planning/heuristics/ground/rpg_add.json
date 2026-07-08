@@ -7,7 +7,7 @@
             "task_file": "tests/classical/airport/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 8
+                    "h": 16
                 }
             },
             "skipped": {
@@ -33,10 +33,10 @@
             "task_file": "tests/classical/barman/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 5
+                    "h": 34
                 },
                 "general": {
-                    "h": 14
+                    "h": 97
                 }
             }
         },
@@ -46,10 +46,10 @@
             "task_file": "tests/classical/blocks_3/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 7
                 },
                 "general": {
-                    "h": 3
+                    "h": 7
                 }
             }
         },
@@ -59,10 +59,10 @@
             "task_file": "tests/classical/blocks_4/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 5
                 },
                 "general": {
-                    "h": 3
+                    "h": 5
                 }
             }
         },
@@ -72,10 +72,10 @@
             "task_file": "tests/classical/childsnack/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -85,10 +85,10 @@
             "task_file": "tests/classical/delivery/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 5
                 },
                 "general": {
-                    "h": 3
+                    "h": 5
                 }
             }
         },
@@ -98,10 +98,10 @@
             "task_file": "tests/classical/driverlog/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 6
                 },
                 "general": {
-                    "h": 4
+                    "h": 6
                 }
             }
         },
@@ -111,10 +111,10 @@
             "task_file": "tests/classical/ferry/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 6
                 },
                 "general": {
-                    "h": 4
+                    "h": 6
                 }
             }
         },
@@ -124,10 +124,10 @@
             "task_file": "tests/classical/grid/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 5
                 },
                 "general": {
-                    "h": 3
+                    "h": 5
                 }
             }
         },
@@ -137,10 +137,10 @@
             "task_file": "tests/classical/gripper/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
-                    "h": 2
+                    "h": 3
                 }
             }
         },
@@ -150,10 +150,10 @@
             "task_file": "tests/classical/hiking/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
-                    "h": 2
+                    "h": 3
                 }
             }
         },
@@ -176,10 +176,10 @@
             "task_file": "tests/classical/miconic/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 6
                 },
                 "general": {
-                    "h": 4
+                    "h": 6
                 }
             }
         },
@@ -215,10 +215,10 @@
             "task_file": "tests/classical/pathways/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 6
                 },
                 "general": {
-                    "h": 4
+                    "h": 6
                 }
             }
         },
@@ -254,7 +254,7 @@
             "task_file": "tests/classical/pushworld/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 11
+                    "h": 40
                 }
             },
             "skipped": {
@@ -267,10 +267,10 @@
             "task_file": "tests/classical/reward/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 5
                 },
                 "general": {
-                    "h": 4
+                    "h": 5
                 }
             }
         },
@@ -280,10 +280,10 @@
             "task_file": "tests/classical/rovers/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -293,10 +293,10 @@
             "task_file": "tests/classical/satellite/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 5
+                    "h": 11
                 },
                 "general": {
-                    "h": 5
+                    "h": 11
                 }
             }
         },
@@ -319,10 +319,10 @@
             "task_file": "tests/classical/sokoban/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 25
+                    "h": 78
                 },
                 "general": {
-                    "h": 25
+                    "h": 78
                 }
             }
         },
@@ -332,10 +332,10 @@
             "task_file": "tests/classical/spanner/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 5
                 },
                 "general": {
-                    "h": 3
+                    "h": 5
                 }
             }
         },
@@ -345,10 +345,10 @@
             "task_file": "tests/classical/visitall/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 6
+                    "h": 13
                 },
                 "general": {
-                    "h": 6
+                    "h": 13
                 }
             }
         },
@@ -358,10 +358,10 @@
             "task_file": "tests/numeric/fo-counters/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 4
                 },
                 "general": {
-                    "h": 2
+                    "h": 4
                 }
             }
         },
@@ -397,10 +397,10 @@
             "task_file": "tests/numeric/tpp/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 8
                 },
                 "general": {
-                    "h": 775.49
+                    "h": 2991.19
                 }
             }
         },
@@ -410,10 +410,10 @@
             "task_file": "tests/numeric/zenotravel/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 6
+                    "h": 10
                 },
                 "general": {
-                    "h": 5812
+                    "h": 11624
                 }
             }
         },
@@ -423,7 +423,7 @@
             "task_file": "tests/numeric/block-grouping/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 1
+                    "h": 2
                 },
                 "general": {
                     "h": 0
@@ -436,7 +436,7 @@
             "task_file": "tests/numeric/counters/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 9
                 },
                 "general": {
                     "h": 0
@@ -449,7 +449,7 @@
             "task_file": "tests/numeric/delivery/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
                     "h": 7
@@ -488,7 +488,7 @@
             "task_file": "tests/numeric/ext-plant-watering/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 5
+                    "h": 7
                 },
                 "general": {
                     "h": 0
@@ -514,7 +514,7 @@
             "task_file": "tests/numeric/fo-farmland/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
                     "h": 0
@@ -527,7 +527,7 @@
             "task_file": "tests/numeric/fo-sailing/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
                     "h": 0
@@ -553,7 +553,7 @@
             "task_file": "tests/numeric/markettrader/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 1
+                    "h": 2
                 },
                 "general": {
                     "h": 0
@@ -566,7 +566,7 @@
             "task_file": "tests/numeric/mprime/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
                     "h": 0
@@ -605,7 +605,7 @@
             "task_file": "tests/numeric/sailing/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
                     "h": 0

@@ -21,8 +21,8 @@ namespace tyr::tests
 {
 using HeuristicTaskKind = ::tyr::planning::LiftedTag;
 template<::tyr::planning::TaskKind Kind>
-using TestedHeuristic = ::tyr::planning::LMCutHeuristic<Kind>;
-inline constexpr const char* kHeuristicFixture = "tests/unit/planning/heuristics/lifted/lmcut.json";
+using TestedHeuristic = ::tyr::planning::MaxRPGHeuristic<Kind>;
+inline constexpr const char* kHeuristicFixture = "tests/unit/planning/heuristics/lifted/rpg_max.json";
 }
 
 #include "../heuristic.hpp"

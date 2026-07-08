@@ -5,558 +5,690 @@
             "name": "Agricola",
             "domain_file": "tests/classical/agricola/domain.pddl",
             "task_file": "tests/classical/agricola/test-1.pddl",
-            "hmax_unit": 24,
-            "hlmcut_unit": 24,
-            "hmax_general": 142,
-            "hlmcut_general": 142
+            "configs": {
+                "unit": {
+                    "h": 24
+                },
+                "general": {
+                    "h": 142
+                }
+            }
         },
         {
             "name": "Airport",
             "domain_file": "tests/classical/airport/domain.pddl",
             "task_file": "tests/classical/airport/test-1.pddl",
-            "hmax_unit": 8,
-            "hlmcut_unit": 8,
-            "hstar_unit": 8
+            "configs": {
+                "unit": {
+                    "h": 8
+                }
+            },
+            "skipped": {
+                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
         },
         {
             "name": "Assembly",
             "domain_file": "tests/classical/assembly/domain.pddl",
             "task_file": "tests/classical/assembly/test-1.pddl",
-            "hmax_unit": 1,
-            "hlmcut_unit": 1,
-            "hstar_unit": 1
+            "configs": {
+                "unit": {
+                    "h": 1
+                }
+            },
+            "skipped": {
+                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
         },
         {
             "name": "Barman",
             "domain_file": "tests/classical/barman/domain.pddl",
             "task_file": "tests/classical/barman/test-1.pddl",
-            "hmax_unit": 5,
-            "hlmcut_unit": 5,
-            "hmax_general": 14,
-            "hlmcut_general": 14,
-            "hstar_unit": 11,
-            "hstar_general": 29
+            "configs": {
+                "unit": {
+                    "h": 5
+                },
+                "general": {
+                    "h": 14
+                }
+            }
         },
         {
             "name": "Blocks3",
             "domain_file": "tests/classical/blocks_3/domain.pddl",
             "task_file": "tests/classical/blocks_3/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 3,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Blocks4",
             "domain_file": "tests/classical/blocks_4/domain.pddl",
             "task_file": "tests/classical/blocks_4/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 3,
-            "hmax_general": 2,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Childsnack",
             "domain_file": "tests/classical/childsnack/domain.pddl",
             "task_file": "tests/classical/childsnack/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 3,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Delivery",
             "domain_file": "tests/classical/delivery/domain.pddl",
             "task_file": "tests/classical/delivery/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 3,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Driverlog",
             "domain_file": "tests/classical/driverlog/domain.pddl",
             "task_file": "tests/classical/driverlog/test-1.pddl",
-            "hmax_unit": 4,
-            "hlmcut_unit": 4,
-            "hmax_general": 4,
-            "hlmcut_general": 4,
-            "hstar_unit": 9,
-            "hstar_general": 9
+            "configs": {
+                "unit": {
+                    "h": 4
+                },
+                "general": {
+                    "h": 4
+                }
+            }
         },
         {
             "name": "Ferry",
             "domain_file": "tests/classical/ferry/domain.pddl",
             "task_file": "tests/classical/ferry/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 4,
-            "hmax_general": 2,
-            "hlmcut_general": 4,
-            "hstar_unit": 7,
-            "hstar_general": 7
+            "configs": {
+                "unit": {
+                    "h": 4
+                },
+                "general": {
+                    "h": 4
+                }
+            }
         },
         {
             "name": "Grid",
             "domain_file": "tests/classical/grid/domain.pddl",
             "task_file": "tests/classical/grid/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 3,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Gripper",
             "domain_file": "tests/classical/gripper/domain.pddl",
             "task_file": "tests/classical/gripper/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 2,
-            "hlmcut_general": 2,
-            "hstar_unit": 3,
-            "hstar_general": 3
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 2
+                }
+            }
         },
         {
             "name": "Hiking",
             "domain_file": "tests/classical/hiking/domain.pddl",
             "task_file": "tests/classical/hiking/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 2,
-            "hlmcut_general": 2,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 2
+                }
+            }
         },
         {
             "name": "Logistics",
             "domain_file": "tests/classical/logistics/domain.pddl",
             "task_file": "tests/classical/logistics/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 3,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Miconic",
             "domain_file": "tests/classical/miconic/domain.pddl",
             "task_file": "tests/classical/miconic/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 4,
-            "hmax_general": 2,
-            "hlmcut_general": 4,
-            "hstar_unit": 5,
-            "hstar_general": 5
+            "configs": {
+                "unit": {
+                    "h": 4
+                },
+                "general": {
+                    "h": 4
+                }
+            }
         },
         {
             "name": "MiconicFulladl",
             "domain_file": "tests/classical/miconic-fulladl/domain.pddl",
             "task_file": "tests/classical/miconic-fulladl/test-1.pddl",
-            "hmax_unit": 0,
-            "hlmcut_unit": 0,
-            "hstar_unit": 7
+            "configs": {
+                "unit": {
+                    "h": 0
+                }
+            },
+            "skipped": {
+                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
         },
         {
             "name": "MiconicSimpleadl",
             "domain_file": "tests/classical/miconic-simpleadl/domain.pddl",
             "task_file": "tests/classical/miconic-simpleadl/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hstar_unit": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                }
+            },
+            "skipped": {
+                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
         },
         {
             "name": "Parcprinter",
             "domain_file": "tests/classical/parcprinter/domain.pddl",
             "task_file": "tests/classical/parcprinter/test-1.pddl",
-            "hmax_unit": 8,
-            "hlmcut_unit": 8,
-            "hmax_general": 169009,
-            "hlmcut_general": 169009,
-            "hstar_unit": 8,
-            "hstar_general": 169009
+            "configs": {
+                "unit": {
+                    "h": 8
+                },
+                "general": {
+                    "h": 169009
+                }
+            }
         },
         {
             "name": "Pathways",
             "domain_file": "tests/classical/pathways/domain.pddl",
             "task_file": "tests/classical/pathways/test-1.pddl",
-            "hmax_unit": 4,
-            "hlmcut_unit": 4,
-            "hmax_general": 4,
-            "hlmcut_general": 4,
-            "hstar_unit": 6,
-            "hstar_general": 6
+            "configs": {
+                "unit": {
+                    "h": 4
+                },
+                "general": {
+                    "h": 4
+                }
+            }
         },
         {
             "name": "Philosophers",
             "domain_file": "tests/classical/philosophers/domain.pddl",
             "task_file": "tests/classical/philosophers/test-1.pddl",
-            "hmax_unit": 0,
-            "hlmcut_unit": 0,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 18,
-            "hstar_general": 18
+            "configs": {
+                "unit": {
+                    "h": 0
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "PsrMiddle",
             "domain_file": "tests/classical/psr-middle/domain.pddl",
             "task_file": "tests/classical/psr-middle/test-1.pddl",
-            "hmax_unit": 0,
-            "hlmcut_unit": 0,
-            "hstar_unit": 4
+            "configs": {
+                "unit": {
+                    "h": 0
+                }
+            },
+            "skipped": {
+                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
         },
         {
             "name": "Pushworld",
             "domain_file": "tests/classical/pushworld/domain.pddl",
             "task_file": "tests/classical/pushworld/test-1.pddl",
-            "hmax_unit": 11,
-            "hlmcut_unit": 11
+            "configs": {
+                "unit": {
+                    "h": 11
+                }
+            },
+            "skipped": {
+                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
         },
         {
             "name": "Reward",
             "domain_file": "tests/classical/reward/domain.pddl",
             "task_file": "tests/classical/reward/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 4,
-            "hmax_general": 3,
-            "hlmcut_general": 4,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 4
+                },
+                "general": {
+                    "h": 4
+                }
+            }
         },
         {
             "name": "Rovers",
             "domain_file": "tests/classical/rovers/domain.pddl",
             "task_file": "tests/classical/rovers/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 3,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Satellite",
             "domain_file": "tests/classical/satellite/domain.pddl",
             "task_file": "tests/classical/satellite/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 5,
-            "hmax_general": 3,
-            "hlmcut_general": 5,
-            "hstar_unit": 7,
-            "hstar_general": 7
+            "configs": {
+                "unit": {
+                    "h": 5
+                },
+                "general": {
+                    "h": 5
+                }
+            }
         },
         {
             "name": "Schedule",
             "domain_file": "tests/classical/schedule/domain.pddl",
             "task_file": "tests/classical/schedule/test-1.pddl",
-            "hmax_unit": 1,
-            "hlmcut_unit": 2,
-            "hstar_unit": 2
+            "configs": {
+                "unit": {
+                    "h": 2
+                }
+            },
+            "skipped": {
+                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
         },
         {
             "name": "Sokoban",
             "domain_file": "tests/classical/sokoban/domain.pddl",
             "task_file": "tests/classical/sokoban/test-1.pddl",
-            "hmax_unit": 14,
-            "hlmcut_unit": 25,
-            "hmax_general": 14,
-            "hlmcut_general": 25
+            "configs": {
+                "unit": {
+                    "h": 25
+                },
+                "general": {
+                    "h": 25
+                }
+            }
         },
         {
             "name": "Spanner",
             "domain_file": "tests/classical/spanner/domain.pddl",
             "task_file": "tests/classical/spanner/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 3,
-            "hlmcut_general": 3,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 3
+                }
+            }
         },
         {
             "name": "Transport",
             "domain_file": "tests/classical/transport/domain.pddl",
             "task_file": "tests/classical/transport/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 3,
-            "hmax_general": 51,
-            "hlmcut_general": 52,
-            "hstar_unit": 5,
-            "hstar_general": 54
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 52
+                }
+            }
         },
         {
             "name": "Visitall",
             "domain_file": "tests/classical/visitall/domain.pddl",
             "task_file": "tests/classical/visitall/test-1.pddl",
-            "hmax_unit": 4,
-            "hlmcut_unit": 6,
-            "hmax_general": 4,
-            "hlmcut_general": 6,
-            "hstar_unit": 8,
-            "hstar_general": 8
+            "configs": {
+                "unit": {
+                    "h": 6
+                },
+                "general": {
+                    "h": 6
+                }
+            }
         },
         {
             "name": "Woodworking",
             "domain_file": "tests/classical/woodworking/domain.pddl",
             "task_file": "tests/classical/woodworking/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 9,
-            "hmax_general": 80,
-            "hlmcut_general": 80,
-            "hstar_unit": 9,
-            "hstar_general": 170
+            "configs": {
+                "unit": {
+                    "h": 9
+                },
+                "general": {
+                    "h": 80
+                }
+            }
         },
         {
             "name": "FoCounters",
             "domain_file": "tests/numeric/fo-counters/domain.pddl",
             "task_file": "tests/numeric/fo-counters/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 2,
-            "hlmcut_general": 2,
-            "hstar_unit": 5,
-            "hstar_general": 5
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 2
+                }
+            }
         },
         {
             "name": "Refuel",
             "domain_file": "tests/numeric/refuel/domain.pddl",
             "task_file": "tests/numeric/refuel/test-1.pddl",
-            "hmax_unit": 5,
-            "hlmcut_unit": 5,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 5,
-            "hstar_general": 5
+            "configs": {
+                "unit": {
+                    "h": 5
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "RefuelAdl",
             "domain_file": "tests/numeric/refuel-adl/domain.pddl",
             "task_file": "tests/numeric/refuel-adl/test-1.pddl",
-            "hmax_unit": 0,
-            "hlmcut_unit": 0,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 10,
-            "hstar_general": 10
+            "configs": {
+                "unit": {
+                    "h": 0
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Tpp",
             "domain_file": "tests/numeric/tpp/domain.pddl",
             "task_file": "tests/numeric/tpp/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 529.95,
-            "hlmcut_general": 775.49,
-            "hstar_unit": 7,
-            "hstar_general": 1833
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 775.49
+                }
+            }
         },
         {
             "name": "Zenotravel",
             "domain_file": "tests/numeric/zenotravel/domain.pddl",
             "task_file": "tests/numeric/zenotravel/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 6,
-            "hmax_general": 3100,
-            "hlmcut_general": 5812,
-            "hstar_unit": 9,
-            "hstar_general": 5952
+            "configs": {
+                "unit": {
+                    "h": 6
+                },
+                "general": {
+                    "h": 5812
+                }
+            }
         },
         {
             "name": "BlockGrouping",
             "domain_file": "tests/numeric/block-grouping/domain.pddl",
             "task_file": "tests/numeric/block-grouping/test-1.pddl",
-            "hmax_unit": 1,
-            "hlmcut_unit": 1,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 1
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Counters",
             "domain_file": "tests/numeric/counters/domain.pddl",
             "task_file": "tests/numeric/counters/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 4,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 12,
-            "hstar_general": 12
+            "configs": {
+                "unit": {
+                    "h": 4
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "NumericDelivery",
             "domain_file": "tests/numeric/delivery/domain.pddl",
             "task_file": "tests/numeric/delivery/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 5,
-            "hlmcut_general": 7,
-            "hstar_unit": 3,
-            "hstar_general": 7
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 7
+                }
+            }
         },
         {
             "name": "Drone",
             "domain_file": "tests/numeric/drone/domain.pddl",
             "task_file": "tests/numeric/drone/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Expedition",
             "domain_file": "tests/numeric/expedition/domain.pddl",
             "task_file": "tests/numeric/expedition/test-1.pddl",
-            "hmax_unit": 1,
-            "hlmcut_unit": 1,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 1,
-            "hstar_general": 1
+            "configs": {
+                "unit": {
+                    "h": 1
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "ExtPlantWatering",
             "domain_file": "tests/numeric/ext-plant-watering/domain.pddl",
             "task_file": "tests/numeric/ext-plant-watering/test-1.pddl",
-            "hmax_unit": 5,
-            "hlmcut_unit": 6,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 8,
-            "hstar_general": 8
+            "configs": {
+                "unit": {
+                    "h": 6
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Farmland",
             "domain_file": "tests/numeric/farmland/domain.pddl",
             "task_file": "tests/numeric/farmland/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "FoFarmland",
             "domain_file": "tests/numeric/fo-farmland/domain.pddl",
             "task_file": "tests/numeric/fo-farmland/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "FoSailing",
             "domain_file": "tests/numeric/fo-sailing/domain.pddl",
             "task_file": "tests/numeric/fo-sailing/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Hydropower",
             "domain_file": "tests/numeric/hydropower/domain.pddl",
             "task_file": "tests/numeric/hydropower/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Markettrader",
             "domain_file": "tests/numeric/markettrader/domain.pddl",
             "task_file": "tests/numeric/markettrader/test-1.pddl",
-            "hmax_unit": 1,
-            "hlmcut_unit": 1,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 1
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Mprime",
             "domain_file": "tests/numeric/mprime/domain.pddl",
             "task_file": "tests/numeric/mprime/test-1.pddl",
-            "hmax_unit": 3,
-            "hlmcut_unit": 3,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 4,
-            "hstar_general": 4
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Pathwaysmetric",
             "domain_file": "tests/numeric/pathwaysmetric/domain.pddl",
             "task_file": "tests/numeric/pathwaysmetric/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Rover",
             "domain_file": "tests/numeric/rover/domain.pddl",
             "task_file": "tests/numeric/rover/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 4,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 5,
-            "hstar_general": 0
+            "configs": {
+                "unit": {
+                    "h": 4
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Sailing",
             "domain_file": "tests/numeric/sailing/domain.pddl",
             "task_file": "tests/numeric/sailing/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 2,
-            "hstar_general": 2
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         },
         {
             "name": "Settersnumeric",
             "domain_file": "tests/numeric/settersnumeric/domain.pddl",
             "task_file": "tests/numeric/settersnumeric/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 2,
-            "hlmcut_general": 2,
-            "hstar_unit": 2,
-            "hstar_general": 6
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 2
+                }
+            }
         },
         {
             "name": "Sugar",
             "domain_file": "tests/numeric/sugar/domain.pddl",
             "task_file": "tests/numeric/sugar/test-1.pddl",
-            "hmax_unit": 2,
-            "hlmcut_unit": 2,
-            "hmax_general": 0,
-            "hlmcut_general": 0,
-            "hstar_unit": 3,
-            "hstar_general": 3
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 0
+                }
+            }
         }
     ]
 }

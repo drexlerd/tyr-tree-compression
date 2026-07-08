@@ -2,6 +2,19 @@
     "prefix": "data/planning-benchmarks",
     "cases": [
         {
+            "name": "Agricola",
+            "domain_file": "tests/classical/agricola/domain.pddl",
+            "task_file": "tests/classical/agricola/test-1.pddl",
+            "configs": {
+                "unit": {
+                    "h": 24
+                },
+                "general": {
+                    "h": 142
+                }
+            }
+        },
+        {
             "name": "Airport",
             "domain_file": "tests/classical/airport/domain.pddl",
             "task_file": "tests/classical/airport/test-1.pddl",
@@ -59,10 +72,10 @@
             "task_file": "tests/classical/blocks_4/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 2
                 },
                 "general": {
-                    "h": 3
+                    "h": 2
                 }
             }
         },
@@ -111,10 +124,10 @@
             "task_file": "tests/classical/ferry/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 2
                 },
                 "general": {
-                    "h": 4
+                    "h": 2
                 }
             }
         },
@@ -176,10 +189,10 @@
             "task_file": "tests/classical/miconic/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 2
                 },
                 "general": {
-                    "h": 4
+                    "h": 2
                 }
             }
         },
@@ -207,6 +220,19 @@
             },
             "skipped": {
                 "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+            }
+        },
+        {
+            "name": "Parcprinter",
+            "domain_file": "tests/classical/parcprinter/domain.pddl",
+            "task_file": "tests/classical/parcprinter/test-1.pddl",
+            "configs": {
+                "unit": {
+                    "h": 8
+                },
+                "general": {
+                    "h": 169009
+                }
             }
         },
         {
@@ -267,10 +293,10 @@
             "task_file": "tests/classical/reward/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 3
                 },
                 "general": {
-                    "h": 4
+                    "h": 3
                 }
             }
         },
@@ -293,10 +319,10 @@
             "task_file": "tests/classical/satellite/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 5
+                    "h": 3
                 },
                 "general": {
-                    "h": 5
+                    "h": 3
                 }
             }
         },
@@ -306,7 +332,7 @@
             "task_file": "tests/classical/schedule/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 1
                 }
             },
             "skipped": {
@@ -319,10 +345,10 @@
             "task_file": "tests/classical/sokoban/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 25
+                    "h": 14
                 },
                 "general": {
-                    "h": 25
+                    "h": 14
                 }
             }
         },
@@ -340,15 +366,41 @@
             }
         },
         {
+            "name": "Transport",
+            "domain_file": "tests/classical/transport/domain.pddl",
+            "task_file": "tests/classical/transport/test-1.pddl",
+            "configs": {
+                "unit": {
+                    "h": 2
+                },
+                "general": {
+                    "h": 51
+                }
+            }
+        },
+        {
             "name": "Visitall",
             "domain_file": "tests/classical/visitall/domain.pddl",
             "task_file": "tests/classical/visitall/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 6
+                    "h": 4
                 },
                 "general": {
-                    "h": 6
+                    "h": 4
+                }
+            }
+        },
+        {
+            "name": "Woodworking",
+            "domain_file": "tests/classical/woodworking/domain.pddl",
+            "task_file": "tests/classical/woodworking/test-1.pddl",
+            "configs": {
+                "unit": {
+                    "h": 3
+                },
+                "general": {
+                    "h": 80
                 }
             }
         },
@@ -400,7 +452,7 @@
                     "h": 3
                 },
                 "general": {
-                    "h": 775.49
+                    "h": 529.95
                 }
             }
         },
@@ -410,10 +462,10 @@
             "task_file": "tests/numeric/zenotravel/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 6
+                    "h": 3
                 },
                 "general": {
-                    "h": 5812
+                    "h": 3100
                 }
             }
         },
@@ -452,7 +504,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 7
+                    "h": 5
                 }
             }
         },
@@ -462,7 +514,7 @@
             "task_file": "tests/numeric/drone/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 2
                 },
                 "general": {
                     "h": 0
@@ -592,7 +644,7 @@
             "task_file": "tests/numeric/rover/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 2
                 },
                 "general": {
                     "h": 0

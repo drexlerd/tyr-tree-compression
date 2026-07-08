@@ -8,10 +8,10 @@
             "configs": {
                 "unit": {
                     "h": 8
+                },
+                "general": {
+                    "h": 8
                 }
-            },
-            "skipped": {
-                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
             }
         },
         {
@@ -21,10 +21,10 @@
             "configs": {
                 "unit": {
                     "h": 1
+                },
+                "general": {
+                    "h": 1
                 }
-            },
-            "skipped": {
-                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
             }
         },
         {
@@ -33,10 +33,10 @@
             "task_file": "tests/classical/barman/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 5
+                    "h": 11
                 },
                 "general": {
-                    "h": 14
+                    "h": 29
                 }
             }
         },
@@ -46,10 +46,10 @@
             "task_file": "tests/classical/blocks_3/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -59,10 +59,10 @@
             "task_file": "tests/classical/blocks_4/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -72,10 +72,10 @@
             "task_file": "tests/classical/childsnack/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -85,10 +85,10 @@
             "task_file": "tests/classical/delivery/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -98,10 +98,10 @@
             "task_file": "tests/classical/driverlog/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 9
                 },
                 "general": {
-                    "h": 4
+                    "h": 9
                 }
             }
         },
@@ -111,10 +111,10 @@
             "task_file": "tests/classical/ferry/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 7
                 },
                 "general": {
-                    "h": 4
+                    "h": 7
                 }
             }
         },
@@ -124,10 +124,10 @@
             "task_file": "tests/classical/grid/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -137,10 +137,10 @@
             "task_file": "tests/classical/gripper/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
-                    "h": 2
+                    "h": 3
                 }
             }
         },
@@ -150,10 +150,10 @@
             "task_file": "tests/classical/hiking/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 4
                 },
                 "general": {
-                    "h": 2
+                    "h": 4
                 }
             }
         },
@@ -163,10 +163,10 @@
             "task_file": "tests/classical/logistics/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -176,10 +176,10 @@
             "task_file": "tests/classical/miconic/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 5
                 },
                 "general": {
-                    "h": 4
+                    "h": 5
                 }
             }
         },
@@ -189,11 +189,11 @@
             "task_file": "tests/classical/miconic-fulladl/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 0
+                    "h": 7
+                },
+                "general": {
+                    "h": 7
                 }
-            },
-            "skipped": {
-                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
             }
         },
         {
@@ -202,11 +202,11 @@
             "task_file": "tests/classical/miconic-simpleadl/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
+                },
+                "general": {
+                    "h": 4
                 }
-            },
-            "skipped": {
-                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
             }
         },
         {
@@ -215,10 +215,10 @@
             "task_file": "tests/classical/pathways/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 6
                 },
                 "general": {
-                    "h": 4
+                    "h": 6
                 }
             }
         },
@@ -228,10 +228,10 @@
             "task_file": "tests/classical/philosophers/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 0
+                    "h": 18
                 },
                 "general": {
-                    "h": 0
+                    "h": 18
                 }
             }
         },
@@ -241,24 +241,20 @@
             "task_file": "tests/classical/psr-middle/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 0
+                    "h": 4
+                },
+                "general": {
+                    "h": 4
                 }
-            },
-            "skipped": {
-                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
             }
         },
         {
             "name": "Pushworld",
             "domain_file": "tests/classical/pushworld/domain.pddl",
             "task_file": "tests/classical/pushworld/test-1.pddl",
-            "configs": {
-                "unit": {
-                    "h": 11
-                }
-            },
             "skipped": {
-                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
+                "unit": "no plan within limits",
+                "general": "no plan within limits"
             }
         },
         {
@@ -280,10 +276,10 @@
             "task_file": "tests/classical/rovers/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -293,10 +289,10 @@
             "task_file": "tests/classical/satellite/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 5
+                    "h": 7
                 },
                 "general": {
-                    "h": 5
+                    "h": 7
                 }
             }
         },
@@ -307,23 +303,19 @@
             "configs": {
                 "unit": {
                     "h": 2
+                },
+                "general": {
+                    "h": 2
                 }
-            },
-            "skipped": {
-                "general": "GENERAL action costs with :conditional-effects are unsupported; compile conditional effects away first."
             }
         },
         {
             "name": "Sokoban",
             "domain_file": "tests/classical/sokoban/domain.pddl",
             "task_file": "tests/classical/sokoban/test-1.pddl",
-            "configs": {
-                "unit": {
-                    "h": 25
-                },
-                "general": {
-                    "h": 25
-                }
+            "skipped": {
+                "unit": "no plan within limits",
+                "general": "no plan within limits"
             }
         },
         {
@@ -332,10 +324,10 @@
             "task_file": "tests/classical/spanner/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 3
+                    "h": 4
                 }
             }
         },
@@ -345,10 +337,10 @@
             "task_file": "tests/classical/visitall/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 6
+                    "h": 8
                 },
                 "general": {
-                    "h": 6
+                    "h": 8
                 }
             }
         },
@@ -358,10 +350,10 @@
             "task_file": "tests/numeric/fo-counters/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 5
                 },
                 "general": {
-                    "h": 2
+                    "h": 5
                 }
             }
         },
@@ -374,7 +366,7 @@
                     "h": 5
                 },
                 "general": {
-                    "h": 0
+                    "h": 5
                 }
             }
         },
@@ -384,10 +376,10 @@
             "task_file": "tests/numeric/refuel-adl/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 0
+                    "h": 10
                 },
                 "general": {
-                    "h": 0
+                    "h": 10
                 }
             }
         },
@@ -397,10 +389,10 @@
             "task_file": "tests/numeric/tpp/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 7
                 },
                 "general": {
-                    "h": 775.49
+                    "h": 1833
                 }
             }
         },
@@ -410,10 +402,10 @@
             "task_file": "tests/numeric/zenotravel/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 6
+                    "h": 9
                 },
                 "general": {
-                    "h": 5812
+                    "h": 5952
                 }
             }
         },
@@ -423,10 +415,10 @@
             "task_file": "tests/numeric/block-grouping/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 1
+                    "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -436,10 +428,10 @@
             "task_file": "tests/numeric/counters/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 12
                 },
                 "general": {
-                    "h": 0
+                    "h": 12
                 }
             }
         },
@@ -449,7 +441,7 @@
             "task_file": "tests/numeric/delivery/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
                     "h": 7
@@ -462,10 +454,10 @@
             "task_file": "tests/numeric/drone/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 0
+                    "h": 4
                 }
             }
         },
@@ -478,7 +470,7 @@
                     "h": 1
                 },
                 "general": {
-                    "h": 0
+                    "h": 1
                 }
             }
         },
@@ -488,10 +480,10 @@
             "task_file": "tests/numeric/ext-plant-watering/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 5
+                    "h": 8
                 },
                 "general": {
-                    "h": 0
+                    "h": 8
                 }
             }
         },
@@ -504,7 +496,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -517,7 +509,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -530,7 +522,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -543,7 +535,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -553,10 +545,10 @@
             "task_file": "tests/numeric/markettrader/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 1
+                    "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -566,10 +558,10 @@
             "task_file": "tests/numeric/mprime/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 4
                 },
                 "general": {
-                    "h": 0
+                    "h": 4
                 }
             }
         },
@@ -582,7 +574,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -592,7 +584,7 @@
             "task_file": "tests/numeric/rover/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 4
+                    "h": 5
                 },
                 "general": {
                     "h": 0
@@ -608,7 +600,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 0
+                    "h": 2
                 }
             }
         },
@@ -621,7 +613,7 @@
                     "h": 2
                 },
                 "general": {
-                    "h": 2
+                    "h": 6
                 }
             }
         },
@@ -631,10 +623,10 @@
             "task_file": "tests/numeric/sugar/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 2
+                    "h": 3
                 },
                 "general": {
-                    "h": 0
+                    "h": 3
                 }
             }
         }

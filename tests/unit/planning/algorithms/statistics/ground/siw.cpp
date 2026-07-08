@@ -15,14 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/planning/planning.hpp"
+#include "tyr/planning/declarations.hpp"
 
 namespace tyr::tests
 {
-using HeuristicTaskKind = ::tyr::planning::LiftedTag;
-template<::tyr::planning::TaskKind Kind>
-using TestedHeuristic = ::tyr::planning::LMCutHeuristic<Kind>;
-inline constexpr const char* kHeuristicFixture = "tests/unit/planning/heuristics/lifted/lmcut.json";
+using StatisticsTaskKind = ::tyr::planning::GroundTag;
+inline constexpr const char* kStatisticsFixture = "tests/unit/planning/algorithms/statistics/ground/siw.json";
 }
 
-#include "../heuristic.hpp"
+#include "../siw.hpp"

@@ -21,7 +21,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Literal, NotRequired, Sequence, TypeAlias, TypedDict
+from typing import Callable, Literal, Mapping, NotRequired, Sequence, TypeAlias, TypedDict
 
 from pypddl.formalism import ParserOptions
 from pyyggdrasil.execution import ExecutionContext
@@ -47,13 +47,16 @@ _KEEPALIVE: list[object] = []
 
 TaskKind: TypeAlias = Literal["lifted", "ground"]
 HeuristicName: TypeAlias = Literal["blind", "hmax", "hadd", "hff", "hlmcut"]
+CostSuffix: TypeAlias = Literal["unit", "general"]
+ConfigSpec: TypeAlias = tuple[HeuristicName | None, CostSuffix | None]
 JsonNumber: TypeAlias = int | float
 FixtureCase: TypeAlias = dict[str, object]
 ConfigResult: TypeAlias = dict[str, object]
 """A run_config returns the per-configuration fixture object, or a skip reason string."""
-RunConfig: TypeAlias = Callable[["TaskKind", "HeuristicName | None", Path, Path, "FixtureCase"], "ConfigResult | str"]
+RunConfig: TypeAlias = Callable[["TaskKind", "HeuristicName | None", "CostSuffix | None", Path, Path, "FixtureCase"], "ConfigResult | str"]
 
 HEURISTICS: tuple[HeuristicName, ...] = ("blind", "hmax", "hadd", "hff", "hlmcut")
+COST_SUFFIXES: tuple[CostSuffix, ...] = ("unit", "general")
 RECORDED_STATUSES = (SearchStatus.SOLVED, SearchStatus.EXHAUSTED, SearchStatus.UNSOLVABLE)
 
 SEARCH_STATUS_NAMES = {
@@ -136,18 +139,22 @@ def make_context(kind: TaskKind, domain_file: Path, task_file: Path) -> TaskCont
     return GroundContext(execution_context, task, successor_generator)
 
 
-def make_heuristic(context: TaskContext, name: HeuristicName) -> object:
+def cost_mode_of(suffix: CostSuffix | None) -> CostMode:
+    return CostMode.UNIT if suffix == "unit" else CostMode.GENERAL
+
+
+def make_heuristic(context: TaskContext, name: HeuristicName, cost_suffix: CostSuffix | None) -> object:
     planning = planning_module(context)
     if name == "blind":
         return planning.BlindHeuristic()
     if name == "hmax":
-        return planning.MaxRPGHeuristic(context.task, context.execution_context, CostMode.GENERAL)
+        return planning.MaxRPGHeuristic(context.task, context.execution_context, cost_mode_of(cost_suffix))
     if name == "hadd":
-        return planning.AddRPGHeuristic(context.task, context.execution_context, CostMode.GENERAL)
+        return planning.AddRPGHeuristic(context.task, context.execution_context, cost_mode_of(cost_suffix))
     if name == "hff":
-        return planning.FFRPGHeuristic(context.task, context.execution_context, CostMode.GENERAL)
+        return planning.FFRPGHeuristic(context.task, context.execution_context, cost_mode_of(cost_suffix))
     if name == "hlmcut":
-        return planning.LMCutHeuristic(context.task, context.execution_context, CostMode.GENERAL)
+        return planning.LMCutHeuristic(context.task, context.execution_context, cost_mode_of(cost_suffix))
     raise ValueError(f"unknown heuristic: {name}")
 
 
@@ -160,8 +167,10 @@ def counters_of(statistics: Statistics) -> ConfigStatistics:
     )
 
 
-def config_label(kind: TaskKind, heuristic_name: HeuristicName | None) -> str:
-    return kind if heuristic_name is None else f"{kind}_{heuristic_name}"
+def config_label(heuristic_name: HeuristicName | None, cost_suffix: CostSuffix | None) -> str:
+    if heuristic_name is None:
+        return "default"
+    return f"{heuristic_name}_{cost_suffix}"
 
 
 def search_module(context: TaskContext, algorithm: Literal["brfs", "astar_eager", "gbfs_lazy"]):
@@ -179,6 +188,7 @@ def run_search_config(
     algorithm: Literal["brfs", "astar_eager", "gbfs_lazy"],
     kind: TaskKind,
     heuristic_name: HeuristicName | None,
+    cost_suffix: CostSuffix | None,
     domain_file: Path,
     task_file: Path,
     suite: FixtureCase,
@@ -195,9 +205,9 @@ def run_search_config(
     if heuristic_name is None:
         result = module.find_solution(context.task, context.successor_generator, options)
     else:
-        options.action_cost_mode = CostMode.GENERAL
+        options.action_cost_mode = cost_mode_of(cost_suffix)
         try:
-            heuristic = make_heuristic(context, heuristic_name)
+            heuristic = make_heuristic(context, heuristic_name, cost_suffix)
         except ValueError as error:
             return f"unsupported heuristic: {error}"
         _KEEPALIVE.append(heuristic)
@@ -217,16 +227,25 @@ def run_search_config(
 
 
 def run_config_external(
-    script: Path, case_name: str, kind: TaskKind, heuristic_name: HeuristicName | None, domain_file: Path, task_file: Path
+    script: Path,
+    fixture: Path,
+    case_name: str,
+    kind: TaskKind,
+    heuristic_name: HeuristicName | None,
+    cost_suffix: CostSuffix | None,
+    domain_file: Path,
+    task_file: Path,
 ) -> ConfigResult | str:
-    label = config_label(kind, heuristic_name)
-    print(f"  running {case_name} :: {label}", flush=True)
+    label = config_label(heuristic_name, cost_suffix)
+    print(f"  running {kind}::{case_name} :: {label}", flush=True)
     command = [
         sys.executable,
         str(script),
         "--worker",
+        str(fixture),
         kind,
         heuristic_name or "-",
+        cost_suffix or "-",
         str(domain_file),
         str(task_file),
     ]
@@ -247,29 +266,28 @@ def run_config_external(
     return payload["config"] if payload.get("config") is not None else str(payload.get("reason", "unknown"))
 
 
-def run_worker(run_config: RunConfig, suite: dict[str, object], argv: list[str]) -> None:
-    _, kind, heuristic_name, domain_file, task_file = argv
+def run_worker(run_config: RunConfig, argv: list[str]) -> None:
+    _, fixture, kind, heuristic_name, cost_suffix, domain_file, task_file = argv
     if kind not in ("lifted", "ground"):
         raise ValueError(f"unknown task kind: {kind}")
-    config = run_config(kind, None if heuristic_name == "-" else heuristic_name, Path(domain_file), Path(task_file), suite)
+    suite = json.loads(Path(fixture).read_text())
+    config = run_config(kind, None if heuristic_name == "-" else heuristic_name, None if cost_suffix == "-" else cost_suffix, Path(domain_file), Path(task_file), suite)
     print(json.dumps({"config": None, "reason": config} if isinstance(config, str) else {"config": config}))
     sys.stdout.flush()
     sys.stderr.flush()
     os._exit(0)
 
 
-def assemble_case(case: FixtureCase, configs: Sequence[tuple[TaskKind, HeuristicName | None]], results: dict[str, ConfigResult | str]) -> FixtureCase:
+def assemble_case(case: FixtureCase, configs: Sequence[ConfigSpec], results: dict[str, ConfigResult | str]) -> FixtureCase:
     result: FixtureCase = {
         "name": case["name"],
         "domain_file": case["domain_file"],
         "task_file": case["task_file"],
     }
 
-    # Flagged configurations are documented under "skipped" and carry no counters, so the
-    # gtest suites (and thus CI) never execute them.
     skipped: dict[str, str] = {}
-    for kind, heuristic_name in configs:
-        label = config_label(kind, heuristic_name)
+    for heuristic_name, cost_suffix in configs:
+        label = config_label(heuristic_name, cost_suffix)
         config = results[label]
         if isinstance(config, str):
             print(f"Skipping {case['name']} :: {label}: {config}", flush=True)
@@ -282,33 +300,33 @@ def assemble_case(case: FixtureCase, configs: Sequence[tuple[TaskKind, Heuristic
     return result
 
 
-def generate_main(script: Path, fixture: Path, configs: Sequence[tuple[TaskKind, HeuristicName | None]], run_config: RunConfig) -> None:
+def generate_main(script: Path, fixtures: Mapping[TaskKind, Path], configs: Sequence[ConfigSpec], run_config: RunConfig) -> None:
     """Entry point for a generator script: handles --worker re-entry and case-name filters."""
-    suite = json.loads(fixture.read_text())
-
     if len(sys.argv) > 1 and sys.argv[1] == "--worker":
-        run_worker(run_config, suite, sys.argv[1:])
+        run_worker(run_config, sys.argv[1:])
 
     filters = set(sys.argv[1:])
-    prefix = ROOT / suite["prefix"]
-    selected = [case for case in suite["cases"] if not filters or case["name"] in filters]
+    for kind, fixture in fixtures.items():
+        suite = json.loads(fixture.read_text())
+        prefix = ROOT / suite["prefix"]
+        selected = [case for case in suite["cases"] if not filters or case["name"] in filters]
 
-    with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as pool:
-        futures = {
-            (str(case["name"]), config_label(kind, heuristic_name)):
-                pool.submit(run_config_external, script, str(case["name"]), kind, heuristic_name,
-                            prefix / str(case["domain_file"]), prefix / str(case["task_file"]))
+        with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as pool:
+            futures = {
+                (str(case["name"]), config_label(heuristic_name, cost_suffix)):
+                    pool.submit(run_config_external, script, fixture, str(case["name"]), kind, heuristic_name, cost_suffix,
+                                prefix / str(case["domain_file"]), prefix / str(case["task_file"]))
+                for case in selected
+                for heuristic_name, cost_suffix in configs
+            }
+            results = {key: future.result() for key, future in futures.items()}
+
+        cases = [
+            assemble_case(case, configs, {label: result for (name, label), result in results.items() if name == case["name"]})
             for case in selected
-            for kind, heuristic_name in configs
-        }
-        results = {key: future.result() for key, future in futures.items()}
+        ]
 
-    cases = [
-        assemble_case(case, configs, {label: result for (name, label), result in results.items() if name == case["name"]})
-        for case in selected
-    ]
-
-    out = fixture if not filters else fixture.with_name(f"{fixture.name}.generated")
-    suite_header = {key: value for key, value in suite.items() if key != "cases"}
-    out.write_text(json.dumps({**suite_header, "cases": cases}, indent=4) + "\n")
-    print(f"Wrote {out}")
+        out = fixture if not filters else fixture.with_name(f"{fixture.name}.generated")
+        suite_header = {key: value for key, value in suite.items() if key != "cases"}
+        out.write_text(json.dumps({**suite_header, "cases": cases}, indent=4) + "\n")
+        print(f"Wrote {out}")

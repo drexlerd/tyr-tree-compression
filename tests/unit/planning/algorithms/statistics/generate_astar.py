@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-"""Regenerate the astar (eager) search-statistics fixture ({ground, lifted} x all heuristics).
-
-Usage:
-    .venv/bin/python tests/unit/planning/algorithms/statistics/generate_astar.py [CASE ...]
-"""
+"""Regenerate the astar (eager) search-statistics fixtures."""
 
 from __future__ import annotations
 
 from functools import partial
 from pathlib import Path
 
-from fixture_generation import HEURISTICS, ROOT, HeuristicName, TaskKind, generate_main, run_search_config
+from fixture_generation import COST_SUFFIXES, HEURISTICS, ROOT, ConfigSpec, TaskKind, generate_main, run_search_config
 
-FIXTURE = ROOT / "tests/unit/planning/algorithms/statistics/astar.json"
-CONFIGS: list[tuple[TaskKind, HeuristicName | None]] = [(kind, heuristic) for kind in ("ground", "lifted") for heuristic in HEURISTICS]
+FIXTURES: dict[TaskKind, Path] = {
+    "ground": ROOT / "tests/unit/planning/algorithms/statistics/ground/astar.json",
+    "lifted": ROOT / "tests/unit/planning/algorithms/statistics/lifted/astar.json",
+}
+CONFIGS: list[ConfigSpec] = [(heuristic, suffix) for heuristic in HEURISTICS for suffix in COST_SUFFIXES]
 
 if __name__ == "__main__":
-    generate_main(Path(__file__).resolve(), FIXTURE, CONFIGS, partial(run_search_config, "astar_eager"))
+    generate_main(Path(__file__).resolve(), FIXTURES, CONFIGS, partial(run_search_config, "astar_eager"))

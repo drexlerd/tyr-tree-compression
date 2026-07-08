@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
 #include "tyr/planning/lifted/heuristics/lmcut.hpp"
 
 #include <algorithm>
@@ -85,9 +84,6 @@ LMCutHeuristicPtr<LiftedTag> LMCutHeuristic<LiftedTag>::create(TaskPtr<LiftedTag
 
 ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& state)
 {
-    // Set TYR_LMCUT_TRACE=1 to print one line per lmcut round (cross-platform divergence diagnosis).
-    const bool trace = std::getenv("TYR_LMCUT_TRACE") != nullptr;
-    auto trace_round = int(0);
     auto value = datalog::Cost(0);
     m_use_expanded_edges = needs_expanded_lmcut(m_rpg_program.get_datalog_program().get_program());
     m_residual_costs.clear();
@@ -102,8 +98,6 @@ ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& sta
             return hmax;
 
         const auto hmax_cost = datalog::Cost(hmax);
-        if (trace)
-            fmt::print(stderr, "TYR_LMCUT_TRACE lifted round={} hmax={} value={}\n", trace_round++, hmax, double(value));
         if (hmax_cost == 0)
             return ygg::float_t(value);
 
@@ -120,15 +114,6 @@ ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& sta
                 cut_cost = std::min(cut_cost, residual);
 
             assert(cut_cost > 0 && cut_cost != std::numeric_limits<datalog::Cost>::max());
-
-            if (trace)
-                fmt::print(stderr,
-                           "TYR_LMCUT_TRACE lifted   cut rule_edges={} numeric_edges={} cut_cost={} goal_zone={} numeric_goal_zone={}\n",
-                           m_rule_cut.size(),
-                           m_numeric_cut.size(),
-                           double(cut_cost),
-                           m_goal_zone.size(),
-                           m_numeric_goal_zone.size());
 
             value += cut_cost;
             for (const auto& [edge, _] : m_rule_cut)
@@ -640,18 +625,11 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
     m_rule_cut.clear();
     m_numeric_cut.clear();
 
-    // TYR_LMCUT_TRACE: the goal-zone seeding below matches recomputed costs against goal_cost with
-    // exact floating-point equality; hexfloat output makes a single-ulp cross-platform mismatch visible.
-    const bool trace = std::getenv("TYR_LMCUT_TRACE") != nullptr;
     const auto goal_cost = get_goal_cost();
-    if (trace)
-        fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed goal_cost={:a} expanded=1\n", double(goal_cost));
     if (const auto& goal = m_workspace.tp.get_goal())
     {
         for (const auto literal : goal->get_literals<::tyr::formalism::FluentTag>())
         {
-            if (trace && literal.get_polarity())
-                fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed literal binding_cost={:a}\n", double(get_binding_cost(literal.get_atom().get_row())));
             if (literal.get_polarity() && get_binding_cost(literal.get_atom().get_row()) == goal_cost)
             {
                 mark_goal_zone(literal.get_atom().get_row());
@@ -664,33 +642,20 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
         {
             const auto constraint_cost =
                 m_workspace.numeric_support_selector->get_constraint_cost(constraint, selection_workspace, datalog::MaxAggregation {});
-            if (trace)
-                fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed constraint_cost={:a}\n", double(constraint_cost));
             if (constraint_cost != goal_cost)
                 continue;
 
             for (const auto& entry : selection_workspace.selection)
             {
-                if (trace)
-                    fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed entry_cost={:a}\n", double(entry.cost));
                 if (entry.cost == goal_cost)
                     mark_goal_zone(NumericNode { entry.binding, entry.interval });
             }
         }
     }
-    if (trace)
-        fmt::print(stderr, "TYR_LMCUT_TRACE lifted   seed goal_zone={} numeric_goal_zone={}\n", m_goal_zone.size(), m_numeric_goal_zone.size());
 
     auto inspect_rule_witness = [&](const auto& witness)
     {
-        const auto has_action_binding = static_cast<bool>(get_action_binding(witness));
-        if (trace)
-            fmt::print(stderr,
-                       "TYR_LMCUT_TRACE lifted     inspect has_action_binding={} witness_cost={:a} body_cost={:a}\n",
-                       has_action_binding,
-                       double(witness.get_cost()),
-                       double(get_witness_body_cost(witness)));
-        if (!has_action_binding)
+        if (!get_action_binding(witness))
             return;
         const auto edge = make_rule_edge(witness);
         const auto residual = get_witness_edge_residual_cost(witness);
@@ -701,8 +666,6 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
         const auto crosses_cut =
             preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
         release_witness_max_preconditions();
-        if (trace)
-            fmt::print(stderr, "TYR_LMCUT_TRACE lifted     inspect residual={:a} npre={} crosses={}\n", double(residual), preconditions.size(), crosses_cut);
         if (crosses_cut)
         {
             const auto [it, inserted] = m_rule_cut.emplace(edge, residual);
@@ -737,13 +700,9 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
     for (const auto binding : m_goal_zone)
     {
         const auto binding_cost = get_binding_cost(binding);
-        if (trace)
-            fmt::print(stderr, "TYR_LMCUT_TRACE lifted   zone binding_cost={:a}\n", double(binding_cost));
         for_each_achiever(binding,
                           [&](const auto& witness)
                           {
-                              if (trace)
-                                  fmt::print(stderr, "TYR_LMCUT_TRACE lifted     achiever witness_cost={:a}\n", double(witness.get_cost()));
                               if (witness.get_cost() == binding_cost)
                                   inspect_rule_witness(witness);
                           });
