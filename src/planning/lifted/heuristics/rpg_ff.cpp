@@ -18,7 +18,7 @@
 #include "tyr/planning/lifted/heuristics/rpg_ff.hpp"
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/formalism/datalog/expression_properties.hpp"
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/grounder.hpp"

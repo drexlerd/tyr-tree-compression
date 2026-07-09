@@ -21,7 +21,7 @@
 #include "tyr/datalog/lifted/bottom_up.hpp"
 #include "tyr/datalog/lifted/contexts/program.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/formalism/canonicalization.hpp"
 #include "tyr/formalism/planning/builder.hpp"

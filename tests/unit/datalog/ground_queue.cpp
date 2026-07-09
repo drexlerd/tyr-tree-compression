@@ -440,7 +440,7 @@ TEST(TyrDatalogGroundQueueTest, GroundTerminationStopsAfterGoalDerived)
 
     EXPECT_EQ(atom_indices(ctx.out().fluent_atoms()), expected_indices({ a }));
     EXPECT_EQ(ctx.out().statistics().num_rules_fired, 1);
-    EXPECT_TRUE(ctx.out().tp().check(program, ctx.out().facts()));
+    EXPECT_TRUE(ctx.out().tp().check(datalog::FactSets { ctx.out().facts().static_fact_sets, ctx.out().facts().fluent_fact_sets }));
 }
 
 TEST(TyrDatalogGroundQueueTest, AchieverPolicyGroundRecordsFiredRule)

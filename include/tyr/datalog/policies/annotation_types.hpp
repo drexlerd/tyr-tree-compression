@@ -194,7 +194,6 @@ inline PredicateAnnotationKeyT<Kind> get_predicate_annotation_key(PredicateAnnot
 
 template<TaskKind Kind>
 inline PredicateAnnotationKeyT<Kind> get_predicate_annotation_key(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> atom) noexcept
-    requires std::same_as<Kind, GroundTag>
 {
     return atom.get_row();
 }

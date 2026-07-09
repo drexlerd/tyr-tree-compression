@@ -54,7 +54,7 @@ bool needs_expanded_lmcut(auto program)
 }
 
 LMCutHeuristic<LiftedTag>::LMCutHeuristic(TaskPtr<LiftedTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode) :
-    Base(task,
+    Base(std::move(task),
          std::move(execution_context),
          datalog::OrAnnotationPolicy<LiftedTag>(),
          datalog::AchieverAndAnnotationPolicy<LiftedTag, datalog::MaxAggregation>(),
@@ -73,7 +73,7 @@ LMCutHeuristic<LiftedTag>::LMCutHeuristic(TaskPtr<LiftedTag> task, ygg::Executio
     m_numeric_cut(),
     m_max_precondition_buffers(),
     m_max_precondition_depth(0),
-    m_use_expanded_edges(false)
+    m_use_expanded_edges(needs_expanded_lmcut(m_rpg_program.get_datalog_program().get_program()))
 {
 }
 
@@ -85,7 +85,6 @@ LMCutHeuristicPtr<LiftedTag> LMCutHeuristic<LiftedTag>::create(TaskPtr<LiftedTag
 ygg::float_t LMCutHeuristic<LiftedTag>::evaluate(const StateView<LiftedTag>& state)
 {
     auto value = datalog::Cost(0);
-    m_use_expanded_edges = needs_expanded_lmcut(m_rpg_program.get_datalog_program().get_program());
     m_residual_costs.clear();
     m_rule_edge_used_costs.clear();
     m_numeric_edge_used_costs.clear();

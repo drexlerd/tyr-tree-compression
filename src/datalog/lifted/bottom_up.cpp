@@ -26,7 +26,7 @@
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
-#include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/rule_scheduler.hpp"
 #include "tyr/datalog/lifted/workspaces/facts.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"

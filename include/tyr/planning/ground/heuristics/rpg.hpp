@@ -18,6 +18,7 @@
 #ifndef TYR_PLANNING_GROUND_HEURISTICS_RPG_HPP_
 #define TYR_PLANNING_GROUND_HEURISTICS_RPG_HPP_
 
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/ground/contexts/program.hpp"
 #include "tyr/datalog/ground/policies/cost.hpp"
 #include "tyr/datalog/ground/policies/numeric_support.hpp"
@@ -193,7 +194,7 @@ ygg::float_t RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::evaluate_impl(con
 
     m_execution_context->arena().execute([&] { datalog::solve_ground_queue(ctx); });
 
-    return m_workspace.tp.check(m_rpg_program.get_datalog_program().get_program(), m_workspace.facts) ?
+    return m_workspace.tp.check(datalog::FactSets { m_workspace.facts.static_fact_sets, m_workspace.facts.fluent_fact_sets }) ?
                self().extract_cost_and_set_preferred_actions_impl(state) :
                std::numeric_limits<ygg::float_t>::infinity();
 }
@@ -245,7 +246,10 @@ template<typename Derived,
 datalog::Cost RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::get_goal_cost() const noexcept
 {
     const auto numeric_support_selector = datalog::GroundNumericSupportSelector(m_workspace.facts, m_workspace.numeric_and_annot);
-    return m_workspace.tp.get_total_cost(m_workspace.facts, m_workspace.and_annot, m_workspace.numeric_and_annot, numeric_support_selector);
+    return m_workspace.tp.get_total_cost(datalog::FactSets { m_workspace.facts.static_fact_sets, m_workspace.facts.fluent_fact_sets },
+                                           m_workspace.and_annot,
+                                           m_workspace.numeric_and_annot,
+                                           numeric_support_selector);
 }
 
 }

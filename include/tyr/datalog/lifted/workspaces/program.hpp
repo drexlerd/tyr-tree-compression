@@ -25,6 +25,7 @@
 #include "tyr/datalog/lifted/workspaces/rule.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/policies/cost_concept.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 #include "tyr/datalog/programs/program.hpp"
 #include "tyr/datalog/statistics/program.hpp"

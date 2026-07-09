@@ -15,10 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tyr/datalog/ground/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 
 #include "tyr/datalog/lifted/applicability.hpp"
-#include "tyr/datalog/policies/aggregation.hpp"
 
 #include <cassert>
 #include <limits>
@@ -26,28 +25,27 @@
 namespace tyr::datalog
 {
 
-template<typename AggregationFunction>
-void TerminationPolicy<GroundTag, AggregationFunction>::set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_)
+template<TaskKind Kind, typename AggregationFunction>
+void TerminationPolicy<Kind, AggregationFunction>::set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_)
 {
     clear();
     goals = goals_;
 }
 
-template<typename AggregationFunction>
-bool TerminationPolicy<GroundTag, AggregationFunction>::check(::tyr::formalism::datalog::ProgramView<GroundTag>,
-                                                              const FactsWorkspace<GroundTag>& facts) const noexcept
+template<TaskKind Kind, typename AggregationFunction>
+bool TerminationPolicy<Kind, AggregationFunction>::check(const FactSets& fact_sets) const noexcept
 {
     if (!goals)
         return false;
 
-    return is_applicable(*goals, FactSets { facts.static_fact_sets, facts.fluent_fact_sets });
+    return is_applicable(*goals, fact_sets);
 }
 
-template<typename AggregationFunction>
-Cost TerminationPolicy<GroundTag, AggregationFunction>::get_total_cost(const FactsWorkspace<GroundTag>&,
-                                                                       const GroundSelectedPredicateAnnotations& and_annot,
-                                                                       const GroundSelectedFunctionAnnotations&,
-                                                                       const GroundNumericSupportSelector& numeric_support_selector) const noexcept
+template<TaskKind Kind, typename AggregationFunction>
+Cost TerminationPolicy<Kind, AggregationFunction>::get_total_cost(const FactSets&,
+                                                                  const SelectedPredicateAnnotations<Kind>& and_annot,
+                                                                  const SelectedFunctionAnnotations<Kind>&,
+                                                                  const details::TerminationNumericSupportSelectorT<Kind>& numeric_support_selector) const noexcept
 {
     if (!goals)
         return AggregationFunction::identity();
@@ -80,13 +78,13 @@ Cost TerminationPolicy<GroundTag, AggregationFunction>::get_total_cost(const Fac
     return total;
 }
 
-template<typename AggregationFunction>
-void TerminationPolicy<GroundTag, AggregationFunction>::reset() noexcept
+template<TaskKind Kind, typename AggregationFunction>
+void TerminationPolicy<Kind, AggregationFunction>::reset() noexcept
 {
 }
 
-template<typename AggregationFunction>
-void TerminationPolicy<GroundTag, AggregationFunction>::clear() noexcept
+template<TaskKind Kind, typename AggregationFunction>
+void TerminationPolicy<Kind, AggregationFunction>::clear() noexcept
 {
     goals = std::nullopt;
     numeric_support_selector_workspace.clear();
@@ -94,5 +92,7 @@ void TerminationPolicy<GroundTag, AggregationFunction>::clear() noexcept
 
 template class TerminationPolicy<GroundTag, SumAggregation>;
 template class TerminationPolicy<GroundTag, MaxAggregation>;
+template class TerminationPolicy<LiftedTag, SumAggregation>;
+template class TerminationPolicy<LiftedTag, MaxAggregation>;
 
 }

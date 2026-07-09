@@ -17,6 +17,7 @@
 
 #include "tyr/datalog/ground/queue.hpp"
 
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/numeric_utils.hpp"
 
 #include <algorithm>
@@ -777,7 +778,7 @@ bool fire_rule(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule, Cos
                     notify_fact_inserted(ctx, head);
                 if (is_annotation_improvement(update))
                     notify_fact_annotation_improved(ctx, head);
-                stop = ctx.out().tp().check(ctx.in().program(), ctx.out().facts());
+                stop = ctx.out().tp().check(FactSets { ctx.out().facts().static_fact_sets, ctx.out().facts().fluent_fact_sets });
             }
             else if constexpr (std::is_same_v<Head, fd::GroundNumericEffectOperatorView<f::FluentTag>>)
             {
@@ -818,7 +819,7 @@ bool commit_numeric_bucket(GroundCtx<OrAP, AndAP, TP, CP>& ctx, PendingNumericBu
     for (const auto term : changed_terms)
         notify_numeric_interval_changed(ctx, term);
 
-    return !changed_terms.empty() && ctx.out().tp().check(ctx.in().program(), ctx.out().facts());
+    return !changed_terms.empty() && ctx.out().tp().check(FactSets { ctx.out().facts().static_fact_sets, ctx.out().facts().fluent_fact_sets });
 }
 
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,

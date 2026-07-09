@@ -20,7 +20,7 @@
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
 #include "tyr/datalog/ground/policies/cost.hpp"
-#include "tyr/datalog/ground/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/planning/ground/heuristics/rpg.hpp"
 #include "tyr/planning/heuristics/lmcut.hpp"
 

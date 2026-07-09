@@ -79,7 +79,7 @@ LMCutHeuristic<GroundTag>::LMCutHeuristic(TaskPtr<GroundTag> task, ygg::Executio
     m_numeric_cut(),
     m_max_precondition_buffers(),
     m_max_precondition_depth(0),
-    m_use_expanded_edges(false)
+    m_use_expanded_edges(needs_expanded_lmcut(m_rpg_program.get_datalog_program().get_program()))
 {
 }
 
@@ -93,7 +93,6 @@ ygg::float_t LMCutHeuristic<GroundTag>::evaluate(const StateView<GroundTag>& sta
 ygg::float_t LMCutHeuristic<GroundTag>::evaluate_impl(const StateView<GroundTag>& state)
 {
     auto value = datalog::Cost(0);
-    m_use_expanded_edges = needs_expanded_lmcut(m_rpg_program.get_datalog_program().get_program());
     m_residual_costs.clear();
     m_rule_edge_used_costs.clear();
     m_numeric_edge_used_costs.clear();

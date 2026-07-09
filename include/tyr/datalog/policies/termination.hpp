@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_GROUND_POLICIES_TERMINATION_HPP_
-#define TYR_DATALOG_GROUND_POLICIES_TERMINATION_HPP_
+#ifndef TYR_DATALOG_POLICIES_TERMINATION_HPP_
+#define TYR_DATALOG_POLICIES_TERMINATION_HPP_
 
 #include "tyr/datalog/declarations.hpp"
-#include "tyr/datalog/ground/policies/numeric_support.hpp"
+#include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 
@@ -29,18 +29,18 @@
 namespace tyr::datalog
 {
 
-template<>
-class NoTerminationPolicy<GroundTag>
+template<TaskKind Kind>
+class NoTerminationPolicy
 {
 public:
     NoTerminationPolicy() = default;
 
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView) {}
-    bool check(::tyr::formalism::datalog::ProgramView<GroundTag>, const FactsWorkspace<GroundTag>&) const noexcept { return false; }
-    Cost get_total_cost(const FactsWorkspace<GroundTag>&,
-                        const GroundSelectedPredicateAnnotations&,
-                        const GroundSelectedFunctionAnnotations&,
-                        const GroundNumericSupportSelector&) const noexcept
+    bool check(const FactSets&) const noexcept { return false; }
+    Cost get_total_cost(const FactSets&,
+                        const SelectedPredicateAnnotations<Kind>&,
+                        const SelectedFunctionAnnotations<Kind>&,
+                        const details::TerminationNumericSupportSelectorT<Kind>&) const noexcept
     {
         return Cost(0);
     }
@@ -48,18 +48,20 @@ public:
     void clear() noexcept {}
 };
 
-template<typename AggregationFunction>
-class TerminationPolicy<GroundTag, AggregationFunction>
+template<TaskKind Kind, typename AggregationFunction>
+class TerminationPolicy
 {
 public:
+    TerminationPolicy() = default;
+
     void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_);
 
-    bool check(::tyr::formalism::datalog::ProgramView<GroundTag>, const FactsWorkspace<GroundTag>& facts) const noexcept;
+    bool check(const FactSets& fact_sets) const noexcept;
 
-    Cost get_total_cost(const FactsWorkspace<GroundTag>&,
-                        const GroundSelectedPredicateAnnotations& and_annot,
-                        const GroundSelectedFunctionAnnotations&,
-                        const GroundNumericSupportSelector& numeric_support_selector) const noexcept;
+    Cost get_total_cost(const FactSets& fact_sets,
+                        const SelectedPredicateAnnotations<Kind>& and_annot,
+                        const SelectedFunctionAnnotations<Kind>&,
+                        const details::TerminationNumericSupportSelectorT<Kind>& numeric_support_selector) const noexcept;
 
     const auto& get_goal() const noexcept { return goals; }
 
@@ -69,13 +71,16 @@ public:
 
 private:
     std::optional<::tyr::formalism::datalog::GroundConjunctiveConditionView> goals;
-    mutable GroundNumericSupportSelectorWorkspace numeric_support_selector_workspace;
+    mutable details::TerminationNumericSupportSelectorWorkspaceT<Kind> numeric_support_selector_workspace;
     AggregationFunction agg;
 };
 
 static_assert(TerminationPolicyConcept<NoTerminationPolicy<GroundTag>, GroundTag>);
+static_assert(TerminationPolicyConcept<NoTerminationPolicy<LiftedTag>, LiftedTag>);
 static_assert(TerminationPolicyConcept<TerminationPolicy<GroundTag, SumAggregation>, GroundTag>);
 static_assert(TerminationPolicyConcept<TerminationPolicy<GroundTag, MaxAggregation>, GroundTag>);
+static_assert(TerminationPolicyConcept<TerminationPolicy<LiftedTag, SumAggregation>, LiftedTag>);
+static_assert(TerminationPolicyConcept<TerminationPolicy<LiftedTag, MaxAggregation>, LiftedTag>);
 
 }
 

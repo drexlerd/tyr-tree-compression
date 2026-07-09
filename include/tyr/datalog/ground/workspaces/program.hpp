@@ -20,7 +20,7 @@
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
 #include "tyr/datalog/ground/policies/cost.hpp"
-#include "tyr/datalog/ground/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/ground/workspaces/facts.hpp"
 #include "tyr/datalog/ground/workspaces/rule.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"

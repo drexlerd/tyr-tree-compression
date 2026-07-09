@@ -21,7 +21,7 @@
 #include "tyr/planning/lifted/state_builder.hpp"
 //
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/planning/axiom_evaluator.hpp"
 #include "tyr/planning/declarations.hpp"

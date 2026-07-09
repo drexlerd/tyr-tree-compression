@@ -20,7 +20,7 @@
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/cost.hpp"
-#include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/planning/heuristics/lmcut.hpp"
 #include "tyr/planning/lifted/heuristics/rpg.hpp"
 

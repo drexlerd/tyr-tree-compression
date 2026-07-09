@@ -19,7 +19,7 @@
 #define TYR_PLANNING_LIFTED_HEURISTICS_RPG_MAX_HPP_
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/formalism/planning/merge_datalog.hpp"
 #include "tyr/planning/heuristics/rpg_max.hpp"
 #include "tyr/planning/lifted/heuristics/rpg.hpp"

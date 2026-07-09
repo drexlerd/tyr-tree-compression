@@ -19,7 +19,7 @@
 #define TYR_PLANNING_LIFTED_SUCCESSOR_GENERATOR_HPP_
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/lifted/policies/termination.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/formalism/planning/grounder_decl.hpp"
