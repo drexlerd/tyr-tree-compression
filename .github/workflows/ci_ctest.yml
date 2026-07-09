@@ -64,4 +64,4 @@ jobs:
           PYYGGDRASIL_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
           export DYLD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
           export LD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
-          GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 TYR_LMCUT_TRACE=1 TYR_TRACE_GROUND_TASK=1 ctest -V
+          GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 TYR_LMCUT_TRACE=1 ctest -V

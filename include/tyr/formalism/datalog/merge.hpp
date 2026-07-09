@@ -474,6 +474,8 @@ inline std::pair<RuleView, bool> merge_d2d(RuleView element, MergeContext& conte
                 return merge_d2d(head, context);
         },
         element.get_head());
+    for (const auto metric_effect : element.get_metric_effects())
+        rule.metric_effects.push_back(merge_d2d(metric_effect, context));
 
     canonicalize(rule);
     return context.destination.get_or_create(rule);
