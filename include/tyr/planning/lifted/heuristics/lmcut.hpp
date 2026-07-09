@@ -20,6 +20,7 @@
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/cost.hpp"
+#include "tyr/datalog/lifted/policies/numeric_support.hpp"
 #include "tyr/datalog/policies/termination.hpp"
 #include "tyr/planning/heuristics/lmcut.hpp"
 #include "tyr/planning/lifted/heuristics/rpg.hpp"
@@ -140,6 +141,7 @@ private:
     ygg::UnorderedMap<RuleEdge, datalog::Cost> m_rule_cut;
     ygg::UnorderedMap<NumericEdge, datalog::Cost> m_numeric_cut;
     std::deque<std::vector<Precondition>> m_max_precondition_buffers;
+    datalog::NumericSupportSelectorWorkspace<LiftedTag> m_numeric_support_selector_workspace;
     size_t m_max_precondition_depth;
     bool m_use_expanded_edges;
 };

@@ -176,7 +176,7 @@ protected:
 
     std::optional<::tyr::formalism::planning::ActionBindingView> get_action_binding(const datalog::WitnessAnnotation<LiftedTag>& witness)
     {
-        const auto rule_binding = witness.get_rule_row();
+        const auto rule_binding = witness.get_rule_key();
         const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_rpg_program.get_datalog_program().get_program_repository());
         const auto& mapping = m_rpg_program.get_rule_to_action_mapping();
         const auto it = mapping.find(rule);
@@ -193,7 +193,7 @@ protected:
     template<typename Callback>
     void for_each_witness_precondition(const datalog::WitnessAnnotation<LiftedTag>& witness, Callback&& callback)
     {
-        const auto rule_binding = witness.get_rule_row();
+        const auto rule_binding = witness.get_rule_key();
         const auto rule = ygg::make_view(rule_binding.get_relation().get_index(), m_rpg_program.get_datalog_program().get_program_repository());
         const auto row = rule_binding.get_objects();
         const auto& const_rule_workspace = *m_rpg_program.get_const_program_workspace().rules[ygg::uint_t(rule.get_index())];

@@ -18,6 +18,7 @@
 #ifndef TYR_DATALOG_GROUND_WORKSPACES_QUEUE_HPP_
 #define TYR_DATALOG_GROUND_WORKSPACES_QUEUE_HPP_
 
+#include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/workspaces/queue.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -48,12 +49,40 @@ struct GroundQueueStatistics
     ygg::uint_t max_queue_size = 0;
 };
 
+struct GroundQueueScratch
+{
+    using SelectionEntry = GroundNumericSupportSelectorWorkspace::SelectionEntry;
+    using Term = ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>;
+
+    std::vector<SelectionEntry> support_selection;
+    std::vector<SelectionEntry> auxiliary_selection;
+    std::vector<SelectionEntry> metric_selection;
+    std::vector<SelectionEntry> evaluation_selection;
+    std::vector<NumericSupport<GroundTag>> numeric_supports;
+    SelectedPredicateAnnotations<GroundTag> predicate_annotations;
+    SelectedFunctionAnnotations<GroundTag> function_annotations;
+    std::vector<Term> changed_terms;
+
+    void clear() noexcept
+    {
+        support_selection.clear();
+        auxiliary_selection.clear();
+        metric_selection.clear();
+        evaluation_selection.clear();
+        numeric_supports.clear();
+        predicate_annotations.clear();
+        function_annotations.clear();
+        changed_terms.clear();
+    }
+};
+
 template<>
 struct QueueWorkspace<GroundTag>
 {
     std::vector<GroundQueueEntry> storage;
     GroundQueueStatistics statistics;
     ygg::uint_t next_sequence = 0;
+    GroundQueueScratch scratch;
 
     explicit QueueWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag> program) { storage.reserve(program.get_ground_rules().size()); }
 
@@ -62,6 +91,7 @@ struct QueueWorkspace<GroundTag>
         storage.clear();
         statistics = GroundQueueStatistics {};
         next_sequence = 0;
+        scratch.clear();
     }
 };
 

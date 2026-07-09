@@ -26,6 +26,7 @@
 #include <limits>
 #include <map>
 #include <optional>
+#include <span>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -73,7 +74,6 @@ struct PendingNumericBuckets
     using Term = fd::GroundFunctionTermView<f::FluentTag>;
     using Interval = ygg::ClosedInterval<ygg::float_t>;
     using Bucket = ygg::UnorderedMap<Term, Interval>;
-    using ChangedTerms = std::vector<Term>;
 
     bool is_empty() const noexcept { return buckets.empty(); }
 
@@ -111,7 +111,6 @@ struct PendingNumericBuckets
     }
 
     std::map<Cost, Bucket> buckets;
-    ChangedTerms changed_terms;
 };
 
 template<typename Facts>
@@ -169,7 +168,7 @@ template<AndAnnotationPolicyConcept<GroundTag> AndAP,
          OrAnnotationPolicyConcept<GroundTag> OrAP,
          TerminationPolicyConcept<GroundTag> TP,
          RuleCostPolicyConcept<GroundTag> CP>
-Metric aggregate_body_metric(fd::GroundRuleView rule, const GroundCtx<OrAP, AndAP, TP, CP>& ctx)
+Metric aggregate_body_metric(fd::GroundRuleView rule, const GroundCtx<OrAP, AndAP, TP, CP>& ctx, std::vector<NumericSelectionEntry>& selection)
 {
     auto metric = Metric {};
     if constexpr (requires { AndAP::agg; })
@@ -184,7 +183,6 @@ Metric aggregate_body_metric(fd::GroundRuleView rule, const GroundCtx<OrAP, AndA
         }
 
         auto selector = make_numeric_support_selector<AndAP>(ctx);
-        auto selection = std::vector<NumericSelectionEntry> {};
         for (const auto numeric_constraint : rule.get_body().get_numeric_constraints())
         {
             if (selector.get_constraint_cost(numeric_constraint, selection, typename std::decay_t<decltype(AndAP::agg)> {}) != std::numeric_limits<Cost>::max())
@@ -256,6 +254,7 @@ template<AndAnnotationPolicyConcept<GroundTag> AndAP,
 Cost aggregate_numeric_effect_support_cost(fd::GroundRuleView rule,
                                            const GroundCtx<OrAP, AndAP, TP, CP>& ctx,
                                            std::vector<NumericSelectionEntry>& selection,
+                                           std::vector<NumericSelectionEntry>& temporary_selection,
                                            EvaluateEffectExpression&& evaluate_effect_expression)
 {
     if constexpr (requires { AndAP::agg; })
@@ -272,22 +271,21 @@ Cost aggregate_numeric_effect_support_cost(fd::GroundRuleView rule,
 
         auto selector = make_numeric_support_selector<AndAP>(ctx);
         selection.clear();
-        auto constraint_selection = std::vector<NumericSelectionEntry> {};
         for (const auto numeric_constraint : rule.get_body().get_numeric_constraints())
         {
-            const auto constraint_cost = selector.get_constraint_cost(numeric_constraint, constraint_selection, typename std::decay_t<decltype(AndAP::agg)> {});
+            const auto constraint_cost = selector.get_constraint_cost(numeric_constraint, temporary_selection, typename std::decay_t<decltype(AndAP::agg)> {});
             if (constraint_cost == std::numeric_limits<Cost>::max())
                 return std::numeric_limits<Cost>::max();
-            selection.insert(selection.end(), constraint_selection.begin(), constraint_selection.end());
+            selection.insert(selection.end(), temporary_selection.begin(), temporary_selection.end());
             cost = AndAP::agg(cost, constraint_cost);
         }
 
-        auto effect_selection = std::vector<NumericSelectionEntry> {};
-        if (!evaluate_effect_expression(selector, effect_selection))
+        temporary_selection.clear();
+        if (!evaluate_effect_expression(selector, temporary_selection))
             return std::numeric_limits<Cost>::max();
 
-        selection.insert(selection.end(), effect_selection.begin(), effect_selection.end());
-        for (const auto& entry : effect_selection)
+        selection.insert(selection.end(), temporary_selection.begin(), temporary_selection.end());
+        for (const auto& entry : temporary_selection)
             cost = AndAP::agg(cost, entry.cost);
         return cost;
     }
@@ -295,18 +293,17 @@ Cost aggregate_numeric_effect_support_cost(fd::GroundRuleView rule,
     {
         auto selector = make_numeric_support_selector<AndAP>(ctx);
         selection.clear();
-        auto constraint_selection = std::vector<NumericSelectionEntry> {};
         for (const auto numeric_constraint : rule.get_body().get_numeric_constraints())
         {
-            if (selector.get_constraint_cost(numeric_constraint, constraint_selection, MaxAggregation {}) == std::numeric_limits<Cost>::max())
+            if (selector.get_constraint_cost(numeric_constraint, temporary_selection, MaxAggregation {}) == std::numeric_limits<Cost>::max())
                 return std::numeric_limits<Cost>::max();
-            selection.insert(selection.end(), constraint_selection.begin(), constraint_selection.end());
+            selection.insert(selection.end(), temporary_selection.begin(), temporary_selection.end());
         }
 
-        auto effect_selection = std::vector<NumericSelectionEntry> {};
-        if (!evaluate_effect_expression(selector, effect_selection))
+        temporary_selection.clear();
+        if (!evaluate_effect_expression(selector, temporary_selection))
             return std::numeric_limits<Cost>::max();
-        selection.insert(selection.end(), effect_selection.begin(), effect_selection.end());
+        selection.insert(selection.end(), temporary_selection.begin(), temporary_selection.end());
         return Cost(0);
     }
 }
@@ -315,10 +312,12 @@ template<AndAnnotationPolicyConcept<GroundTag> AndAP,
          OrAnnotationPolicyConcept<GroundTag> OrAP,
          TerminationPolicyConcept<GroundTag> TP,
          RuleCostPolicyConcept<GroundTag> CP>
-Cost aggregate_body_cost(fd::GroundRuleView rule, const GroundCtx<OrAP, AndAP, TP, CP>& ctx)
+Cost aggregate_body_cost(fd::GroundRuleView rule,
+                         const GroundCtx<OrAP, AndAP, TP, CP>& ctx,
+                         std::vector<NumericSelectionEntry>& selection,
+                         std::vector<NumericSelectionEntry>& temporary_selection)
 {
-    auto selection = std::vector<NumericSelectionEntry> {};
-    return aggregate_numeric_effect_support_cost<AndAP>(rule, ctx, selection, [](const auto&, auto&) { return true; });
+    return aggregate_numeric_effect_support_cost<AndAP>(rule, ctx, selection, temporary_selection, [](const auto&, auto&) { return true; });
 }
 
 template<OrAnnotationPolicyConcept<GroundTag> OrAP,
@@ -329,11 +328,14 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
 Cost aggregate_numeric_effect_rule_cost(fd::GroundRuleView rule,
                                         fd::GroundNumericEffectView<Op, f::FluentTag> effect,
                                         const GroundCtx<OrAP, AndAP, TP, CP>& ctx,
-                                        std::vector<NumericSelectionEntry>& selection)
+                                        std::vector<NumericSelectionEntry>& selection,
+                                        std::vector<NumericSelectionEntry>& temporary_selection,
+                                        std::vector<NumericSelectionEntry>& metric_selection)
 {
     const auto support_cost = aggregate_numeric_effect_support_cost<AndAP>(rule,
                                                                            ctx,
                                                                            selection,
+                                                                           temporary_selection,
                                                                            [&](const auto& selector, auto& selected)
                                                                            {
                                                                                if constexpr (!std::is_same_v<Op, f::Assign>)
@@ -347,7 +349,6 @@ Cost aggregate_numeric_effect_rule_cost(fd::GroundRuleView rule,
     if (support_cost == std::numeric_limits<Cost>::max())
         return support_cost;
 
-    auto metric_selection = std::vector<NumericSelectionEntry> {};
     const auto metric_cost = aggregate_metric_effect_cost(rule, ctx, metric_selection);
     if (metric_cost == std::numeric_limits<Cost>::max())
         return metric_cost;
@@ -362,8 +363,9 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          AndAnnotationPolicyConcept<GroundTag> AndAP,
          TerminationPolicyConcept<GroundTag> TP,
          RuleCostPolicyConcept<GroundTag> CP>
-Cost aggregate_rule_cost(fd::GroundRuleView rule, const GroundCtx<OrAP, AndAP, TP, CP>& ctx)
+Cost aggregate_rule_cost(fd::GroundRuleView rule, GroundCtx<OrAP, AndAP, TP, CP>& ctx)
 {
+    auto& scratch = ctx.out().queue().scratch;
     return ygg::visit(
         [&](auto&& head) -> Cost
         {
@@ -374,8 +376,13 @@ Cost aggregate_rule_cost(fd::GroundRuleView rule, const GroundCtx<OrAP, AndAP, T
                 ygg::visit(
                     [&](auto&& effect)
                     {
-                        auto selection = std::vector<NumericSelectionEntry> {};
-                        best_cost = std::min(best_cost, aggregate_numeric_effect_rule_cost(rule, effect, ctx, selection));
+                        best_cost = std::min(best_cost,
+                                             aggregate_numeric_effect_rule_cost(rule,
+                                                                                effect,
+                                                                                ctx,
+                                                                                scratch.support_selection,
+                                                                                scratch.auxiliary_selection,
+                                                                                scratch.metric_selection));
                     },
                     head.get_variant());
                 return best_cost;
@@ -384,14 +391,13 @@ Cost aggregate_rule_cost(fd::GroundRuleView rule, const GroundCtx<OrAP, AndAP, T
             {
                 if constexpr (requires { AndAP::agg; })
                 {
-                    const auto body_cost = aggregate_body_cost<AndAP>(rule, ctx);
+                    const auto body_cost = aggregate_body_cost<AndAP>(rule, ctx, scratch.support_selection, scratch.auxiliary_selection);
                     if (body_cost == std::numeric_limits<Cost>::max())
                         return body_cost;
-                    auto metric_selection = std::vector<NumericSelectionEntry> {};
-                    const auto metric_cost = aggregate_metric_effect_cost(rule, ctx, metric_selection);
+                    const auto metric_cost = aggregate_metric_effect_cost(rule, ctx, scratch.metric_selection);
                     if (metric_cost == std::numeric_limits<Cost>::max())
                         return metric_cost;
-                    return aggregate_selection_cost(body_cost, metric_selection, AndAP::agg) + metric_cost;
+                    return aggregate_selection_cost(body_cost, scratch.metric_selection, AndAP::agg) + metric_cost;
                 }
                 else
                 {
@@ -623,19 +629,21 @@ void update_numeric_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
 {
     if constexpr (requires { AndAP::agg; })
     {
-        auto delta_annotation = GroundSelectedFunctionAnnotations {};
-        auto metric = aggregate_body_metric<AndAP>(rule, ctx);
-        metric = aggregate_numeric_selection_metric(metric, selection, ctx);
-        auto metric_selection = std::vector<NumericSelectionEntry> {};
-        metric = add_metric_delta<AndAP>(metric, aggregate_metric_effect_cost(rule, ctx, metric_selection));
-        metric = aggregate_numeric_selection_metric(metric, metric_selection, ctx);
-        auto numeric_supports = std::vector<NumericSupport<GroundTag>> {};
-        append_numeric_supports(numeric_supports, selection, ctx);
-        append_numeric_supports(numeric_supports, metric_selection, ctx);
-        const auto context = GroundAndAnnotationContext { metric, cost, std::move(numeric_supports), rule, ctx.out().and_annot() };
-        ctx.out().and_ap().update_annotation(term, interval, context, delta_annotation);
+        auto& scratch = ctx.out().queue().scratch;
+        scratch.function_annotations.clear();
+        scratch.numeric_supports.clear();
 
-        if (const auto* annotation = delta_annotation.find(term, interval))
+        auto metric = aggregate_body_metric<AndAP>(rule, ctx, scratch.evaluation_selection);
+        metric = aggregate_numeric_selection_metric(metric, selection, ctx);
+        metric = add_metric_delta<AndAP>(metric, aggregate_metric_effect_cost(rule, ctx, scratch.metric_selection));
+        metric = aggregate_numeric_selection_metric(metric, scratch.metric_selection, ctx);
+        append_numeric_supports(scratch.numeric_supports, selection, ctx);
+        append_numeric_supports(scratch.numeric_supports, scratch.metric_selection, ctx);
+        const auto context =
+            AndAnnotationContext<GroundTag> { metric, cost, std::span<const NumericSupport<GroundTag>>(scratch.numeric_supports), rule, ctx.out().and_annot() };
+        ctx.out().and_ap().update_annotation(term, term, interval, context, scratch.function_annotations);
+
+        if (const auto* annotation = scratch.function_annotations.find(term, interval))
             ctx.out().numeric_and_annot().insert(term, interval, *annotation);
     }
 }
@@ -650,20 +658,21 @@ bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
                             fd::GroundNumericEffectView<Op, f::FluentTag> effect,
                             PendingNumericBuckets& pending_numeric)
 {
+    auto& scratch = ctx.out().queue().scratch;
     auto selector = make_numeric_support_selector<AndAP>(ctx);
-    auto selection = std::vector<NumericSelectionEntry> {};
+    scratch.evaluation_selection.clear();
     const auto lhs = [&]
     {
         if constexpr (std::is_same_v<Op, f::Assign>)
             return ygg::ClosedInterval<ygg::float_t>();
         else
-            return selector.select_fluent_interval(effect.get_fterm(), selection);
+            return selector.select_fluent_interval(effect.get_fterm(), scratch.evaluation_selection);
     }();
     if constexpr (!std::is_same_v<Op, f::Assign>)
         if (empty(lhs))
             return false;
 
-    const auto rhs = selector.evaluate_effect_expression(effect.get_fexpr(), selection);
+    const auto rhs = selector.evaluate_effect_expression(effect.get_fexpr(), scratch.evaluation_selection);
     if (empty(rhs))
         return false;
 
@@ -675,15 +684,14 @@ bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
     if (!empty(current) && subset(interval, current))
         return false;
 
-    auto annotation_selection = std::vector<NumericSelectionEntry> {};
-    const auto generated_cost = aggregate_numeric_effect_rule_cost(rule, effect, ctx, annotation_selection);
+    const auto generated_cost =
+        aggregate_numeric_effect_rule_cost(rule, effect, ctx, scratch.support_selection, scratch.auxiliary_selection, scratch.metric_selection);
     if (generated_cost == std::numeric_limits<Cost>::max())
         return false;
 
     if (!empty(current))
     {
-        auto metric_selection = std::vector<NumericSelectionEntry> {};
-        const auto rem_rule_cost = aggregate_metric_effect_cost(rule, ctx, metric_selection);
+        const auto rem_rule_cost = aggregate_metric_effect_cost(rule, ctx, scratch.metric_selection);
         if (rem_rule_cost == Cost(0))
             interval = widen_free_growth(interval, current);
     }
@@ -693,7 +701,7 @@ bool enqueue_numeric_effect(GroundCtx<OrAP, AndAP, TP, CP>& ctx,
     if (!pending_numeric.insert(transition_cost, effect.get_fterm(), interval))
         return false;
 
-    update_numeric_annotation(ctx, rule, effect.get_fterm(), interval, transition_cost, annotation_selection);
+    update_numeric_annotation(ctx, rule, effect.get_fterm(), interval, transition_cost, scratch.support_selection);
     return true;
 }
 
@@ -712,42 +720,44 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
          AndAnnotationPolicyConcept<GroundTag> AndAP,
          TerminationPolicyConcept<GroundTag> TP,
          RuleCostPolicyConcept<GroundTag> CP>
-std::optional<GroundCostUpdate>
+std::optional<CostUpdate<GroundTag>>
 update_fact_annotation(GroundCtx<OrAP, AndAP, TP, CP>& ctx, fd::GroundRuleView rule, fd::GroundAtomView<f::FluentTag> fact, Cost cost)
 {
     auto& out = ctx.out();
-    auto delta_annotation = GroundSelectedPredicateAnnotations {};
-    auto numeric_supports = std::vector<NumericSupport<GroundTag>> {};
-    auto metric = aggregate_body_metric<AndAP>(rule, ctx);
+    auto& scratch = out.queue().scratch;
+    scratch.predicate_annotations.clear();
+    scratch.numeric_supports.clear();
+
+    auto metric = aggregate_body_metric<AndAP>(rule, ctx, scratch.evaluation_selection);
     if constexpr (requires { AndAP::agg; })
     {
         auto selector = make_numeric_support_selector<AndAP>(ctx);
-        auto selection = std::vector<NumericSelectionEntry> {};
         for (const auto numeric_constraint : rule.get_body().get_numeric_constraints())
-            if (selector.get_constraint_cost(numeric_constraint, selection, typename std::decay_t<decltype(AndAP::agg)> {}) != std::numeric_limits<Cost>::max())
-                append_numeric_supports(numeric_supports, selection, ctx);
+            if (selector.get_constraint_cost(numeric_constraint, scratch.auxiliary_selection, typename std::decay_t<decltype(AndAP::agg)> {})
+                != std::numeric_limits<Cost>::max())
+                append_numeric_supports(scratch.numeric_supports, scratch.auxiliary_selection, ctx);
 
-        auto metric_selection = std::vector<NumericSelectionEntry> {};
-        const auto metric_cost = aggregate_metric_effect_cost(rule, ctx, metric_selection);
+        const auto metric_cost = aggregate_metric_effect_cost(rule, ctx, scratch.metric_selection);
         if (metric_cost != std::numeric_limits<Cost>::max())
         {
             metric = add_metric_delta<AndAP>(metric, metric_cost);
-            metric = aggregate_numeric_selection_metric(metric, metric_selection, ctx);
-            append_numeric_supports(numeric_supports, metric_selection, ctx);
+            metric = aggregate_numeric_selection_metric(metric, scratch.metric_selection, ctx);
+            append_numeric_supports(scratch.numeric_supports, scratch.metric_selection, ctx);
         }
     }
-    const auto context = GroundAndAnnotationContext { metric, cost, std::move(numeric_supports), rule, out.and_annot() };
+    const auto context =
+        AndAnnotationContext<GroundTag> { metric, cost, std::span<const NumericSupport<GroundTag>>(scratch.numeric_supports), rule, out.and_annot() };
 
     out.and_ap().record_achiever(fact, context);
-    out.and_ap().update_annotation(fact, context, delta_annotation);
+    out.and_ap().update_annotation(fact, fact, context, scratch.predicate_annotations);
 
-    if (const auto* annotation = delta_annotation.find(fact))
-        return out.or_ap().update_annotation(fact, *annotation, out.and_annot());
+    if (scratch.predicate_annotations.find(fact))
+        return out.or_ap().update_annotation(fact, fact, scratch.predicate_annotations, out.and_annot());
 
     return std::nullopt;
 }
 
-bool is_annotation_improvement(const std::optional<GroundCostUpdate>& update) noexcept
+bool is_annotation_improvement(const std::optional<CostUpdate<GroundTag>>& update) noexcept
 {
     return update && (!update->old_cost || update->new_cost < *update->old_cost);
 }
@@ -804,7 +814,7 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
 bool commit_numeric_bucket(GroundCtx<OrAP, AndAP, TP, CP>& ctx, PendingNumericBuckets& pending_numeric, Cost cost)
 {
     auto bucket = pending_numeric.take(cost);
-    auto& changed_terms = pending_numeric.changed_terms;
+    auto& changed_terms = ctx.out().queue().scratch.changed_terms;
     changed_terms.clear();
     changed_terms.reserve(bucket.size());
 

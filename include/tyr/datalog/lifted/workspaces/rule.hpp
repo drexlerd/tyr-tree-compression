@@ -195,6 +195,8 @@ struct RuleWorkspace<LiftedTag>
             const std::vector<::tyr::formalism::datalog::RuleBindingView>& get_sorted_pending_rule_bindings();
 
             NumericSupportSelectorWorkspace<LiftedTag> numeric_support_selector_workspace;
+            std::vector<NumericSupport<LiftedTag>> numeric_support_scratch;
+            std::vector<NumericSupport<LiftedTag>> witness_support_scratch;
 
             /// Statistics
             RuleWorkerStatistics statistics;
@@ -343,6 +345,8 @@ RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::Solve(::tyr::formalism::datalo
     pending_rule_bindings(),
     pending_rule_binding_scratch(),
     numeric_support_selector_workspace(),
+    numeric_support_scratch(),
+    witness_support_scratch(),
     statistics()
 {
 }
@@ -355,6 +359,8 @@ void RuleWorkspace<LiftedTag>::Instance<AndAP>::Solve::clear() noexcept
     pending_rule_bindings.clear();
     pending_rule_binding_scratch.clear();
     numeric_support_selector_workspace.clear();
+    numeric_support_scratch.clear();
+    witness_support_scratch.clear();
     and_ap.clear_achievers();
 }
 

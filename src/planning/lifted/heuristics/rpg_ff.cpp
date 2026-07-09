@@ -201,7 +201,7 @@ void FFRPGHeuristic<LiftedTag>::extract_relaxed_plan_and_preferred_actions(const
 {
     const auto& mapping = this->m_rpg_program.get_rule_to_action_mapping();
 
-    const auto rule_row = witness.get_rule_row();
+    const auto rule_row = witness.get_rule_key();
     const auto rule = ygg::make_view(rule_row.get_relation().get_index(), this->m_rpg_program.get_datalog_program().get_program_repository());
     const auto row = rule_row.get_objects();
 

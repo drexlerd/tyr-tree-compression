@@ -21,14 +21,47 @@
 #include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
+#include <span>
+
 namespace tyr::datalog
 {
+
+template<>
+struct NumericSupportKey<LiftedTag>
+{
+    using type = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
+};
+
+template<>
+struct WitnessRuleKey<LiftedTag>
+{
+    using type = ::tyr::formalism::datalog::RuleBindingView;
+};
+
+template<>
+struct AnnotationPolicyTypes<LiftedTag>
+{
+    using PredicateHead = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
+    using FunctionHead = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
+};
+
+template<>
+struct NumericIntervalBindingParts<LiftedTag>
+{
+    using Binding = NumericSupportKeyT<LiftedTag>;
+    using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
+    using Key = ygg::Index<::tyr::formalism::Row>;
+
+    static Relation get_relation(Binding binding) noexcept { return binding.get_relation(); }
+    static Key get_key(Binding binding) noexcept { return binding.get_index().row; }
+};
 
 template<>
 struct AndAnnotationContext<LiftedTag>
 {
     Cost current_cost;
-    std::vector<NumericSupport<LiftedTag>> numeric_supports;
+    std::span<const NumericSupport<LiftedTag>> numeric_supports;
+    std::vector<NumericSupport<LiftedTag>>& witness_support_scratch;
     ::tyr::formalism::datalog::RuleView rule;
     ::tyr::formalism::datalog::RuleBindingView rule_binding;
     Cost metric_effect_cost;
@@ -40,14 +73,6 @@ struct AndAnnotationContext<LiftedTag>
     ::tyr::formalism::datalog::GrounderContext& delta_context;
     ::tyr::formalism::datalog::GrounderContext& iteration_context;
 };
-
-using LiftedWitnessAnnotation = WitnessAnnotation<LiftedTag>;
-using LiftedBaseAnnotation = BaseAnnotation<LiftedTag>;
-using LiftedAnnotation = Annotation<LiftedTag>;
-using LiftedSelectedPredicateAnnotations = SelectedPredicateAnnotations<LiftedTag>;
-using LiftedSelectedFunctionAnnotations = SelectedFunctionAnnotations<LiftedTag>;
-using LiftedAndAnnotationContext = AndAnnotationContext<LiftedTag>;
-using LiftedCostUpdate = CostUpdate<LiftedTag>;
 
 }
 

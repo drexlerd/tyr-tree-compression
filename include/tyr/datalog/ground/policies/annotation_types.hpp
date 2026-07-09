@@ -21,26 +21,50 @@
 #include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
+#include <span>
+
 namespace tyr::datalog
 {
+
+template<>
+struct NumericSupportKey<GroundTag>
+{
+    using type = ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>;
+};
+
+template<>
+struct WitnessRuleKey<GroundTag>
+{
+    using type = ::tyr::formalism::datalog::GroundRuleView;
+};
+
+template<>
+struct AnnotationPolicyTypes<GroundTag>
+{
+    using PredicateHead = ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>;
+    using FunctionHead = ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>;
+};
+
+template<>
+struct NumericIntervalBindingParts<GroundTag>
+{
+    using Binding = NumericSupportKeyT<GroundTag>;
+    using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
+    using Key = ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::FluentTag>>;
+
+    static Relation get_relation(Binding binding) noexcept { return binding.get_function(); }
+    static Key get_key(Binding binding) noexcept { return binding.get_index(); }
+};
 
 template<>
 struct AndAnnotationContext<GroundTag>
 {
     ygg::ClosedInterval<ygg::float_t> metric;
     Cost current_cost;
-    std::vector<NumericSupport<GroundTag>> numeric_supports;
+    std::span<const NumericSupport<GroundTag>> numeric_supports;
     ::tyr::formalism::datalog::GroundRuleView rule;
     const SelectedPredicateAnnotations<GroundTag>& program_and_annot;
 };
-
-using GroundWitnessAnnotation = WitnessAnnotation<GroundTag>;
-using GroundBaseAnnotation = BaseAnnotation<GroundTag>;
-using GroundAnnotation = Annotation<GroundTag>;
-using GroundSelectedPredicateAnnotations = SelectedPredicateAnnotations<GroundTag>;
-using GroundSelectedFunctionAnnotations = SelectedFunctionAnnotations<GroundTag>;
-using GroundAndAnnotationContext = AndAnnotationContext<GroundTag>;
-using GroundCostUpdate = CostUpdate<GroundTag>;
 
 }
 

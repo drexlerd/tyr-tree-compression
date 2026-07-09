@@ -90,7 +90,7 @@ TEST(TyrDatalogCostPolicyTest, RuleCostPolicyLiftedDefaultsToZero)
 
     const auto policy = d::RuleCostPolicy<LiftedTag>();
 
-    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 0);
+    EXPECT_EQ(policy.get_cost(fixture.binding), 0);
 }
 
 TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedDefaultsToZero)
@@ -101,7 +101,7 @@ TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedDefaultsToZero)
 
     const auto policy = d::RuleCostOverridePolicy<LiftedTag>();
 
-    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 0);
+    EXPECT_EQ(policy.get_cost(fixture.binding), 0);
 }
 
 TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesExactOverride)
@@ -113,7 +113,7 @@ TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesExactOverride)
     auto policy = d::RuleCostOverridePolicy<LiftedTag>();
     policy.set_cost(fixture.binding, 3);
 
-    EXPECT_EQ(policy.get_cost(fixture.rule, fixture.binding), 3);
+    EXPECT_EQ(policy.get_cost(fixture.binding), 3);
 }
 
 TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesEquivalentOverride)
@@ -127,7 +127,7 @@ TEST(TyrDatalogCostPolicyTest, RuleCostOverridePolicyLiftedUsesEquivalentOverrid
     auto policy = d::RuleCostOverridePolicy<LiftedTag>();
     policy.set_cost(first_fixture.binding, 3);
 
-    EXPECT_EQ(policy.get_cost(second_fixture.rule, second_fixture.binding), 3);
+    EXPECT_EQ(policy.get_cost(second_fixture.binding), 3);
 }
 
 }

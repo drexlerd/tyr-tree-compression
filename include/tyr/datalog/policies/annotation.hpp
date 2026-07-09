@@ -29,6 +29,45 @@
 namespace tyr::datalog
 {
 
+template<TaskKind Kind>
+class NoOrAnnotationPolicy
+{
+public:
+    using PredicateHead = PredicateAnnotationHeadT<Kind>;
+    using FunctionHead = FunctionAnnotationHeadT<Kind>;
+
+    void initialize_annotation(PredicateHead, SelectedPredicateAnnotations<Kind>&) const noexcept {}
+    void initialize_annotation(FunctionHead, ygg::ClosedInterval<ygg::float_t>, SelectedFunctionAnnotations<Kind>&) const noexcept {}
+
+    CostUpdate<Kind>
+    update_annotation(PredicateHead, PredicateHead, const SelectedPredicateAnnotations<Kind>&, SelectedPredicateAnnotations<Kind>&) const noexcept
+    {
+        return {};
+    }
+};
+
+template<TaskKind Kind>
+class NoAndAnnotationPolicy
+{
+public:
+    using PredicateHead = PredicateAnnotationHeadT<Kind>;
+    using FunctionHead = FunctionAnnotationHeadT<Kind>;
+
+    void clear_achievers() noexcept {}
+
+    void record_achiever(PredicateHead, const AndAnnotationContext<Kind>&) const noexcept {}
+
+    void update_annotation(PredicateHead, PredicateHead, const AndAnnotationContext<Kind>&, SelectedPredicateAnnotations<Kind>&) const noexcept {}
+
+    void update_annotation(FunctionHead,
+                           FunctionHead,
+                           ygg::ClosedInterval<ygg::float_t>,
+                           const AndAnnotationContext<Kind>&,
+                           SelectedFunctionAnnotations<Kind>&) const noexcept
+    {
+    }
+};
+
 template<TaskKind Kind, typename Binding>
 Cost fetch_annotation_cost(Binding binding, const SelectedPredicateAnnotations<Kind>& annotations)
 {

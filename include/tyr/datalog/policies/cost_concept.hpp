@@ -15,21 +15,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYR_DATALOG_POLICIES_COST_CONCEPT_BY_KIND_HPP_
-#define TYR_DATALOG_POLICIES_COST_CONCEPT_BY_KIND_HPP_
+#ifndef TYR_DATALOG_POLICIES_COST_CONCEPT_HPP_
+#define TYR_DATALOG_POLICIES_COST_CONCEPT_HPP_
 
-#include "tyr/datalog/ground/policies/cost_concept.hpp"
-#include "tyr/datalog/lifted/policies/cost_concept.hpp"
-#include "tyr/declarations.hpp"
+#include "tyr/datalog/policies/annotation_types.hpp"
+
+#include <concepts>
 
 namespace tyr::datalog
 {
 
 template<typename T, typename Kind>
-concept RuleCostPolicyConcept = TaskKind<Kind> && details::RuleCostPolicyConceptImpl<Kind, T>::value;
+concept RuleCostPolicyConcept = TaskKind<Kind>
+                                && requires(T& policy,
+                                            const T& const_policy,
+                                            WitnessRuleKeyT<Kind> rule_key,
+                                            NumericSupportKeyT<Kind> numeric_key,
+                                            ygg::ClosedInterval<ygg::float_t> interval,
+                                            Cost cost) {
+                                       { const_policy.get_cost(rule_key) } -> std::same_as<Cost>;
+                                       { const_policy.get_cost(rule_key, numeric_key, interval) } -> std::same_as<Cost>;
+                                       { policy.clear() } -> std::same_as<void>;
+                                       { policy.set_cost(rule_key, cost) } -> std::same_as<void>;
+                                       { policy.set_cost(rule_key, numeric_key, interval, cost) } -> std::same_as<void>;
+                                   };
 
 template<typename T, typename Kind>
-concept MutableRuleCostPolicyConcept = TaskKind<Kind> && details::MutableRuleCostPolicyConceptImpl<Kind, T>::value;
+concept MutableRuleCostPolicyConcept = RuleCostPolicyConcept<T, Kind>;
 
 }
 

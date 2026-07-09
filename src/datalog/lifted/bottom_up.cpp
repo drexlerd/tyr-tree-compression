@@ -49,6 +49,7 @@
 #include <memory>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <oneapi/tbb/task_arena.h>
+#include <span>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
@@ -98,6 +99,8 @@ struct RuleUpdateInput
     fd::ConjunctiveConditionView witness_condition;
     const NumericSupportSelector<LiftedTag>& numeric_support_selector;
     NumericSupportSelectorWorkspace<LiftedTag>& numeric_support_selector_workspace;
+    std::vector<NumericSupport<LiftedTag>>& numeric_support_scratch;
+    std::vector<NumericSupport<LiftedTag>>& witness_support_scratch;
     Cost current_cost;
     const SelectedPredicateAnnotations<LiftedTag>& program_and_annot;
     const SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot;
@@ -108,10 +111,11 @@ struct RuleUpdateInput
     fd::GrounderContext& iteration_context;
 
     AndAnnotationContext<LiftedTag>
-    make_annotation_context(fd::RuleBindingView rule_binding, Cost metric_effect_cost, std::vector<NumericSupport<LiftedTag>> numeric_supports = {}) const
+    make_annotation_context(fd::RuleBindingView rule_binding, Cost metric_effect_cost, std::span<const NumericSupport<LiftedTag>> numeric_supports = {}) const
     {
         return AndAnnotationContext<LiftedTag> { current_cost,
-                                                 std::move(numeric_supports),
+                                                 numeric_supports,
+                                                 witness_support_scratch,
                                                  rule,
                                                  rule_binding,
                                                  metric_effect_cost,
@@ -132,6 +136,8 @@ static auto make_rule_update_input(const In& in, Out& out, const NumericSupportS
                                                                                                             in.cws_rule().get_witness_rule().get_body(),
                                                                                                             numeric_support_selector,
                                                                                                             out.numeric_support_selector_workspace(),
+                                                                                                            out.numeric_support_scratch(),
+                                                                                                            out.witness_support_scratch(),
                                                                                                             in.cost_buckets().current_cost(),
                                                                                                             in.and_annot(),
                                                                                                             in.numeric_and_annot(),
@@ -180,7 +186,8 @@ static bool collect_numeric_head_supports(fd::NumericEffectView<Op, f::FluentTag
                                           const RuleUpdateInput<AndAP, CP>& input,
                                           std::vector<NumericSupport<LiftedTag>>& supports)
 {
-    auto selection = std::vector<NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry> {};
+    auto& selection = input.numeric_support_selector_workspace.selection;
+    selection.clear();
 
     if constexpr (!std::is_same_v<Op, f::Assign>)
     {
@@ -196,7 +203,8 @@ static bool collect_metric_effect_supports(fd::NumericEffectView<Op, f::FluentTa
                                            const RuleUpdateInput<AndAP, CP>& input,
                                            std::vector<NumericSupport<LiftedTag>>& supports)
 {
-    auto selection = std::vector<NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry> {};
+    auto& selection = input.numeric_support_selector_workspace.selection;
+    selection.clear();
 
     if constexpr (!std::is_same_v<Op, f::Increase> && !std::is_same_v<Op, f::Decrease>)
     {
@@ -229,7 +237,7 @@ Cost metric_effect_cost(fd::RuleBindingView rule_binding, const RuleUpdateInput<
         delta += effect_delta;
     }
 
-    return reduce_cost(delta, input.cost_policy.get_cost(input.rule, rule_binding));
+    return reduce_cost(delta, input.cost_policy.get_cost(rule_binding));
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
@@ -241,10 +249,11 @@ static void record_propositional_achiever(fd::AtomView<f::FluentTag> head, const
     const auto cost = metric_effect_cost(rule_binding, input);
     if (cost == std::numeric_limits<Cost>::max())
         return;
-    auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
+    auto& numeric_supports = input.numeric_support_scratch;
+    numeric_supports.clear();
     if (!collect_metric_effect_supports(input, numeric_supports))
         return;
-    const auto context = input.make_annotation_context(rule_binding, cost, std::move(numeric_supports));
+    const auto context = input.make_annotation_context(rule_binding, cost, numeric_supports);
 
     input.and_ap.record_achiever(program_head, context);
 }
@@ -267,10 +276,11 @@ static void insert_propositional_update(fd::AtomView<f::FluentTag> head,
     const auto cost = metric_effect_cost(rule_binding, input);
     if (cost == std::numeric_limits<Cost>::max())
         return;
-    auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
+    auto& numeric_supports = input.numeric_support_scratch;
+    numeric_supports.clear();
     if (!collect_metric_effect_supports(input, numeric_supports))
         return;
-    const auto context = input.make_annotation_context(rule_binding, cost, std::move(numeric_supports));
+    const auto context = input.make_annotation_context(rule_binding, cost, numeric_supports);
 
     input.and_ap.record_achiever(program_head, context);
 
@@ -304,10 +314,11 @@ static void insert_numeric_update(fd::NumericEffectOperatorView<f::FluentTag> he
                 rem_rule_cost == Cost(0) ? widen_free_growth(interval, fact_sets.get<f::FluentTag>().function[program_head]) : interval;
 
             const auto cost = reduce_cost(rem_rule_cost, input.cost_policy.get_cost(rule_binding, program_head, effect_interval));
-            auto numeric_supports = std::vector<NumericSupport<LiftedTag>> {};
+            auto& numeric_supports = input.numeric_support_scratch;
+            numeric_supports.clear();
             if (!collect_metric_effect_supports(input, numeric_supports) || !collect_numeric_head_supports(effect, program_head, input, numeric_supports))
                 return;
-            const auto context = input.make_annotation_context(rule_binding, cost, std::move(numeric_supports));
+            const auto context = input.make_annotation_context(rule_binding, cost, numeric_supports);
 
             input.and_ap.update_annotation(program_head, worker_head.get_row(), effect_interval, context, numeric_and_annot);
 

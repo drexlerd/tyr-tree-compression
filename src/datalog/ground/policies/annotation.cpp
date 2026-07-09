@@ -19,81 +19,51 @@
 
 #include "tyr/datalog/policies/annotation.hpp"
 
+#include <utility>
+
 namespace tyr::datalog
 {
 
-void NoOrAnnotationPolicy<GroundTag>::initialize_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
-                                                            GroundSelectedPredicateAnnotations&) const noexcept
-{
-}
-
-void NoOrAnnotationPolicy<GroundTag>::initialize_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
-                                                            ygg::ClosedInterval<ygg::float_t>,
-                                                            GroundSelectedFunctionAnnotations&) const noexcept
-{
-}
-
-GroundCostUpdate NoOrAnnotationPolicy<GroundTag>::update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
-                                                                    const GroundAnnotation&,
-                                                                    GroundSelectedPredicateAnnotations&) const noexcept
-{
-    return GroundCostUpdate();
-}
-
-void NoAndAnnotationPolicy<GroundTag>::clear_achievers() noexcept {}
-
-void NoAndAnnotationPolicy<GroundTag>::record_achiever(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
-                                                       const GroundAndAnnotationContext&) const noexcept
-{
-}
-
-void NoAndAnnotationPolicy<GroundTag>::update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
-                                                         const GroundAndAnnotationContext&,
-                                                         GroundSelectedPredicateAnnotations&) const noexcept
-{
-}
-
-void NoAndAnnotationPolicy<GroundTag>::update_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
-                                                         ygg::ClosedInterval<ygg::float_t>,
-                                                         const GroundAndAnnotationContext&,
-                                                         GroundSelectedFunctionAnnotations&) const noexcept
-{
-}
-
 void OrAnnotationPolicy<GroundTag>::initialize_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
-                                                          GroundSelectedPredicateAnnotations& program_and_annot) const
+                                                          SelectedPredicateAnnotations<GroundTag>& program_and_annot) const
 {
-    program_and_annot.insert_or_assign(program_head, GroundBaseAnnotation(Cost(0)));
+    program_and_annot.insert_or_assign(program_head, BaseAnnotation<GroundTag>(Cost(0)));
 }
 
 void OrAnnotationPolicy<GroundTag>::initialize_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> program_head,
                                                           ygg::ClosedInterval<ygg::float_t> interval,
-                                                          GroundSelectedFunctionAnnotations& program_numeric_and_annot) const
+                                                          SelectedFunctionAnnotations<GroundTag>& program_numeric_and_annot) const
 {
-    program_numeric_and_annot.insert(program_head, interval, GroundBaseAnnotation(Cost(0)));
+    program_numeric_and_annot.insert(program_head, interval, BaseAnnotation<GroundTag>(Cost(0)));
 }
 
-GroundCostUpdate OrAnnotationPolicy<GroundTag>::update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
-                                                                  const GroundAnnotation& delta_and_annot,
-                                                                  GroundSelectedPredicateAnnotations& program_and_annot) const
+CostUpdate<GroundTag> OrAnnotationPolicy<GroundTag>::update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
+                                                                       ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> delta_head,
+                                                                       const SelectedPredicateAnnotations<GroundTag>& delta_and_annot,
+                                                                       SelectedPredicateAnnotations<GroundTag>& program_and_annot) const
 {
-    const auto new_cost = get_cost(delta_and_annot);
+    const auto* delta_annotation = delta_and_annot.find(delta_head);
+    if (!delta_annotation)
+        return {};
+
+    const auto new_cost = get_cost(*delta_annotation);
     if (const auto* old_annotation = program_and_annot.find(program_head))
     {
         const auto old_cost = get_cost(*old_annotation);
         if (new_cost < old_cost)
         {
-            program_and_annot.insert_or_assign(program_head, delta_and_annot);
-            return GroundCostUpdate(old_cost, new_cost);
+            program_and_annot.insert_or_assign(program_head, *delta_annotation);
+            return CostUpdate<GroundTag>(old_cost, new_cost);
         }
         if (new_cost == old_cost)
-            if (const auto* witness = std::get_if<GroundWitnessAnnotation>(&delta_and_annot); witness && witness_wins_tie<GroundTag>(*witness, old_annotation))
-                program_and_annot.insert_or_assign(program_head, delta_and_annot);
-        return GroundCostUpdate(old_cost, old_cost);
+            if (const auto* witness = std::get_if<WitnessAnnotation<GroundTag>>(delta_annotation);
+                witness && witness_wins_tie<GroundTag>(*witness, old_annotation))
+                program_and_annot.insert_or_assign(program_head, *delta_annotation);
+        return CostUpdate<GroundTag>(old_cost, old_cost);
     }
 
-    program_and_annot.insert_or_assign(program_head, delta_and_annot);
-    return GroundCostUpdate(std::nullopt, new_cost);
+    program_and_annot.insert_or_assign(program_head, *delta_annotation);
+    return CostUpdate<GroundTag>(std::nullopt, new_cost);
 }
 
 template<typename AggregationFunction>
@@ -103,41 +73,43 @@ void AndAnnotationPolicy<GroundTag, AggregationFunction>::clear_achievers() noex
 
 template<typename AggregationFunction>
 void AndAnnotationPolicy<GroundTag, AggregationFunction>::record_achiever(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
-                                                                          const GroundAndAnnotationContext&) const noexcept
+                                                                          const AndAnnotationContext<GroundTag>&) const noexcept
 {
 }
 
 template<typename AggregationFunction>
 void AndAnnotationPolicy<GroundTag, AggregationFunction>::update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
-                                                                            const GroundAndAnnotationContext& context,
-                                                                            GroundSelectedPredicateAnnotations& delta_and_annot) const
+                                                                            ::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> delta_head,
+                                                                            const AndAnnotationContext<GroundTag>& context,
+                                                                            SelectedPredicateAnnotations<GroundTag>& delta_and_annot) const
 {
     const auto best_global_cost = fetch_annotation_cost<GroundTag>(program_head, context.program_and_annot);
-    const auto best_local_cost = fetch_annotation_cost<GroundTag>(program_head, delta_and_annot);
+    const auto best_local_cost = fetch_annotation_cost<GroundTag>(delta_head, delta_and_annot);
     const auto best_cost = std::min(best_global_cost, best_local_cost);
     if (best_cost < context.current_cost)
         return;
 
-    const auto witness = GroundWitnessAnnotation(context.rule, context.metric, context.current_cost, context.numeric_supports);
+    auto witness = WitnessAnnotation<GroundTag>(context.rule, context.metric, context.current_cost, context.numeric_supports);
     if (best_cost == context.current_cost
         && !witness_wins_tie<GroundTag>(
             witness,
-            select_incumbent<GroundTag>(program_head, program_head, best_global_cost, best_local_cost, context.program_and_annot, delta_and_annot)))
+            select_incumbent<GroundTag>(program_head, delta_head, best_global_cost, best_local_cost, context.program_and_annot, delta_and_annot)))
         return;
 
-    delta_and_annot.insert_or_assign(program_head, GroundAnnotation(witness));
+    delta_and_annot.insert_or_assign(delta_head, Annotation<GroundTag>(std::move(witness)));
 }
 
 template<typename AggregationFunction>
 void AndAnnotationPolicy<GroundTag, AggregationFunction>::update_annotation(
-    ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> program_head,
+    ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
+    ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> delta_head,
     ygg::ClosedInterval<ygg::float_t> interval,
-    const GroundAndAnnotationContext& context,
-    GroundSelectedFunctionAnnotations& delta_numeric_and_annot) const
+    const AndAnnotationContext<GroundTag>& context,
+    SelectedFunctionAnnotations<GroundTag>& delta_numeric_and_annot) const
 {
-    delta_numeric_and_annot.insert(program_head,
+    delta_numeric_and_annot.insert(delta_head,
                                    interval,
-                                   GroundWitnessAnnotation(context.rule, context.metric, context.current_cost, context.numeric_supports));
+                                   WitnessAnnotation<GroundTag>(context.rule, context.metric, context.current_cost, context.numeric_supports));
 }
 
 template<typename AggregationFunction>
@@ -155,7 +127,7 @@ AchieverAndAnnotationPolicy<GroundTag, AggregationFunction>::find_achievers(Atom
 }
 
 template<typename AggregationFunction>
-void AchieverAndAnnotationPolicy<GroundTag, AggregationFunction>::record_achiever(Atom program_head, const GroundAndAnnotationContext& context) const
+void AchieverAndAnnotationPolicy<GroundTag, AggregationFunction>::record_achiever(Atom program_head, const AndAnnotationContext<GroundTag>& context) const
 {
     achievers[program_head.get_index()].emplace_back(context.rule, context.metric, context.current_cost, context.numeric_supports);
 }

@@ -26,6 +26,7 @@
 #include <cassert>
 #include <limits>
 #include <optional>
+#include <span>
 #include <tuple>
 #include <utility>
 #include <variant>
@@ -41,38 +42,23 @@ namespace tyr::datalog
 template<TaskKind Kind>
 struct NumericSupportKey;
 
-template<>
-struct NumericSupportKey<GroundTag>
-{
-    using type = ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>;
-};
-
-template<>
-struct NumericSupportKey<LiftedTag>
-{
-    using type = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
-};
-
 template<TaskKind Kind>
 using NumericSupportKeyT = typename NumericSupportKey<Kind>::type;
 
 template<TaskKind Kind>
 struct WitnessRuleKey;
 
-template<>
-struct WitnessRuleKey<GroundTag>
-{
-    using type = ::tyr::formalism::datalog::GroundRuleView;
-};
-
-template<>
-struct WitnessRuleKey<LiftedTag>
-{
-    using type = ::tyr::formalism::datalog::RuleBindingView;
-};
-
 template<TaskKind Kind>
 using WitnessRuleKeyT = typename WitnessRuleKey<Kind>::type;
+
+template<TaskKind Kind>
+struct AnnotationPolicyTypes;
+
+template<TaskKind Kind>
+using PredicateAnnotationHeadT = typename AnnotationPolicyTypes<Kind>::PredicateHead;
+
+template<TaskKind Kind>
+using FunctionAnnotationHeadT = typename AnnotationPolicyTypes<Kind>::FunctionHead;
 
 template<TaskKind Kind>
 struct NumericSupport
@@ -81,16 +67,7 @@ struct NumericSupport
     ygg::ClosedInterval<ygg::float_t> interval;
     Cost cost;
 
-    auto get_term() const noexcept
-        requires std::same_as<Kind, GroundTag>
-    {
-        return key;
-    }
-    auto get_binding() const noexcept
-        requires std::same_as<Kind, LiftedTag>
-    {
-        return key;
-    }
+    auto get_key() const noexcept { return key; }
     auto get_interval() const noexcept { return interval; }
     auto get_cost() const noexcept { return cost; }
 
@@ -116,16 +93,12 @@ struct WitnessAnnotation
         std::sort(numeric_supports.begin(), numeric_supports.end(), ygg::Less<NumericSupport<Kind>> {});
     }
 
-    auto get_rule() const noexcept
-        requires std::same_as<Kind, GroundTag>
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Metric metric_, Cost cost_, std::span<const NumericSupport<Kind>> numeric_supports_) :
+        WitnessAnnotation(rule_key_, metric_, cost_, NumericSupports(numeric_supports_.begin(), numeric_supports_.end()))
     {
-        return rule_key;
     }
-    auto get_rule_row() const noexcept
-        requires std::same_as<Kind, LiftedTag>
-    {
-        return rule_key;
-    }
+
+    auto get_rule_key() const noexcept { return rule_key; }
     auto get_metric() const noexcept { return metric; }
     auto get_cost() const noexcept { return cost; }
     const auto& get_numeric_supports() const noexcept { return numeric_supports; }
@@ -241,28 +214,6 @@ struct NumericIntervalAnnotation
 
 template<TaskKind Kind>
 struct NumericIntervalBindingParts;
-
-template<>
-struct NumericIntervalBindingParts<GroundTag>
-{
-    using Binding = NumericSupportKeyT<GroundTag>;
-    using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
-    using Key = ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::FluentTag>>;
-
-    static Relation get_relation(Binding binding) noexcept { return binding.get_function(); }
-    static Key get_key(Binding binding) noexcept { return binding.get_index(); }
-};
-
-template<>
-struct NumericIntervalBindingParts<LiftedTag>
-{
-    using Binding = NumericSupportKeyT<LiftedTag>;
-    using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
-    using Key = ygg::Index<::tyr::formalism::Row>;
-
-    static Relation get_relation(Binding binding) noexcept { return binding.get_relation(); }
-    static Key get_key(Binding binding) noexcept { return binding.get_index().row; }
-};
 
 template<TaskKind Kind>
 class NumericIntervalAnnotations

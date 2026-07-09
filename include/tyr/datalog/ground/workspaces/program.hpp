@@ -20,11 +20,11 @@
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
 #include "tyr/datalog/ground/policies/cost.hpp"
-#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/ground/workspaces/facts.hpp"
 #include "tyr/datalog/ground/workspaces/rule.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/policies/cost_concept.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 #include "tyr/datalog/workspaces/program.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -63,8 +63,8 @@ struct ProgramWorkspace<GroundTag>
         FactsWorkspace<GroundTag> facts;
         OrAP or_ap;
         AndAP and_ap;
-        GroundSelectedPredicateAnnotations and_annot;
-        GroundSelectedFunctionAnnotations numeric_and_annot;
+        SelectedPredicateAnnotations<GroundTag> and_annot;
+        SelectedFunctionAnnotations<GroundTag> numeric_and_annot;
         TP tp;
         CP cost_policy;
         RuleWorkspace<GroundTag> rules;

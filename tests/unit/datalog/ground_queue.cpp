@@ -476,7 +476,7 @@ TEST(TyrDatalogGroundQueueTest, AchieverPolicyGroundRecordsFiredRule)
     const auto* achievers = ctx.out().and_ap().find_achievers(b);
     ASSERT_NE(achievers, nullptr);
     ASSERT_EQ(achievers->size(), 1);
-    EXPECT_EQ((*achievers)[0].get_rule().get_index(), derive_b.get_index());
+    EXPECT_EQ((*achievers)[0].get_rule_key().get_index(), derive_b.get_index());
 }
 
 TEST(TyrDatalogGroundQueueTest, UnfilteredNegativeFluentLiteralDoesNotFire)

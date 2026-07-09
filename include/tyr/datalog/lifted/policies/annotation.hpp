@@ -21,6 +21,7 @@
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
+#include "tyr/datalog/policies/annotation.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -39,67 +40,20 @@ namespace tyr::datalog
 {
 
 template<>
-class NoOrAnnotationPolicy<LiftedTag>
-{
-public:
-    void initialize_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> head,
-                               SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const noexcept
-    {
-    }
-    void initialize_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> head,
-                               ygg::ClosedInterval<ygg::float_t> interval,
-                               SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot) const noexcept
-    {
-    }
-
-    CostUpdate<LiftedTag> update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                                            ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                                            const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
-                                            SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const noexcept
-    {
-        return CostUpdate<LiftedTag>();
-    }
-};
-
-template<>
-class NoAndAnnotationPolicy<LiftedTag>
-{
-public:
-    void clear_achievers() noexcept {}
-
-    void record_achiever(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                         const AndAnnotationContext<LiftedTag>& context) const noexcept
-    {
-    }
-
-    void update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                           ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                           const AndAnnotationContext<LiftedTag>& context,
-                           SelectedPredicateAnnotations<LiftedTag>& delta_and_annot) const noexcept
-    {
-    }
-
-    void update_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> program_head,
-                           ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> delta_head,
-                           ygg::ClosedInterval<ygg::float_t> interval,
-                           const AndAnnotationContext<LiftedTag>& context,
-                           SelectedFunctionAnnotations<LiftedTag>& delta_numeric_and_annot) const
-    {
-    }
-};
-
-template<>
 class OrAnnotationPolicy<LiftedTag>
 {
 public:
-    void initialize_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                               SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const;
-    void initialize_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> program_head,
+    using PredicateHead = PredicateAnnotationHeadT<LiftedTag>;
+    using FunctionHead = FunctionAnnotationHeadT<LiftedTag>;
+
+    void initialize_annotation(PredicateHead program_head, SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const;
+
+    void initialize_annotation(FunctionHead program_head,
                                ygg::ClosedInterval<ygg::float_t> interval,
                                SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot) const;
 
-    CostUpdate<LiftedTag> update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                                            ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+    CostUpdate<LiftedTag> update_annotation(PredicateHead program_head,
+                                            PredicateHead delta_head,
                                             const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
                                             SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const;
 };
@@ -108,22 +62,22 @@ template<typename AggregationFunction>
 class AndAnnotationPolicy<LiftedTag, AggregationFunction>
 {
 public:
+    using PredicateHead = PredicateAnnotationHeadT<LiftedTag>;
+    using FunctionHead = FunctionAnnotationHeadT<LiftedTag>;
+
     static constexpr AggregationFunction agg = AggregationFunction {};
 
     void clear_achievers() noexcept {}
 
-    void record_achiever(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                         const AndAnnotationContext<LiftedTag>& context) const noexcept
-    {
-    }
+    void record_achiever(PredicateHead program_head, const AndAnnotationContext<LiftedTag>& context) const noexcept {}
 
-    void update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                           ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+    void update_annotation(PredicateHead program_head,
+                           PredicateHead delta_head,
                            const AndAnnotationContext<LiftedTag>& context,
                            SelectedPredicateAnnotations<LiftedTag>& delta_and_annot) const;
 
-    void update_annotation(::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> program_head,
-                           ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> delta_head,
+    void update_annotation(FunctionHead program_head,
+                           FunctionHead delta_head,
                            ygg::ClosedInterval<ygg::float_t> interval,
                            const AndAnnotationContext<LiftedTag>& context,
                            SelectedFunctionAnnotations<LiftedTag>& delta_numeric_and_annot) const;
@@ -133,7 +87,7 @@ template<typename AggregationFunction>
 class AchieverAndAnnotationPolicy<LiftedTag, AggregationFunction> : public AndAnnotationPolicy<LiftedTag, AggregationFunction>
 {
 public:
-    using PredicateBinding = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
+    using PredicateBinding = PredicateAnnotationHeadT<LiftedTag>;
     using PredicateBindingIndex = ygg::Index<::tyr::formalism::RelationBinding<::tyr::formalism::Predicate<::tyr::formalism::FluentTag>>>;
     using Achievers = std::vector<WitnessAnnotation<LiftedTag>>;
 
@@ -146,6 +100,12 @@ public:
 private:
     mutable ygg::UnorderedMap<PredicateBindingIndex, Achievers> m_achievers;
 };
+
+static_assert(OrAnnotationPolicyConcept<NoOrAnnotationPolicy<LiftedTag>, LiftedTag>);
+static_assert(AndAnnotationPolicyConcept<NoAndAnnotationPolicy<LiftedTag>, LiftedTag>);
+static_assert(OrAnnotationPolicyConcept<OrAnnotationPolicy<LiftedTag>, LiftedTag>);
+static_assert(AndAnnotationPolicyConcept<AndAnnotationPolicy<LiftedTag, SumAggregation>, LiftedTag>);
+static_assert(AndAnnotationPolicyConcept<AchieverAndAnnotationPolicy<LiftedTag, MaxAggregation>, LiftedTag>);
 
 }
 

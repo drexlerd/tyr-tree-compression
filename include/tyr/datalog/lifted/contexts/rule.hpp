@@ -117,6 +117,8 @@ public:
         auto& pending_rule_bindings() noexcept { return m_ws_worker.solve.pending_rule_bindings; }
         const auto& sorted_pending_rule_bindings() { return m_ws_worker.solve.get_sorted_pending_rule_bindings(); }
         auto& numeric_support_selector_workspace() noexcept { return m_ws_worker.solve.numeric_support_selector_workspace; }
+        auto& numeric_support_scratch() noexcept { return m_ws_worker.solve.numeric_support_scratch; }
+        auto& witness_support_scratch() noexcept { return m_ws_worker.solve.witness_support_scratch; }
         auto& statistics() noexcept { return m_ws_worker.solve.statistics; }
 
         auto& ground_context_solve() noexcept { return m_ground_context_solve; }

@@ -20,6 +20,7 @@
 
 #include "tyr/datalog/ground/policies/annotation.hpp"
 #include "tyr/datalog/ground/policies/cost.hpp"
+#include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/policies/termination.hpp"
 #include "tyr/planning/ground/heuristics/rpg.hpp"
 #include "tyr/planning/heuristics/lmcut.hpp"
@@ -96,8 +97,8 @@ private:
 
     datalog::Cost get_residual_cost(CostKey action_binding) const;
     datalog::Cost get_residual_cost(Rule rule) const;
-    datalog::Cost get_witness_body_cost(const datalog::GroundWitnessAnnotation& witness) const;
-    datalog::Cost get_witness_edge_residual_cost(const datalog::GroundWitnessAnnotation& witness) const;
+    datalog::Cost get_witness_body_cost(const datalog::WitnessAnnotation<GroundTag>& witness) const;
+    datalog::Cost get_witness_edge_residual_cost(const datalog::WitnessAnnotation<GroundTag>& witness) const;
     void set_residual_cost(CostKey action_binding, datalog::Cost cost);
     void set_residual_cost(Rule rule, datalog::Cost cost);
     void use_rule_edge_cost(Rule rule, datalog::Cost cost);
@@ -105,8 +106,8 @@ private:
     ygg::float_t evaluate_impl(const StateView<GroundTag>& state);
     void apply_residual_costs();
     datalog::Cost get_numeric_cost(NumericNode node) const noexcept;
-    const datalog::GroundWitnessAnnotation* get_numeric_witness(NumericNode node) const noexcept;
-    const std::vector<Precondition>& get_witness_max_preconditions(const datalog::GroundWitnessAnnotation& witness, datalog::Cost edge_cost);
+    const datalog::WitnessAnnotation<GroundTag>* get_numeric_witness(NumericNode node) const noexcept;
+    const std::vector<Precondition>& get_witness_max_preconditions(const datalog::WitnessAnnotation<GroundTag>& witness, datalog::Cost edge_cost);
     void release_witness_max_preconditions();
     void mark_goal_zone(Atom atom);
     void mark_goal_zone(NumericNode node);
@@ -130,6 +131,7 @@ private:
     ygg::UnorderedMap<RuleEdge, datalog::Cost> m_rule_cut;
     ygg::UnorderedMap<NumericEdge, datalog::Cost> m_numeric_cut;
     std::deque<std::vector<Precondition>> m_max_precondition_buffers;
+    datalog::GroundNumericSupportSelectorWorkspace m_numeric_support_selector_workspace;
     size_t m_max_precondition_depth;
     bool m_use_expanded_edges;
 };

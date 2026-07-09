@@ -18,98 +18,12 @@
 #ifndef TYR_DATALOG_GROUND_POLICIES_COST_HPP_
 #define TYR_DATALOG_GROUND_POLICIES_COST_HPP_
 
-#include "tyr/datalog/declarations.hpp"
+#include "tyr/datalog/ground/policies/annotation_types.hpp"
+#include "tyr/datalog/policies/cost.hpp"
 #include "tyr/datalog/policies/cost_concept.hpp"
-
-#include <tuple>
-#include <utility>
-#include <yggdrasil/core/closed_interval.hpp>
-#include <yggdrasil/core/config.hpp>
-#include <yggdrasil/containers/associative_containers.hpp>
 
 namespace tyr::datalog
 {
-
-struct GroundNumericTransitionCostKey
-{
-    ::tyr::formalism::datalog::GroundRuleView rule;
-    ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term;
-    ygg::ClosedInterval<ygg::float_t> interval;
-
-    auto identifying_members() const noexcept { return std::make_tuple(rule, term, lower(interval), upper(interval)); }
-};
-
-template<>
-class RuleCostPolicy<GroundTag>
-{
-public:
-    Cost get_cost(::tyr::formalism::datalog::GroundRuleView) const noexcept { return Cost(0); }
-    Cost get_cost(::tyr::formalism::datalog::GroundRuleView,
-                  ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
-                  ygg::ClosedInterval<ygg::float_t>) const noexcept
-    {
-        return Cost(0);
-    }
-    void clear() noexcept {}
-    void set_cost(::tyr::formalism::datalog::GroundRuleView, Cost) noexcept {}
-    void set_cost(::tyr::formalism::datalog::GroundRuleView,
-                  ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
-                  ygg::ClosedInterval<ygg::float_t>,
-                  Cost) noexcept
-    {
-    }
-};
-
-template<>
-class RuleCostOverridePolicy<GroundTag>
-{
-public:
-    using CostMap = ygg::UnorderedMap<::tyr::formalism::datalog::GroundRuleView, Cost>;
-    using NumericTransitionCostMap = ygg::UnorderedMap<GroundNumericTransitionCostKey, Cost>;
-
-    RuleCostOverridePolicy() = default;
-    explicit RuleCostOverridePolicy(CostMap costs_) : costs(std::move(costs_)), numeric_transition_costs() {}
-
-    Cost get_cost(::tyr::formalism::datalog::GroundRuleView rule) const
-    {
-        if (const auto it = costs.find(rule); it != costs.end())
-            return it->second;
-        return Cost(0);
-    }
-
-    Cost get_cost(::tyr::formalism::datalog::GroundRuleView rule,
-                  ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
-                  ygg::ClosedInterval<ygg::float_t> interval) const
-    {
-        if (const auto it = numeric_transition_costs.find(GroundNumericTransitionCostKey { rule, term, interval }); it != numeric_transition_costs.end())
-            return it->second;
-        return Cost(0);
-    }
-
-    void clear() noexcept
-    {
-        costs.clear();
-        numeric_transition_costs.clear();
-    }
-
-    void set_cost(::tyr::formalism::datalog::GroundRuleView rule, Cost cost) { costs.insert_or_assign(rule, cost); }
-
-    void set_cost(::tyr::formalism::datalog::GroundRuleView rule,
-                  ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term,
-                  ygg::ClosedInterval<ygg::float_t> interval,
-                  Cost cost)
-    {
-        numeric_transition_costs.insert_or_assign(GroundNumericTransitionCostKey { rule, term, interval }, cost);
-    }
-
-    const CostMap& get_costs() const noexcept { return costs; }
-    CostMap& get_costs() noexcept { return costs; }
-    const NumericTransitionCostMap& get_numeric_transition_costs() const noexcept { return numeric_transition_costs; }
-
-private:
-    CostMap costs;
-    NumericTransitionCostMap numeric_transition_costs;
-};
 
 static_assert(RuleCostPolicyConcept<RuleCostPolicy<GroundTag>, GroundTag>);
 static_assert(RuleCostPolicyConcept<RuleCostOverridePolicy<GroundTag>, GroundTag>);
