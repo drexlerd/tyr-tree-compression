@@ -1,4 +1,4 @@
-name: CI Ctest
+name: CI Ctest TPP
 
 on:
   push:
@@ -44,7 +44,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake
 
-      - name: Configure and Build Tyr
+      - name: Configure Tyr
         run: |
           cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                 -DTYR_BUILD_TESTS=ON \
@@ -55,13 +55,13 @@ jobs:
                 -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
                 -S . -B build_${{ matrix.build_type }} \
                 -DCMAKE_PREFIX_PATH="$(python -c 'import pypddl, pyyggdrasil; print(f"{pypddl.native_prefix()};{pyyggdrasil.native_prefix()}")')"
-          cmake --build build_${{ matrix.build_type }} -j2
 
-      - name: Run Tests
+      - name: Build and Run TPP Astar Statistics
         working-directory: build_${{ matrix.build_type }}/tests/unit
         run: |
+          cmake --build ../.. --target planning_algorithms_statistics_ground_astar -j2
           PYPDDL_LIB_DIR="$(python -c 'import pypddl; print(pypddl.native_prefix() / "lib")')"
           PYYGGDRASIL_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
           export DYLD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
           export LD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
-          GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V
+          GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ./planning_algorithms_statistics_ground_astar --gtest_filter='TyrPlanningAstarStatistics/AstarStatisticsTest.StatisticsMatchFixture/Tpp'
