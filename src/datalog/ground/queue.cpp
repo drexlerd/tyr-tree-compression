@@ -71,6 +71,7 @@ struct PendingNumericBuckets
     using Term = fd::GroundFunctionTermView<f::FluentTag>;
     using Interval = ygg::ClosedInterval<ygg::float_t>;
     using Bucket = ygg::UnorderedMap<Term, Interval>;
+    using ChangedTerms = std::vector<Term>;
 
     bool is_empty() const noexcept { return buckets.empty(); }
 
@@ -108,6 +109,7 @@ struct PendingNumericBuckets
     }
 
     std::map<Cost, Bucket> buckets;
+    ChangedTerms changed_terms;
 };
 
 template<typename Facts>
@@ -802,13 +804,17 @@ template<OrAnnotationPolicyConcept<GroundTag> OrAP,
 bool commit_numeric_bucket(GroundCtx<OrAP, AndAP, TP, CP>& ctx, PendingNumericBuckets& pending_numeric, Cost cost)
 {
     auto bucket = pending_numeric.take(cost);
-    auto changed_terms = std::vector<fd::GroundFunctionTermView<f::FluentTag>> {};
+    auto& changed_terms = pending_numeric.changed_terms;
+    changed_terms.clear();
     changed_terms.reserve(bucket.size());
 
     for (const auto& [term, interval] : bucket)
         if (derive_interval(ctx, term, interval))
             changed_terms.push_back(term);
 
+    // Keep equal-cost rule notifications independent of unordered bucket iteration.
+    if (changed_terms.size() > 1)
+        std::sort(changed_terms.begin(), changed_terms.end(), ygg::Less<fd::GroundFunctionTermView<f::FluentTag>> {});
     for (const auto term : changed_terms)
         notify_numeric_interval_changed(ctx, term);
 

@@ -64,4 +64,4 @@ jobs:
           PYYGGDRASIL_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
           export DYLD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
           export LD_LIBRARY_PATH="${PYPDDL_LIB_DIR}:${PYYGGDRASIL_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
-          TYR_TRACE_ASTAR=1 GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ./planning_algorithms_statistics_ground_astar --gtest_filter='TyrPlanningAstarStatistics/AstarStatisticsTest.StatisticsMatchFixture/Tpp'
+          TYR_TRACE_ASTAR=1 TYR_TRACE_HFF_STATE=22 GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ./planning_algorithms_statistics_ground_astar --gtest_filter='TyrPlanningAstarStatistics/AstarStatisticsTest.StatisticsMatchFixture/Tpp'

@@ -5633,8 +5633,8 @@
                 }
             },
             "hff_unit": {
-                "num_generated": 159,
-                "num_expanded": 74,
+                "num_generated": 160,
+                "num_expanded": 75,
                 "num_deadends": 0,
                 "num_pruned": 0,
                 "plan": {
