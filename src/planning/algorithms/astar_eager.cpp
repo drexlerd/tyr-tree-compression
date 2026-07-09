@@ -22,6 +22,7 @@
 #include "tyr/planning/algorithms/astar_eager/event_handler.hpp"
 #include "tyr/planning/algorithms/concepts.hpp"
 #include "tyr/planning/algorithms/openlists/alternating.hpp"
+#include "tyr/planning/algorithms/portable_shuffle.hpp"
 #include "tyr/planning/algorithms/strategies/goal.hpp"
 #include "tyr/planning/algorithms/strategies/pruning.hpp"
 #include "tyr/planning/algorithms/utils.hpp"
@@ -44,8 +45,6 @@
 #include "tyr/planning/state_index.hpp"
 
 #include <algorithm>
-#include <cstdlib>
-#include <fmt/core.h>
 #include <random>
 #include <yggdrasil/containers/segmented_vector.hpp>
 #include <yggdrasil/core/chrono.hpp>
@@ -94,8 +93,6 @@ struct QueueEntry
     using ItemType = std::tuple<ygg::float_t, ygg::Index<State<Kind>>>;
 
     ygg::float_t f_value;
-    ygg::float_t g_value;
-    ygg::float_t h_value;
     ygg::Index<State<Kind>> state;
     SearchNodeStatus status;
     ygg::uint_t step;
@@ -104,24 +101,11 @@ struct QueueEntry
     ItemType get_item() const { return std::make_tuple(f_value, state); }
 };
 
-static_assert(sizeof(QueueEntry<LiftedTag>) == 40);
-static_assert(sizeof(QueueEntry<GroundTag>) == 40);
+static_assert(sizeof(QueueEntry<LiftedTag>) == 24);
+static_assert(sizeof(QueueEntry<GroundTag>) == 24);
 
 template<TaskKind Kind>
 using Queue = PriorityQueue<QueueEntry<Kind>>;
-
-const char* to_string(SearchNodeStatus status)
-{
-    switch (status)
-    {
-        case SearchNodeStatus::GOAL: return "GOAL";
-        case SearchNodeStatus::DEAD_END: return "DEAD_END";
-        case SearchNodeStatus::CLOSED: return "CLOSED";
-        case SearchNodeStatus::OPEN: return "OPEN";
-        case SearchNodeStatus::NEW: return "NEW";
-    }
-    return "UNKNOWN";
-}
 
 template<TaskKind Kind>
 SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& successor_generator, Heuristic<Kind>& heuristic, const Options<Kind>& options)
@@ -139,38 +123,6 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
     auto result = SearchResult<Kind>();
     auto search_nodes = SearchNodeVector<Kind>();
     auto openlist = Queue<Kind>();
-    const auto trace_astar = (std::getenv("TYR_TRACE_ASTAR") != nullptr);
-    const auto trace_entry = [&](const char* event, const QueueEntry<Kind>& entry, SearchNodeStatus node_status) {
-        if (!trace_astar)
-            return;
-
-        fmt::print("[ASTAR] {} state={} g={} h={} f={} entry_status={} node_status={} step={} open={}\n",
-                   event,
-                   entry.state.get_value(),
-                   entry.g_value,
-                   entry.h_value,
-                   entry.f_value,
-                   to_string(entry.status),
-                   to_string(node_status),
-                   entry.step,
-                   openlist.size());
-    };
-    const auto trace_reject = [&](const ygg::Index<State<Kind>> source,
-                                  const ygg::Index<State<Kind>> successor,
-                                  ygg::float_t successor_g_value,
-                                  ygg::float_t old_g_value,
-                                  SearchNodeStatus node_status) {
-        if (!trace_astar)
-            return;
-
-        fmt::print("[ASTAR] Reject state={} parent={} g={} old_g={} node_status={} open={}\n",
-                   successor.get_value(),
-                   source.get_value(),
-                   successor_g_value,
-                   old_g_value,
-                   to_string(node_status),
-                   openlist.size());
-    };
     const auto start_g_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(start_node.get_metric());
     const auto start_h_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(heuristic.evaluate(start_node));
     const auto start_f_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(start_g_value + start_h_value);
@@ -230,9 +182,8 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
     auto labeled_succ_nodes = std::vector<LabeledNode<Kind>> {};
     auto f_value = start_f_value;
-    const auto start_entry = QueueEntry<Kind> { start_f_value, start_g_value, start_h_value, start_state_index, start_search_node.status, step++ };
+    const auto start_entry = QueueEntry<Kind> { start_f_value, start_state_index, start_search_node.status, step++ };
     openlist.insert(start_entry);
-    trace_entry("Push", start_entry, start_search_node.status);
 
     auto stopwatch = options.max_time ? std::optional<ygg::CountdownWatch>(options.max_time.value()) : std::nullopt;
 
@@ -252,14 +203,12 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
         openlist.pop();
 
         auto& search_node = get_or_create_search_node(state_index, search_nodes);
-        trace_entry("Pop", queue_entry, search_node.status);
         auto node = Node<Kind>(state, search_node.g_value);
 
         /* Close state. */
 
         if (search_node.status == SearchNodeStatus::CLOSED || search_node.status == SearchNodeStatus::DEAD_END)
         {
-            trace_entry("Skip", queue_entry, search_node.status);
             continue;
         }
 
@@ -275,7 +224,6 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
         if (search_node.status == SearchNodeStatus::GOAL)
         {
             search_node.status = SearchNodeStatus::GOAL;
-            trace_entry("ExpandGoal", queue_entry, search_node.status);
 
             event_handler->on_expand_goal_node(node);
 
@@ -291,7 +239,6 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
         /* Expand the successors of the node. */
 
-        trace_entry("Expand", queue_entry, search_node.status);
         event_handler->on_expand_node(node);
 
         /* Ensure that the state is closed */
@@ -308,7 +255,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
         }
 
         if (options.shuffle_labeled_succ_nodes)
-            std::shuffle(labeled_succ_nodes.begin(), labeled_succ_nodes.end(), rng);
+            portable_shuffle(labeled_succ_nodes.begin(), labeled_succ_nodes.end(), rng);
 
         for (const auto& labeled_succ_node : labeled_succ_nodes)
         {
@@ -363,9 +310,6 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
                 if (successor_h_value == std::numeric_limits<ygg::float_t>::infinity())
                 {
                     successor_search_node.status = SearchNodeStatus::DEAD_END;
-                    const auto successor_f_value = std::numeric_limits<ygg::float_t>::infinity();
-                    const auto successor_entry = QueueEntry<Kind> { successor_f_value, successor_g_value, successor_h_value, succ_state_index, successor_search_node.status, step };
-                    trace_entry("GenerateDeadEnd", successor_entry, successor_search_node.status);
                     continue;
                 }
 
@@ -375,13 +319,10 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
                 event_handler->on_generate_node_relaxed(node, normalized_labeled_succ_node);
 
                 const auto successor_f_value = ygg::FloatTolerance<ygg::float_t>::canonicalize(successor_g_value + successor_h_value);
-                const auto successor_entry = QueueEntry<Kind> { successor_f_value, successor_g_value, successor_h_value, succ_state_index, successor_search_node.status, step++ };
-                openlist.insert(successor_entry);
-                trace_entry("Generate", successor_entry, successor_search_node.status);
+                openlist.insert(QueueEntry<Kind> { successor_f_value, succ_state_index, successor_search_node.status, step++ });
             }
             else
             {
-                trace_reject(state_index, succ_state_index, successor_g_value, successor_search_node.g_value, successor_search_node.status);
                 event_handler->on_generate_node_not_relaxed(node, normalized_labeled_succ_node);
             }
         }

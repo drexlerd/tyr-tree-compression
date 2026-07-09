@@ -21,6 +21,7 @@
 #include "tyr/formalism/planning/views.hpp"
 #include "tyr/planning/algorithms/brfs/event_handler.hpp"
 #include "tyr/planning/algorithms/concepts.hpp"
+#include "tyr/planning/algorithms/portable_shuffle.hpp"
 #include "tyr/planning/algorithms/strategies/goal.hpp"
 #include "tyr/planning/algorithms/strategies/pruning.hpp"
 #include "tyr/planning/algorithms/utils.hpp"
@@ -183,7 +184,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
         }
 
         if (options.shuffle_labeled_succ_nodes)
-            std::shuffle(labeled_succ_nodes.begin(), labeled_succ_nodes.end(), rng);
+            portable_shuffle(labeled_succ_nodes.begin(), labeled_succ_nodes.end(), rng);
 
         for (const auto& labeled_succ_node : labeled_succ_nodes)
         {

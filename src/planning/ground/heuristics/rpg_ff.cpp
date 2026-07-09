@@ -17,61 +17,15 @@
 
 #include "tyr/planning/ground/heuristics/rpg_ff.hpp"
 
-#include "tyr/formalism/planning/formatter.hpp"
 #include "tyr/planning/applicability.hpp"
 
-#include <algorithm>
-#include <cstdlib>
-#include <fmt/core.h>
 #include <utility>
 
 namespace f = tyr::formalism;
 namespace fd = tyr::formalism::datalog;
-namespace fp = tyr::formalism::planning;
 
 namespace tyr::planning
 {
-namespace
-{
-bool should_trace_hff_state(ygg::Index<State<GroundTag>> state_index)
-{
-    const auto* value = std::getenv("TYR_TRACE_HFF_STATE");
-    if (!value)
-        return false;
-
-    char* end = nullptr;
-    const auto requested = std::strtoull(value, &end, 10);
-    return end != value && *end == '\0' && requested == state_index.get_value();
-}
-
-const char* cost_mode_name(CostMode cost_mode) noexcept
-{
-    switch (cost_mode)
-    {
-        case CostMode::UNIT: return "unit";
-        case CostMode::GENERAL: return "general";
-    }
-    return "unknown";
-}
-
-void trace_relaxed_plan(ygg::Index<State<GroundTag>> state_index,
-                        CostMode cost_mode,
-                        ygg::float_t value,
-                        const ygg::UnorderedSet<ygg::Index<fp::GroundAction>>& relaxed_plan,
-                        const fp::Repository& repository)
-{
-    auto actions = std::vector<fp::GroundActionView> {};
-    actions.reserve(relaxed_plan.size());
-    for (const auto action_index : relaxed_plan)
-        actions.push_back(ygg::make_view(action_index, repository));
-
-    std::sort(actions.begin(), actions.end(), [](const auto lhs, const auto rhs) { return lhs.get_index() < rhs.get_index(); });
-
-    fmt::print("[HFF] state={} cost_mode={} value={} relaxed_plan_size={}\n", state_index.get_value(), cost_mode_name(cost_mode), value, actions.size());
-    for (const auto action : actions)
-        fmt::print("[HFF]   action={} {}\n", action.get_index().get_value(), std::make_pair(action, fp::PlanFormatting()));
-}
-}
 
 FFRPGHeuristic<GroundTag>::FFRPGHeuristic(TaskPtr<GroundTag> task, ygg::ExecutionContextPtr execution_context, CostMode cost_mode) :
     RPGBase<GroundTag,
@@ -122,11 +76,7 @@ ygg::float_t FFRPGHeuristic<GroundTag>::extract_cost_and_set_preferred_actions_i
             extract_numeric_constraint_support(constraint, state_context);
     }
 
-    const auto value = ygg::float_t(m_relaxed_plan.size());
-    if (should_trace_hff_state(state.get_index()))
-        trace_relaxed_plan(state.get_index(), this->m_cost_mode, value, m_relaxed_plan, *this->m_task->get_repository());
-
-    return value;
+    return ygg::float_t(m_relaxed_plan.size());
 }
 
 const ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>>& FFRPGHeuristic<GroundTag>::get_preferred_actions()
