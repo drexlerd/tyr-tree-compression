@@ -1,0 +1,80 @@
+/*
+ * Copyright (C) 2025-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef TYR_DATALOG_POLICIES_ANNOTATION_HPP_
+#define TYR_DATALOG_POLICIES_ANNOTATION_HPP_
+
+#include "tyr/datalog/policies/annotation_types.hpp"
+
+#include <algorithm>
+#include <limits>
+#include <optional>
+#include <variant>
+#include <yggdrasil/semantics/comparators.hpp>
+
+namespace tyr::datalog
+{
+
+template<TaskKind Kind, typename Binding>
+Cost fetch_annotation_cost(Binding binding, const SelectedPredicateAnnotations<Kind>& annotations)
+{
+    if (const auto* annotation = annotations.find(binding))
+        return get_cost(*annotation);
+    return std::numeric_limits<Cost>::max();
+}
+
+template<TaskKind Kind, typename Binding>
+std::optional<WitnessAnnotation<Kind>> fetch_witness(Binding binding, const SelectedPredicateAnnotations<Kind>& annotations)
+{
+    if (const auto* annotation = annotations.find(binding))
+        if (const auto* witness = std::get_if<WitnessAnnotation<Kind>>(annotation))
+            return *witness;
+    return std::nullopt;
+}
+
+template<TaskKind Kind>
+CostUpdate<Kind> update_min_cost(Cost& cost, Cost candidate)
+{
+    const auto old_cost = cost;
+    if (candidate < old_cost)
+        cost = candidate;
+    return CostUpdate<Kind>(old_cost, cost);
+}
+
+template<TaskKind Kind>
+bool witness_wins_tie(const WitnessAnnotation<Kind>& witness, const Annotation<Kind>* incumbent)
+{
+    if (!incumbent)
+        return true;
+    const auto* incumbent_witness = std::get_if<WitnessAnnotation<Kind>>(incumbent);
+    return incumbent_witness && ygg::Less<WitnessAnnotation<Kind>> {}(witness, *incumbent_witness);
+}
+
+template<TaskKind Kind, typename Binding>
+const Annotation<Kind>* select_incumbent(Binding program_head,
+                                         Binding delta_head,
+                                         Cost best_global_cost,
+                                         Cost best_local_cost,
+                                         const SelectedPredicateAnnotations<Kind>& program_and_annot,
+                                         const SelectedPredicateAnnotations<Kind>& delta_and_annot)
+{
+    return best_local_cost <= best_global_cost ? delta_and_annot.find(delta_head) : program_and_annot.find(program_head);
+}
+
+}
+
+#endif

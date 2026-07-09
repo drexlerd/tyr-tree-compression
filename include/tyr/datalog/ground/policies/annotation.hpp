@@ -19,6 +19,7 @@
 #define TYR_DATALOG_GROUND_POLICIES_ANNOTATION_HPP_
 
 #include "tyr/datalog/declarations.hpp"
+#include "tyr/datalog/ground/policies/annotation_types.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 
@@ -32,42 +33,33 @@ template<>
 class NoOrAnnotationPolicy<GroundTag>
 {
 public:
-    void initialize_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, GroundSelectedPredicateAnnotations&) const noexcept {}
+    void initialize_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, GroundSelectedPredicateAnnotations&) const noexcept;
 
     void initialize_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
                                ygg::ClosedInterval<ygg::float_t>,
-                               GroundSelectedFunctionAnnotations&) const noexcept
-    {
-    }
+                               GroundSelectedFunctionAnnotations&) const noexcept;
 
     GroundCostUpdate update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
                                        const GroundAnnotation&,
-                                       GroundSelectedPredicateAnnotations&) const noexcept
-    {
-        return GroundCostUpdate();
-    }
+                                       GroundSelectedPredicateAnnotations&) const noexcept;
 };
 
 template<>
 class NoAndAnnotationPolicy<GroundTag>
 {
 public:
-    void clear_achievers() noexcept {}
+    void clear_achievers() noexcept;
 
-    void record_achiever(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, const GroundAndAnnotationContext&) const noexcept {}
+    void record_achiever(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, const GroundAndAnnotationContext&) const noexcept;
 
     void update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>,
                            const GroundAndAnnotationContext&,
-                           GroundSelectedPredicateAnnotations&) const noexcept
-    {
-    }
+                           GroundSelectedPredicateAnnotations&) const noexcept;
 
     void update_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
                            ygg::ClosedInterval<ygg::float_t>,
                            const GroundAndAnnotationContext&,
-                           GroundSelectedFunctionAnnotations&) const noexcept
-    {
-    }
+                           GroundSelectedFunctionAnnotations&) const noexcept;
 };
 
 template<>
@@ -75,37 +67,15 @@ class OrAnnotationPolicy<GroundTag>
 {
 public:
     void initialize_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
-                               GroundSelectedPredicateAnnotations& program_and_annot) const
-    {
-        program_and_annot.insert_or_assign(program_head, GroundBaseAnnotation(Cost(0)));
-    }
+                               GroundSelectedPredicateAnnotations& program_and_annot) const;
 
     void initialize_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> program_head,
                                ygg::ClosedInterval<ygg::float_t> interval,
-                               GroundSelectedFunctionAnnotations& program_numeric_and_annot) const
-    {
-        program_numeric_and_annot.insert(program_head, interval, GroundBaseAnnotation(Cost(0)));
-    }
+                               GroundSelectedFunctionAnnotations& program_numeric_and_annot) const;
 
     GroundCostUpdate update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
                                        const GroundAnnotation& delta_and_annot,
-                                       GroundSelectedPredicateAnnotations& program_and_annot) const
-    {
-        const auto new_cost = get_cost(delta_and_annot);
-        if (const auto* old_annotation = program_and_annot.find(program_head))
-        {
-            const auto old_cost = get_cost(*old_annotation);
-            if (new_cost < old_cost)
-            {
-                program_and_annot.insert_or_assign(program_head, delta_and_annot);
-                return GroundCostUpdate(old_cost, new_cost);
-            }
-            return GroundCostUpdate(old_cost, old_cost);
-        }
-
-        program_and_annot.insert_or_assign(program_head, delta_and_annot);
-        return GroundCostUpdate(std::nullopt, new_cost);
-    }
+                                       GroundSelectedPredicateAnnotations& program_and_annot) const;
 };
 
 template<typename AggregationFunction>
@@ -114,24 +84,18 @@ class AndAnnotationPolicy<GroundTag, AggregationFunction>
 public:
     static constexpr AggregationFunction agg = AggregationFunction {};
 
-    void clear_achievers() noexcept {}
+    void clear_achievers() noexcept;
 
-    void record_achiever(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, const GroundAndAnnotationContext&) const noexcept {}
+    void record_achiever(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag>, const GroundAndAnnotationContext&) const noexcept;
 
     void update_annotation(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> program_head,
                            const GroundAndAnnotationContext& context,
-                           GroundSelectedPredicateAnnotations& delta_and_annot) const
-    {
-        delta_and_annot.insert_or_assign(program_head, GroundWitnessAnnotation(context.rule, context.metric, context.current_cost, context.numeric_supports));
-    }
+                           GroundSelectedPredicateAnnotations& delta_and_annot) const;
 
     void update_annotation(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> program_head,
                            ygg::ClosedInterval<ygg::float_t> interval,
                            const GroundAndAnnotationContext& context,
-                           GroundSelectedFunctionAnnotations& delta_numeric_and_annot) const
-    {
-        delta_numeric_and_annot.insert(program_head, interval, GroundWitnessAnnotation(context.rule, context.metric, context.current_cost, context.numeric_supports));
-    }
+                           GroundSelectedFunctionAnnotations& delta_numeric_and_annot) const;
 };
 
 template<typename AggregationFunction>
@@ -142,18 +106,11 @@ public:
     using AtomIndex = ygg::Index<::tyr::formalism::datalog::GroundAtom<::tyr::formalism::FluentTag>>;
     using Achievers = std::vector<GroundWitnessAnnotation>;
 
-    void clear_achievers() noexcept { achievers.clear(); }
+    void clear_achievers() noexcept;
 
-    const Achievers* find_achievers(Atom program_head) const noexcept
-    {
-        const auto it = achievers.find(program_head.get_index());
-        return it == achievers.end() ? nullptr : &it->second;
-    }
+    const Achievers* find_achievers(Atom program_head) const noexcept;
 
-    void record_achiever(Atom program_head, const GroundAndAnnotationContext& context) const
-    {
-        achievers[program_head.get_index()].emplace_back(context.rule, context.metric, context.current_cost, context.numeric_supports);
-    }
+    void record_achiever(Atom program_head, const GroundAndAnnotationContext& context) const;
 
 private:
     mutable ygg::UnorderedMap<AtomIndex, Achievers> achievers;

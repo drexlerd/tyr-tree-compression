@@ -527,7 +527,7 @@
             "task_file": "tests/numeric/fo-sailing/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 2
                 },
                 "general": {
                     "h": 0
@@ -605,7 +605,7 @@
             "task_file": "tests/numeric/sailing/test-1.pddl",
             "configs": {
                 "unit": {
-                    "h": 3
+                    "h": 2
                 },
                 "general": {
                     "h": 0
