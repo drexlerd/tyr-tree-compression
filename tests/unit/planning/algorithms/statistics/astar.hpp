@@ -31,6 +31,8 @@ private:
     using Base = p::astar_eager::EventHandlerBase<TppExpandedNodeTraceEventHandler, StatisticsTaskKind>;
     friend Base;
 
+    p::Heuristic<StatisticsTaskKind>& m_heuristic;
+
     void on_expand_node_impl(const p::Node<StatisticsTaskKind>& node) const { static_cast<void>(node); }
     void on_expand_goal_node_impl(const p::Node<StatisticsTaskKind>& node) const { static_cast<void>(node); }
     void on_generate_node_impl(const p::LabeledNode<StatisticsTaskKind>& labeled_succ_node) const { static_cast<void>(labeled_succ_node); }
@@ -53,22 +55,34 @@ private:
     void on_solved_impl(const p::Plan<StatisticsTaskKind>& plan) const { static_cast<void>(plan); }
 
 public:
-    TppExpandedNodeTraceEventHandler() : Base(0) {}
+    explicit TppExpandedNodeTraceEventHandler(p::Heuristic<StatisticsTaskKind>& heuristic) : Base(0), m_heuristic(heuristic) {}
 
     void on_expand_node(const p::Node<StatisticsTaskKind>& node) override
     {
         Base::on_expand_node(node);
-        fmt::print("[ASTAR][TPP] Expanded #{} state={} metric={}\n",
-                   this->get_statistics().get_num_expanded(),
-                   node.get_state().get_index().get_value(),
-                   node.get_metric());
+        print_node("Expanded", this->get_statistics().get_num_expanded(), node);
+    }
+
+    void on_generate_node(const p::Node<StatisticsTaskKind>& source_node, const p::LabeledNode<StatisticsTaskKind>& labeled_succ_node) override
+    {
+        Base::on_generate_node(source_node, labeled_succ_node);
+        print_node("Generated", this->get_statistics().get_num_generated(), labeled_succ_node.node);
+    }
+
+    void print_node(const char* event, uint64_t count, const p::Node<StatisticsTaskKind>& node)
+    {
+        const auto g = ygg::FloatTolerance<ygg::float_t>::canonicalize(node.get_metric());
+        const auto h = ygg::FloatTolerance<ygg::float_t>::canonicalize(m_heuristic.evaluate(node));
+        const auto f = ygg::FloatTolerance<ygg::float_t>::canonicalize(g + h);
+        fmt::print("[ASTAR][TPP] {} #{} state={} g={} h={} f={}\n", event, count, node.get_state().get_index().get_value(), g, h, f);
     }
 };
 
-p::astar_eager::EventHandlerPtr<StatisticsTaskKind> create_astar_event_handler(const SearchCase& test_case, const std::string& key)
+p::astar_eager::EventHandlerPtr<StatisticsTaskKind>
+create_astar_event_handler(const SearchCase& test_case, const std::string& key, p::Heuristic<StatisticsTaskKind>& heuristic)
 {
     if (test_case.name == "Tpp" && key == "hff_unit")
-        return std::make_shared<TppExpandedNodeTraceEventHandler>();
+        return std::make_shared<TppExpandedNodeTraceEventHandler>(heuristic);
 
     return p::astar_eager::DefaultEventHandler<StatisticsTaskKind>::create();
 }
@@ -81,7 +95,7 @@ void check_statistics(const SearchStatistics& expected,
 {
     auto context = create_search_context<StatisticsTaskKind>(test_case.domain_file, test_case.task_file);
     auto heuristic = create_search_heuristic<StatisticsTaskKind>(heuristic_name, context, cost_mode);
-    auto event_handler = create_astar_event_handler(test_case, key);
+    auto event_handler = create_astar_event_handler(test_case, key, *heuristic);
 
     auto options = p::astar_eager::Options<StatisticsTaskKind>();
     options.event_handler = event_handler;
