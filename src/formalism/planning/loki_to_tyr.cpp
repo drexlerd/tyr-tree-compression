@@ -24,6 +24,7 @@
 #include <unordered_set>
 #include <variant>
 #include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
 
 namespace tyr::formalism::planning
 {
@@ -740,11 +741,11 @@ NumericEffectViewVariant LokiToTyrTranslator::translate_lifted(loki::formalism::
 ygg::IndexList<ConditionalEffect>
 LokiToTyrTranslator::translate_lifted(loki::formalism::EffectView element, const ygg::IndexList<Variable>& parameters, Builder& builder, Repository& context)
 {
-    using ConditionalEffectData = ygg::UnorderedMap<ygg::Index<ConjunctiveCondition>,
-                                                    std::tuple<ygg::IndexList<Variable>,
-                                                               ygg::IndexList<Literal<FluentTag>>,
-                                                               ygg::DataList<NumericEffectOperator<FluentTag>>,
-                                                               ::cista::optional<ygg::Data<NumericEffectOperator<AuxiliaryTag>>>>>;
+    using ConditionalEffectData = ygg::Map<ygg::Index<ConjunctiveCondition>,
+                                             std::tuple<ygg::IndexList<Variable>,
+                                                        ygg::IndexList<Literal<FluentTag>>,
+                                                        ygg::DataList<NumericEffectOperator<FluentTag>>,
+                                                        ::cista::optional<ygg::Data<NumericEffectOperator<AuxiliaryTag>>>>>;
 
     const auto translate_effect_func = [&](loki::formalism::EffectView effect, ConditionalEffectData& ref_conditional_effect_data)
     {
