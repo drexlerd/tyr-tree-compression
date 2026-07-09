@@ -71,7 +71,7 @@ struct NumericSupport
     auto get_interval() const noexcept { return interval; }
     auto get_cost() const noexcept { return cost; }
 
-    auto identifying_members() const noexcept { return std::make_tuple(key, lower(interval), upper(interval), cost); }
+    auto identifying_members() const noexcept { return std::tie(key, interval, cost); }
 };
 
 template<TaskKind Kind>
@@ -80,23 +80,10 @@ struct WitnessAnnotation
     using Metric = ygg::ClosedInterval<ygg::float_t>;
     using NumericSupports = std::vector<NumericSupport<Kind>>;
 
-    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Cost cost_) : rule_key(rule_key_), metric(), cost(cost_) {}
-
-    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Metric metric_, Cost cost_) : rule_key(rule_key_), metric(metric_), cost(cost_) {}
-
-    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Metric metric_, Cost cost_, NumericSupports numeric_supports_) :
-        rule_key(rule_key_),
-        metric(metric_),
-        cost(cost_),
-        numeric_supports(std::move(numeric_supports_))
-    {
-        std::sort(numeric_supports.begin(), numeric_supports.end(), ygg::Less<NumericSupport<Kind>> {});
-    }
-
-    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Metric metric_, Cost cost_, std::span<const NumericSupport<Kind>> numeric_supports_) :
-        WitnessAnnotation(rule_key_, metric_, cost_, NumericSupports(numeric_supports_.begin(), numeric_supports_.end()))
-    {
-    }
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key, Cost cost);
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key, Metric metric, Cost cost);
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key, Metric metric, Cost cost, NumericSupports numeric_supports);
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key, Metric metric, Cost cost, std::span<const NumericSupport<Kind>> numeric_supports);
 
     auto get_rule_key() const noexcept { return rule_key; }
     auto get_metric() const noexcept { return metric; }

@@ -75,9 +75,11 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     formalism/planning/planning_task.cpp
 
     datalog/lifted/policies/annotation.cpp
+    datalog/lifted/policies/cost.cpp
     datalog/lifted/policies/numeric_support.cpp
     datalog/ground/policies/annotation.cpp
     datalog/ground/policies/numeric_support.cpp
+    datalog/policies/annotation_types.cpp
     datalog/policies/termination.cpp
     datalog/lifted/programs/program.cpp
     datalog/lifted/workspaces/facts.cpp

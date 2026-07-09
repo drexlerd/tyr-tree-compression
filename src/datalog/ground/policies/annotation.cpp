@@ -20,6 +20,7 @@
 #include "tyr/datalog/policies/annotation.hpp"
 
 #include <utility>
+#include <variant>
 
 namespace tyr::datalog
 {

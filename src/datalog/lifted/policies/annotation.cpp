@@ -38,12 +38,35 @@
 #include <limits>
 #include <optional>
 #include <tuple>
+#include <variant>
 #include <vector>
 #include <yggdrasil/containers/vector.hpp>
 #include <yggdrasil/core/config.hpp>
+#include <yggdrasil/semantics/comparators.hpp>
 
 namespace tyr::datalog
 {
+namespace
+{
+template<TaskKind Kind, typename Binding>
+std::optional<WitnessAnnotation<Kind>> fetch_witness(Binding binding, const SelectedPredicateAnnotations<Kind>& annotations)
+{
+    if (const auto* annotation = annotations.find(binding))
+        if (const auto* witness = std::get_if<WitnessAnnotation<Kind>>(annotation))
+            return *witness;
+    return std::nullopt;
+}
+
+template<TaskKind Kind>
+CostUpdate<Kind> update_min_cost(Cost& cost, Cost candidate)
+{
+    const auto old_cost = cost;
+    if (candidate < old_cost)
+        cost = candidate;
+    return CostUpdate<Kind>(old_cost, cost);
+}
+
+}
 
 /**
  * OrAnnotationPolicy
