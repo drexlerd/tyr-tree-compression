@@ -21,6 +21,7 @@
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/fact_sets.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
+#include "tyr/datalog/policies/numeric_support_core.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 
 #include <optional>
@@ -40,7 +41,7 @@ public:
     Cost get_total_cost(const FactSets&,
                         const SelectedPredicateAnnotations<Kind>&,
                         const SelectedFunctionAnnotations<Kind>&,
-                        const details::TerminationNumericSupportSelectorT<Kind>&) const noexcept
+                        const NumericSupportSelector<Kind>&) const noexcept
     {
         return Cost(0);
     }
@@ -61,7 +62,7 @@ public:
     Cost get_total_cost(const FactSets& fact_sets,
                         const SelectedPredicateAnnotations<Kind>& and_annot,
                         const SelectedFunctionAnnotations<Kind>&,
-                        const details::TerminationNumericSupportSelectorT<Kind>& numeric_support_selector) const noexcept;
+                        const NumericSupportSelector<Kind>& numeric_support_selector) const noexcept;
 
     const auto& get_goal() const noexcept { return goals; }
 
@@ -71,16 +72,9 @@ public:
 
 private:
     std::optional<::tyr::formalism::datalog::GroundConjunctiveConditionView> goals;
-    mutable details::TerminationNumericSupportSelectorWorkspaceT<Kind> numeric_support_selector_workspace;
+    mutable NumericSupportSelectorWorkspace<Kind> numeric_support_selector_workspace;
     AggregationFunction agg;
 };
-
-static_assert(TerminationPolicyConcept<NoTerminationPolicy<GroundTag>, GroundTag>);
-static_assert(TerminationPolicyConcept<NoTerminationPolicy<LiftedTag>, LiftedTag>);
-static_assert(TerminationPolicyConcept<TerminationPolicy<GroundTag, SumAggregation>, GroundTag>);
-static_assert(TerminationPolicyConcept<TerminationPolicy<GroundTag, MaxAggregation>, GroundTag>);
-static_assert(TerminationPolicyConcept<TerminationPolicy<LiftedTag, SumAggregation>, LiftedTag>);
-static_assert(TerminationPolicyConcept<TerminationPolicy<LiftedTag, MaxAggregation>, LiftedTag>);
 
 }
 

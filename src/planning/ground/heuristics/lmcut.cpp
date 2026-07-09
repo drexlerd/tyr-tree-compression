@@ -23,7 +23,6 @@
 #include <ranges>
 #include <type_traits>
 #include <variant>
-
 #include <yggdrasil/containers/variant.hpp>
 
 namespace f = tyr::formalism;
@@ -40,10 +39,7 @@ bool is_numeric_head(const Head&) noexcept
     return false;
 }
 
-bool is_numeric_head(fd::GroundNumericEffectOperatorView<f::FluentTag>) noexcept
-{
-    return true;
-}
+bool is_numeric_head(fd::GroundNumericEffectOperatorView<f::FluentTag>) noexcept { return true; }
 
 bool needs_expanded_lmcut(auto program)
 {
@@ -277,9 +273,8 @@ void LMCutHeuristic<GroundTag>::mark_goal_zone(Atom atom)
 
             const auto& mapping = m_rpg_program.get_rule_to_action_mapping();
             const auto action_it = mapping.find(witness.get_rule());
-            const auto residual = m_use_expanded_edges ?
-                                      (action_it != mapping.end() ? get_witness_edge_residual_cost(witness) : datalog::Cost(0)) :
-                                      get_residual_cost(witness.get_rule());
+            const auto residual = m_use_expanded_edges ? (action_it != mapping.end() ? get_witness_edge_residual_cost(witness) : datalog::Cost(0)) :
+                                                         get_residual_cost(witness.get_rule());
             if (action_it != mapping.end() && residual > 0)
                 continue;
 
@@ -342,10 +337,10 @@ bool LMCutHeuristic<GroundTag>::is_before_goal_zone(Atom atom)
 
             has_optimal_achiever = true;
             const auto action_it = m_rpg_program.get_rule_to_action_mapping().find(witness.get_rule());
-            const auto residual = m_use_expanded_edges ?
-                                      (action_it != m_rpg_program.get_rule_to_action_mapping().end() ? get_witness_edge_residual_cost(witness) :
-                                                                                                       datalog::Cost(0)) :
-                                      get_residual_cost(witness.get_rule());
+            const auto residual =
+                m_use_expanded_edges ?
+                    (action_it != m_rpg_program.get_rule_to_action_mapping().end() ? get_witness_edge_residual_cost(witness) : datalog::Cost(0)) :
+                    get_residual_cost(witness.get_rule());
             const auto& preconditions = get_witness_max_preconditions(witness, residual);
             before = preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
             release_witness_max_preconditions();
@@ -381,10 +376,9 @@ bool LMCutHeuristic<GroundTag>::is_before_goal_zone(NumericNode node)
     if (witness && witness->get_cost() == get_numeric_cost(node))
     {
         const auto action_it = m_rpg_program.get_rule_to_action_mapping().find(witness->get_rule());
-        const auto residual = m_use_expanded_edges ?
-                                  (action_it != m_rpg_program.get_rule_to_action_mapping().end() ? get_witness_edge_residual_cost(*witness) :
-                                                                                                   datalog::Cost(0)) :
-                                  get_residual_cost(witness->get_rule());
+        const auto residual = m_use_expanded_edges ? (action_it != m_rpg_program.get_rule_to_action_mapping().end() ? get_witness_edge_residual_cost(*witness) :
+                                                                                                                      datalog::Cost(0)) :
+                                                     get_residual_cost(witness->get_rule());
         const auto& preconditions = get_witness_max_preconditions(*witness, residual);
         before = preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
         release_witness_max_preconditions();
@@ -435,7 +429,7 @@ void LMCutHeuristic<GroundTag>::extract_cut()
 
             for (const auto& entry : selection)
                 if (entry.cost == goal_cost)
-                    mark_goal_zone(NumericNode { entry.term, entry.interval });
+                    mark_goal_zone(NumericNode { entry.key, entry.interval });
         }
     }
 
@@ -446,8 +440,8 @@ void LMCutHeuristic<GroundTag>::extract_cut()
             return;
 
         const auto& preconditions = get_witness_max_preconditions(witness, get_residual_cost(witness.get_rule()));
-        const auto crosses_cut = preconditions.empty()
-                                 || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
+        const auto crosses_cut =
+            preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
         release_witness_max_preconditions();
         if (crosses_cut)
             m_cut.insert(action_it->second.get_row());
@@ -499,7 +493,7 @@ void LMCutHeuristic<GroundTag>::extract_expanded_cut()
 
             for (const auto& entry : selection)
                 if (entry.cost == goal_cost)
-                    mark_goal_zone(NumericNode { entry.term, entry.interval });
+                    mark_goal_zone(NumericNode { entry.key, entry.interval });
         }
     }
 
@@ -512,8 +506,8 @@ void LMCutHeuristic<GroundTag>::extract_expanded_cut()
             return;
 
         const auto& preconditions = get_witness_max_preconditions(witness, residual);
-        const auto crosses_cut = preconditions.empty()
-                                 || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
+        const auto crosses_cut =
+            preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
         release_witness_max_preconditions();
         if (crosses_cut)
         {
@@ -534,8 +528,8 @@ void LMCutHeuristic<GroundTag>::extract_expanded_cut()
             return;
 
         const auto& preconditions = get_witness_max_preconditions(witness, residual);
-        const auto crosses_cut = preconditions.empty()
-                                 || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
+        const auto crosses_cut =
+            preconditions.empty() || std::ranges::any_of(preconditions, [&](const auto precondition) { return is_before_goal_zone(precondition); });
         release_witness_max_preconditions();
         if (crosses_cut)
         {

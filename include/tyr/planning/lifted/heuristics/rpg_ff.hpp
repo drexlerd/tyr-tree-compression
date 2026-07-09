@@ -85,7 +85,7 @@ private:
     ygg::itertools::cartesian_set::Workspace<ygg::Index<::tyr::formalism::Object>> m_iter_workspace;
     ::tyr::formalism::planning::GrounderCacheEntry<::tyr::formalism::planning::Action> m_grounder_cache;
     ::tyr::formalism::planning::EffectFamilyList m_effect_families;
-    datalog::NumericSupportSelectorWorkspace m_numeric_support_selector_workspace;
+    datalog::NumericSupportSelectorWorkspace<LiftedTag> m_numeric_support_selector_workspace;
 
     ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_relaxed_plan;
     ygg::UnorderedSet<ygg::Index<::tyr::formalism::planning::GroundAction>> m_preferred_actions;

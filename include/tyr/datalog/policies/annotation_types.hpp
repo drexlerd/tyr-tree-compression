@@ -38,9 +38,6 @@
 namespace tyr::datalog
 {
 
-class NumericSupportSelector;
-class NumericSupportSelectorWorkspace;
-
 template<TaskKind Kind>
 struct NumericSupportKey;
 

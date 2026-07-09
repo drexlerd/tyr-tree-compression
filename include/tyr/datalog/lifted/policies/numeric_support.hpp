@@ -32,32 +32,17 @@
 
 namespace tyr::datalog
 {
-class NumericSupportSelectorWorkspace
-{
-public:
-    struct SelectionEntry
-    {
-        ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag> binding;
-        ygg::ClosedInterval<ygg::float_t> interval;
-        const NumericIntervalAnnotation<LiftedTag>* annotation;
-        Cost cost;
 
-        bool operator<(const SelectionEntry& other) const noexcept { return cost < other.cost; }
-    };
-
-    void clear() noexcept;
-
-    std::vector<SelectionEntry> selection;
-};
-
-class NumericSupportSelector : public NumericSupportSelectorCore<NumericSupportSelector,
-                                                                 ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>,
-                                                                 NumericSupportSelectorWorkspace::SelectionEntry>
+template<>
+class NumericSupportSelector<LiftedTag> :
+    public NumericSupportSelectorCore<NumericSupportSelector<LiftedTag>,
+                                      ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>,
+                                      NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry>
 {
 public:
     using Key = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
-    using SelectionEntry = NumericSupportSelectorWorkspace::SelectionEntry;
-    using Core = NumericSupportSelectorCore<NumericSupportSelector, Key, SelectionEntry>;
+    using SelectionEntry = NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry;
+    using Core = NumericSupportSelectorCore<NumericSupportSelector<LiftedTag>, Key, SelectionEntry>;
 
     NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations<LiftedTag>& annotations);
 
@@ -65,7 +50,7 @@ public:
      * Storage accessors for the shared core.
      */
 
-    static Key key_of(const SelectionEntry& entry) noexcept { return entry.binding; }
+    static Key key_of(const SelectionEntry& entry) noexcept { return entry.key; }
     Key fluent_key(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term) const noexcept { return term.get_row(); }
     ygg::ClosedInterval<ygg::float_t> lookup_static(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::StaticTag> term) const;
     ygg::ClosedInterval<ygg::float_t> current_interval(Key key) const;
@@ -77,12 +62,12 @@ public:
      * Workspace-based conveniences on top of the shared core.
      */
 
-    using Core::get_constraint_cost;
     using Core::for_each_constraint_support;
+    using Core::get_constraint_cost;
 
     template<typename AggregationFunction>
     Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
-                             NumericSupportSelectorWorkspace& workspace,
+                             NumericSupportSelectorWorkspace<LiftedTag>& workspace,
                              AggregationFunction agg) const
     {
         return get_constraint_cost(constraint, workspace.selection, agg);
@@ -90,7 +75,7 @@ public:
 
     template<typename AggregationFunction, typename Callback>
     Cost for_each_constraint_support(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
-                                     NumericSupportSelectorWorkspace& workspace,
+                                     NumericSupportSelectorWorkspace<LiftedTag>& workspace,
                                      AggregationFunction agg,
                                      Callback callback) const
     {
@@ -102,6 +87,7 @@ private:
     const NumericIntervalAnnotations<LiftedTag>& m_annotations;
     ygg::EqualTo<Key> m_binding_equal;
 };
+
 }
 
 #endif

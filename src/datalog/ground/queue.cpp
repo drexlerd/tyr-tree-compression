@@ -18,6 +18,7 @@
 #include "tyr/datalog/ground/queue.hpp"
 
 #include "tyr/datalog/fact_sets.hpp"
+#include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/numeric_utils.hpp"
 
 #include <algorithm>
@@ -143,13 +144,12 @@ void append_numeric_supports(std::vector<NumericSupport<GroundTag>>& supports,
     const auto selector = make_numeric_support_selector<AndAP>(ctx);
     for (const auto& entry : selection)
     {
-        const auto reported = selector.for_each_entry_support(
-            entry,
-            [&](auto term, auto interval, const auto& annotation)
-            { supports.push_back(NumericSupport<GroundTag> { term, interval, get_cost(annotation) }); });
+        const auto reported = selector.for_each_entry_support(entry,
+                                                              [&](auto term, auto interval, const auto& annotation)
+                                                              { supports.push_back(NumericSupport<GroundTag> { term, interval, get_cost(annotation) }); });
 
         if (!reported)
-            supports.push_back(NumericSupport<GroundTag> { entry.term, entry.interval, entry.cost });
+            supports.push_back(NumericSupport<GroundTag> { entry.key, entry.interval, entry.cost });
     }
 }
 
@@ -161,8 +161,7 @@ Metric aggregate_numeric_selection_metric(Metric metric, const std::vector<Numer
 {
     const auto selector = make_numeric_support_selector<AndAP>(ctx);
     for (const auto& entry : selection)
-        selector.for_each_entry_support(entry,
-                                        [&](auto, auto, const auto& annotation) { metric = aggregate_metric_support(metric, get_metric(annotation)); });
+        selector.for_each_entry_support(entry, [&](auto, auto, const auto& annotation) { metric = aggregate_metric_support(metric, get_metric(annotation)); });
     return metric;
 }
 
@@ -851,7 +850,6 @@ bool process_rule_frontier(GroundCtx<OrAP, AndAP, TP, CP>& ctx, PendingNumericBu
 
         if (fire_rule(ctx, entry->rule, entry->cost, pending_numeric))
             return true;
-
     }
 
     return false;

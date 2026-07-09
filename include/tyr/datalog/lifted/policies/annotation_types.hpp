@@ -33,8 +33,8 @@ struct AndAnnotationContext<LiftedTag>
     ::tyr::formalism::datalog::RuleBindingView rule_binding;
     Cost metric_effect_cost;
     ::tyr::formalism::datalog::ConjunctiveConditionView witness_condition;
-    const NumericSupportSelector& numeric_support_selector;
-    NumericSupportSelectorWorkspace& numeric_support_selector_workspace;
+    const NumericSupportSelector<LiftedTag>& numeric_support_selector;
+    NumericSupportSelectorWorkspace<LiftedTag>& numeric_support_selector_workspace;
     const SelectedPredicateAnnotations<LiftedTag>& program_and_annot;
     const SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot;
     ::tyr::formalism::datalog::GrounderContext& delta_context;

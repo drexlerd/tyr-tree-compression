@@ -209,7 +209,7 @@ struct ProgramWorkspace<LiftedTag>
         OrAP or_ap;
         SelectedPredicateAnnotations<LiftedTag> and_annot;
         SelectedFunctionAnnotations<LiftedTag> numeric_and_annot;
-        std::optional<NumericSupportSelector> numeric_support_selector;
+        std::optional<NumericSupportSelector<LiftedTag>> numeric_support_selector;
 
         TP tp;
         CP cost_policy;

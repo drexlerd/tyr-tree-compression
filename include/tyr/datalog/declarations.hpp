@@ -68,6 +68,10 @@ template<TaskKind Kind>
 class RuleCostPolicy;
 template<TaskKind Kind>
 class RuleCostOverridePolicy;
+template<TaskKind Kind>
+class NumericSupportSelectorWorkspace;
+template<TaskKind Kind>
+class NumericSupportSelector;
 
 struct D2PWorkspace;
 template<TaskKind Kind>

@@ -153,7 +153,7 @@ std::optional<WitnessAnnotation<LiftedTag>> try_ground_witness(const AndAnnotati
         {
             if (entry.annotation)
                 body_metric = aggregate_metric_support(body_metric, get_metric(entry.annotation->annotation));
-            numeric_supports.push_back(NumericSupport<LiftedTag> { entry.binding, entry.interval, entry.cost });
+            numeric_supports.push_back(NumericSupport<LiftedTag> { entry.key, entry.interval, entry.cost });
         }
 
         body_cost = AggregationFunction()(body_cost, constraint_cost);

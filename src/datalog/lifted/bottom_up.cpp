@@ -26,13 +26,13 @@
 #include "tyr/datalog/lifted/delta_kpkc.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
 #include "tyr/datalog/lifted/policies/numeric_support.hpp"
-#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/rule_scheduler.hpp"
 #include "tyr/datalog/lifted/workspaces/facts.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 #include "tyr/datalog/lifted/workspaces/rule.hpp"
 #include "tyr/datalog/numeric_utils.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/declarations.hpp"
 #include "tyr/formalism/datalog/conjunctive_condition_view.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
@@ -96,8 +96,8 @@ struct RuleUpdateInput
 {
     fd::RuleView rule;
     fd::ConjunctiveConditionView witness_condition;
-    const NumericSupportSelector& numeric_support_selector;
-    NumericSupportSelectorWorkspace& numeric_support_selector_workspace;
+    const NumericSupportSelector<LiftedTag>& numeric_support_selector;
+    NumericSupportSelectorWorkspace<LiftedTag>& numeric_support_selector_workspace;
     Cost current_cost;
     const SelectedPredicateAnnotations<LiftedTag>& program_and_annot;
     const SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot;
@@ -126,7 +126,7 @@ struct RuleUpdateInput
 };
 
 template<typename In, typename Out>
-static auto make_rule_update_input(const In& in, Out& out, const NumericSupportSelector& numeric_support_selector)
+static auto make_rule_update_input(const In& in, Out& out, const NumericSupportSelector<LiftedTag>& numeric_support_selector)
 {
     return RuleUpdateInput<std::decay_t<decltype(in.and_ap())>, std::decay_t<decltype(in.cost_policy())>> { in.cws_rule().get_rule(),
                                                                                                             in.cws_rule().get_witness_rule().get_body(),
@@ -151,18 +151,18 @@ Cost metric_effect_delta(fd::NumericEffectView<Op, f::FluentTag> effect, const R
         [&] { return is_valid_binding(effect.get_fexpr(), input.fact_sets, input.solve_context); });
 }
 
-static void append_numeric_supports(const std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection,
+static void append_numeric_supports(const std::vector<NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry>& selection,
                                     std::vector<NumericSupport<LiftedTag>>& supports)
 {
     for (const auto& entry : selection)
-        supports.push_back(NumericSupport<LiftedTag> { entry.binding, entry.interval, entry.cost });
+        supports.push_back(NumericSupport<LiftedTag> { entry.key, entry.interval, entry.cost });
 }
 
 template<AndAnnotationPolicyConcept<LiftedTag> AndAP, RuleCostPolicyConcept<LiftedTag> CP>
 static bool collect_expression_supports(fd::FunctionExpressionView expression,
                                         const RuleUpdateInput<AndAP, CP>& input,
                                         std::vector<NumericSupport<LiftedTag>>& supports,
-                                        std::vector<NumericSupportSelectorWorkspace::SelectionEntry>& selection)
+                                        std::vector<NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry>& selection)
 {
     const auto ground_expression = fd::ground(expression, input.iteration_context);
     const auto value =
@@ -180,7 +180,7 @@ static bool collect_numeric_head_supports(fd::NumericEffectView<Op, f::FluentTag
                                           const RuleUpdateInput<AndAP, CP>& input,
                                           std::vector<NumericSupport<LiftedTag>>& supports)
 {
-    auto selection = std::vector<NumericSupportSelectorWorkspace::SelectionEntry> {};
+    auto selection = std::vector<NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry> {};
 
     if constexpr (!std::is_same_v<Op, f::Assign>)
     {
@@ -196,7 +196,7 @@ static bool collect_metric_effect_supports(fd::NumericEffectView<Op, f::FluentTa
                                            const RuleUpdateInput<AndAP, CP>& input,
                                            std::vector<NumericSupport<LiftedTag>>& supports)
 {
-    auto selection = std::vector<NumericSupportSelectorWorkspace::SelectionEntry> {};
+    auto selection = std::vector<NumericSupportSelectorWorkspace<LiftedTag>::SelectionEntry> {};
 
     if constexpr (!std::is_same_v<Op, f::Increase> && !std::is_same_v<Op, f::Decrease>)
     {
@@ -407,7 +407,7 @@ template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
          TerminationPolicyConcept<LiftedTag> TP,
          RuleCostPolicyConcept<LiftedTag> CP>
 void process_clique(RuleWorkerExecutionContext<OrAP, AndAP, TP, CP>& wrctx,
-                    const NumericSupportSelector& numeric_support_selector,
+                    const NumericSupportSelector<LiftedTag>& numeric_support_selector,
                     std::span<const kpkc::Vertex> clique,
                     bool require_novel_binding)
 {

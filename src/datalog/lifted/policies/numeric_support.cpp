@@ -23,22 +23,20 @@ namespace f = tyr::formalism;
 namespace tyr::datalog
 {
 
-void NumericSupportSelectorWorkspace::clear() noexcept { selection.clear(); }
-
-NumericSupportSelector::NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations<LiftedTag>& annotations) :
+NumericSupportSelector<LiftedTag>::NumericSupportSelector(const FactSets& fact_sets, const NumericIntervalAnnotations<LiftedTag>& annotations) :
     m_fact_sets(fact_sets),
     m_annotations(annotations)
 {
 }
 
-ygg::ClosedInterval<ygg::float_t> NumericSupportSelector::lookup_static(fd::GroundFunctionTermView<f::StaticTag> term) const
+ygg::ClosedInterval<ygg::float_t> NumericSupportSelector<LiftedTag>::lookup_static(fd::GroundFunctionTermView<f::StaticTag> term) const
 {
     return m_fact_sets.get<f::StaticTag>().function[term];
 }
 
-ygg::ClosedInterval<ygg::float_t> NumericSupportSelector::current_interval(Key key) const { return m_fact_sets.get<f::FluentTag>().function[key]; }
+ygg::ClosedInterval<ygg::float_t> NumericSupportSelector<LiftedTag>::current_interval(Key key) const { return m_fact_sets.get<f::FluentTag>().function[key]; }
 
-const NumericIntervalAnnotations<LiftedTag>::Entries* NumericSupportSelector::find_entries(Key key) const
+const NumericIntervalAnnotations<LiftedTag>::Entries* NumericSupportSelector<LiftedTag>::find_entries(Key key) const
 {
     const auto relation_it = m_annotations.partitions().find(key.get_relation());
     if (relation_it == m_annotations.partitions().end())

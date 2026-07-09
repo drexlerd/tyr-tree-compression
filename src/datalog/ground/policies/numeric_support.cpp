@@ -23,11 +23,9 @@ namespace f = tyr::formalism;
 namespace tyr::datalog
 {
 
-void GroundNumericSupportSelectorWorkspace::clear() noexcept { selection.clear(); }
-
-GroundNumericSupportSelector::GroundNumericSupportSelector(const FactsWorkspace<GroundTag>& facts,
-                                                           const NumericIntervalAnnotations<GroundTag>& annotations,
-                                                           bool initial_intervals_cost_zero) :
+NumericSupportSelector<GroundTag>::NumericSupportSelector(const FactsWorkspace<GroundTag>& facts,
+                                                          const NumericIntervalAnnotations<GroundTag>& annotations,
+                                                          bool initial_intervals_cost_zero) :
     m_facts(facts),
     m_annotations(annotations),
     m_initial_intervals_cost_zero(initial_intervals_cost_zero),
@@ -35,19 +33,19 @@ GroundNumericSupportSelector::GroundNumericSupportSelector(const FactsWorkspace<
 {
 }
 
-ygg::ClosedInterval<ygg::float_t> GroundNumericSupportSelector::lookup_static(fd::GroundFunctionTermView<f::StaticTag> term) const
+ygg::ClosedInterval<ygg::float_t> NumericSupportSelector<GroundTag>::lookup_static(fd::GroundFunctionTermView<f::StaticTag> term) const
 {
     const auto it = m_facts.static_fterm_intervals.find(term);
     return it == m_facts.static_fterm_intervals.end() ? ygg::ClosedInterval<ygg::float_t>() : it->second;
 }
 
-ygg::ClosedInterval<ygg::float_t> GroundNumericSupportSelector::current_interval(Key key) const
+ygg::ClosedInterval<ygg::float_t> NumericSupportSelector<GroundTag>::current_interval(Key key) const
 {
     const auto it = m_facts.fluent_fterm_intervals.find(key);
     return it == m_facts.fluent_fterm_intervals.end() ? ygg::ClosedInterval<ygg::float_t>() : it->second;
 }
 
-const NumericIntervalAnnotations<GroundTag>::Entries* GroundNumericSupportSelector::find_entries(Key key) const
+const NumericIntervalAnnotations<GroundTag>::Entries* NumericSupportSelector<GroundTag>::find_entries(Key key) const
 {
     const auto relation_it = m_annotations.partitions().find(key.get_function());
     if (relation_it == m_annotations.partitions().end())

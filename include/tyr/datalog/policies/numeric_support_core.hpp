@@ -19,6 +19,7 @@
 #define TYR_DATALOG_POLICIES_NUMERIC_SUPPORT_CORE_HPP_
 
 #include "tyr/datalog/policies/aggregation.hpp"
+#include "tyr/datalog/policies/annotation_types.hpp"
 #include "tyr/formalism/arithmetic_operator_utils.hpp"
 #include "tyr/formalism/boolean_operator_utils.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -34,6 +35,25 @@
 
 namespace tyr::datalog
 {
+
+template<TaskKind Kind>
+class NumericSupportSelectorWorkspace
+{
+public:
+    struct SelectionEntry
+    {
+        NumericSupportKeyT<Kind> key;
+        ygg::ClosedInterval<ygg::float_t> interval;
+        const NumericIntervalAnnotation<Kind>* annotation;
+        Cost cost;
+
+        bool operator<(const SelectionEntry& other) const noexcept { return cost < other.cost; }
+    };
+
+    void clear() noexcept { selection.clear(); }
+
+    std::vector<SelectionEntry> selection;
+};
 
 /// Interval evaluation of ground datalog expressions where each referenced fluent function term is
 /// lazily resolved (and recorded) through the selector's support selection.
@@ -151,8 +171,7 @@ class NumericSupportSelectorCore
 public:
     using Selection = std::vector<SelectionEntry>;
 
-    ygg::ClosedInterval<ygg::float_t> evaluate_effect_expression(::tyr::formalism::datalog::GroundFunctionExpressionView expression,
-                                                                 Selection& selection) const
+    ygg::ClosedInterval<ygg::float_t> evaluate_effect_expression(::tyr::formalism::datalog::GroundFunctionExpressionView expression, Selection& selection) const
     {
         return numeric_support_detail::evaluate(expression, derived(), selection);
     }
@@ -180,9 +199,7 @@ public:
     }
 
     template<typename AggregationFunction>
-    Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
-                             Selection& selection,
-                             AggregationFunction agg) const
+    Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint, Selection& selection, AggregationFunction agg) const
     {
         return get_greedy_support_cost(selection, agg, [&](auto& selected) { return is_supported(constraint, selected); });
     }
@@ -276,8 +293,7 @@ public:
 private:
     const Derived& derived() const noexcept { return static_cast<const Derived&>(*this); }
 
-    const SelectionEntry* find_selection_entry(Key key,
-                                                                 const Selection& selection) const
+    const SelectionEntry* find_selection_entry(Key key, const Selection& selection) const
     {
         for (const auto& entry : selection)
             if (derived().keys_equal(Derived::key_of(entry), key))

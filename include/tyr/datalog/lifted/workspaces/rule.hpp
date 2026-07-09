@@ -194,7 +194,7 @@ struct RuleWorkspace<LiftedTag>
 
             const std::vector<::tyr::formalism::datalog::RuleBindingView>& get_sorted_pending_rule_bindings();
 
-            NumericSupportSelectorWorkspace numeric_support_selector_workspace;
+            NumericSupportSelectorWorkspace<LiftedTag> numeric_support_selector_workspace;
 
             /// Statistics
             RuleWorkerStatistics statistics;

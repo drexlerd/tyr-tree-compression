@@ -31,42 +31,28 @@
 namespace tyr::datalog
 {
 
-class GroundNumericSupportSelectorWorkspace
-{
-public:
-    struct SelectionEntry
-    {
-        ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag> term;
-        ygg::ClosedInterval<ygg::float_t> interval;
-        const NumericIntervalAnnotation<GroundTag>* annotation;
-        Cost cost;
+using GroundNumericSupportSelectorWorkspace = NumericSupportSelectorWorkspace<GroundTag>;
 
-        bool operator<(const SelectionEntry& other) const noexcept { return cost < other.cost; }
-    };
-
-    void clear() noexcept;
-
-    std::vector<SelectionEntry> selection;
-};
-
-class GroundNumericSupportSelector : public NumericSupportSelectorCore<GroundNumericSupportSelector,
-                                                                       ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
-                                                                       GroundNumericSupportSelectorWorkspace::SelectionEntry>
+template<>
+class NumericSupportSelector<GroundTag> :
+    public NumericSupportSelectorCore<NumericSupportSelector<GroundTag>,
+                                      ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>,
+                                      NumericSupportSelectorWorkspace<GroundTag>::SelectionEntry>
 {
 public:
     using Key = ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>;
-    using SelectionEntry = GroundNumericSupportSelectorWorkspace::SelectionEntry;
-    using Core = NumericSupportSelectorCore<GroundNumericSupportSelector, Key, SelectionEntry>;
+    using SelectionEntry = NumericSupportSelectorWorkspace<GroundTag>::SelectionEntry;
+    using Core = NumericSupportSelectorCore<NumericSupportSelector<GroundTag>, Key, SelectionEntry>;
 
-    GroundNumericSupportSelector(const FactsWorkspace<GroundTag>& facts,
-                                 const NumericIntervalAnnotations<GroundTag>& annotations,
-                                 bool initial_intervals_cost_zero = false);
+    NumericSupportSelector(const FactsWorkspace<GroundTag>& facts,
+                           const NumericIntervalAnnotations<GroundTag>& annotations,
+                           bool initial_intervals_cost_zero = false);
 
     /**
      * Storage accessors for the shared core.
      */
 
-    static Key key_of(const SelectionEntry& entry) noexcept { return entry.term; }
+    static Key key_of(const SelectionEntry& entry) noexcept { return entry.key; }
     Key fluent_key(Key term) const noexcept { return term; }
     ygg::ClosedInterval<ygg::float_t> lookup_static(::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::StaticTag> term) const;
     ygg::ClosedInterval<ygg::float_t> current_interval(Key key) const;
@@ -79,8 +65,8 @@ public:
      * Workspace-based conveniences on top of the shared core.
      */
 
-    using Core::get_constraint_cost;
     using Core::for_each_constraint_support;
+    using Core::get_constraint_cost;
 
     template<typename AggregationFunction>
     Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint, AggregationFunction agg) const
@@ -91,7 +77,7 @@ public:
 
     template<typename AggregationFunction>
     Cost get_constraint_cost(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
-                             GroundNumericSupportSelectorWorkspace& workspace,
+                             NumericSupportSelectorWorkspace<GroundTag>& workspace,
                              AggregationFunction agg) const
     {
         return get_constraint_cost(constraint, workspace.selection, agg);
@@ -99,7 +85,7 @@ public:
 
     template<typename AggregationFunction, typename Callback>
     Cost for_each_constraint_support(::tyr::formalism::datalog::GroundBooleanOperatorView constraint,
-                                     GroundNumericSupportSelectorWorkspace& workspace,
+                                     NumericSupportSelectorWorkspace<GroundTag>& workspace,
                                      AggregationFunction agg,
                                      Callback callback) const
     {
@@ -112,6 +98,8 @@ private:
     bool m_initial_intervals_cost_zero;
     mutable std::vector<SelectionEntry> m_selection;
 };
+
+using GroundNumericSupportSelector = NumericSupportSelector<GroundTag>;
 
 }
 

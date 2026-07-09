@@ -571,7 +571,7 @@ void LMCutHeuristic<LiftedTag>::extract_cut()
             }
         }
 
-        auto selection_workspace = datalog::NumericSupportSelectorWorkspace {};
+        auto selection_workspace = datalog::NumericSupportSelectorWorkspace<LiftedTag> {};
         for (const auto constraint : goal->get_numeric_constraints())
         {
             if (m_workspace.numeric_support_selector->get_constraint_cost(constraint, selection_workspace, datalog::MaxAggregation {}) != goal_cost)
@@ -579,7 +579,7 @@ void LMCutHeuristic<LiftedTag>::extract_cut()
 
             for (const auto& entry : selection_workspace.selection)
                 if (entry.cost == goal_cost)
-                    mark_goal_zone(NumericNode { entry.binding, entry.interval });
+                    mark_goal_zone(NumericNode { entry.key, entry.interval });
         }
     }
 
@@ -636,18 +636,17 @@ void LMCutHeuristic<LiftedTag>::extract_expanded_cut()
             }
         }
 
-        auto selection_workspace = datalog::NumericSupportSelectorWorkspace {};
+        auto selection_workspace = datalog::NumericSupportSelectorWorkspace<LiftedTag> {};
         for (const auto constraint : goal->get_numeric_constraints())
         {
-            const auto constraint_cost =
-                m_workspace.numeric_support_selector->get_constraint_cost(constraint, selection_workspace, datalog::MaxAggregation {});
+            const auto constraint_cost = m_workspace.numeric_support_selector->get_constraint_cost(constraint, selection_workspace, datalog::MaxAggregation {});
             if (constraint_cost != goal_cost)
                 continue;
 
             for (const auto& entry : selection_workspace.selection)
             {
                 if (entry.cost == goal_cost)
-                    mark_goal_zone(NumericNode { entry.binding, entry.interval });
+                    mark_goal_zone(NumericNode { entry.key, entry.interval });
             }
         }
     }

@@ -17,13 +17,22 @@
 
 #include "tyr/datalog/policies/termination.hpp"
 
+#include "tyr/datalog/ground/policies/numeric_support.hpp"
 #include "tyr/datalog/lifted/applicability.hpp"
+#include "tyr/datalog/lifted/policies/numeric_support.hpp"
 
 #include <cassert>
 #include <limits>
 
 namespace tyr::datalog
 {
+
+static_assert(TerminationPolicyConcept<NoTerminationPolicy<GroundTag>, GroundTag>);
+static_assert(TerminationPolicyConcept<NoTerminationPolicy<LiftedTag>, LiftedTag>);
+static_assert(TerminationPolicyConcept<TerminationPolicy<GroundTag, SumAggregation>, GroundTag>);
+static_assert(TerminationPolicyConcept<TerminationPolicy<GroundTag, MaxAggregation>, GroundTag>);
+static_assert(TerminationPolicyConcept<TerminationPolicy<LiftedTag, SumAggregation>, LiftedTag>);
+static_assert(TerminationPolicyConcept<TerminationPolicy<LiftedTag, MaxAggregation>, LiftedTag>);
 
 template<TaskKind Kind, typename AggregationFunction>
 void TerminationPolicy<Kind, AggregationFunction>::set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_)
@@ -45,7 +54,7 @@ template<TaskKind Kind, typename AggregationFunction>
 Cost TerminationPolicy<Kind, AggregationFunction>::get_total_cost(const FactSets&,
                                                                   const SelectedPredicateAnnotations<Kind>& and_annot,
                                                                   const SelectedFunctionAnnotations<Kind>&,
-                                                                  const details::TerminationNumericSupportSelectorT<Kind>& numeric_support_selector) const noexcept
+                                                                  const NumericSupportSelector<Kind>& numeric_support_selector) const noexcept
 {
     if (!goals)
         return AggregationFunction::identity();

@@ -19,8 +19,8 @@
 #define TYR_SOLVER_POLICIES_ANNOTATION_HPP_
 
 #include "tyr/datalog/declarations.hpp"
-#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation_types.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/formalism/datalog/declarations.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
@@ -38,9 +38,6 @@
 namespace tyr::datalog
 {
 
-class NumericSupportSelector;
-class NumericSupportSelectorWorkspace;
-
 template<>
 class NoOrAnnotationPolicy<LiftedTag>
 {
@@ -56,9 +53,9 @@ public:
     }
 
     CostUpdate<LiftedTag> update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                                 ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                                 const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
-                                 SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const noexcept
+                                            ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+                                            const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
+                                            SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const noexcept
     {
         return CostUpdate<LiftedTag>();
     }
@@ -102,9 +99,9 @@ public:
                                SelectedFunctionAnnotations<LiftedTag>& program_numeric_and_annot) const;
 
     CostUpdate<LiftedTag> update_annotation(::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> program_head,
-                                 ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
-                                 const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
-                                 SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const;
+                                            ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag> delta_head,
+                                            const SelectedPredicateAnnotations<LiftedTag>& delta_and_annot,
+                                            SelectedPredicateAnnotations<LiftedTag>& program_and_annot) const;
 };
 
 template<typename AggregationFunction>
