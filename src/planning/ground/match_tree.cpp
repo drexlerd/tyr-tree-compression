@@ -864,6 +864,7 @@ void MatchTree<Tag>::generate(const StateContext<GroundTag>& state, ygg::IndexLi
             },
             node.value);
     }
+
 }
 
 template class MatchTree<::tyr::formalism::planning::GroundAction>;

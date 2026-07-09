@@ -20,7 +20,11 @@
 
 #include "planning/parser.hpp"
 
+#include "tyr/formalism/planning/formatter.hpp"
+
 #include <boost/json.hpp>
+#include <cstdlib>
+#include <cstdio>
 #include <cstdint>
 #include <filesystem>
 #include <gtest/gtest.h>
@@ -201,6 +205,10 @@ SearchContext<Kind> create_search_context(const std::filesystem::path& domain_fi
         task = std::move(lifted_task);
     else
         task = lifted_task->instantiate_ground_task(*execution_context).task;
+
+    if constexpr (std::is_same_v<Kind, planning::GroundTag>)
+        if (std::getenv("TYR_TRACE_GROUND_TASK"))
+            fmt::print(stderr, "TYR_TRACE_GROUND_TASK {} {}\n{}\n", domain_file.string(), task_file.string(), task->get_formalism_task());
 
     auto axiom_evaluator = planning::AxiomEvaluatorFactory<Kind>().create(task, execution_context);
     auto state_repository = planning::StateRepositoryFactory<Kind>().create(task, axiom_evaluator);
