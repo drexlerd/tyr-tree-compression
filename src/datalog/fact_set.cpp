@@ -19,6 +19,7 @@
 #include "tyr/formalism/datalog/formatter.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
+#include <algorithm>
 #include <boost/dynamic_bitset.hpp>
 #include <limits>
 #include <stdexcept>
@@ -71,7 +72,7 @@ bool PredicateFactSet<T>::insert(fd::PredicateBindingView<T> binding)
     if (!ygg::test(i, m_bitset))
     {
         ygg::set(i, true, m_bitset);
-        m_bindings.push_back(binding.get_index().row);
+        m_bindings.insert(std::upper_bound(m_bindings.begin(), m_bindings.end(), binding.get_index().row), binding.get_index().row);
         return true;
     }
 

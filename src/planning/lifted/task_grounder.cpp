@@ -409,20 +409,6 @@ std::optional<fp::GroundAxiomView> ground_pruned(fp::AxiomView element,
     canonicalize(axiom);
     return context.destination.get_or_create(axiom).first;
 }
-
-template<f::FactKind T>
-auto sorted_predicate_bindings(const d::PredicateFactSets<T>& fact_sets)
-{
-    auto result = std::vector<fd::PredicateBindingView<T>> {};
-
-    for (const auto& set : fact_sets.get_sets())
-        for (const auto binding : set.get_bindings())
-            result.push_back(binding);
-
-    std::sort(result.begin(), result.end(), [](const auto lhs, const auto rhs) { return ygg::Less<decltype(lhs.get_key())> {}(lhs.get_key(), rhs.get_key()); });
-
-    return result;
-}
 }
 
 GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_task,  //
@@ -482,7 +468,10 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
      * Create ground atoms
      */
 
-    const auto predicate_bindings = sorted_predicate_bindings<f::FluentTag>(workspace.facts.fact_sets.predicate);
+    auto predicate_bindings = std::vector<fd::PredicateBindingView<f::FluentTag>> {};
+    for (const auto& set : workspace.facts.fact_sets.predicate.get_sets())
+        for (const auto binding : set.get_bindings())
+            predicate_bindings.push_back(binding);
 
     auto fluent_predicates = task.get_domain().get_predicates<f::FluentTag>();
     auto fluent_predicates_set = ygg::UnorderedSet<fp::PredicateView<f::FluentTag>>(fluent_predicates.begin(), fluent_predicates.end());
