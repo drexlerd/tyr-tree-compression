@@ -20,13 +20,17 @@
 
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
+#include "tyr/formalism/datalog/repository.hpp"
 
 #include <algorithm>
 #include <cassert>
 #include <limits>
 #include <optional>
 #include <tuple>
+#include <utility>
 #include <variant>
+#include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
 #include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/core/config.hpp>
 #include <yggdrasil/semantics/comparators.hpp>
@@ -38,10 +42,105 @@ class NumericSupportSelector;
 class NumericSupportSelectorWorkspace;
 
 template<TaskKind Kind>
-struct WitnessAnnotation;
+struct NumericSupportKey;
+
+template<>
+struct NumericSupportKey<GroundTag>
+{
+    using type = ::tyr::formalism::datalog::GroundFunctionTermView<::tyr::formalism::FluentTag>;
+};
+
+template<>
+struct NumericSupportKey<LiftedTag>
+{
+    using type = ::tyr::formalism::datalog::FunctionBindingView<::tyr::formalism::FluentTag>;
+};
 
 template<TaskKind Kind>
-struct NumericSupport;
+using NumericSupportKeyT = typename NumericSupportKey<Kind>::type;
+
+template<TaskKind Kind>
+struct WitnessRuleKey;
+
+template<>
+struct WitnessRuleKey<GroundTag>
+{
+    using type = ::tyr::formalism::datalog::GroundRuleView;
+};
+
+template<>
+struct WitnessRuleKey<LiftedTag>
+{
+    using type = ::tyr::formalism::datalog::RuleBindingView;
+};
+
+template<TaskKind Kind>
+using WitnessRuleKeyT = typename WitnessRuleKey<Kind>::type;
+
+template<TaskKind Kind>
+struct NumericSupport
+{
+    NumericSupportKeyT<Kind> key;
+    ygg::ClosedInterval<ygg::float_t> interval;
+    Cost cost;
+
+    auto get_term() const noexcept
+        requires std::same_as<Kind, GroundTag>
+    {
+        return key;
+    }
+    auto get_binding() const noexcept
+        requires std::same_as<Kind, LiftedTag>
+    {
+        return key;
+    }
+    auto get_interval() const noexcept { return interval; }
+    auto get_cost() const noexcept { return cost; }
+
+    auto identifying_members() const noexcept { return std::make_tuple(key, lower(interval), upper(interval), cost); }
+};
+
+template<TaskKind Kind>
+struct WitnessAnnotation
+{
+    using Metric = ygg::ClosedInterval<ygg::float_t>;
+    using NumericSupports = std::vector<NumericSupport<Kind>>;
+
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Cost cost_) : rule_key(rule_key_), metric(), cost(cost_) {}
+
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Metric metric_, Cost cost_) : rule_key(rule_key_), metric(metric_), cost(cost_) {}
+
+    WitnessAnnotation(WitnessRuleKeyT<Kind> rule_key_, Metric metric_, Cost cost_, NumericSupports numeric_supports_) :
+        rule_key(rule_key_),
+        metric(metric_),
+        cost(cost_),
+        numeric_supports(std::move(numeric_supports_))
+    {
+        std::sort(numeric_supports.begin(), numeric_supports.end(), ygg::Less<NumericSupport<Kind>> {});
+    }
+
+    auto get_rule() const noexcept
+        requires std::same_as<Kind, GroundTag>
+    {
+        return rule_key;
+    }
+    auto get_rule_row() const noexcept
+        requires std::same_as<Kind, LiftedTag>
+    {
+        return rule_key;
+    }
+    auto get_metric() const noexcept { return metric; }
+    auto get_cost() const noexcept { return cost; }
+    const auto& get_numeric_supports() const noexcept { return numeric_supports; }
+
+    auto identifying_members() const noexcept { return std::tie(rule_key, metric, cost, numeric_supports); }
+
+private:
+    WitnessRuleKeyT<Kind> rule_key;
+    Metric metric;
+    Cost cost;
+    NumericSupports numeric_supports;
+};
 
 template<TaskKind Kind>
 struct BaseAnnotation
@@ -79,7 +178,58 @@ inline Cost get_cost(const Annotation<Kind>& annotation) noexcept
 }
 
 template<TaskKind Kind>
-class PredicateAnnotationMap;
+struct PredicateAnnotationKey
+{
+    using type = ::tyr::formalism::datalog::PredicateBindingView<::tyr::formalism::FluentTag>;
+};
+
+template<TaskKind Kind>
+using PredicateAnnotationKeyT = typename PredicateAnnotationKey<Kind>::type;
+
+template<TaskKind Kind>
+inline PredicateAnnotationKeyT<Kind> get_predicate_annotation_key(PredicateAnnotationKeyT<Kind> binding) noexcept
+{
+    return binding;
+}
+
+template<TaskKind Kind>
+inline PredicateAnnotationKeyT<Kind> get_predicate_annotation_key(::tyr::formalism::datalog::GroundAtomView<::tyr::formalism::FluentTag> atom) noexcept
+    requires std::same_as<Kind, GroundTag>
+{
+    return atom.get_row();
+}
+
+template<TaskKind Kind>
+class PredicateAnnotationMap
+{
+public:
+    using Key = PredicateAnnotationKeyT<Kind>;
+
+    void clear() noexcept { annotations.clear(); }
+
+    template<typename Binding>
+    void insert_or_assign(Binding binding, Annotation<Kind> annotation)
+    {
+        annotations.insert_or_assign(get_predicate_annotation_key<Kind>(binding), std::move(annotation));
+    }
+
+    template<typename Binding>
+    const Annotation<Kind>* find(Binding binding) const noexcept
+    {
+        const auto it = annotations.find(get_predicate_annotation_key<Kind>(binding));
+        return it == annotations.end() ? nullptr : &it->second;
+    }
+
+    template<typename Binding>
+    Annotation<Kind>* find(Binding binding) noexcept
+    {
+        const auto it = annotations.find(get_predicate_annotation_key<Kind>(binding));
+        return it == annotations.end() ? nullptr : &it->second;
+    }
+
+private:
+    ygg::UnorderedMap<Key, Annotation<Kind>> annotations;
+};
 
 template<TaskKind Kind>
 using SelectedPredicateAnnotations = PredicateAnnotationMap<Kind>;
@@ -94,7 +244,114 @@ struct NumericIntervalAnnotation
 };
 
 template<TaskKind Kind>
-class NumericIntervalAnnotations;
+struct NumericIntervalBindingParts;
+
+template<>
+struct NumericIntervalBindingParts<GroundTag>
+{
+    using Binding = NumericSupportKeyT<GroundTag>;
+    using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
+    using Key = ygg::Index<::tyr::formalism::datalog::GroundFunctionTerm<::tyr::formalism::FluentTag>>;
+
+    static Relation get_relation(Binding binding) noexcept { return binding.get_function(); }
+    static Key get_key(Binding binding) noexcept { return binding.get_index(); }
+};
+
+template<>
+struct NumericIntervalBindingParts<LiftedTag>
+{
+    using Binding = NumericSupportKeyT<LiftedTag>;
+    using Relation = ::tyr::formalism::datalog::FunctionView<::tyr::formalism::FluentTag>;
+    using Key = ygg::Index<::tyr::formalism::Row>;
+
+    static Relation get_relation(Binding binding) noexcept { return binding.get_relation(); }
+    static Key get_key(Binding binding) noexcept { return binding.get_index().row; }
+};
+
+template<TaskKind Kind>
+class NumericIntervalAnnotations
+{
+public:
+    using Binding = typename NumericIntervalBindingParts<Kind>::Binding;
+    using Relation = typename NumericIntervalBindingParts<Kind>::Relation;
+    using Key = typename NumericIntervalBindingParts<Kind>::Key;
+    using Entry = NumericIntervalAnnotation<Kind>;
+    using Entries = std::vector<Entry>;
+    using KeyPartitions = ygg::UnorderedMap<Key, Entries>;
+    using Partitions = ygg::UnorderedMap<Relation, KeyPartitions>;
+
+    void clear() noexcept
+    {
+        m_size = 0;
+        for (auto& [_, key_partitions] : m_partitions)
+            for (auto& [_, entries] : key_partitions)
+                entries.clear();
+    }
+
+    size_t size() const noexcept { return m_size; }
+
+    const Partitions& partitions() const noexcept { return m_partitions; }
+
+    const Annotation<Kind>* find(Binding binding) const noexcept
+    {
+        const auto* entries = find_entries(binding);
+        return (!entries || entries->empty()) ? nullptr : &entries->back().annotation;
+    }
+
+    Annotation<Kind>* find(Binding binding) noexcept
+    {
+        auto* entries = find_entries(binding);
+        return (!entries || entries->empty()) ? nullptr : &entries->back().annotation;
+    }
+
+    const Annotation<Kind>* find(Binding binding, ygg::ClosedInterval<ygg::float_t> interval) const noexcept
+    {
+        const auto* entries = find_entries(binding);
+        if (!entries)
+            return nullptr;
+
+        for (const auto& entry : *entries)
+            if (entry.interval == interval)
+                return &entry.annotation;
+
+        return nullptr;
+    }
+
+    void insert(Binding binding, ygg::ClosedInterval<ygg::float_t> interval, Annotation<Kind> annotation)
+    {
+        if (empty(interval))
+            return;
+
+        auto entry = Entry { interval, std::move(annotation) };
+        auto& entries = m_partitions[NumericIntervalBindingParts<Kind>::get_relation(binding)][NumericIntervalBindingParts<Kind>::get_key(binding)];
+        entries.insert(std::upper_bound(entries.begin(), entries.end(), entry, ygg::Less<Entry> {}), std::move(entry));
+        ++m_size;
+    }
+
+private:
+    const Entries* find_entries(Binding binding) const noexcept
+    {
+        const auto relation_it = m_partitions.find(NumericIntervalBindingParts<Kind>::get_relation(binding));
+        if (relation_it == m_partitions.end())
+            return nullptr;
+
+        const auto key_it = relation_it->second.find(NumericIntervalBindingParts<Kind>::get_key(binding));
+        return key_it == relation_it->second.end() ? nullptr : &key_it->second;
+    }
+
+    Entries* find_entries(Binding binding) noexcept
+    {
+        const auto relation_it = m_partitions.find(NumericIntervalBindingParts<Kind>::get_relation(binding));
+        if (relation_it == m_partitions.end())
+            return nullptr;
+
+        const auto key_it = relation_it->second.find(NumericIntervalBindingParts<Kind>::get_key(binding));
+        return key_it == relation_it->second.end() ? nullptr : &key_it->second;
+    }
+
+    Partitions m_partitions;
+    size_t m_size = 0;
+};
 
 template<TaskKind Kind>
 using SelectedFunctionAnnotations = NumericIntervalAnnotations<Kind>;

@@ -20,12 +20,9 @@
 
 #include "tyr/datalog/declarations.hpp"
 #include "tyr/datalog/ground/policies/numeric_support.hpp"
-#include "tyr/datalog/lifted/applicability.hpp"
 #include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/policies/termination_concept.hpp"
 
-#include <cassert>
-#include <limits>
 #include <optional>
 #include <yggdrasil/core/config.hpp>
 
@@ -55,65 +52,20 @@ template<typename AggregationFunction>
 class TerminationPolicy<GroundTag, AggregationFunction>
 {
 public:
-    void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_)
-    {
-        clear();
-        goals = goals_;
-    }
+    void set_goals(::tyr::formalism::datalog::GroundConjunctiveConditionView goals_);
 
-    bool check(::tyr::formalism::datalog::ProgramView<GroundTag>, const FactsWorkspace<GroundTag>& facts) const noexcept
-    {
-        if (!goals.has_value())
-            return false;
-
-        return is_applicable(*goals, FactSets { facts.static_fact_sets, facts.fluent_fact_sets });
-    }
+    bool check(::tyr::formalism::datalog::ProgramView<GroundTag>, const FactsWorkspace<GroundTag>& facts) const noexcept;
 
     Cost get_total_cost(const FactsWorkspace<GroundTag>&,
                         const GroundSelectedPredicateAnnotations& and_annot,
                         const GroundSelectedFunctionAnnotations&,
-                        const GroundNumericSupportSelector& numeric_support_selector) const noexcept
-    {
-        if (!goals.has_value())
-            return AggregationFunction::identity();
-
-        auto total = AggregationFunction::identity();
-        for (const auto literal : goals->template get_literals<::tyr::formalism::FluentTag>())
-        {
-            if (!literal.get_polarity())
-                continue;
-
-            const auto* annotation = and_annot.find(literal.get_atom());
-            assert(annotation);
-            if (!annotation)
-                return std::numeric_limits<Cost>::max();
-
-            const auto atom_cost = get_cost(*annotation);
-            if (atom_cost == std::numeric_limits<Cost>::max())
-                return std::numeric_limits<Cost>::max();
-            total = agg(total, atom_cost);
-        }
-
-        for (const auto numeric_constraint : goals->get_numeric_constraints())
-        {
-            const auto constraint_cost = numeric_support_selector.get_constraint_cost(numeric_constraint, numeric_support_selector_workspace, agg);
-            if (constraint_cost == std::numeric_limits<Cost>::max())
-                return std::numeric_limits<Cost>::max();
-            total = agg(total, constraint_cost);
-        }
-
-        return total;
-    }
+                        const GroundNumericSupportSelector& numeric_support_selector) const noexcept;
 
     const auto& get_goal() const noexcept { return goals; }
 
-    void reset() noexcept {}
+    void reset() noexcept;
 
-    void clear() noexcept
-    {
-        goals.reset();
-        numeric_support_selector_workspace.clear();
-    }
+    void clear() noexcept;
 
 private:
     std::optional<::tyr::formalism::datalog::GroundConjunctiveConditionView> goals;

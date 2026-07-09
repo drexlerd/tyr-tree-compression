@@ -79,6 +79,7 @@ add_library(core SHARED ${TYR_PRIVATE_HEADER_FILES} ${TYR_PUBLIC_HEADER_FILES}
     datalog/lifted/policies/termination.cpp
     datalog/ground/policies/annotation.cpp
     datalog/ground/policies/numeric_support.cpp
+    datalog/ground/policies/termination.cpp
     datalog/lifted/programs/program.cpp
     datalog/lifted/workspaces/facts.cpp
     datalog/lifted/workspaces/program.cpp
