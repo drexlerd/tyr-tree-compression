@@ -634,25 +634,16 @@ template<::tyr::formalism::FactKind T>
 void TaggedAssignmentSets<T>::insert(const TaggedFactSets<T>& fact_sets)
 {
     for (const auto& set : fact_sets.predicate.get_sets())
-        predicate.insert(set.get_bindings());
+        for (const auto binding : set.get_bindings())
+            predicate.insert(binding);
 
     for (ygg::uint_t i = 0; i < fact_sets.function.get_sets().size(); ++i)
     {
         auto& self = function.get_sets()[i];
         const auto& other = fact_sets.function.get_sets()[i];
 
-        const auto& remap = other.get_remap();
-        const auto& bindings = other.get_bindings();
-        const auto& values = other.get_values();
-
-        for (ygg::uint_t j = 0; j < remap.size(); ++j)
-        {
-            if (remap[j] == std::numeric_limits<ygg::uint_t>::max())
-                continue;
-
-            const auto pos = remap[j];
-            self.insert(bindings[pos], values[pos]);
-        }
+        for (const auto [binding, interval] : other.get_binding_values())
+            self.insert(binding, interval);
     }
 }
 

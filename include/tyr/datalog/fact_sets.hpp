@@ -18,9 +18,11 @@
 #ifndef TYR_DATALOG_FACT_SETS_HPP_
 #define TYR_DATALOG_FACT_SETS_HPP_
 
+#include "tyr/datalog/fact_sets_iterators.hpp"
 #include "tyr/formalism/datalog/repository.hpp"
 
 #include <boost/dynamic_bitset.hpp>
+#include <vector>
 #include <yggdrasil/core/closed_interval.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
 #include <yggdrasil/semantics/hash.hpp>
@@ -36,7 +38,6 @@ private:
     const ::tyr::formalism::datalog::Repository& m_repository;
 
     ygg::Index<::tyr::formalism::Predicate<T>> m_predicate_index;
-    std::vector<ygg::Index<::tyr::formalism::Row>> m_bindings;
 
     boost::dynamic_bitset<> m_bitset;
 
@@ -55,7 +56,8 @@ public:
 
     bool contains(::tyr::formalism::datalog::PredicateBindingView<T> binding) const noexcept;
 
-    ::tyr::formalism::datalog::PredicateBindingForwardRangeView<T> get_bindings() const noexcept;
+    PredicateBindingIndexRange<T> get_binding_indices() const noexcept;
+    PredicateBindingViewRange<T> get_bindings() const noexcept;
 };
 
 template<::tyr::formalism::FactKind T>
@@ -112,9 +114,8 @@ public:
     ygg::ClosedInterval<ygg::float_t> operator[](::tyr::formalism::datalog::FunctionBindingView<T> binding) const noexcept;
     ygg::ClosedInterval<ygg::float_t> operator[](::tyr::formalism::datalog::GroundFunctionTermView<T> fterm) const noexcept;
 
-    const std::vector<ygg::uint_t>& get_remap() const noexcept;
-    ::tyr::formalism::datalog::FunctionBindingRandomAccessRangeView<T> get_bindings() const noexcept;
-    const std::vector<ygg::ClosedInterval<ygg::float_t>>& get_values() const noexcept;
+    FunctionBindingIndexValueRange<T> get_binding_index_values() const noexcept;
+    FunctionBindingViewValueRange<T> get_binding_values() const noexcept;
 };
 
 template<::tyr::formalism::FactKind T>

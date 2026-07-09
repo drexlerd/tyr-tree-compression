@@ -123,13 +123,10 @@ struct ProgramExecutionContext<LiftedTag, OrAP, AndAP, TP, CP>
 
         for (const auto& set : out.facts().fact_sets.function.get_sets())
         {
-            const auto bindings = set.get_bindings();
-            const auto& values = set.get_values();
-
-            for (ygg::uint_t i = 0; i < bindings.size(); ++i)
+            for (const auto [binding, interval] : set.get_binding_values())
             {
-                out.or_ap().initialize_annotation(bindings[i], values[i], out.numeric_and_annot());
-                out.facts().assignment_sets.function.insert(bindings[i], values[i]);
+                out.or_ap().initialize_annotation(binding, interval, out.numeric_and_annot());
+                out.facts().assignment_sets.function.insert(binding, interval);
             }
         }
 
