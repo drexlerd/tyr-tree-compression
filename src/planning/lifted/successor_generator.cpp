@@ -49,12 +49,10 @@ namespace tyr::planning
 namespace
 {
 template<typename Callback>
-void for_each_action_binding(
-    const d::ProgramWorkspace<LiftedTag>::Instance<d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>&
-        workspace,
-    const ApplicableActionProgram<LiftedTag>& program,
-    ygg::IndexList<f::Object>& binding_scratch,
-    Callback&& callback)
+void for_each_action_binding(const d::ProgramWorkspace<LiftedTag>& workspace,
+                             const ApplicableActionProgram<LiftedTag>& program,
+                             ygg::IndexList<f::Object>& binding_scratch,
+                             Callback&& callback)
 {
     const auto& mapping = program.get_predicate_to_action_mapping();
 
@@ -85,11 +83,7 @@ SuccessorGenerator<LiftedTag>::SuccessorGenerator(ygg::uint_t index,
     m_execution_context(std::move(execution_context)),
     m_action_program(m_task->get_task()),
     m_grounder_cache(),
-    m_workspace(m_action_program.get_datalog_program(),
-                m_action_program.get_const_program_workspace(),
-                d::NoOrAnnotationPolicy<LiftedTag>(),
-                d::NoAndAnnotationPolicy<LiftedTag>(),
-                d::NoTerminationPolicy<LiftedTag>()),
+    m_workspace(m_action_program.get_datalog_program()),
     m_state_repository(std::move(state_repository)),
     m_executor()
 {
@@ -292,11 +286,7 @@ void SuccessorGenerator<LiftedTag>::compute_action_facts(const Node<LiftedTag>& 
                           m_workspace.facts.fact_sets,
                           m_workspace.facts.assignment_sets);
 
-    auto ctx =
-        d::ProgramExecutionContext<LiftedTag, d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
-            m_workspace,
-            program.get_const_program_workspace());
-    ctx.clear();
+    auto ctx = d::ProgramExecutionContext(m_workspace);
     m_execution_context->arena().execute([&] { d::solve_bottom_up(ctx); });
 }
 

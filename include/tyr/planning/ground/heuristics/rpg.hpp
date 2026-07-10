@@ -92,7 +92,7 @@ protected:
     ygg::ExecutionContextPtr m_execution_context;
     RPGProgram<GroundTag> m_rpg_program;
     ygg::UnorderedMap<::tyr::formalism::planning::ActionBindingView, ::tyr::formalism::planning::GroundActionView> m_action_binding_to_ground_action;
-    datalog::ProgramWorkspace<GroundTag>::Instance<OrAP, AndAP, TP, CP> m_workspace;
+    datalog::ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP> m_workspace;
     datalog::QueueWorkspace<GroundTag> m_queue_workspace;
     CostMode m_cost_mode;
 };
@@ -111,7 +111,7 @@ RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::RPGBase(TaskPtr<GroundTag> tas
     m_execution_context(std::move(execution_context)),
     m_rpg_program(m_task->get_task(), cost_mode),
     m_action_binding_to_ground_action(),
-    m_workspace(m_rpg_program.get_datalog_program().get_const_program_workspace(), or_ap, and_ap, make_termination_policy()),
+    m_workspace(m_rpg_program.get_datalog_program(), or_ap, and_ap, make_termination_policy()),
     m_queue_workspace(m_rpg_program.get_datalog_program().get_program()),
     m_cost_mode(cost_mode)
 {
@@ -187,9 +187,7 @@ ygg::float_t RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::evaluate_impl(con
         if (const auto it = p2d.fluent_to_fluent_fterm.find(fterm); it != p2d.fluent_to_fluent_fterm.end())
             m_workspace.facts.fluent_fterm_intervals.insert_or_assign(it->second, ygg::ClosedInterval<ygg::float_t>(value, value));
 
-    auto ctx = datalog::ProgramExecutionContext<GroundTag, OrAP, AndAP, TP, CP>(m_workspace,
-                                                                                m_queue_workspace,
-                                                                                m_rpg_program.get_datalog_program().get_const_program_workspace());
+    auto ctx = datalog::ProgramExecutionContext(m_workspace, m_queue_workspace);
     ctx.initialize();
 
     m_execution_context->arena().execute([&] { datalog::solve_ground_queue(ctx); });
@@ -247,9 +245,9 @@ datalog::Cost RPGBase<GroundTag, Derived, OrAP, AndAP, TP, CP>::get_goal_cost() 
 {
     const auto numeric_support_selector = datalog::GroundNumericSupportSelector(m_workspace.facts, m_workspace.numeric_and_annot);
     return m_workspace.tp.get_total_cost(datalog::FactSets { m_workspace.facts.static_fact_sets, m_workspace.facts.fluent_fact_sets },
-                                           m_workspace.and_annot,
-                                           m_workspace.numeric_and_annot,
-                                           numeric_support_selector);
+                                         m_workspace.and_annot,
+                                         m_workspace.numeric_and_annot,
+                                         numeric_support_selector);
 }
 
 }

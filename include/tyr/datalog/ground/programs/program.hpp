@@ -46,6 +46,15 @@ private:
     ConstProgramWorkspace<GroundTag> m_const_program_workspace;
 };
 
+template<OrAnnotationPolicyConcept<GroundTag> OrAP,
+         AndAnnotationPolicyConcept<GroundTag> AndAP,
+         TerminationPolicyConcept<GroundTag> TP,
+         RuleCostPolicyConcept<GroundTag> CP>
+ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP>::ProgramWorkspace(Program<GroundTag>& program, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy) :
+    ProgramWorkspace(program.get_const_program_workspace(), std::move(or_ap), std::move(and_ap), std::move(tp), std::move(cost_policy))
+{
+}
+
 }
 
 #endif

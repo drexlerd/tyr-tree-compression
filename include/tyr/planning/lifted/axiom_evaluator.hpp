@@ -21,8 +21,8 @@
 #include "tyr/planning/lifted/state_builder.hpp"
 //
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/planning/axiom_evaluator.hpp"
 #include "tyr/planning/declarations.hpp"
 #include "tyr/planning/lifted/programs/axiom.hpp"
@@ -56,9 +56,7 @@ private:
     ygg::ExecutionContextPtr m_execution_context;
     AxiomEvaluatorProgram<LiftedTag> m_axiom_program;
 
-    datalog::ProgramWorkspace<
-        LiftedTag>::Instance<datalog::NoOrAnnotationPolicy<LiftedTag>, datalog::NoAndAnnotationPolicy<LiftedTag>, datalog::NoTerminationPolicy<LiftedTag>>
-        m_workspace;
+    datalog::ProgramWorkspace<LiftedTag> m_workspace;
 };
 
 }

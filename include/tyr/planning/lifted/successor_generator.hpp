@@ -19,8 +19,8 @@
 #define TYR_PLANNING_LIFTED_SUCCESSOR_GENERATOR_HPP_
 
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/formalism/planning/ground_action_view.hpp"
 #include "tyr/formalism/planning/grounder_decl.hpp"
 #include "tyr/planning/action_executor.hpp"
@@ -109,9 +109,7 @@ private:
     ApplicableActionProgram<LiftedTag> m_action_program;
     ::tyr::formalism::planning::GrounderCacheEntry<::tyr::formalism::planning::Action> m_grounder_cache;
 
-    datalog::ProgramWorkspace<
-        LiftedTag>::Instance<datalog::NoOrAnnotationPolicy<LiftedTag>, datalog::NoAndAnnotationPolicy<LiftedTag>, datalog::NoTerminationPolicy<LiftedTag>>
-        m_workspace;
+    datalog::ProgramWorkspace<LiftedTag> m_workspace;
 
     StateRepositoryPtr<LiftedTag> m_state_repository;
 

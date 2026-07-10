@@ -51,39 +51,43 @@ struct ConstProgramWorkspace<GroundTag>
     explicit ConstProgramWorkspace(::tyr::formalism::datalog::ProgramView<GroundTag> program);
 };
 
-template<>
-struct ProgramWorkspace<GroundTag>
+template<OrAnnotationPolicyConcept<GroundTag> OrAP,
+         AndAnnotationPolicyConcept<GroundTag> AndAP,
+         TerminationPolicyConcept<GroundTag> TP,
+         RuleCostPolicyConcept<GroundTag> CP>
+struct ProgramWorkspace<GroundTag, OrAP, AndAP, TP, CP>
 {
-    template<OrAnnotationPolicyConcept<GroundTag> OrAP = NoOrAnnotationPolicy<GroundTag>,
-             AndAnnotationPolicyConcept<GroundTag> AndAP = NoAndAnnotationPolicy<GroundTag>,
-             TerminationPolicyConcept<GroundTag> TP = NoTerminationPolicy<GroundTag>,
-             RuleCostPolicyConcept<GroundTag> CP = RuleCostPolicy<GroundTag>>
-    struct Instance
+    const ConstProgramWorkspace<GroundTag>& const_workspace;
+    FactsWorkspace<GroundTag> facts;
+    OrAP or_ap;
+    AndAP and_ap;
+    SelectedPredicateAnnotations<GroundTag> and_annot;
+    SelectedFunctionAnnotations<GroundTag> numeric_and_annot;
+    TP tp;
+    CP cost_policy;
+    RuleWorkspace<GroundTag> rules;
+
+    explicit ProgramWorkspace(const ConstProgramWorkspace<GroundTag>& cws,
+                              OrAP or_ap_ = OrAP(),
+                              AndAP and_ap_ = AndAP(),
+                              TP tp_ = TP(),
+                              CP cost_policy_ = CP()) :
+        const_workspace(cws),
+        facts(cws.program),
+        or_ap(std::move(or_ap_)),
+        and_ap(std::move(and_ap_)),
+        and_annot(),
+        numeric_and_annot(),
+        tp(std::move(tp_)),
+        cost_policy(std::move(cost_policy_)),
+        rules(cws.program)
     {
-        FactsWorkspace<GroundTag> facts;
-        OrAP or_ap;
-        AndAP and_ap;
-        SelectedPredicateAnnotations<GroundTag> and_annot;
-        SelectedFunctionAnnotations<GroundTag> numeric_and_annot;
-        TP tp;
-        CP cost_policy;
-        RuleWorkspace<GroundTag> rules;
+        facts.fluent_atoms.reserve(cws.program.template get_atoms<::tyr::formalism::FluentTag>().size());
+    }
 
-        explicit Instance(const ConstProgramWorkspace<GroundTag>& cws, OrAP or_ap_ = OrAP(), AndAP and_ap_ = AndAP(), TP tp_ = TP(), CP cost_policy_ = CP()) :
-            facts(cws.program),
-            or_ap(std::move(or_ap_)),
-            and_ap(std::move(and_ap_)),
-            and_annot(),
-            numeric_and_annot(),
-            tp(std::move(tp_)),
-            cost_policy(std::move(cost_policy_)),
-            rules(cws.program)
-        {
-            facts.fluent_atoms.reserve(cws.program.template get_atoms<::tyr::formalism::FluentTag>().size());
-        }
+    explicit ProgramWorkspace(Program<GroundTag>& program, OrAP or_ap_ = OrAP(), AndAP and_ap_ = AndAP(), TP tp_ = TP(), CP cost_policy_ = CP());
 
-        void clear_costs() { cost_policy.clear(); }
-    };
+    void clear_costs() { cost_policy.clear(); }
 };
 
 }

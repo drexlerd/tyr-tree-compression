@@ -17,10 +17,10 @@
 
 #include "tyr/datalog/lifted/workspaces/program.hpp"
 
-#include "tyr/datalog/policies/aggregation.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/programs/program.hpp"
+#include "tyr/datalog/policies/aggregation.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 
 namespace tyr::datalog
 {
@@ -28,12 +28,8 @@ template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
          AndAnnotationPolicyConcept<LiftedTag> AndAP,
          TerminationPolicyConcept<LiftedTag> TP,
          RuleCostPolicyConcept<LiftedTag> CP>
-ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP>::Instance(Program<LiftedTag>& program,
-                                                                     const ConstProgramWorkspace<LiftedTag>& cws,
-                                                                     OrAP or_ap,
-                                                                     AndAP and_ap,
-                                                                     TP tp,
-                                                                     CP cost_policy) :
+ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>::ProgramWorkspace(Program<LiftedTag>& program, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy) :
+    const_workspace(program.get_const_program_workspace()),
     program_repository(program.get_program_repository()),
     workspace_repository(program.get_workspace_repository()),
     facts(program.get_program().get_predicates<::tyr::formalism::FluentTag>(),
@@ -62,41 +58,55 @@ ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP>::Instance(Program<Lif
     statistics()
 {
     for (ygg::uint_t i = 0; i < program.get_program().get_rules().size(); ++i)
-        rules.emplace_back(cws.rules[i].has_value() ? std::make_unique<RuleWorkspace<LiftedTag>::Instance<AndAP>>(program.get_repository_factory(),
-                                                                                                                  program_repository,
-                                                                                                                  workspace_repository,
-                                                                                                                  *cws.rules[i],
-                                                                                                                  and_ap) :
-                                                      nullptr);
+        rules.emplace_back(const_workspace.rules[i].has_value() ? std::make_unique<RuleWorkspace<LiftedTag>::Instance<AndAP>>(program.get_repository_factory(),
+                                                                                                                              program_repository,
+                                                                                                                              workspace_repository,
+                                                                                                                              *const_workspace.rules[i],
+                                                                                                                              and_ap) :
+                                                                  nullptr);
 }
 
-template struct ProgramWorkspace<LiftedTag>::Instance<NoOrAnnotationPolicy<LiftedTag>, NoAndAnnotationPolicy<LiftedTag>, NoTerminationPolicy<LiftedTag>>;
-template struct ProgramWorkspace<
-    LiftedTag>::Instance<OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, SumAggregation>, NoTerminationPolicy<LiftedTag>>;
-template struct ProgramWorkspace<
-    LiftedTag>::Instance<OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, SumAggregation>, TerminationPolicy<LiftedTag, SumAggregation>>;
-template struct ProgramWorkspace<
-    LiftedTag>::Instance<OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, MaxAggregation>, NoTerminationPolicy<LiftedTag>>;
-template struct ProgramWorkspace<
-    LiftedTag>::Instance<OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, MaxAggregation>, TerminationPolicy<LiftedTag, MaxAggregation>>;
-template struct ProgramWorkspace<
-    LiftedTag>::Instance<NoOrAnnotationPolicy<LiftedTag>, NoAndAnnotationPolicy<LiftedTag>, NoTerminationPolicy<LiftedTag>, RuleCostOverridePolicy<LiftedTag>>;
-template struct ProgramWorkspace<LiftedTag>::
-    Instance<OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, SumAggregation>, NoTerminationPolicy<LiftedTag>, RuleCostOverridePolicy<LiftedTag>>;
-template struct ProgramWorkspace<LiftedTag>::Instance<OrAnnotationPolicy<LiftedTag>,
-                                                      AndAnnotationPolicy<LiftedTag, SumAggregation>,
-                                                      TerminationPolicy<LiftedTag, SumAggregation>,
-                                                      RuleCostOverridePolicy<LiftedTag>>;
-template struct ProgramWorkspace<LiftedTag>::
-    Instance<OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, MaxAggregation>, NoTerminationPolicy<LiftedTag>, RuleCostOverridePolicy<LiftedTag>>;
-template struct ProgramWorkspace<LiftedTag>::Instance<OrAnnotationPolicy<LiftedTag>,
-                                                      AndAnnotationPolicy<LiftedTag, MaxAggregation>,
-                                                      TerminationPolicy<LiftedTag, MaxAggregation>,
-                                                      RuleCostOverridePolicy<LiftedTag>>;
-template struct ProgramWorkspace<LiftedTag>::Instance<OrAnnotationPolicy<LiftedTag>,
-                                                      AchieverAndAnnotationPolicy<LiftedTag, MaxAggregation>,
-                                                      TerminationPolicy<LiftedTag, MaxAggregation>,
-                                                      RuleCostOverridePolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag, NoOrAnnotationPolicy<LiftedTag>, NoAndAnnotationPolicy<LiftedTag>, NoTerminationPolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag, OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, SumAggregation>, NoTerminationPolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 OrAnnotationPolicy<LiftedTag>,
+                                 AndAnnotationPolicy<LiftedTag, SumAggregation>,
+                                 TerminationPolicy<LiftedTag, SumAggregation>>;
+template struct ProgramWorkspace<LiftedTag, OrAnnotationPolicy<LiftedTag>, AndAnnotationPolicy<LiftedTag, MaxAggregation>, NoTerminationPolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 OrAnnotationPolicy<LiftedTag>,
+                                 AndAnnotationPolicy<LiftedTag, MaxAggregation>,
+                                 TerminationPolicy<LiftedTag, MaxAggregation>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 NoOrAnnotationPolicy<LiftedTag>,
+                                 NoAndAnnotationPolicy<LiftedTag>,
+                                 NoTerminationPolicy<LiftedTag>,
+                                 RuleCostOverridePolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 OrAnnotationPolicy<LiftedTag>,
+                                 AndAnnotationPolicy<LiftedTag, SumAggregation>,
+                                 NoTerminationPolicy<LiftedTag>,
+                                 RuleCostOverridePolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 OrAnnotationPolicy<LiftedTag>,
+                                 AndAnnotationPolicy<LiftedTag, SumAggregation>,
+                                 TerminationPolicy<LiftedTag, SumAggregation>,
+                                 RuleCostOverridePolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 OrAnnotationPolicy<LiftedTag>,
+                                 AndAnnotationPolicy<LiftedTag, MaxAggregation>,
+                                 NoTerminationPolicy<LiftedTag>,
+                                 RuleCostOverridePolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 OrAnnotationPolicy<LiftedTag>,
+                                 AndAnnotationPolicy<LiftedTag, MaxAggregation>,
+                                 TerminationPolicy<LiftedTag, MaxAggregation>,
+                                 RuleCostOverridePolicy<LiftedTag>>;
+template struct ProgramWorkspace<LiftedTag,
+                                 OrAnnotationPolicy<LiftedTag>,
+                                 AchieverAndAnnotationPolicy<LiftedTag, MaxAggregation>,
+                                 TerminationPolicy<LiftedTag, MaxAggregation>,
+                                 RuleCostOverridePolicy<LiftedTag>>;
 
 ConstProgramWorkspace<LiftedTag>::ConstProgramWorkspace(Program<LiftedTag>& program) :
     facts(program.get_program().get_predicates<::tyr::formalism::StaticTag>(),

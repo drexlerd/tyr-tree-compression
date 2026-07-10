@@ -23,6 +23,7 @@
 #include "tyr/datalog/lifted/rule_scheduler.hpp"
 #include "tyr/datalog/lifted/workspaces/facts.hpp"
 #include "tyr/datalog/lifted/workspaces/rule.hpp"
+#include "tyr/datalog/policies/annotation.hpp"
 #include "tyr/datalog/policies/annotation_concept.hpp"
 #include "tyr/datalog/policies/cost_concept.hpp"
 #include "tyr/datalog/policies/termination.hpp"
@@ -192,45 +193,42 @@ private:
     std::vector<FunctionBucketEntry> m_function_bucket_scratch;
 };
 
-template<>
-struct ProgramWorkspace<LiftedTag>
+template<OrAnnotationPolicyConcept<LiftedTag> OrAP,
+         AndAnnotationPolicyConcept<LiftedTag> AndAP,
+         TerminationPolicyConcept<LiftedTag> TP,
+         RuleCostPolicyConcept<LiftedTag> CP>
+struct ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP>
 {
-    template<OrAnnotationPolicyConcept<LiftedTag> OrAP = NoOrAnnotationPolicy<LiftedTag>,
-             AndAnnotationPolicyConcept<LiftedTag> AndAP = NoAndAnnotationPolicy<LiftedTag>,
-             TerminationPolicyConcept<LiftedTag> TP = NoTerminationPolicy<LiftedTag>,
-             RuleCostPolicyConcept<LiftedTag> CP = RuleCostPolicy<LiftedTag>>
-    struct Instance
-    {
-        const ::tyr::formalism::datalog::Repository& program_repository;
-        ::tyr::formalism::datalog::Repository& workspace_repository;
+    const ConstProgramWorkspace<LiftedTag>& const_workspace;
+    const ::tyr::formalism::datalog::Repository& program_repository;
+    ::tyr::formalism::datalog::Repository& workspace_repository;
 
-        FactsWorkspace<LiftedTag> facts;
+    FactsWorkspace<LiftedTag> facts;
 
-        OrAP or_ap;
-        SelectedPredicateAnnotations<LiftedTag> and_annot;
-        SelectedFunctionAnnotations<LiftedTag> numeric_and_annot;
-        std::optional<NumericSupportSelector<LiftedTag>> numeric_support_selector;
+    OrAP or_ap;
+    SelectedPredicateAnnotations<LiftedTag> and_annot;
+    SelectedFunctionAnnotations<LiftedTag> numeric_and_annot;
+    std::optional<NumericSupportSelector<LiftedTag>> numeric_support_selector;
 
-        TP tp;
-        CP cost_policy;
+    TP tp;
+    CP cost_policy;
 
-        std::vector<std::unique_ptr<RuleWorkspace<LiftedTag>::Instance<AndAP>>> rules;
+    std::vector<std::unique_ptr<RuleWorkspace<LiftedTag>::Instance<AndAP>>> rules;
 
-        ::tyr::formalism::planning::Builder planning_builder;
-        ::tyr::formalism::datalog::Builder datalog_builder;
+    ::tyr::formalism::planning::Builder planning_builder;
+    ::tyr::formalism::datalog::Builder datalog_builder;
 
-        ygg::IndexList<::tyr::formalism::Object> binding;
+    ygg::IndexList<::tyr::formalism::Object> binding;
 
-        RuleSchedulerStrata schedulers;
+    RuleSchedulerStrata schedulers;
 
-        CostBuckets cost_buckets;
+    CostBuckets cost_buckets;
 
-        ProgramStatistics statistics;
+    ProgramStatistics statistics;
 
-        explicit Instance(Program<LiftedTag>& program, const ConstProgramWorkspace<LiftedTag>& cws, OrAP or_ap, AndAP and_ap, TP tp, CP cost_policy = CP());
+    explicit ProgramWorkspace(Program<LiftedTag>& program, OrAP or_ap = OrAP(), AndAP and_ap = AndAP(), TP tp = TP(), CP cost_policy = CP());
 
-        void clear_costs() { cost_policy.clear(); }
-    };
+    void clear_costs() { cost_policy.clear(); }
 };
 
 template<>

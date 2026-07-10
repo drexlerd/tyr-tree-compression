@@ -21,8 +21,8 @@
 #include "tyr/datalog/lifted/bottom_up.hpp"
 #include "tyr/datalog/lifted/contexts/program.hpp"
 #include "tyr/datalog/lifted/policies/annotation.hpp"
-#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/datalog/lifted/workspaces/program.hpp"
+#include "tyr/datalog/policies/termination.hpp"
 #include "tyr/formalism/canonicalization.hpp"
 #include "tyr/formalism/planning/builder.hpp"
 #include "tyr/formalism/planning/formatter.hpp"
@@ -435,19 +435,8 @@ GroundTaskInstantiationResult instantiate_ground_task(Task<LiftedTag>& lifted_ta
      */
 
     auto ground_program = GroundTaskProgram(lifted_task.get_task());
-    const auto& const_workspace = ground_program.get_const_program_workspace();
-    auto workspace =
-        d::ProgramWorkspace<LiftedTag>::Instance<d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
-            ground_program.get_datalog_program(),
-            const_workspace,
-            d::NoOrAnnotationPolicy<LiftedTag>(),
-            d::NoAndAnnotationPolicy<LiftedTag>(),
-            d::NoTerminationPolicy<LiftedTag>());
-    auto ctx =
-        d::ProgramExecutionContext<LiftedTag, d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
-            workspace,
-            const_workspace);
-    ctx.clear();
+    auto workspace = d::ProgramWorkspace<LiftedTag>(ground_program.get_datalog_program());
+    auto ctx = d::ProgramExecutionContext(workspace);
 
     execution_context.arena().execute([&] { d::solve_bottom_up(ctx); });
 

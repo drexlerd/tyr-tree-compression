@@ -79,11 +79,7 @@ AxiomEvaluator<LiftedTag>::AxiomEvaluator(ygg::uint_t index, TaskPtr<LiftedTag> 
     m_task(std::move(task)),
     m_execution_context(std::move(execution_context)),
     m_axiom_program(m_task->get_task()),
-    m_workspace(m_axiom_program.get_datalog_program(),
-                m_axiom_program.get_const_program_workspace(),
-                d::NoOrAnnotationPolicy<LiftedTag>(),
-                d::NoAndAnnotationPolicy<LiftedTag>(),
-                d::NoTerminationPolicy<LiftedTag>())
+    m_workspace(m_axiom_program.get_datalog_program())
 {
 }
 
@@ -99,11 +95,7 @@ void AxiomEvaluator<LiftedTag>::compute_extended_state(UnpackedState<LiftedTag>&
                             m_workspace.facts.fact_sets,
                             m_workspace.facts.assignment_sets);
 
-    auto ctx =
-        d::ProgramExecutionContext<LiftedTag, d::NoOrAnnotationPolicy<LiftedTag>, d::NoAndAnnotationPolicy<LiftedTag>, d::NoTerminationPolicy<LiftedTag>>(
-            m_workspace,
-            program.get_const_program_workspace());
-    ctx.clear();
+    auto ctx = d::ProgramExecutionContext(m_workspace);
 
     m_execution_context->arena().execute([&] { d::solve_bottom_up(ctx); });
 

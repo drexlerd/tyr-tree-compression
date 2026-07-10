@@ -69,7 +69,7 @@ public:
         m_task(std::move(task)),
         m_execution_context(std::move(execution_context)),
         m_rpg_program(m_task->get_task(), cost_mode),
-        m_workspace(m_rpg_program.get_datalog_program(), m_rpg_program.get_const_program_workspace(), or_ap, and_ap, TP()),
+        m_workspace(m_rpg_program.get_datalog_program(), or_ap, and_ap, TP()),
         m_cost_mode(cost_mode)
     {
         m_workspace.tp.set_goals(m_rpg_program.get_goal());
@@ -108,8 +108,7 @@ public:
                                         m_workspace.facts.fact_sets);
         insert_numeric_variables_to_fact_set(state.get_unpacked_state(), *m_task->get_repository(), merge_context, m_workspace.facts.fact_sets);
 
-        auto ctx = datalog::ProgramExecutionContext<LiftedTag, OrAP, AndAP, TP, CP>(m_workspace, m_rpg_program.get_const_program_workspace());
-        ctx.clear();
+        auto ctx = datalog::ProgramExecutionContext(m_workspace);
 
         m_execution_context->arena().execute([&] { datalog::solve_bottom_up(ctx); });
 
@@ -258,7 +257,7 @@ protected:
     ygg::ExecutionContextPtr m_execution_context;
     RPGProgram<LiftedTag> m_rpg_program;
 
-    datalog::ProgramWorkspace<LiftedTag>::Instance<OrAP, AndAP, TP, CP> m_workspace;
+    datalog::ProgramWorkspace<LiftedTag, OrAP, AndAP, TP, CP> m_workspace;
     CostMode m_cost_mode;
 };
 

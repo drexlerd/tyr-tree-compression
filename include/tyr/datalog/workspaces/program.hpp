@@ -19,11 +19,18 @@
 #define TYR_DATALOG_WORKSPACES_PROGRAM_HPP_
 
 #include "tyr/datalog/declarations.hpp"
+#include "tyr/datalog/policies/annotation_concept.hpp"
+#include "tyr/datalog/policies/cost_concept.hpp"
+#include "tyr/datalog/policies/termination_concept.hpp"
 
 namespace tyr::datalog
 {
 
-template<TaskKind Kind>
+template<TaskKind Kind,
+         OrAnnotationPolicyConcept<Kind> OrAP = NoOrAnnotationPolicy<Kind>,
+         AndAnnotationPolicyConcept<Kind> AndAP = NoAndAnnotationPolicy<Kind>,
+         TerminationPolicyConcept<Kind> TP = NoTerminationPolicy<Kind>,
+         RuleCostPolicyConcept<Kind> CP = RuleCostPolicy<Kind>>
 struct ProgramWorkspace;
 
 template<TaskKind Kind>
