@@ -20,35 +20,54 @@
 #include "tyr/planning/lifted/state_storage/tree_compression/context.hpp"
 #include "tyr/planning/lifted/task.hpp"
 
+#include <algorithm>
+#include <cassert>
+#include <limits>
+
 namespace tyr::planning
 {
+namespace
+{
+ygg::uint_t encode_index(size_t index, bool is_derived)
+{
+    assert(index <= (std::numeric_limits<ygg::uint_t>::max() >> 1));
+    return (static_cast<ygg::uint_t>(index) << 1) | static_cast<ygg::uint_t>(is_derived);
+}
+}
 
 FactStorageBackend<LiftedTag, TreeCompression>::FactStorageBackend(StateStorageContext<LiftedTag, TreeCompression>& ctx) : m_uint_nodes(ctx.uint_nodes) {}
 
-typename FactStorageBackend<LiftedTag, TreeCompression>::Packed
-FactStorageBackend<LiftedTag, TreeCompression>::insert(const typename FactStorageBackend<LiftedTag, TreeCompression>::Unpacked& unpacked)
+typename FactStorageBackend<LiftedTag, TreeCompression>::Packed FactStorageBackend<LiftedTag, TreeCompression>::insert(const FactUnpacked& facts,
+                                                                                                                       const AtomUnpacked& atoms)
 {
     m_uint_node_buffer.clear();
-    const auto& bits = unpacked.indices;
-    for (auto i = bits.find_first(); i != boost::dynamic_bitset<>::npos; i = bits.find_next(i))
-        m_uint_node_buffer.push_back(i);
+    for (auto i = facts.indices.find_first(); i != boost::dynamic_bitset<>::npos; i = facts.indices.find_next(i))
+        m_uint_node_buffer.push_back(encode_index(i, false));
+    for (auto i = atoms.indices.find_first(); i != boost::dynamic_bitset<>::npos; i = atoms.indices.find_next(i))
+        m_uint_node_buffer.push_back(encode_index(i, true));
+    std::ranges::sort(m_uint_node_buffer);
 
     const auto slot = valla::insert_sequence(m_uint_node_buffer, m_uint_nodes);
     return FactStorageBackend<LiftedTag, TreeCompression>::Packed { slot };
 }
 
 void FactStorageBackend<LiftedTag, TreeCompression>::unpack(const typename FactStorageBackend<LiftedTag, TreeCompression>::Packed& packed,
-                                                            typename FactStorageBackend<LiftedTag, TreeCompression>::Unpacked& unpacked)
+                                                            FactUnpacked& facts,
+                                                            AtomUnpacked& atoms)
 {
-    auto& indices = unpacked.indices;
-
     m_uint_node_buffer.clear();
-    indices.clear();
+    facts.indices.clear();
+    atoms.indices.clear();
 
     valla::read_sequence(packed.slot, m_uint_nodes, std::back_inserter(m_uint_node_buffer));
 
-    for (const auto i : m_uint_node_buffer)
-        ygg::set(i, true, indices);
+    for (const auto encoded : m_uint_node_buffer)
+    {
+        if (encoded & 1)
+            ygg::set(encoded >> 1, true, atoms.indices);
+        else
+            ygg::set(encoded >> 1, true, facts.indices);
+    }
 }
 
 }

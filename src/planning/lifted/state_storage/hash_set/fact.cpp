@@ -20,30 +20,50 @@
 #include "tyr/planning/lifted/state_storage/hash_set/context.hpp"
 #include "tyr/planning/lifted/task.hpp"
 
+#include <algorithm>
+#include <cassert>
+#include <limits>
+
 namespace tyr::planning
 {
+namespace
+{
+ygg::uint_t encode_index(size_t index, bool is_derived)
+{
+    assert(index <= (std::numeric_limits<ygg::uint_t>::max() >> 1));
+    return (static_cast<ygg::uint_t>(index) << 1) | static_cast<ygg::uint_t>(is_derived);
+}
+}
 
 FactStorageBackend<LiftedTag, HashSet>::FactStorageBackend(StateStorageContext<LiftedTag, HashSet>& ctx) : m_uint_vec_set(ctx.uint_vec_set), m_buffer() {}
 
-typename FactStorageBackend<LiftedTag, HashSet>::Packed
-FactStorageBackend<LiftedTag, HashSet>::insert(const typename FactStorageBackend<LiftedTag, HashSet>::Unpacked& unpacked)
+typename FactStorageBackend<LiftedTag, HashSet>::Packed FactStorageBackend<LiftedTag, HashSet>::insert(const FactUnpacked& facts, const AtomUnpacked& atoms)
 {
     m_buffer.clear();
-    const auto& bits = unpacked.indices;
-    for (auto i = bits.find_first(); i != boost::dynamic_bitset<>::npos; i = bits.find_next(i))
-        m_buffer.push_back(i);
+    for (auto i = facts.indices.find_first(); i != boost::dynamic_bitset<>::npos; i = facts.indices.find_next(i))
+        m_buffer.push_back(encode_index(i, false));
+    for (auto i = atoms.indices.find_first(); i != boost::dynamic_bitset<>::npos; i = atoms.indices.find_next(i))
+        m_buffer.push_back(encode_index(i, true));
+    std::ranges::sort(m_buffer);
 
     return FactStorageBackend<LiftedTag, HashSet>::Packed { m_uint_vec_set.insert(m_buffer) };
 }
 
 void FactStorageBackend<LiftedTag, HashSet>::unpack(const typename FactStorageBackend<LiftedTag, HashSet>::Packed& packed,
-                                                    typename FactStorageBackend<LiftedTag, HashSet>::Unpacked& unpacked)
+                                                    FactUnpacked& facts,
+                                                    AtomUnpacked& atoms)
 {
     const auto view = m_uint_vec_set[packed.index];
 
-    unpacked.indices.clear();
-    for (ygg::uint_t i = 0; i < view.size(); ++i)
-        ygg::set(view[i], true, unpacked.indices);
+    facts.indices.clear();
+    atoms.indices.clear();
+    for (const auto encoded : view)
+    {
+        if (encoded & 1)
+            ygg::set(encoded >> 1, true, atoms.indices);
+        else
+            ygg::set(encoded >> 1, true, facts.indices);
+    }
 }
 
 }

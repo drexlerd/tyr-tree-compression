@@ -42,8 +42,7 @@ StateRepository<LiftedTag>::StateRepository(ygg::uint_t index, TaskPtr<LiftedTag
     m_task(task),
     m_execution_context(axiom_evaluator ? axiom_evaluator->get_execution_context() : nullptr),
     m_context(),
-    m_fluent_backend(m_context),
-    m_derived_backend(m_context),
+    m_fact_backend(m_context),
     m_numeric_backend(m_context),
     m_unpacked_state_pool(),
     m_axiom_evaluator(std::move(axiom_evaluator))
@@ -70,8 +69,7 @@ StateView<LiftedTag> StateRepository<LiftedTag>::get_registered_state(ygg::Index
     auto unpacked_state = get_unregistered_state();
 
     unpacked_state->set(state_index);
-    m_fluent_backend.unpack(packed_state.template get_atoms<f::FluentTag>(), unpacked_state->template get_atoms<f::FluentTag>());
-    m_derived_backend.unpack(packed_state.template get_atoms<f::DerivedTag>(), unpacked_state->template get_atoms<f::DerivedTag>());
+    m_fact_backend.unpack(packed_state.get_atoms(), unpacked_state->template get_atoms<f::FluentTag>(), unpacked_state->template get_atoms<f::DerivedTag>());
     m_numeric_backend.unpack(packed_state.get_numeric_variables(), unpacked_state->get_numeric_variables());
 
     return StateView<LiftedTag>(shared_from_this(), std::move(unpacked_state));
@@ -118,12 +116,12 @@ StateView<LiftedTag> StateRepository<LiftedTag>::register_state(ygg::SharedObjec
     if (m_axiom_evaluator)
         m_axiom_evaluator->compute_extended_state(*state);
 
-    state->set(m_packed_states
-                   .insert(ygg::Data<State<LiftedTag>>(ygg::Index<State<LiftedTag>>(m_packed_states.size()),
-                                                       m_fluent_backend.insert(state->template get_atoms<f::FluentTag>()),
-                                                       m_derived_backend.insert(state->template get_atoms<f::DerivedTag>()),
-                                                       m_numeric_backend.insert(state->get_numeric_variables())))
-                   .first);
+    state->set(
+        m_packed_states
+            .insert(ygg::Data<State<LiftedTag>>(ygg::Index<State<LiftedTag>>(m_packed_states.size()),
+                                                m_fact_backend.insert(state->template get_atoms<f::FluentTag>(), state->template get_atoms<f::DerivedTag>()),
+                                                m_numeric_backend.insert(state->get_numeric_variables())))
+            .first);
 
     return StateView<LiftedTag>(shared_from_this(), std::move(state));
 }

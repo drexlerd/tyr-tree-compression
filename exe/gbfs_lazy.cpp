@@ -44,6 +44,8 @@ int main(int argc, char** argv)
         .implicit_value(true)
         .help("Disable invariant synthesis during ground task instantiation.");
     program.add_argument("-H", "--heuristic-type").default_value("blind").choices("blind", "goal_count", "rpg_max", "rpg_add", "rpg_ff", "lmcut");
+    program.add_argument("--heuristic-cost-type").default_value("general").choices("unit", "general");
+    program.add_argument("--search-cost-type").default_value("general").choices("unit", "general");
     program.add_argument("-V", "--verbosity")
         .default_value(size_t(0))
         .scan<'u', size_t>()
@@ -74,12 +76,19 @@ int main(int argc, char** argv)
         auto instantiate_ground_task = program.get<bool>("--instantiate-ground-task");
         auto disable_invariant_synthesis = program.get<bool>("--disable-invariant-synthesis");
         auto heuristic_type = program.get<std::string>("--heuristic-type");
+        auto heuristic_cost_type = program.get<std::string>("--heuristic-cost-type");
+        auto search_cost_type = program.get<std::string>("--search-cost-type");
         auto verbosity = program.get<size_t>("--verbosity");
+
+        auto heuristic_cost_mode = heuristic_cost_type == "unit" ? CostMode::UNIT : CostMode::GENERAL;
+        auto search_cost_mode = search_cost_type == "unit" ? CostMode::UNIT : CostMode::GENERAL;
 
         std::cout << "[INPUT] Num worker threads: " << num_worker_threads << std::endl;
         std::cout << "[INPUT] Random seed: " << random_seed << std::endl;
         std::cout << "[INPUT] Shuffle labeled successor nodes: " << shuffle_labeled_succ_nodes << std::endl;
         std::cout << "[INPUT] Use preferred actions: " << !disable_preferred_actions << std::endl;
+        std::cout << "[INPUT] Heuristic cost type: " << heuristic_cost_type << std::endl;
+        std::cout << "[INPUT] Search cost type: " << search_cost_type << std::endl;
 
         auto parser_options = loki::ParserOptions();
         // parser_options.strict = true;
@@ -88,10 +97,10 @@ int main(int argc, char** argv)
 
         auto lifted_task = planning::Task<planning::LiftedTag>::create(parser.parse_task(problem_filepath));
 
-        if (verbosity > 0)
+        if (verbosity > 1)
             fmt::print(std::cout, "{}\n", domain);
 
-        if (verbosity > 0)
+        if (verbosity > 1)
             fmt::print(std::cout, "{}\n", *lifted_task);
 
         auto execution_context = ygg::ExecutionContext::create(num_worker_threads);
@@ -108,6 +117,7 @@ int main(int argc, char** argv)
             options.random_seed = random_seed;
             options.use_preferred_actions = !disable_preferred_actions;
             options.shuffle_labeled_succ_nodes = shuffle_labeled_succ_nodes;
+            options.action_cost_mode = search_cost_mode;
 
             auto heuristic = std::shared_ptr<planning::Heuristic<planning::LiftedTag>> { nullptr };
             if (heuristic_type == "blind")
@@ -115,13 +125,13 @@ int main(int argc, char** argv)
             else if (heuristic_type == "goal_count")
                 heuristic = planning::GoalCountHeuristic<planning::LiftedTag>::create(lifted_task);
             else if (heuristic_type == "rpg_add")
-                heuristic = planning::AddRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
+                heuristic = planning::AddRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, heuristic_cost_mode);
             else if (heuristic_type == "rpg_max")
-                heuristic = planning::MaxRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
+                heuristic = planning::MaxRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, heuristic_cost_mode);
             else if (heuristic_type == "rpg_ff")
-                heuristic = planning::FFRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
+                heuristic = planning::FFRPGHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, heuristic_cost_mode);
             else if (heuristic_type == "lmcut")
-                heuristic = planning::LMCutHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, options.action_cost_mode);
+                heuristic = planning::LMCutHeuristic<planning::LiftedTag>::create(lifted_task, execution_context, heuristic_cost_mode);
             else
                 throw std::invalid_argument("The heuristic is not implemented.");
 
@@ -177,6 +187,7 @@ int main(int argc, char** argv)
                 options.random_seed = random_seed;
                 options.use_preferred_actions = !disable_preferred_actions;
                 options.shuffle_labeled_succ_nodes = shuffle_labeled_succ_nodes;
+                options.action_cost_mode = search_cost_mode;
 
                 auto heuristic = std::shared_ptr<planning::Heuristic<planning::GroundTag>> { nullptr };
                 if (heuristic_type == "blind")
@@ -184,13 +195,13 @@ int main(int argc, char** argv)
                 else if (heuristic_type == "goal_count")
                     heuristic = planning::GoalCountHeuristic<planning::GroundTag>::create(ground_task);
                 else if (heuristic_type == "rpg_add")
-                    heuristic = planning::AddRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
+                    heuristic = planning::AddRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, heuristic_cost_mode);
                 else if (heuristic_type == "rpg_max")
-                    heuristic = planning::MaxRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
+                    heuristic = planning::MaxRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, heuristic_cost_mode);
                 else if (heuristic_type == "rpg_ff")
-                    heuristic = planning::FFRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
+                    heuristic = planning::FFRPGHeuristic<planning::GroundTag>::create(ground_task, execution_context, heuristic_cost_mode);
                 else if (heuristic_type == "lmcut")
-                    heuristic = planning::LMCutHeuristic<planning::GroundTag>::create(ground_task, execution_context, options.action_cost_mode);
+                    heuristic = planning::LMCutHeuristic<planning::GroundTag>::create(ground_task, execution_context, heuristic_cost_mode);
                 else
                     throw std::invalid_argument("The heuristic is not implemented.");
 

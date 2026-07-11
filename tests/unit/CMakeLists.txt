@@ -53,3 +53,4 @@ add_gtest(planning_algorithms_portable_shuffle           "planning/algorithms/po
 add_gtest(planning_algorithms_iw_novelty_table           "planning/algorithms/iw/novelty_table.cpp")
 add_gtest(planning_algorithms_serialized                 "planning/algorithms/serialized.cpp")
 target_link_libraries(planning_algorithms_serialized PRIVATE Boost::json)
+add_gtest(planning_lifted_state_storage                  "planning/lifted/state_storage.cpp")

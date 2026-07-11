@@ -25,7 +25,6 @@ if("${TYR_STATE_STORAGE_POLICY}" STREQUAL "Hashset")
         planning/ground/state_storage/hash_set/atom.cpp
         planning/ground/state_storage/hash_set/fact.cpp
         planning/ground/state_storage/hash_set/context.cpp
-        planning/lifted/state_storage/hash_set/atom.cpp
         planning/lifted/state_storage/hash_set/fact.cpp
     )
 elseif("${TYR_STATE_STORAGE_POLICY}" STREQUAL "Tree")
@@ -34,7 +33,6 @@ elseif("${TYR_STATE_STORAGE_POLICY}" STREQUAL "Tree")
         planning/ground/state_storage/tree_compression/atom.cpp
         planning/ground/state_storage/tree_compression/fact.cpp
         planning/ground/state_storage/tree_compression/context.cpp
-        planning/lifted/state_storage/tree_compression/atom.cpp
         planning/lifted/state_storage/tree_compression/fact.cpp
     )
 endif()

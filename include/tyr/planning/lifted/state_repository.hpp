@@ -30,11 +30,9 @@
 #include <yggdrasil/execution/onetbb.hpp>
 
 #if defined(TYR_STATE_STORAGE_HASHSET)
-#include "tyr/planning/lifted/state_storage/hash_set/atom.hpp"
 #include "tyr/planning/lifted/state_storage/hash_set/fact.hpp"
 #include "tyr/planning/state_storage/hash_set/numeric.hpp"
 #elif defined(TYR_STATE_STORAGE_TREE)
-#include "tyr/planning/lifted/state_storage/tree_compression/atom.hpp"
 #include "tyr/planning/lifted/state_storage/tree_compression/fact.hpp"
 #include "tyr/planning/state_storage/tree_compression/numeric.hpp"
 #endif
@@ -86,8 +84,7 @@ private:
     ygg::ExecutionContextPtr m_execution_context;
 
     StateStorageContext<LiftedTag, StateStoragePolicyTag> m_context;
-    FactStorageBackend<LiftedTag, StateStoragePolicyTag> m_fluent_backend;
-    AtomStorageBackend<LiftedTag, StateStoragePolicyTag> m_derived_backend;
+    FactStorageBackend<LiftedTag, StateStoragePolicyTag> m_fact_backend;
     NumericStorageBackend<LiftedTag, StateStoragePolicyTag> m_numeric_backend;
 
     ygg::IndexedHashSet<State<LiftedTag>> m_packed_states;

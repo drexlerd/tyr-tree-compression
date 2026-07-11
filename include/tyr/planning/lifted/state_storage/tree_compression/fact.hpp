@@ -41,14 +41,15 @@ template<>
 class FactStorageBackend<LiftedTag, TreeCompression>
 {
 public:
-    using Unpacked = FactUnpackedStorage<LiftedTag>;
+    using FactUnpacked = FactUnpackedStorage<LiftedTag>;
+    using AtomUnpacked = AtomUnpackedStorage<LiftedTag>;
     using Packed = FactPackedStorage<LiftedTag, TreeCompression>;
 
     explicit FactStorageBackend(StateStorageContext<LiftedTag, TreeCompression>& ctx);
 
-    Packed insert(const Unpacked& unpacked);
+    Packed insert(const FactUnpacked& facts, const AtomUnpacked& atoms);
 
-    void unpack(const Packed& packed, Unpacked& unpacked);
+    void unpack(const Packed& packed, FactUnpacked& facts, AtomUnpacked& atoms);
 
 private:
     valla::IndexedHashSet<valla::Slot<ygg::uint_t>, ygg::uint_t>& m_uint_nodes;

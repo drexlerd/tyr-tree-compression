@@ -48,65 +48,88 @@ RANDOM_SEED = 0
 if REMOTE:
     ENV = TetralithEnvironment(
         setup=TetralithEnvironment.DEFAULT_SETUP,
-        memory_per_cpu="2840M",
-        cpus_per_task=1,  # 1*2840 >= 16000
-        extra_options="#SBATCH --account=naiss2025-22-1245")
-    ENV.MAX_TASKS = 300
+        memory_per_cpu="4000M",
+        cpus_per_task=1,
+        extra_options="#SBATCH --account=naiss2025-5-382")
     
+    # ENV.MAX_TASKS = 300
 else:
     ENV = LocalEnvironment(processes=6)
 
 if REMOTE:
     SUITES = [
-        ("ipc2023-numeric", SUITE_IPC2023_NUMERIC),
-        ("mine-pddl-numeric", SUITE_MINEPDDL)
+        ("cnot-synthesis", SUITE_CNOT_SYNTHESIS),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_STRIPS),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_ADL),
+        ("ipc2023-learning", SUITE_IPC_LEARNING),
+        #("autoscale-benchmarks-main/21.11-optimal-strips", SUITE_AUTOSCALE_OPTIMAL_STRIPS),
+        ("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS),
+        ("htg-domains/flat", SUITE_HTG),
+        ("pushworld", SUITE_PUSHWORLD),
+        ("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC),
+        ("mine-pddl", SUITE_MINEPDDL),
     ]
-    WALL_TIME_LIMIT = 5 * 60
+    WALL_TIME_LIMIT = 30 * 60
 else:
     SUITES = [
-        ("ipc2023-numeric", SUITE_IPC2023_NUMERIC_TEST),
-        ("mine-pddl-numeric", SUITE_MINEPDDL_TEST)
+        ("downward-benchmarks", ["gripper:prob01.pddl"]), 
+        #("cnot-synthesis", SUITE_CNOT_SYNTHESIS_TEST),
+        #("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS_TEST),
+        #("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL_TEST),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_STRIPS_TEST),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_ADL_TEST),
+        #("ipc2023-learning", SUITE_IPC_LEARNING_TEST),
+        #("autoscale-benchmarks-main/21.11-optimal-strips", SUITE_AUTOSCALE_OPTIMAL_STRIPS_TEST),
+        #("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS_TEST),
+        #("htg-domains/flat", SUITE_HTG_TEST),
+        #("pushworld", SUITE_PUSHWORLD_TEST),
+        #("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC_TEST),
+        #("mine-pddl", SUITE_MINEPDDL_TEST),
     ]
-    WALL_TIME_LIMIT = 5
+    WALL_TIME_LIMIT = 1
 
 ATTRIBUTES = [
     "run_dir",
 ]
 ATTRIBUTES += SearchParser.get_attributes()
-ATTRIBUTES += DatalogParser.get_attributes()
 
-MEMORY_LIMIT = 2500
+MEMORY_LIMIT = 4000
 
-# Create a new experiment.
+REPRESENTATION = "tree"
+
 exp = Experiment(environment=ENV)
 exp.add_parser(SearchParser())
 exp.add_parser(DatalogParser())
 
-PLANNER_DIR = REPO / "build" / "exe" / "gbfs_lazy"
+PLANNER_DIR = REPO / f"build-{REPRESENTATION}" / "exe" / "astar_eager"
 
 exp.add_resource("planner_exe", PLANNER_DIR)
-exp.add_resource("run_planner", DIR / "gbfs_lazy.sh")
-
-base_cmd = [
-    "{run_planner}",
-    "{planner_exe}",
-    "{domain}",
-    "{problem}",
-    "plan.out",
-    "rpg_ff",
-    str(NUM_THREADS),
-    str(RANDOM_SEED),
-]
+exp.add_resource("run_planner", DIR / "astar_eager.sh")
 
 for prefix, SUITE in SUITES:
+    for heuristic in ["blind"]:
+        base_cmd = [
+            "{run_planner}",
+            "{planner_exe}",
+            "{domain}",
+            "{problem}",
+            "plan.out",
+            heuristic,
+            str(NUM_THREADS),
+            str(RANDOM_SEED),
+        ]
+
     for task in suites.build_suite(BENCHMARKS_DIR / prefix, SUITE):
+        ################ Lifted ################
         run = exp.add_run()
         run.add_resource("domain", task.domain_file, symlink=True)
         run.add_resource("problem", task.problem_file, symlink=True)
 
         run.add_command(
-            f"gbfs-lazy-hff-pref-ff-{NUM_THREADS}",
-            base_cmd + ["-S"],
+            f"tyr-lifted-{REPRESENTATION}-astar-{heuristic}",
+            base_cmd + ["-S", "-V", "1"],
             time_limit=None,
             wall_time_limit=WALL_TIME_LIMIT,
             memory_limit=MEMORY_LIMIT,
@@ -115,7 +138,7 @@ for prefix, SUITE in SUITES:
         # 'domain', 'problem', 'algorithm', 'coverage'.
         run.set_property("domain", task.domain)
         run.set_property("problem", task.problem)
-        run.set_property("algorithm", f"gbfs-lazy-hff-pref-ff-{NUM_THREADS}")
+        run.set_property("algorithm", f"tyr-lifted-{REPRESENTATION}-astar-{heuristic}")
         # BaseReport needs the following properties:
         # 'time_limit', 'memory_limit'.
         run.set_property("wall_time_limit", WALL_TIME_LIMIT)
@@ -123,7 +146,8 @@ for prefix, SUITE in SUITES:
         # Every run has to have a unique id in the form of a list.
         # The algorithm name is only really needed when there are
         # multiple algorithms.
-        run.set_property("id", [f"gbfs-lazy-hff-pref-ff-{NUM_THREADS}", task.domain, task.problem])
+        run.set_property("id", [f"tyr-lifted-{REPRESENTATION}-astar-{heuristic}", task.domain, task.problem])
+
 
 # Add step that writes experiment files to disk.
 exp.add_step("build", exp.build)

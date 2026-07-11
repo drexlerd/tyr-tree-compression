@@ -41,14 +41,15 @@ template<>
 class FactStorageBackend<LiftedTag, HashSet>
 {
 public:
-    using Unpacked = FactUnpackedStorage<LiftedTag>;
+    using FactUnpacked = FactUnpackedStorage<LiftedTag>;
+    using AtomUnpacked = AtomUnpackedStorage<LiftedTag>;
     using Packed = FactPackedStorage<LiftedTag, HashSet>;
 
     explicit FactStorageBackend(StateStorageContext<LiftedTag, HashSet>& ctx);
 
-    Packed insert(const Unpacked& unpacked);
+    Packed insert(const FactUnpacked& facts, const AtomUnpacked& atoms);
 
-    void unpack(const Packed& packed, Unpacked& unpacked);
+    void unpack(const Packed& packed, FactUnpacked& facts, AtomUnpacked& atoms);
 
 private:
     ygg::RawVectorSet<ygg::uint_t, ygg::uint_t>& m_uint_vec_set;

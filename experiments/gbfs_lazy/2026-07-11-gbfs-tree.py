@@ -42,47 +42,45 @@ BENCHMARKS_DIR = Path(os.environ["BENCHMARKS_PDDL"])
 NODE = platform.node()
 REMOTE = re.match(r"tetralith\d+.nsc.liu.se|n\d+", NODE)
 
-NUM_THREADS = 2
+NUM_THREADS = 1
 RANDOM_SEED = 0
 
 if REMOTE:
     ENV = TetralithEnvironment(
         setup=TetralithEnvironment.DEFAULT_SETUP,
-        memory_per_cpu="2840M",
-        cpus_per_task=2,  # 2*2840 >= 5000
+        memory_per_cpu="4000M",
+        cpus_per_task=1,
         extra_options="#SBATCH --account=naiss2025-5-382")
-    ENV.MAX_TASKS = 300
-    
 else:
     ENV = LocalEnvironment(processes=6)
 
 if REMOTE:
     SUITES = [
-        #("cnot-synthesis", SUITE_CNOT_SYNTHESIS),
-        #("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS),
-        #("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL),
-        ("downward-benchmarks", SUITE_IPC_SATISFICING_STRIPS),
-        ("downward-benchmarks", SUITE_IPC_SATISFICING_ADL),
-        #("ipc2023-learning", SUITE_IPC_LEARNING),
+        ("cnot-synthesis", SUITE_CNOT_SYNTHESIS),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_STRIPS),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_ADL),
+        ("ipc2023-learning", SUITE_IPC_LEARNING),
         #("autoscale-benchmarks-main/21.11-optimal-strips", SUITE_AUTOSCALE_OPTIMAL_STRIPS),
-        # ("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS),
+        ("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS),
         ("htg-domains/flat", SUITE_HTG),
-        #("pushworld", SUITE_PUSHWORLD),
-        #("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC),
-        #("mine-pddl", SUITE_MINEPDDL),
+        ("pushworld", SUITE_PUSHWORLD),
+        ("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC),
+        ("mine-pddl", SUITE_MINEPDDL),
     ]
-    WALL_TIME_LIMIT = 5 * 60
+    WALL_TIME_LIMIT = 30 * 60
 else:
     SUITES = [
-        #("downward-benchmarks", ["gripper:prob01.pddl"]), 
+        # ("downward-benchmarks", ["gripper:prob01.pddl"]), 
         #("cnot-synthesis", SUITE_CNOT_SYNTHESIS_TEST),
-        #("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS_TEST),
-        #("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL_TEST),
-        ("downward-benchmarks", SUITE_IPC_SATISFICING_STRIPS_TEST),
-        ("downward-benchmarks", SUITE_IPC_SATISFICING_ADL_TEST),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS_TEST),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL_TEST),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_STRIPS_TEST),
+        #("downward-benchmarks", SUITE_IPC_SATISFICING_ADL_TEST),
         #("ipc2023-learning", SUITE_IPC_LEARNING_TEST),
         #("autoscale-benchmarks-main/21.11-optimal-strips", SUITE_AUTOSCALE_OPTIMAL_STRIPS_TEST),
-        ("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS_TEST),
+        #("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS_TEST),
         #("htg-domains/flat", SUITE_HTG_TEST),
         #("pushworld", SUITE_PUSHWORLD_TEST),
         #("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC_TEST),
@@ -96,55 +94,60 @@ ATTRIBUTES = [
 ATTRIBUTES += SearchParser.get_attributes()
 ATTRIBUTES += DatalogParser.get_attributes()
 
-MEMORY_LIMIT = 5000
+MEMORY_LIMIT = 4000
+
+REPRESENTATION = "tree"
 
 # Create a new experiment.
+
 exp = Experiment(environment=ENV)
 exp.add_parser(SearchParser())
 exp.add_parser(DatalogParser())
 
-PLANNER_DIR = REPO / "build" / "exe" / "gbfs_lazy"
+PLANNER_DIR = REPO / f"build-{REPRESENTATION}" / "exe" / "gbfs_lazy"
 
 exp.add_resource("planner_exe", PLANNER_DIR)
 exp.add_resource("run_planner", DIR / "gbfs_lazy.sh")
 
-base_cmd = [
-    "{run_planner}",
-    "{planner_exe}",
-    "{domain}",
-    "{problem}",
-    "plan.out",
-    "rpg_ff",
-    str(NUM_THREADS),
-    str(RANDOM_SEED),
-]
 
 for prefix, SUITE in SUITES:
-    for task in suites.build_suite(BENCHMARKS_DIR / prefix, SUITE):
-        run = exp.add_run()
-        run.add_resource("domain", task.domain_file, symlink=True)
-        run.add_resource("problem", task.problem_file, symlink=True)
+    for heuristic in ["rpg_ff", "goal_count"]:
+        base_cmd = [
+            "{run_planner}",
+            "{planner_exe}",
+            "{domain}",
+            "{problem}",
+            "plan.out",
+            heuristic,
+            str(NUM_THREADS),
+            str(RANDOM_SEED),
+        ]
 
-        run.add_command(
-            f"gbfs-lazy-hff-pref-ff-{NUM_THREADS}",
-            base_cmd + ["-S"],
-            time_limit=None,
-            wall_time_limit=WALL_TIME_LIMIT,
-            memory_limit=MEMORY_LIMIT,
-        )
-        # AbsoluteReport needs the following properties:
-        # 'domain', 'problem', 'algorithm', 'coverage'.
-        run.set_property("domain", task.domain)
-        run.set_property("problem", task.problem)
-        run.set_property("algorithm", f"gbfs-lazy-hff-pref-ff-{NUM_THREADS}")
-        # BaseReport needs the following properties:
-        # 'time_limit', 'memory_limit'.
-        run.set_property("wall_time_limit", WALL_TIME_LIMIT)
-        run.set_property("memory_limit", MEMORY_LIMIT)
-        # Every run has to have a unique id in the form of a list.
-        # The algorithm name is only really needed when there are
-        # multiple algorithms.
-        run.set_property("id", [f"gbfs-lazy-hff-pref-ff-{NUM_THREADS}", task.domain, task.problem])
+        for task in suites.build_suite(BENCHMARKS_DIR / prefix, SUITE):
+            run = exp.add_run()
+            run.add_resource("domain", task.domain_file, symlink=True)
+            run.add_resource("problem", task.problem_file, symlink=True)
+
+            run.add_command(
+                f"tyr-lifted-{REPRESENTATION}-gbfs-lazy-{heuristic}",
+                base_cmd + ["-S", "-V", "1", "--heuristic-cost-type", "unit"],
+                time_limit=None,
+                wall_time_limit=WALL_TIME_LIMIT,
+                memory_limit=MEMORY_LIMIT,
+            )
+            # AbsoluteReport needs the following properties:
+            # 'domain', 'problem', 'algorithm', 'coverage'.
+            run.set_property("domain", task.domain)
+            run.set_property("problem", task.problem)
+            run.set_property("algorithm", f"tyr-lifted-{REPRESENTATION}-gbfs-lazy-{heuristic}")
+            # BaseReport needs the following properties:
+            # 'time_limit', 'memory_limit'.
+            run.set_property("wall_time_limit", WALL_TIME_LIMIT)
+            run.set_property("memory_limit", MEMORY_LIMIT)
+            # Every run has to have a unique id in the form of a list.
+            # The algorithm name is only really needed when there are
+            # multiple algorithms.
+            run.set_property("id", [f"tyr-lifted-{REPRESENTATION}-gbfs-lazy-{heuristic}", task.domain, task.problem])
 
 # Add step that writes experiment files to disk.
 exp.add_step("build", exp.build)
