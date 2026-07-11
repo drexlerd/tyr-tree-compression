@@ -42,10 +42,8 @@ def add_coverage(content, props):
 def add_out_of_memory(content, props):
     props["out_of_memory"] = int("std::bad_alloc" in content)
 
-
 def add_out_of_time(content, props):
     props["out_of_time"] = int(bool(re.search(r"exceeded (?:CPU|wall-clock) time limit:", content)))
-
 
 class SearchParser(Parser):
     """

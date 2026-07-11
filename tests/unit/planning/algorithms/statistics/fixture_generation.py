@@ -217,7 +217,7 @@ def run_search_config(
     if heuristic_name is None:
         result = module.find_solution(context.task, context.successor_generator, options)
     else:
-        options.action_cost_mode = cost_mode_of(cost_suffix)
+        options.cost_mode = cost_mode_of(cost_suffix)
         try:
             heuristic = make_heuristic(context, heuristic_name, cost_suffix)
         except ValueError as error:

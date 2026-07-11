@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     program.add_argument("--heuristic-cost-type").default_value("general").choices("unit", "general");
     program.add_argument("--search-cost-type").default_value("general").choices("unit", "general");
     program.add_argument("-V", "--verbosity")
-        .default_value(size_t(0))
+        .default_value(size_t(1))
         .scan<'u', size_t>()
         .help("The verbosity level. Defaults to minimal amount of debug output.");
 
@@ -74,18 +74,13 @@ int main(int argc, char** argv)
         auto instantiate_ground_task = program.get<bool>("--instantiate-ground-task");
         auto disable_invariant_synthesis = program.get<bool>("--disable-invariant-synthesis");
         auto heuristic_type = program.get<std::string>("--heuristic-type");
-        auto heuristic_cost_type = program.get<std::string>("--heuristic-cost-type");
-        auto search_cost_type = program.get<std::string>("--search-cost-type");
+        auto heuristic_cost_mode = program.get<std::string>("--heuristic-cost-type") == "unit" ? planning::CostMode::UNIT : planning::CostMode::GENERAL;
+        auto search_cost_mode = program.get<std::string>("--search-cost-type") == "unit" ? planning::CostMode::UNIT : planning::CostMode::GENERAL;
         auto verbosity = program.get<size_t>("--verbosity");
-
-        auto heuristic_cost_mode = heuristic_cost_type == "unit" ? CostMode::UNIT : CostMode::GENERAL;
-        auto search_cost_mode = search_cost_type == "unit" ? CostMode::UNIT : CostMode::GENERAL;
 
         std::cout << "[INPUT] Num worker threads: " << num_worker_threads << std::endl;
         std::cout << "[INPUT] Random seed: " << random_seed << std::endl;
         std::cout << "[INPUT] Shuffle labeled successor nodes: " << shuffle_labeled_succ_nodes << std::endl;
-        std::cout << "[INPUT] Heuristic cost type: " << heuristic_cost_type << std::endl;
-        std::cout << "[INPUT] Search cost type: " << search_cost_type << std::endl;
 
         auto parser_options = loki::ParserOptions();
         // parser_options.strict = true;
@@ -111,9 +106,9 @@ int main(int argc, char** argv)
             auto options = planning::astar_eager::Options<planning::LiftedTag>();
             options.start_node = successor_generator->get_initial_node();
             options.event_handler = planning::astar_eager::DefaultEventHandler<planning::LiftedTag>::create(verbosity);
+            options.cost_mode = search_cost_mode;
             options.random_seed = random_seed;
             options.shuffle_labeled_succ_nodes = shuffle_labeled_succ_nodes;
-            options.action_cost_mode = search_cost_mode;
 
             auto heuristic = std::shared_ptr<planning::Heuristic<planning::LiftedTag>> { nullptr };
             if (heuristic_type == "blind")
@@ -175,9 +170,9 @@ int main(int argc, char** argv)
                 auto options = planning::astar_eager::Options<planning::GroundTag>();
                 options.start_node = successor_generator->get_initial_node();
                 options.event_handler = planning::astar_eager::DefaultEventHandler<planning::GroundTag>::create(verbosity);
+                options.cost_mode = search_cost_mode;
                 options.random_seed = random_seed;
                 options.shuffle_labeled_succ_nodes = shuffle_labeled_succ_nodes;
-                options.action_cost_mode = search_cost_mode;
 
                 auto heuristic = std::shared_ptr<planning::Heuristic<planning::GroundTag>> { nullptr };
                 if (heuristic_type == "blind")
