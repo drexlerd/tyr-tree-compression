@@ -234,8 +234,8 @@ def test_public_package_reexports_native_bindings():
     public_names = {name for name in dir(public_module) if not name.startswith("_")}
     native_names = {name for name in dir(native_module) if not name.startswith("_")}
 
-    assert native_names <= public_names
-    assert public_names - native_names == {"ParserOptions"}
+    # ParserOptions is pypddl API and intentionally not re-exported by pytyr.
+    assert public_names == native_names
 
 
 def test_views_from_independent_parsers_use_deterministic_factory_local_identity():
