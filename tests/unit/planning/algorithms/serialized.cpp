@@ -74,8 +74,8 @@ struct GroundSearchContext
 GroundSearchContext create_gripper_context()
 {
     const auto root = ygg::common::root_path();
-    const auto domain_file = root / "data/planning-benchmarks/tests/classical/gripper/domain.pddl";
-    const auto task_file = root / "data/planning-benchmarks/tests/classical/gripper/test-1.pddl";
+    const auto domain_file = root / "data/benchmarks/classical/tests/gripper/domain.pddl";
+    const auto task_file = root / "data/benchmarks/classical/tests/gripper/test-1.pddl";
 
     auto execution_context = ygg::ExecutionContext::create(1);
     auto task = p::Task<p::LiftedTag>(make_test_parser(domain_file).parse_task(task_file)).instantiate_ground_task(*execution_context).task;

@@ -4,11 +4,13 @@ from pathlib import Path
 import pytest
 
 from pytyr import planning
+from pypddl.formalism import ParserOptions
 from pytyr.formalism import planning as formalism_planning
-from pytyr.formalism.planning import Parser, ParserOptions
+from pytyr.formalism.planning import Parser
 
-ROOT_DIR = Path(__file__).parent.parent.parent.parent
-BENCHMARK_DIR = ROOT_DIR / "data" / "planning-benchmarks"
+from pypddl_datasets import fetch_task
+
+GRIPPER = fetch_task("classical/tests/gripper/test-1.pddl")
 
 
 def test_planning_modules_export_expected_algorithm_submodules():
@@ -557,9 +559,9 @@ def test_algorithm_options_are_default_constructible_with_expected_fields():
 
 def _make_gripper_tasks():
     parser_options = ParserOptions()
-    parser = Parser(str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"), parser_options)
+    parser = Parser(str(GRIPPER.domain_path), parser_options)
     formalism_task = parser.parse_task(
-        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl"),
+        str(GRIPPER.task_path),
         parser_options,
     )
 
@@ -589,9 +591,9 @@ def _make_successor_generator(task_module, task, state_repository):
 
 def test_planning_task_view_accessors_keep_temporary_owners_alive():
     parser_options = ParserOptions()
-    parser = Parser(str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"), parser_options)
+    parser = Parser(str(GRIPPER.domain_path), parser_options)
     formalism_task = parser.parse_task(
-        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl"),
+        str(GRIPPER.task_path),
         parser_options,
     )
 
@@ -602,9 +604,9 @@ def test_planning_task_view_accessors_keep_temporary_owners_alive():
     assert lifted_task_view.get_name() == "gripper-2"
     assert [object_.get_name() for object_ in lifted_task_view.get_objects()] == ["ball1", "ball2", "left", "right"]
 
-    parser = Parser(str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"), parser_options)
+    parser = Parser(str(GRIPPER.domain_path), parser_options)
     formalism_task = parser.parse_task(
-        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl"),
+        str(GRIPPER.task_path),
         parser_options,
     )
     ground_task_view = planning.lifted.Task(formalism_task).instantiate_ground_task(
@@ -639,9 +641,9 @@ def test_ground_task_instantiation_result_default_is_explicit_failure():
 
 def test_lifted_task_instantiates_ground_task_from_parsed_pddl():
     parser_options = ParserOptions()
-    parser = Parser(str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"), parser_options)
+    parser = Parser(str(GRIPPER.domain_path), parser_options)
     formalism_task = parser.parse_task(
-        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl"),
+        str(GRIPPER.task_path),
         parser_options,
     )
 

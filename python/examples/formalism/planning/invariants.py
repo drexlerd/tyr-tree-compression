@@ -1,11 +1,10 @@
 """
 Synthesize and inspect invariants from a planning domain.
 
-Example usage (run from the repository root):
+Example usage (benchmark files are provided by the pypddl-datasets package):
 
-    python3 python/examples/formalism/planning/invariants.py \
-        -d data/planning-benchmarks/tests/classical/gripper/domain.pddl \
-        -p data/planning-benchmarks/tests/classical/gripper/test-1.pddl
+    GRIPPER=$(python3 -c "import pypddl_datasets; print(pypddl_datasets.fetch_domain('classical/tests/gripper').path)")
+    python3 python/examples/formalism/planning/invariants.py -d "$GRIPPER/domain.pddl" -p "$GRIPPER/test-1.pddl"
 
 Author: Dominik Drexler (dominik.drexler@liu.se)
 """
@@ -14,8 +13,8 @@ import argparse
 from itertools import product
 from pathlib import Path
 
+from pypddl.formalism import ParserOptions
 from pytyr.formalism.planning import (
-    ParserOptions,
     Parser,
     ParameterIndex,
     ObjectIndex,

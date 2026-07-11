@@ -28,6 +28,7 @@ Homepage = "https://github.com/planning-and-learning/tyr"
 [project.optional-dependencies]
 test = [
     "pytest",
+    "pypddl-datasets",
 ]
 
 [tool.scikit-build]

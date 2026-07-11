@@ -11,7 +11,7 @@ with their failure reason.
 Keep benchmark instances in the same domain directory:
 
 ```text
-data/planning-benchmarks/profiling/<suite>/<domain>/
+data/benchmarks/profiling/<suite>/<domain>/
   domain.pddl
   profiling-1.pddl
   profiling-2.pddl
@@ -24,12 +24,12 @@ Example:
 
 ```json
 {
-  "prefix": "data/planning-benchmarks",
+  "prefix": "data/benchmarks",
   "domains": {
     "blocksworld-large-simple": {
-      "domain_file": "profiling/htg/blocksworld-large-simple/domain.pddl",
+      "domain_file": "classical/profiling/blocksworld-large-simple/domain.pddl",
       "tasks": {
-        "profiling-1": "profiling/htg/blocksworld-large-simple/p-100-2.pddl"
+        "profiling-1": "classical/profiling/blocksworld-large-simple/p-100-2.pddl"
       }
     }
   },

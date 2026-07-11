@@ -1,14 +1,16 @@
 from pathlib import Path
 
-from pytyr.formalism.planning import Parser, ParserOptions
+from pypddl.formalism import ParserOptions
+from pytyr.formalism.planning import Parser
 
-ROOT_DIR = (Path(__file__).parent.parent.parent.parent.parent).absolute()
-BENCHMARK_DIR = ROOT_DIR / "data" / "planning-benchmarks"
+from pypddl_datasets import fetch_task
+
+GRIPPER = fetch_task("classical/tests/gripper/test-1.pddl")
 
 
 def _parse_gripper_task():
-    domain_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl")
-    problem_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl")
+    domain_filepath = str(GRIPPER.domain_path)
+    problem_filepath = str(GRIPPER.task_path)
     parser_options = ParserOptions()
     parser = Parser(domain_filepath, parser_options)
 
@@ -27,8 +29,8 @@ def test_parser_view_accessors_keep_temporary_owners_alive():
     import gc
 
     parser_options = ParserOptions()
-    domain_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl")
-    problem_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl")
+    domain_filepath = str(GRIPPER.domain_path)
+    problem_filepath = str(GRIPPER.task_path)
 
     domain = Parser(domain_filepath, parser_options).get_domain().get_domain()
     task = Parser(domain_filepath, parser_options).parse_task(problem_filepath, parser_options).get_task()
@@ -44,8 +46,8 @@ def test_nested_task_view_accessors_keep_temporary_parent_views_alive():
     import gc
 
     parser_options = ParserOptions()
-    domain_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl")
-    problem_filepath = str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "test-1.pddl")
+    domain_filepath = str(GRIPPER.domain_path)
+    problem_filepath = str(GRIPPER.task_path)
 
     task = Parser(domain_filepath, parser_options).parse_task(problem_filepath, parser_options).get_task()
     domain = task.get_domain()
@@ -238,11 +240,11 @@ def test_public_package_reexports_native_bindings():
 
 def test_views_from_independent_parsers_use_deterministic_factory_local_identity():
     first_parser = Parser(
-        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"),
+        str(GRIPPER.domain_path),
         ParserOptions(),
     )
     second_parser = Parser(
-        str(BENCHMARK_DIR / "tests" / "classical" / "gripper" / "domain.pddl"),
+        str(GRIPPER.domain_path),
         ParserOptions(),
     )
 
