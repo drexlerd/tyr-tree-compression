@@ -39,7 +39,11 @@ def add_coverage(content, props):
     else:
         props["coverage"] = 0
 
+def add_out_of_memory(content, props):
+    props["out_of_memory"] = int("std::bad_alloc" in content)
 
+def add_out_of_time(content, props):
+    props["out_of_time"] = int(bool(re.search(r"exceeded (?:CPU|wall-clock) time limit:", content)))
 
 class SearchParser(Parser):
     """
@@ -101,11 +105,15 @@ class SearchParser(Parser):
         self.add_function(add_search_time_ms_per_expanded)
         self.add_function(add_memory_mb)
         self.add_function(add_coverage)
+        self.add_function(add_out_of_memory, "run.err")
+        self.add_function(add_out_of_time, "driver.log")
 
     @staticmethod
     def get_attributes():
         return [
             Attribute("coverage", min_wins=False),
+            "out_of_time",
+            "out_of_memory",
             "cost",
             "length",
             "unsolvable",
