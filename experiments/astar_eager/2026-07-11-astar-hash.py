@@ -65,7 +65,7 @@ if REMOTE:
         #("downward-benchmarks", SUITE_IPC_SATISFICING_ADL),
         ("ipc2023-learning", SUITE_IPC_LEARNING),
         #("autoscale-benchmarks-main/21.11-optimal-strips", SUITE_AUTOSCALE_OPTIMAL_STRIPS),
-        ("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS),
+        # ("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS),
         ("htg-domains", SUITE_HTG),
         ("pushworld", SUITE_PUSHWORLD),
         ("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC),
@@ -75,18 +75,18 @@ if REMOTE:
 else:
     SUITES = [
         #("downward-benchmarks", ["gripper:prob01.pddl"]), 
-        #("cnot-synthesis", SUITE_CNOT_SYNTHESIS_TEST),
-        #("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS_TEST),
-        #("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL_TEST),
+        ("cnot-synthesis", SUITE_CNOT_SYNTHESIS_TEST),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_STRIPS_TEST),
+        ("downward-benchmarks", SUITE_IPC_OPTIMAL_ADL_TEST),
         #("downward-benchmarks", SUITE_IPC_SATISFICING_STRIPS_TEST),
         #("downward-benchmarks", SUITE_IPC_SATISFICING_ADL_TEST),
-        #("ipc2023-learning", SUITE_IPC_LEARNING_TEST),
+        ("ipc2023-learning", SUITE_IPC_LEARNING_TEST),
         #("autoscale-benchmarks-main/21.11-optimal-strips", SUITE_AUTOSCALE_OPTIMAL_STRIPS_TEST),
         #("autoscale-benchmarks-main/21.11-agile-strips", SUITE_AUTOSCALE_AGILE_STRIPS_TEST),
-        #("htg-domains", SUITE_HTG_TEST),
-        #("pushworld", SUITE_PUSHWORLD_TEST),
-        #("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC_TEST),
-        #("mine-pddl", SUITE_MINEPDDL_TEST),
+        ("htg-domains", SUITE_HTG_TEST),
+        ("pushworld", SUITE_PUSHWORLD_TEST),
+        ("beluga2025", SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC_TEST),
+        ("mine-pddl", SUITE_MINEPDDL_TEST),
     ]
     WALL_TIME_LIMIT = 1
 
