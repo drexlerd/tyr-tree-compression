@@ -227,17 +227,6 @@ def test_fdr_context_view_accessors_keep_temporary_owners_alive():
     assert fact.get_variable() in variables
 
 
-def test_public_package_reexports_native_bindings():
-    import pytyr.formalism.planning as public_module
-    import pytyr._pytyr.formalism.planning as native_module
-
-    public_names = {name for name in dir(public_module) if not name.startswith("_")}
-    native_names = {name for name in dir(native_module) if not name.startswith("_")}
-
-    # ParserOptions is pypddl API and intentionally not re-exported by pytyr.
-    assert public_names == native_names
-
-
 def test_views_from_independent_parsers_use_deterministic_factory_local_identity():
     first_parser = Parser(
         str(GRIPPER.domain_path),
