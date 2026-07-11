@@ -31,7 +31,7 @@ void check_statistics(const SearchStatistics& expected, const SearchCase& test_c
 
     auto options = p::gbfs_lazy::Options<StatisticsTaskKind>();
     options.event_handler = event_handler;
-    options.action_cost_mode = cost_mode;
+    options.cost_mode = cost_mode;
     const auto result = p::gbfs_lazy::find_solution(*context.task, *context.successor_generator, *heuristic, options);
 
     expect_statistics(expected, event_handler->get_statistics(), result);

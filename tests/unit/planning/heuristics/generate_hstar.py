@@ -30,7 +30,7 @@ def solve_hstar(kind: TaskKind, domain_file: Path, task_file: Path, cost_mode: C
     options = planning.astar_eager.Options()
     options.max_num_states = MAX_NUM_STATES
     options.max_time = MAX_TIME
-    options.action_cost_mode = cost_mode
+    options.cost_mode = cost_mode
     result = planning.astar_eager.find_solution(context.task, context.successor_generator, heuristic, options)
     return None if result.plan is None else as_json_number(float(result.plan.get_cost()))
 

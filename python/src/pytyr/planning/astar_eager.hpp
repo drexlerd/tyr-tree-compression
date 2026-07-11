@@ -85,7 +85,7 @@ void bind_options(nb::module_& m, const std::string& name)
         .def_rw("goal_strategy", &T::goal_strategy)
         .def_rw("max_num_states", &T::max_num_states)
         .def_rw("max_time", &T::max_time)
-        .def_rw("action_cost_mode", &T::action_cost_mode)
+        .def_rw("cost_mode", &T::cost_mode)
         .def_rw("random_seed", &T::random_seed)
         .def_rw("shuffle_labeled_succ_nodes", &T::shuffle_labeled_succ_nodes);
 }

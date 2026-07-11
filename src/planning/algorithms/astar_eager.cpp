@@ -227,7 +227,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
             event_handler->on_expand_goal_node(node);
 
-            result.plan = extract_total_ordered_plan(search_node, node, search_nodes, successor_generator, options.action_cost_mode);
+            result.plan = extract_total_ordered_plan(search_node, node, search_nodes, successor_generator, options.cost_mode);
             result.goal_node = node;
             result.status = SearchStatus::SOLVED;
 
@@ -294,7 +294,7 @@ SearchResult<Kind> find_solution(Task<Kind>& task, SuccessorGenerator<Kind>& suc
 
             /* Check whether state must be reopened or not. */
 
-            const auto successor_g_value = compute_successor_g_value(search_node.g_value, succ_node.get_metric(), options.action_cost_mode);
+            const auto successor_g_value = compute_successor_g_value(search_node.g_value, succ_node.get_metric(), options.cost_mode);
             const auto normalized_succ_node = Node<Kind>(succ_state, successor_g_value);
             const auto normalized_labeled_succ_node = LabeledNode<Kind> { labeled_succ_node.label, normalized_succ_node };
 

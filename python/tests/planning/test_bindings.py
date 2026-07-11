@@ -446,7 +446,7 @@ def test_algorithm_options_are_default_constructible_with_expected_fields():
             "goal_strategy": None,
             "max_num_states": ygg_uint_max,
             "max_time": None,
-            "action_cost_mode": planning.CostMode.GENERAL,
+            "cost_mode": planning.CostMode.GENERAL,
             "random_seed": 0,
             "shuffle_labeled_succ_nodes": False,
         },
@@ -467,7 +467,7 @@ def test_algorithm_options_are_default_constructible_with_expected_fields():
             "goal_strategy": None,
             "max_num_states": ygg_uint_max,
             "max_time": None,
-            "action_cost_mode": planning.CostMode.GENERAL,
+            "cost_mode": planning.CostMode.GENERAL,
             "use_preferred_actions": True,
             "boost_preferred_queue": 1000,
             "random_seed": 0,
@@ -499,7 +499,7 @@ def test_algorithm_options_are_default_constructible_with_expected_fields():
             "goal_strategy",
             "max_num_states",
             "max_time",
-            "action_cost_mode",
+            "cost_mode",
             "random_seed",
             "shuffle_labeled_succ_nodes",
         ),
@@ -520,7 +520,7 @@ def test_algorithm_options_are_default_constructible_with_expected_fields():
             "goal_strategy",
             "max_num_states",
             "max_time",
-            "action_cost_mode",
+            "cost_mode",
             "use_preferred_actions",
             "boost_preferred_queue",
             "random_seed",
@@ -618,16 +618,16 @@ def test_planning_task_view_accessors_keep_temporary_owners_alive():
     assert [object_.get_name() for object_ in ground_task_view.get_objects()] == ["ball1", "ball2", "left", "right"]
 
 
-def test_action_cost_mode_is_bound_for_cost_sensitive_algorithms():
+def test_cost_mode_is_bound_for_cost_sensitive_algorithms():
     assert planning.CostMode.UNIT != planning.CostMode.GENERAL
 
     for task_module in (planning.ground, planning.lifted):
         for algorithm_module in (task_module.astar_eager, task_module.gbfs_lazy):
             options = algorithm_module.Options()
 
-            assert options.action_cost_mode == planning.CostMode.GENERAL
-            options.action_cost_mode = planning.CostMode.UNIT
-            assert options.action_cost_mode == planning.CostMode.UNIT
+            assert options.cost_mode == planning.CostMode.GENERAL
+            options.cost_mode = planning.CostMode.UNIT
+            assert options.cost_mode == planning.CostMode.UNIT
 
 
 def test_ground_task_instantiation_result_default_is_explicit_failure():

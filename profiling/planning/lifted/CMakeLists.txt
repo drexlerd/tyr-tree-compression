@@ -28,3 +28,13 @@ target_link_libraries(rpg_ff
         benchmark::benchmark
         Boost::json
 )
+
+add_executable(lmcut
+    "heuristics/lmcut.cpp"
+)
+target_link_libraries(lmcut
+    PRIVATE
+        tyr::core
+        benchmark::benchmark
+        Boost::json
+)
