@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     program.add_argument("--heuristic-cost-type").default_value("general").choices("unit", "general");
     program.add_argument("--search-cost-type").default_value("general").choices("unit", "general");
     program.add_argument("-V", "--verbosity")
-        .default_value(size_t(0))
+        .default_value(size_t(1))
         .scan<'u', size_t>()
         .help("The verbosity level. Defaults to minimal amount of debug output.");
 
@@ -89,10 +89,10 @@ int main(int argc, char** argv)
 
         auto lifted_task = planning::Task<planning::LiftedTag>::create(parser.parse_task(problem_filepath));
 
-        if (verbosity > 0)
+        if (verbosity > 1)
             fmt::print(std::cout, "{}\n", domain);
 
-        if (verbosity > 0)
+        if (verbosity > 1)
             fmt::print(std::cout, "{}\n", *lifted_task);
 
         auto execution_context = ygg::ExecutionContext::create(num_worker_threads);

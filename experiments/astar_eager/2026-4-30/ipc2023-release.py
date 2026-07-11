@@ -2,7 +2,6 @@
 
 import platform
 import re
-import os
 import sys
 
 from pathlib import Path
@@ -15,13 +14,15 @@ from lab.reports import Attribute, geometric_mean, arithmetic_mean
 
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent.parent.parent
+BENCHMARKS_DIR = REPO / "data" / "planning-benchmarks" / "suites" / "numeric"
 
 sys.path.append(str(REPO))
+sys.path.insert(0, str(BENCHMARKS_DIR))
 
 from experiments.parser_search import SearchParser
 
-from experiments.suite import SUITE_CNOT_SYNTHESIS, SUITE_IPC_OPTIMAL_STRIPS, SUITE_IPC_OPTIMAL_ADL, SUITE_IPC_SATISFICING_STRIPS, SUITE_IPC_LEARNING, SUITE_AUTOSCALE_OPTIMAL_STRIPS, SUITE_AUTOSCALE_AGILE_STRIPS, SUITE_HTG, SUITE_IPC2023_NUMERIC, SUITE_PUSHWORLD, SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC, SUITE_MINEPDDL, SUITE_IPC_SATISFICING_ADL
-from experiments.suite_test import SUITE_CNOT_SYNTHESIS_TEST, SUITE_IPC_OPTIMAL_STRIPS_TEST, SUITE_IPC_OPTIMAL_ADL_TEST, SUITE_IPC_SATISFICING_STRIPS_TEST, SUITE_IPC_LEARNING_TEST, SUITE_AUTOSCALE_OPTIMAL_STRIPS_TEST, SUITE_AUTOSCALE_AGILE_STRIPS_TEST, SUITE_HTG_TEST, SUITE_IPC2023_NUMERIC_TEST, SUITE_PUSHWORLD_TEST, SUITE_BELUGA2025_SCALABILITY_DETERMINISTIC_TEST, SUITE_MINEPDDL_TEST, SUITE_IPC_SATISFICING_ADL_TEST
+from suite import SUITE_IPC2023_NUMERIC, SUITE_MINEPDDL
+from suite_test import SUITE_IPC2023_NUMERIC_TEST, SUITE_MINEPDDL_TEST
 
 # Create custom report class with suitable info and error attributes.
 class BaseReport(AbsoluteReport):
@@ -36,7 +37,6 @@ class BaseReport(AbsoluteReport):
     ]
 
 
-BENCHMARKS_DIR = Path(os.environ["BENCHMARKS_PDDL"])
 
 NODE = platform.node()
 REMOTE = re.match(r"tetralith\d+.nsc.liu.se|n\d+", NODE)
@@ -57,12 +57,12 @@ else:
 
 if REMOTE:
     SUITES = [
-        ("ipc2023-numeric", SUITE_IPC2023_NUMERIC),
+        ("ipc2023", SUITE_IPC2023_NUMERIC),
     ]
     WALL_TIME_LIMIT = 30 * 60
 else:
     SUITES = [
-        ("ipc2023-numeric", SUITE_IPC2023_NUMERIC_TEST),
+        ("ipc2023", SUITE_IPC2023_NUMERIC_TEST),
     ]
     WALL_TIME_LIMIT = 5
 
