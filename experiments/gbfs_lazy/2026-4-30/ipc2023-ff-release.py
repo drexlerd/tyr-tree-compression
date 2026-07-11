@@ -44,22 +44,22 @@ RANDOM_SEED = 0
 if REMOTE:
     ENV = TetralithEnvironment(
         setup=TetralithEnvironment.DEFAULT_SETUP,
-        memory_per_cpu="2500M",
+        memory_per_cpu="8000M",
         cpus_per_task=1, 
         extra_options="#SBATCH --account=naiss2025-22-1245")
-    ENV.MAX_TASKS = 200
+    # ENV.MAX_TASKS = 300
     
 else:
     ENV = LocalEnvironment(processes=6)
 
 if REMOTE:
     SUITES = [
-        "mine-pddl-numeric"
+        "ipc2023-numeric",
     ]
-    WALL_TIME_LIMIT = 5 * 60
+    WALL_TIME_LIMIT = 30 * 60
 else:
     SUITES = [
-        "mine-pddl-numeric-test"
+        "ipc2023-numeric-test",
     ]
     WALL_TIME_LIMIT = 5
 
@@ -68,21 +68,21 @@ ATTRIBUTES = [
 ]
 ATTRIBUTES += SearchParser.get_attributes()
 
-MEMORY_LIMIT = 2500
+MEMORY_LIMIT = 8000
 
 # Create a new experiment.
 exp = Experiment(environment=ENV)
 exp.add_parser(SearchParser())
 
-PLANNER_DIR = REPO / "build-debug" / "exe" / "astar_eager"
+PLANNER_DIR = REPO / "build" / "exe" / "gbfs_lazy"
 
 exp.add_resource("planner_exe", PLANNER_DIR)
-exp.add_resource("run_planner", DIR.parent / "astar_eager.sh")
+exp.add_resource("run_planner", DIR.parent / "gbfs_lazy.sh")
 
 
 for SUITE in SUITES:
     for domain in pypddl_datasets.fetch_suite(SUITE).domains:
-        for heuristic in ["blind"]:
+        for heuristic in ["rpg_ff", "rpg_add"]:
             base_cmd = [
                 "{run_planner}",
                 "{planner_exe}",
@@ -100,7 +100,7 @@ for SUITE in SUITES:
                 run.add_resource("problem", task.task_path, symlink=True)
 
                 run.add_command(
-                    f"astar-eager-lifted-{heuristic}-{NUM_THREADS}",
+                    f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}",
                     base_cmd + ["-S"],
                     time_limit=None,
                     wall_time_limit=WALL_TIME_LIMIT,
@@ -110,7 +110,7 @@ for SUITE in SUITES:
                 # 'domain', 'problem', 'algorithm', 'coverage'.
                 run.set_property("domain", task.domain)
                 run.set_property("problem", task.problem)
-                run.set_property("algorithm", f"astar-eager-lifted-{heuristic}-{NUM_THREADS}")
+                run.set_property("algorithm", f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}")
                 # BaseReport needs the following properties:
                 # 'time_limit', 'memory_limit'.
                 run.set_property("wall_time_limit", WALL_TIME_LIMIT)
@@ -118,46 +118,7 @@ for SUITE in SUITES:
                 # Every run has to have a unique id in the form of a list.
                 # The algorithm name is only really needed when there are
                 # multiple algorithms.
-                run.set_property("id", [f"astar-eager-lifted-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
-
-        for heuristic in ["blind"]:
-            base_cmd = [
-                "{run_planner}",
-                "{planner_exe}",
-                "{domain}",
-                "{problem}",
-                "plan.out",
-                heuristic,
-                str(NUM_THREADS),
-                str(RANDOM_SEED),
-            ]
-        
-        for task in domain.tasks:
-                run = exp.add_run()
-                run.add_resource("domain", task.domain_path, symlink=True)
-                run.add_resource("problem", task.task_path, symlink=True)
-
-                run.add_command(
-                    f"astar-eager-ground-{heuristic}-{NUM_THREADS}",
-                    base_cmd + ["-S", "-G"],
-                    time_limit=None,
-                    wall_time_limit=WALL_TIME_LIMIT,
-                    memory_limit=MEMORY_LIMIT,
-                )
-                # AbsoluteReport needs the following properties:
-                # 'domain', 'problem', 'algorithm', 'coverage'.
-                run.set_property("domain", task.domain)
-                run.set_property("problem", task.problem)
-                run.set_property("algorithm", f"astar-eager-ground-{heuristic}-{NUM_THREADS}")
-                # BaseReport needs the following properties:
-                # 'time_limit', 'memory_limit'.
-                run.set_property("wall_time_limit", WALL_TIME_LIMIT)
-                run.set_property("memory_limit", MEMORY_LIMIT)
-                # Every run has to have a unique id in the form of a list.
-                # The algorithm name is only really needed when there are
-                # multiple algorithms.
-                run.set_property("id", [f"astar-eager-ground-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
-
+                run.set_property("id", [f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
 
 
 # Add step that writes experiment files to disk.
