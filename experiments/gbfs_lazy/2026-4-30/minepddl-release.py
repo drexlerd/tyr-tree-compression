@@ -94,7 +94,7 @@ for SUITE in SUITES:
                 str(RANDOM_SEED),
             ]
         
-        for task in domain.tasks:
+            for task in domain.tasks:
                 run = exp.add_run()
                 run.add_resource("domain", task.domain_path, symlink=True)
                 run.add_resource("problem", task.task_path, symlink=True)
@@ -132,7 +132,7 @@ for SUITE in SUITES:
                 str(RANDOM_SEED),
             ]
         
-        for task in domain.tasks:
+            for task in domain.tasks:
                 run = exp.add_run()
                 run.add_resource("domain", task.domain_path, symlink=True)
                 run.add_resource("problem", task.task_path, symlink=True)
