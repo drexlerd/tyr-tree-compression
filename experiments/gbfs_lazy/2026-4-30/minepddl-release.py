@@ -6,7 +6,8 @@ import sys
 
 from pathlib import Path
 
-from downward import suites
+import pypddl_datasets
+
 from downward.reports.absolute import AbsoluteReport
 from lab.environments import TetralithEnvironment, LocalEnvironment
 from lab.experiment import Experiment
@@ -14,15 +15,11 @@ from lab.reports import Attribute, geometric_mean, arithmetic_mean
 
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent.parent.parent
-BENCHMARKS_DIR = REPO / "data" / "planning-benchmarks" / "suites" / "numeric"
 
 sys.path.append(str(REPO))
-sys.path.insert(0, str(BENCHMARKS_DIR))
 
 from experiments.parser_search import SearchParser
 
-from suite import SUITE_IPC2023_NUMERIC, SUITE_MINEPDDL
-from suite_test import SUITE_IPC2023_NUMERIC_TEST, SUITE_MINEPDDL_TEST
 
 # Create custom report class with suitable info and error attributes.
 class BaseReport(AbsoluteReport):
@@ -57,12 +54,12 @@ else:
 
 if REMOTE:
     SUITES = [
-        ("mine-pddl", SUITE_MINEPDDL)
+        "mine-pddl-numeric"
     ]
     WALL_TIME_LIMIT = 30 * 60
 else:
     SUITES = [
-        ("mine-pddl", SUITE_MINEPDDL_TEST)
+        "mine-pddl-numeric-test"
     ]
     WALL_TIME_LIMIT = 5
 
@@ -83,82 +80,83 @@ exp.add_resource("planner_exe", PLANNER_DIR)
 exp.add_resource("run_planner", DIR.parent / "gbfs_lazy.sh")
 
 
-for prefix, SUITE in SUITES:
-    for heuristic in ["rpg_ff", "rpg_add", "blind", "goal_count"]:
-        base_cmd = [
-            "{run_planner}",
-            "{planner_exe}",
-            "{domain}",
-            "{problem}",
-            "plan.out",
-            heuristic,
-            str(NUM_THREADS),
-            str(RANDOM_SEED),
-        ]
+for SUITE in SUITES:
+    for domain in pypddl_datasets.fetch_suite(SUITE).domains:
+        for heuristic in ["rpg_ff", "rpg_add", "blind", "goal_count"]:
+            base_cmd = [
+                "{run_planner}",
+                "{planner_exe}",
+                "{domain}",
+                "{problem}",
+                "plan.out",
+                heuristic,
+                str(NUM_THREADS),
+                str(RANDOM_SEED),
+            ]
         
-        for task in suites.build_suite(BENCHMARKS_DIR / prefix, SUITE):
-            run = exp.add_run()
-            run.add_resource("domain", task.domain_file, symlink=True)
-            run.add_resource("problem", task.problem_file, symlink=True)
+            for task in domain.tasks:
+                run = exp.add_run()
+                run.add_resource("domain", task.domain_path, symlink=True)
+                run.add_resource("problem", task.task_path, symlink=True)
 
-            run.add_command(
-                f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}",
-                base_cmd + ["-S"],
-                time_limit=None,
-                wall_time_limit=WALL_TIME_LIMIT,
-                memory_limit=MEMORY_LIMIT,
-            )
-            # AbsoluteReport needs the following properties:
-            # 'domain', 'problem', 'algorithm', 'coverage'.
-            run.set_property("domain", task.domain)
-            run.set_property("problem", task.problem)
-            run.set_property("algorithm", f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}")
-            # BaseReport needs the following properties:
-            # 'time_limit', 'memory_limit'.
-            run.set_property("wall_time_limit", WALL_TIME_LIMIT)
-            run.set_property("memory_limit", MEMORY_LIMIT)
-            # Every run has to have a unique id in the form of a list.
-            # The algorithm name is only really needed when there are
-            # multiple algorithms.
-            run.set_property("id", [f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
+                run.add_command(
+                    f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}",
+                    base_cmd + ["-S"],
+                    time_limit=None,
+                    wall_time_limit=WALL_TIME_LIMIT,
+                    memory_limit=MEMORY_LIMIT,
+                )
+                # AbsoluteReport needs the following properties:
+                # 'domain', 'problem', 'algorithm', 'coverage'.
+                run.set_property("domain", task.domain)
+                run.set_property("problem", task.problem)
+                run.set_property("algorithm", f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}")
+                # BaseReport needs the following properties:
+                # 'time_limit', 'memory_limit'.
+                run.set_property("wall_time_limit", WALL_TIME_LIMIT)
+                run.set_property("memory_limit", MEMORY_LIMIT)
+                # Every run has to have a unique id in the form of a list.
+                # The algorithm name is only really needed when there are
+                # multiple algorithms.
+                run.set_property("id", [f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
 
-    for heuristic in ["blind", "goal_count"]:
-        base_cmd = [
-            "{run_planner}",
-            "{planner_exe}",
-            "{domain}",
-            "{problem}",
-            "plan.out",
-            heuristic,
-            str(NUM_THREADS),
-            str(RANDOM_SEED),
-        ]
+        for heuristic in ["blind", "goal_count"]:
+            base_cmd = [
+                "{run_planner}",
+                "{planner_exe}",
+                "{domain}",
+                "{problem}",
+                "plan.out",
+                heuristic,
+                str(NUM_THREADS),
+                str(RANDOM_SEED),
+            ]
         
-        for task in suites.build_suite(BENCHMARKS_DIR / prefix, SUITE):
-            run = exp.add_run()
-            run.add_resource("domain", task.domain_file, symlink=True)
-            run.add_resource("problem", task.problem_file, symlink=True)
+            for task in domain.tasks:
+                run = exp.add_run()
+                run.add_resource("domain", task.domain_path, symlink=True)
+                run.add_resource("problem", task.task_path, symlink=True)
 
-            run.add_command(
-                f"gbfs-lazy-ground-{heuristic}-{NUM_THREADS}",
-                base_cmd + ["-S", "-G"],
-                time_limit=None,
-                wall_time_limit=WALL_TIME_LIMIT,
-                memory_limit=MEMORY_LIMIT,
-            )
-            # AbsoluteReport needs the following properties:
-            # 'domain', 'problem', 'algorithm', 'coverage'.
-            run.set_property("domain", task.domain)
-            run.set_property("problem", task.problem)
-            run.set_property("algorithm", f"gbfs-lazy-ground-{heuristic}-{NUM_THREADS}")
-            # BaseReport needs the following properties:
-            # 'time_limit', 'memory_limit'.
-            run.set_property("wall_time_limit", WALL_TIME_LIMIT)
-            run.set_property("memory_limit", MEMORY_LIMIT)
-            # Every run has to have a unique id in the form of a list.
-            # The algorithm name is only really needed when there are
-            # multiple algorithms.
-            run.set_property("id", [f"gbfs-lazy-ground-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
+                run.add_command(
+                    f"gbfs-lazy-ground-{heuristic}-{NUM_THREADS}",
+                    base_cmd + ["-S", "-G"],
+                    time_limit=None,
+                    wall_time_limit=WALL_TIME_LIMIT,
+                    memory_limit=MEMORY_LIMIT,
+                )
+                # AbsoluteReport needs the following properties:
+                # 'domain', 'problem', 'algorithm', 'coverage'.
+                run.set_property("domain", task.domain)
+                run.set_property("problem", task.problem)
+                run.set_property("algorithm", f"gbfs-lazy-ground-{heuristic}-{NUM_THREADS}")
+                # BaseReport needs the following properties:
+                # 'time_limit', 'memory_limit'.
+                run.set_property("wall_time_limit", WALL_TIME_LIMIT)
+                run.set_property("memory_limit", MEMORY_LIMIT)
+                # Every run has to have a unique id in the form of a list.
+                # The algorithm name is only really needed when there are
+                # multiple algorithms.
+                run.set_property("id", [f"gbfs-lazy-ground-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
 
 
 

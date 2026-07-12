@@ -7,17 +7,17 @@ import sys
 from pathlib import Path
 
 import pypddl_datasets
+
 from downward.reports.absolute import AbsoluteReport
 from lab.environments import TetralithEnvironment, LocalEnvironment
 from lab.experiment import Experiment
 from lab.reports import Attribute, geometric_mean, arithmetic_mean
 
 DIR = Path(__file__).resolve().parent
-REPO = DIR.parent.parent
+REPO = DIR.parent.parent.parent
 
-sys.path.append(str(DIR.parent.parent))
+sys.path.append(str(REPO))
 
-from experiments.parser_datalog import DatalogParser
 from experiments.parser_search import SearchParser
 
 
@@ -44,70 +44,45 @@ RANDOM_SEED = 0
 if REMOTE:
     ENV = TetralithEnvironment(
         setup=TetralithEnvironment.DEFAULT_SETUP,
-        memory_per_cpu="4000M",
+        memory_per_cpu="8000M",
         cpus_per_task=1,
-        extra_options="#SBATCH --account=naiss2025-5-382")
+        extra_options="#SBATCH --account=naiss2025-22-1245")
+    # ENV.MAX_TASKS = 300
+
 else:
     ENV = LocalEnvironment(processes=6)
 
 if REMOTE:
     SUITES = [
-        "cnot-synthesis",
-        "ipc-optimal-strips",
-        "ipc-optimal-adl",
-        #"ipc-satisficing-strips",
-        #"ipc-satisficing-adl",
-        "ipc2023-learning",
-        #"autoscale-optimal-strips",
-        #"autoscale-agile-strips",
-        "htg",
-        "pushworld",
-        "beluga2025-scalability-deterministic",
-        "mine-pddl-classical",
+        "ipc2023-numeric",
     ]
     WALL_TIME_LIMIT = 30 * 60
 else:
     SUITES = [
-        #"cnot-synthesis-test",
-        "ipc-optimal-strips-test",
-        "ipc-optimal-adl-test",
-        #"ipc-satisficing-strips-test",
-        #"ipc-satisficing-adl-test",
-        #"ipc2023-learning-test",
-        #"autoscale-optimal-strips-test",
-        #"autoscale-agile-strips-test",
-        #"htg-test",
-        #"pushworld-test",
-        #"beluga2025-scalability-deterministic-test",
-        #"mine-pddl-classical-test",
+        "ipc2023-numeric-test",
     ]
-    WALL_TIME_LIMIT = 1
+    WALL_TIME_LIMIT = 5
 
 ATTRIBUTES = [
     "run_dir",
 ]
 ATTRIBUTES += SearchParser.get_attributes()
-ATTRIBUTES += DatalogParser.get_attributes()
 
-MEMORY_LIMIT = 4000
-
-REPRESENTATION = "hash"
+MEMORY_LIMIT = 8000
 
 # Create a new experiment.
-
 exp = Experiment(environment=ENV)
 exp.add_parser(SearchParser())
-exp.add_parser(DatalogParser())
 
-PLANNER_DIR = REPO / f"build-{REPRESENTATION}" / "exe" / "gbfs_lazy"
+PLANNER_DIR = REPO / "build" / "exe" / "gbfs_lazy"
 
 exp.add_resource("planner_exe", PLANNER_DIR)
-exp.add_resource("run_planner", DIR / "gbfs_lazy.sh")
+exp.add_resource("run_planner", DIR.parent / "gbfs_lazy.sh")
 
 
 for SUITE in SUITES:
     for domain in pypddl_datasets.fetch_suite(SUITE).domains:
-        for heuristic in ["rpg_ff", "goal_count"]:
+        for heuristic in ["rpg_ff", "rpg_add"]:
             base_cmd = [
                 "{run_planner}",
                 "{planner_exe}",
@@ -125,8 +100,8 @@ for SUITE in SUITES:
                 run.add_resource("problem", task.task_path, symlink=True)
 
                 run.add_command(
-                    f"tyr-lifted-{REPRESENTATION}-gbfs-lazy-{heuristic}",
-                    base_cmd + ["-S", "-V", "1", "--heuristic-cost-type", "unit"],
+                    f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}",
+                    base_cmd + ["-S"],
                     time_limit=None,
                     wall_time_limit=WALL_TIME_LIMIT,
                     memory_limit=MEMORY_LIMIT,
@@ -135,7 +110,7 @@ for SUITE in SUITES:
                 # 'domain', 'problem', 'algorithm', 'coverage'.
                 run.set_property("domain", task.domain)
                 run.set_property("problem", task.problem)
-                run.set_property("algorithm", f"tyr-lifted-{REPRESENTATION}-gbfs-lazy-{heuristic}")
+                run.set_property("algorithm", f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}")
                 # BaseReport needs the following properties:
                 # 'time_limit', 'memory_limit'.
                 run.set_property("wall_time_limit", WALL_TIME_LIMIT)
@@ -143,7 +118,8 @@ for SUITE in SUITES:
                 # Every run has to have a unique id in the form of a list.
                 # The algorithm name is only really needed when there are
                 # multiple algorithms.
-                run.set_property("id", [f"tyr-lifted-{REPRESENTATION}-gbfs-lazy-{heuristic}", task.domain, task.problem])
+                run.set_property("id", [f"gbfs-lazy-lifted-{heuristic}-{NUM_THREADS}", task.domain, task.problem])
+
 
 # Add step that writes experiment files to disk.
 exp.add_step("build", exp.build)

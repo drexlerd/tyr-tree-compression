@@ -3,11 +3,12 @@ import sys
 from pathlib import Path
 
 import pytest
+from pypddl_datasets import fetch_task
 
 ROOT_DIR = Path(__file__).parent.parent.parent
-BENCHMARK_DIR = ROOT_DIR / "data" / "planning-benchmarks" / "tests" / "classical" / "gripper"
-DOMAIN_FILE = BENCHMARK_DIR / "domain.pddl"
-TASK_FILE = BENCHMARK_DIR / "test-1.pddl"
+GRIPPER = fetch_task("classical/tests/gripper/test-1.pddl")
+DOMAIN_FILE = GRIPPER.domain_path
+TASK_FILE = GRIPPER.task_path
 
 
 def _run_example(*args: str):

@@ -1,10 +1,10 @@
 {
-    "prefix": "data/planning-benchmarks",
+    "prefix": "data/benchmarks",
     "cases": [
         {
             "name": "Agricola",
-            "domain_file": "tests/classical/agricola/domain.pddl",
-            "task_file": "tests/classical/agricola/test-1.pddl",
+            "domain_file": "classical/tests/agricola/domain.pddl",
+            "task_file": "classical/tests/agricola/test-1.pddl",
             "skipped": {
                 "unit": "no plan within limits",
                 "general": "no plan within limits"
@@ -12,8 +12,8 @@
         },
         {
             "name": "Airport",
-            "domain_file": "tests/classical/airport/domain.pddl",
-            "task_file": "tests/classical/airport/test-1.pddl",
+            "domain_file": "classical/tests/airport/domain.pddl",
+            "task_file": "classical/tests/airport/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 8
@@ -25,8 +25,8 @@
         },
         {
             "name": "Assembly",
-            "domain_file": "tests/classical/assembly/domain.pddl",
-            "task_file": "tests/classical/assembly/test-1.pddl",
+            "domain_file": "classical/tests/assembly/domain.pddl",
+            "task_file": "classical/tests/assembly/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 1
@@ -38,8 +38,8 @@
         },
         {
             "name": "Barman",
-            "domain_file": "tests/classical/barman/domain.pddl",
-            "task_file": "tests/classical/barman/test-1.pddl",
+            "domain_file": "classical/tests/barman/domain.pddl",
+            "task_file": "classical/tests/barman/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 11
@@ -51,8 +51,8 @@
         },
         {
             "name": "Blocks3",
-            "domain_file": "tests/classical/blocks_3/domain.pddl",
-            "task_file": "tests/classical/blocks_3/test-1.pddl",
+            "domain_file": "classical/tests/blocks_3/domain.pddl",
+            "task_file": "classical/tests/blocks_3/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -64,8 +64,8 @@
         },
         {
             "name": "Blocks4",
-            "domain_file": "tests/classical/blocks_4/domain.pddl",
-            "task_file": "tests/classical/blocks_4/test-1.pddl",
+            "domain_file": "classical/tests/blocks_4/domain.pddl",
+            "task_file": "classical/tests/blocks_4/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -77,8 +77,8 @@
         },
         {
             "name": "Childsnack",
-            "domain_file": "tests/classical/childsnack/domain.pddl",
-            "task_file": "tests/classical/childsnack/test-1.pddl",
+            "domain_file": "classical/tests/childsnack/domain.pddl",
+            "task_file": "classical/tests/childsnack/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -90,8 +90,8 @@
         },
         {
             "name": "Delivery",
-            "domain_file": "tests/classical/delivery/domain.pddl",
-            "task_file": "tests/classical/delivery/test-1.pddl",
+            "domain_file": "classical/tests/delivery/domain.pddl",
+            "task_file": "classical/tests/delivery/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -103,8 +103,8 @@
         },
         {
             "name": "Driverlog",
-            "domain_file": "tests/classical/driverlog/domain.pddl",
-            "task_file": "tests/classical/driverlog/test-1.pddl",
+            "domain_file": "classical/tests/driverlog/domain.pddl",
+            "task_file": "classical/tests/driverlog/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 9
@@ -116,8 +116,8 @@
         },
         {
             "name": "Ferry",
-            "domain_file": "tests/classical/ferry/domain.pddl",
-            "task_file": "tests/classical/ferry/test-1.pddl",
+            "domain_file": "classical/tests/ferry/domain.pddl",
+            "task_file": "classical/tests/ferry/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 7
@@ -129,8 +129,8 @@
         },
         {
             "name": "Grid",
-            "domain_file": "tests/classical/grid/domain.pddl",
-            "task_file": "tests/classical/grid/test-1.pddl",
+            "domain_file": "classical/tests/grid/domain.pddl",
+            "task_file": "classical/tests/grid/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -142,8 +142,8 @@
         },
         {
             "name": "Gripper",
-            "domain_file": "tests/classical/gripper/domain.pddl",
-            "task_file": "tests/classical/gripper/test-1.pddl",
+            "domain_file": "classical/tests/gripper/domain.pddl",
+            "task_file": "classical/tests/gripper/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 3
@@ -155,8 +155,8 @@
         },
         {
             "name": "Hiking",
-            "domain_file": "tests/classical/hiking/domain.pddl",
-            "task_file": "tests/classical/hiking/test-1.pddl",
+            "domain_file": "classical/tests/hiking/domain.pddl",
+            "task_file": "classical/tests/hiking/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -168,8 +168,8 @@
         },
         {
             "name": "Logistics",
-            "domain_file": "tests/classical/logistics/domain.pddl",
-            "task_file": "tests/classical/logistics/test-1.pddl",
+            "domain_file": "classical/tests/logistics/domain.pddl",
+            "task_file": "classical/tests/logistics/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -181,8 +181,8 @@
         },
         {
             "name": "Miconic",
-            "domain_file": "tests/classical/miconic/domain.pddl",
-            "task_file": "tests/classical/miconic/test-1.pddl",
+            "domain_file": "classical/tests/miconic/domain.pddl",
+            "task_file": "classical/tests/miconic/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 5
@@ -194,8 +194,8 @@
         },
         {
             "name": "MiconicFulladl",
-            "domain_file": "tests/classical/miconic-fulladl/domain.pddl",
-            "task_file": "tests/classical/miconic-fulladl/test-1.pddl",
+            "domain_file": "classical/tests/miconic-fulladl/domain.pddl",
+            "task_file": "classical/tests/miconic-fulladl/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 7
@@ -207,8 +207,8 @@
         },
         {
             "name": "MiconicSimpleadl",
-            "domain_file": "tests/classical/miconic-simpleadl/domain.pddl",
-            "task_file": "tests/classical/miconic-simpleadl/test-1.pddl",
+            "domain_file": "classical/tests/miconic-simpleadl/domain.pddl",
+            "task_file": "classical/tests/miconic-simpleadl/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -220,8 +220,8 @@
         },
         {
             "name": "Parcprinter",
-            "domain_file": "tests/classical/parcprinter/domain.pddl",
-            "task_file": "tests/classical/parcprinter/test-1.pddl",
+            "domain_file": "classical/tests/parcprinter/domain.pddl",
+            "task_file": "classical/tests/parcprinter/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 8
@@ -233,8 +233,8 @@
         },
         {
             "name": "Pathways",
-            "domain_file": "tests/classical/pathways/domain.pddl",
-            "task_file": "tests/classical/pathways/test-1.pddl",
+            "domain_file": "classical/tests/pathways/domain.pddl",
+            "task_file": "classical/tests/pathways/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 6
@@ -246,8 +246,8 @@
         },
         {
             "name": "Philosophers",
-            "domain_file": "tests/classical/philosophers/domain.pddl",
-            "task_file": "tests/classical/philosophers/test-1.pddl",
+            "domain_file": "classical/tests/philosophers/domain.pddl",
+            "task_file": "classical/tests/philosophers/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 18
@@ -259,8 +259,8 @@
         },
         {
             "name": "PsrMiddle",
-            "domain_file": "tests/classical/psr-middle/domain.pddl",
-            "task_file": "tests/classical/psr-middle/test-1.pddl",
+            "domain_file": "classical/tests/psr-middle/domain.pddl",
+            "task_file": "classical/tests/psr-middle/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -272,8 +272,8 @@
         },
         {
             "name": "Pushworld",
-            "domain_file": "tests/classical/pushworld/domain.pddl",
-            "task_file": "tests/classical/pushworld/test-1.pddl",
+            "domain_file": "classical/tests/pushworld/domain.pddl",
+            "task_file": "classical/tests/pushworld/test-1.pddl",
             "skipped": {
                 "unit": "no plan within limits",
                 "general": "no plan within limits"
@@ -281,8 +281,8 @@
         },
         {
             "name": "Reward",
-            "domain_file": "tests/classical/reward/domain.pddl",
-            "task_file": "tests/classical/reward/test-1.pddl",
+            "domain_file": "classical/tests/reward/domain.pddl",
+            "task_file": "classical/tests/reward/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -294,8 +294,8 @@
         },
         {
             "name": "Rovers",
-            "domain_file": "tests/classical/rovers/domain.pddl",
-            "task_file": "tests/classical/rovers/test-1.pddl",
+            "domain_file": "classical/tests/rovers/domain.pddl",
+            "task_file": "classical/tests/rovers/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -307,8 +307,8 @@
         },
         {
             "name": "Satellite",
-            "domain_file": "tests/classical/satellite/domain.pddl",
-            "task_file": "tests/classical/satellite/test-1.pddl",
+            "domain_file": "classical/tests/satellite/domain.pddl",
+            "task_file": "classical/tests/satellite/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 7
@@ -320,8 +320,8 @@
         },
         {
             "name": "Schedule",
-            "domain_file": "tests/classical/schedule/domain.pddl",
-            "task_file": "tests/classical/schedule/test-1.pddl",
+            "domain_file": "classical/tests/schedule/domain.pddl",
+            "task_file": "classical/tests/schedule/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -333,8 +333,8 @@
         },
         {
             "name": "Sokoban",
-            "domain_file": "tests/classical/sokoban/domain.pddl",
-            "task_file": "tests/classical/sokoban/test-1.pddl",
+            "domain_file": "classical/tests/sokoban/domain.pddl",
+            "task_file": "classical/tests/sokoban/test-1.pddl",
             "skipped": {
                 "unit": "no plan within limits",
                 "general": "no plan within limits"
@@ -342,8 +342,8 @@
         },
         {
             "name": "Spanner",
-            "domain_file": "tests/classical/spanner/domain.pddl",
-            "task_file": "tests/classical/spanner/test-1.pddl",
+            "domain_file": "classical/tests/spanner/domain.pddl",
+            "task_file": "classical/tests/spanner/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -355,8 +355,8 @@
         },
         {
             "name": "Transport",
-            "domain_file": "tests/classical/transport/domain.pddl",
-            "task_file": "tests/classical/transport/test-1.pddl",
+            "domain_file": "classical/tests/transport/domain.pddl",
+            "task_file": "classical/tests/transport/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 5
@@ -368,8 +368,8 @@
         },
         {
             "name": "Visitall",
-            "domain_file": "tests/classical/visitall/domain.pddl",
-            "task_file": "tests/classical/visitall/test-1.pddl",
+            "domain_file": "classical/tests/visitall/domain.pddl",
+            "task_file": "classical/tests/visitall/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 8
@@ -381,8 +381,8 @@
         },
         {
             "name": "Woodworking",
-            "domain_file": "tests/classical/woodworking/domain.pddl",
-            "task_file": "tests/classical/woodworking/test-1.pddl",
+            "domain_file": "classical/tests/woodworking/domain.pddl",
+            "task_file": "classical/tests/woodworking/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 9
@@ -394,8 +394,8 @@
         },
         {
             "name": "FoCounters",
-            "domain_file": "tests/numeric/fo-counters/domain.pddl",
-            "task_file": "tests/numeric/fo-counters/test-1.pddl",
+            "domain_file": "numeric/tests/fo-counters/domain.pddl",
+            "task_file": "numeric/tests/fo-counters/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 5
@@ -407,8 +407,8 @@
         },
         {
             "name": "Refuel",
-            "domain_file": "tests/numeric/refuel/domain.pddl",
-            "task_file": "tests/numeric/refuel/test-1.pddl",
+            "domain_file": "numeric/tests/refuel/domain.pddl",
+            "task_file": "numeric/tests/refuel/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 5
@@ -420,8 +420,8 @@
         },
         {
             "name": "RefuelAdl",
-            "domain_file": "tests/numeric/refuel-adl/domain.pddl",
-            "task_file": "tests/numeric/refuel-adl/test-1.pddl",
+            "domain_file": "numeric/tests/refuel-adl/domain.pddl",
+            "task_file": "numeric/tests/refuel-adl/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 10
@@ -433,8 +433,8 @@
         },
         {
             "name": "Tpp",
-            "domain_file": "tests/numeric/tpp/domain.pddl",
-            "task_file": "tests/numeric/tpp/test-1.pddl",
+            "domain_file": "numeric/tests/tpp/domain.pddl",
+            "task_file": "numeric/tests/tpp/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 7
@@ -446,8 +446,8 @@
         },
         {
             "name": "Zenotravel",
-            "domain_file": "tests/numeric/zenotravel/domain.pddl",
-            "task_file": "tests/numeric/zenotravel/test-1.pddl",
+            "domain_file": "numeric/tests/zenotravel/domain.pddl",
+            "task_file": "numeric/tests/zenotravel/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 9
@@ -459,8 +459,8 @@
         },
         {
             "name": "BlockGrouping",
-            "domain_file": "tests/numeric/block-grouping/domain.pddl",
-            "task_file": "tests/numeric/block-grouping/test-1.pddl",
+            "domain_file": "numeric/tests/block-grouping/domain.pddl",
+            "task_file": "numeric/tests/block-grouping/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -472,8 +472,8 @@
         },
         {
             "name": "Counters",
-            "domain_file": "tests/numeric/counters/domain.pddl",
-            "task_file": "tests/numeric/counters/test-1.pddl",
+            "domain_file": "numeric/tests/counters/domain.pddl",
+            "task_file": "numeric/tests/counters/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 12
@@ -485,8 +485,8 @@
         },
         {
             "name": "NumericDelivery",
-            "domain_file": "tests/numeric/delivery/domain.pddl",
-            "task_file": "tests/numeric/delivery/test-1.pddl",
+            "domain_file": "numeric/tests/delivery/domain.pddl",
+            "task_file": "numeric/tests/delivery/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 3
@@ -498,8 +498,8 @@
         },
         {
             "name": "Drone",
-            "domain_file": "tests/numeric/drone/domain.pddl",
-            "task_file": "tests/numeric/drone/test-1.pddl",
+            "domain_file": "numeric/tests/drone/domain.pddl",
+            "task_file": "numeric/tests/drone/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -511,8 +511,8 @@
         },
         {
             "name": "Expedition",
-            "domain_file": "tests/numeric/expedition/domain.pddl",
-            "task_file": "tests/numeric/expedition/test-1.pddl",
+            "domain_file": "numeric/tests/expedition/domain.pddl",
+            "task_file": "numeric/tests/expedition/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 1
@@ -524,8 +524,8 @@
         },
         {
             "name": "ExtPlantWatering",
-            "domain_file": "tests/numeric/ext-plant-watering/domain.pddl",
-            "task_file": "tests/numeric/ext-plant-watering/test-1.pddl",
+            "domain_file": "numeric/tests/ext-plant-watering/domain.pddl",
+            "task_file": "numeric/tests/ext-plant-watering/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 8
@@ -537,8 +537,8 @@
         },
         {
             "name": "Farmland",
-            "domain_file": "tests/numeric/farmland/domain.pddl",
-            "task_file": "tests/numeric/farmland/test-1.pddl",
+            "domain_file": "numeric/tests/farmland/domain.pddl",
+            "task_file": "numeric/tests/farmland/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -550,8 +550,8 @@
         },
         {
             "name": "FoFarmland",
-            "domain_file": "tests/numeric/fo-farmland/domain.pddl",
-            "task_file": "tests/numeric/fo-farmland/test-1.pddl",
+            "domain_file": "numeric/tests/fo-farmland/domain.pddl",
+            "task_file": "numeric/tests/fo-farmland/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -563,8 +563,8 @@
         },
         {
             "name": "FoSailing",
-            "domain_file": "tests/numeric/fo-sailing/domain.pddl",
-            "task_file": "tests/numeric/fo-sailing/test-1.pddl",
+            "domain_file": "numeric/tests/fo-sailing/domain.pddl",
+            "task_file": "numeric/tests/fo-sailing/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -576,8 +576,8 @@
         },
         {
             "name": "Hydropower",
-            "domain_file": "tests/numeric/hydropower/domain.pddl",
-            "task_file": "tests/numeric/hydropower/test-1.pddl",
+            "domain_file": "numeric/tests/hydropower/domain.pddl",
+            "task_file": "numeric/tests/hydropower/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -589,8 +589,8 @@
         },
         {
             "name": "Markettrader",
-            "domain_file": "tests/numeric/markettrader/domain.pddl",
-            "task_file": "tests/numeric/markettrader/test-1.pddl",
+            "domain_file": "numeric/tests/markettrader/domain.pddl",
+            "task_file": "numeric/tests/markettrader/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -602,8 +602,8 @@
         },
         {
             "name": "Mprime",
-            "domain_file": "tests/numeric/mprime/domain.pddl",
-            "task_file": "tests/numeric/mprime/test-1.pddl",
+            "domain_file": "numeric/tests/mprime/domain.pddl",
+            "task_file": "numeric/tests/mprime/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 4
@@ -615,8 +615,8 @@
         },
         {
             "name": "Pathwaysmetric",
-            "domain_file": "tests/numeric/pathwaysmetric/domain.pddl",
-            "task_file": "tests/numeric/pathwaysmetric/test-1.pddl",
+            "domain_file": "numeric/tests/pathwaysmetric/domain.pddl",
+            "task_file": "numeric/tests/pathwaysmetric/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -628,8 +628,8 @@
         },
         {
             "name": "Rover",
-            "domain_file": "tests/numeric/rover/domain.pddl",
-            "task_file": "tests/numeric/rover/test-1.pddl",
+            "domain_file": "numeric/tests/rover/domain.pddl",
+            "task_file": "numeric/tests/rover/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 5
@@ -641,8 +641,8 @@
         },
         {
             "name": "Sailing",
-            "domain_file": "tests/numeric/sailing/domain.pddl",
-            "task_file": "tests/numeric/sailing/test-1.pddl",
+            "domain_file": "numeric/tests/sailing/domain.pddl",
+            "task_file": "numeric/tests/sailing/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -654,8 +654,8 @@
         },
         {
             "name": "Settersnumeric",
-            "domain_file": "tests/numeric/settersnumeric/domain.pddl",
-            "task_file": "tests/numeric/settersnumeric/test-1.pddl",
+            "domain_file": "numeric/tests/settersnumeric/domain.pddl",
+            "task_file": "numeric/tests/settersnumeric/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 2
@@ -667,8 +667,8 @@
         },
         {
             "name": "Sugar",
-            "domain_file": "tests/numeric/sugar/domain.pddl",
-            "task_file": "tests/numeric/sugar/test-1.pddl",
+            "domain_file": "numeric/tests/sugar/domain.pddl",
+            "task_file": "numeric/tests/sugar/test-1.pddl",
             "configs": {
                 "unit": {
                     "h": 3

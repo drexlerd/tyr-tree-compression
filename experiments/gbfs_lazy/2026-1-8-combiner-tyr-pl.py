@@ -11,14 +11,18 @@ from lab.reports import Attribute, geometric_mean
 
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent.parent
-SUITES_DIR = REPO / "data" / "planning-benchmarks" / "suites" / "classical"
 
 sys.path.append(str(DIR.parent.parent))
-sys.path.insert(0, str(SUITES_DIR))
 
 from experiments.parser_search import SearchParser
 
-from suite import SUITE_IPC_SATISFICING_ADL, SUITE_IPC_SATISFICING_STRIPS, SUITE_HTG, SUITE_AUTOSCALE_AGILE_STRIPS
+from pypddl_datasets import suites as _suites
+
+# old eval data records bare domain names, so strip the collection prefixes
+SUITE_IPC_SATISFICING_ADL = [name.rsplit("/", 1)[-1] for name in _suites.SUITE_IPC_SATISFICING_ADL]
+SUITE_IPC_SATISFICING_STRIPS = [name.rsplit("/", 1)[-1] for name in _suites.SUITE_IPC_SATISFICING_STRIPS]
+SUITE_HTG = [name.rsplit("/", 1)[-1] for name in _suites.SUITE_HTG]
+SUITE_AUTOSCALE_AGILE_STRIPS = [name.rsplit("/", 1)[-1] for name in _suites.SUITE_AUTOSCALE_AGILE_STRIPS]
 
 # Create custom report class with suitable info and error attributes.
 class BaseReport(AbsoluteReport):
