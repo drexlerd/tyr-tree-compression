@@ -8,10 +8,11 @@ with their failure reason.
 
 ## Data Layout
 
-Keep benchmark instances in the same domain directory:
+Benchmark files come from the [pypddl-datasets](https://pypi.org/project/pypddl-datasets/)
+cache; suite entries are paths relative to its data root, e.g.:
 
 ```text
-data/benchmarks/profiling/<suite>/<domain>/
+classical/profiling/<domain>/
   domain.pddl
   profiling-1.pddl
   profiling-2.pddl
@@ -24,7 +25,6 @@ Example:
 
 ```json
 {
-  "prefix": "data/benchmarks",
   "domains": {
     "blocksworld-large-simple": {
       "domain_file": "classical/profiling/blocksworld-large-simple/domain.pddl",

@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <filesystem>
 #include "statistics.hpp"
 
 namespace p = tyr::planning;
@@ -55,8 +56,8 @@ SiwExpectation parse_expectation(const boost::json::object& object)
 SiwCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
     auto result = SiwCase { ygg::common::as_string(object, "name", "case"),
-                            ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                            ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")),
+                            ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "domain_file", "case")),
+                            ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "task_file", "case")),
                             ygg::common::as_uint_t(suite, "max_arity", "suite"),
                             {} };
     for (const auto& [key, value] : object)

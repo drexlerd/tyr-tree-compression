@@ -46,8 +46,8 @@ void PrintTo(const ParserSymbolIndexStabilityCase& test_case, std::ostream* os) 
 ParserSymbolIndexStabilityCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
     return ParserSymbolIndexStabilityCase { ygg::common::as_string(object, "name", "case"),
-                                            ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                                            ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
+                                            ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "domain_file", "case")),
+                                            ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "task_file", "case")) };
 }
 
 std::vector<ParserSymbolIndexStabilityCase> load_cases()

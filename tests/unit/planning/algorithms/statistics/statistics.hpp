@@ -165,8 +165,8 @@ inline void PrintTo(const SearchCase& test_case, std::ostream* os) { *os << test
 inline SearchCase parse_search_case(const boost::json::object& suite, const boost::json::object& object)
 {
     auto result = SearchCase { ygg::common::as_string(object, "name", "case"),
-                               ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                               ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")),
+                               ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "domain_file", "case")),
+                               ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "task_file", "case")),
                                {} };
     for (const auto& [key, value] : object)
         if (value.is_object() && value.as_object().if_contains("num_generated"))

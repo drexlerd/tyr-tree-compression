@@ -22,16 +22,6 @@ Tyr is designed to address several challenges in modern planning systems:
 
 - **Memory model**: Tyr stores generated data in hierarchically structured, geometrically growing buffers. For variable-sized objects, it uses [Cista](https://github.com/felixguendling/cista) for serialization and zero-copy deserialization. This design allows derived buffers to inherit data from parent buffers without duplication. For example, multiple tasks can share a domain, and multiple workers can share task data.
   
-# Benchmark Data
-
-Benchmarks are provided by the [pypddl-datasets](https://pypi.org/project/pypddl-datasets/)
-package (installed with the `test` extra) and downloaded on demand. The C++ test and
-profiling fixtures expect them materialized under `data/benchmarks`:
-
-```sh
-python -c "import pypddl_datasets as pb; [pb.export_suite(s, 'data/benchmarks') for s in ('tests-classical', 'tests-numeric', 'profiling-htg', 'profiling-ipc2023-numeric')]"
-```
-
 # Getting Started
 
 The library consists of a **formalism** and a **planning** component. The formalism component is responsible for representing PDDL entities. The planning component provides functionality for implementing search algorithms, as well as off-the-shelf implementations of eager A*, lazy GBFS, and heuristics such as blind, max, add, and FF. Below is a minimal overview of the Python and C++ APIs for implementing custom search algorithms.
@@ -121,8 +111,9 @@ auto labeled_successor_nodes = successor_generator->get_labeled_successor_nodes(
 
 Tyr consumes native dependencies from Python packages:
 
-- `pyyggdrasil >= 0.0.18, < 0.1` for shared third-party native dependencies.
-- `pypddl >= 1.0.21, < 1.1` for Loki's PDDL parser library, headers, and CMake package.
+- `pyyggdrasil >= 0.0.21, < 0.1` for shared third-party native dependencies.
+- `pypddl >= 1.0.23, < 1.1` for Loki's PDDL parser library, headers, and CMake package.
+- `pypddl-datasets >= 0.0.5, < 0.1` for the PDDL benchmark data used by the C++ test and profiling fixtures (resolved from its cache at CMake configure time).
 
 The shared workspace layout, layered install order, and the common
 build-from-source and CMake-integration patterns are documented in the
@@ -135,7 +126,7 @@ Install Tyr's native dependency providers into the active Python environment,
 then configure CMake with their native prefixes:
 
 ```console
-python -m pip install 'pyyggdrasil>=0.0.21,<0.1' 'pypddl>=1.0.21,<1.1'
+python -m pip install 'pyyggdrasil>=0.0.21,<0.1' 'pypddl>=1.0.23,<1.1' 'pypddl-datasets>=0.0.5,<0.1'
 
 cmake -S . -B build \
   -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \

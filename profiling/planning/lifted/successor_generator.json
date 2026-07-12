@@ -1,5 +1,4 @@
 {
-    "prefix": "data/benchmarks",
     "domains": {
         "blocksworld-large-simple": {
             "domain_file": "classical/profiling/blocksworld-large-simple/domain.pddl",
