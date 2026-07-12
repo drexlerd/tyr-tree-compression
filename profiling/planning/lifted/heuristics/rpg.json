@@ -1,5 +1,4 @@
 {
-    "prefix": "data/benchmarks",
     "domains": {
         "block-grouping": {
             "domain_file": "numeric/profiling/block-grouping/domain.pddl",

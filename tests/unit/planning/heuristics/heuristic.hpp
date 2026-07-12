@@ -82,8 +82,8 @@ inline HeuristicExpectation parse_expectation(const std::string& key, const boos
 inline HeuristicCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
     auto result = HeuristicCase { ygg::common::as_string(object, "name", "case"),
-                                  ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                                  ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")),
+                                  ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "domain_file", "case")),
+                                  ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "task_file", "case")),
                                   {} };
     if (const auto* configs_value = object.if_contains("configs"))
         for (const auto& [key, value] : configs_value->as_object())

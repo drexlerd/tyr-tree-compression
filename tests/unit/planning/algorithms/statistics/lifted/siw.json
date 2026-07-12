@@ -1,5 +1,4 @@
 {
-    "prefix": "data/benchmarks",
     "max_arity": 2,
     "cases": [
         {

@@ -17,6 +17,7 @@
 
 #include "planning/parser.hpp"
 
+#include <filesystem>
 #include <yggdrasil/serialization/json.hpp>
 #include <yggdrasil/serialization/json_suite.hpp>
 #include "tyr/formalism/formalism.hpp"
@@ -95,8 +96,8 @@ TEST(TyrTests, TyrFormalismPlanningInvariantsSynthesis)
 
         SCOPED_TRACE(name);
 
-        auto lifted_task = make_test_parser(ygg::common::suite_path(suite_object, ygg::common::as_string(case_object, "domain_file", "case")))
-                               .parse_task(ygg::common::suite_path(suite_object, ygg::common::as_string(case_object, "task_file", "case")));
+        auto lifted_task = make_test_parser(ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(case_object, "domain_file", "case")))
+                               .parse_task(ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(case_object, "task_file", "case")));
         auto& repository = *lifted_task.get_repository();
 
         auto actual = fpi::synthesize_invariants(lifted_task.get_task().get_domain());

@@ -64,7 +64,7 @@ std::vector<BenchmarkCase> load_cases()
 {
     const auto document = ygg::common::load_json_file(ygg::common::profiling_path("planning/lifted/heuristics/rpg.json"));
     const auto& root = ygg::common::as_object(document, "suite");
-    const auto prefix = ygg::common::suite_prefix_path(root);
+    const auto prefix = std::filesystem::path(BENCHMARKS_DIR);
     const auto& domains = ygg::common::as_object(root, "domains", "suite");
 
     auto result = std::vector<BenchmarkCase>();
